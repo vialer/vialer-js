@@ -1,0 +1,53 @@
+{
+    "manifest_version": 2,
+    "name": "Click-to-dial",
+    "description": "Click-to-dial web extension.",
+    "version": "2.0",
+    "homepage_url": "https://github.com/voipgrid/click-to-dial",
+    "icons": {
+        "16": "build/img/call-green-16.png",
+        "48": "build/img/clicktodial-big.png"
+    },
+    "browser_action": {
+        "default_icon": "build/img/call-gray.png",
+        "default_title": "Click-to-dial",
+        "default_popup": "build/click-to-dial-popup.html"
+    },
+    "background": {
+        "scripts": [
+            "build/js/lib/thirdparty/SIPml-api.js",
+            "build/js/lib/thirdparty/jquery/jquery.js",
+            "build/js/click-to-dial-bg.js"
+        ]
+    },
+    "permissions": [
+        "https://partner.voipgrid.nl/",
+        "*://*/*",
+        "contextMenus",
+        "notifications",
+        "storage",
+        "tabs"
+    ],
+    "content_security_policy": "script-src 'self' https://www.google-analytics.com 'unsafe-eval'; object-src 'self'",
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "build/js/lib/thirdparty/zepto.min.js",
+                "build/js/click-to-dial-tab.js"
+            ],
+            "run_at": "document_end",
+            "all_frames": true
+        }
+    ],
+    "options_page": "chrome/options/html/options.html",
+    "web_accessible_resources": [
+        "build/img/*.png",
+        "build/css/*.css",
+        "build/click-to-dial-callstatus.html",
+        "build/js/*.map"
+    ],
+    "default_locale": "en"
+}

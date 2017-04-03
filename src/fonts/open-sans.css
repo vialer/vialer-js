@@ -1,0 +1,43 @@
+@font-face {
+    font-family: 'Open Sans';
+    src: local('Open Sans'), local('OpenSans'), url('OpenSans-Regular-webfont.eot');
+    src: local('Open Sans'), local('OpenSans'), url('open-sans/OpenSans-Regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('open-sans/OpenSans-Regular-webfont.woff') format('woff'),
+         url('open-sans/OpenSans-Regular-webfont.ttf') format('truetype'),
+         url('open-sans/OpenSans-Regular-webfont.svg#OpenSansRegular') format('svg');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url('OpenSans-Semibold-webfont.eot');
+    src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url('open-sans/OpenSans-Semibold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('open-sans/OpenSans-Semibold-webfont.woff') format('woff'),
+         url('open-sans/OpenSans-Semibold-webfont.ttf') format('truetype'),
+         url('open-sans/OpenSans-Semibold-webfont.svg#OpenSansSemibold') format('svg');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: local('Open Sans Italic'), local('OpenSans-Italic'), url('OpenSans-Italic-webfont.eot');
+    src: local('Open Sans Italic'), local('OpenSans-Italic'), url('open-sans/OpenSans-Italic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('open-sans/OpenSans-Italic-webfont.woff') format('woff'),
+         url('open-sans/OpenSans-Italic-webfont.ttf') format('truetype'),
+         url('open-sans/OpenSans-Italic-webfont.svg#OpenSansItalic') format('svg');
+    font-weight: 400;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Open Sans';
+    src: local('Open Sans Semibold Italic'), local('OpenSans-SemiboldItalic'), url('OpenSans-SemiboldItalic-webfont.eot');
+    src: local('Open Sans Semibold Italic'), local('OpenSans-SemiboldItalic'), url('open-sans/OpenSans-SemiboldItalic-webfont.eot?#iefix') format('embedded-opentype'),
+         url('open-sans/OpenSans-SemiboldItalic-webfont.woff') format('woff'),
+         url('open-sans/OpenSans-SemiboldItalic-webfont.ttf') format('truetype'),
+         url('open-sans/OpenSans-SemiboldItalic-webfont.svg#OpenSansSemiboldItalic') format('svg');
+    font-weight: 600;
+    font-style: italic;
+}

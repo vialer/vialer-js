@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="nl">
+    <head>
+        <meta charset="utf-8" />
+        <link href="fonts/font-awesome.css" rel="stylesheet" />
+        <link href="fonts/open-sans.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
+        <script src="js/lib/thirdparty/zepto.min.js"></script>
+        <script src="js/lib/thirdparty/translate/chrome-i18n-html-translate.js"></script>
+        <script src="js/click-to-dial-callstatus.js"></script>
+
+    </head>
+    <body>
+        <div class="voipgrid-status">
+            <p class="heading">
+                <i class="fa fa-fw fa-phone-square fa-vertical-align"></i>
+                <span data-i18n-content="clicktodialTitle"></span>
+                <span id="number">?</span>
+                <i id="close" class="close fa fa-fw fa-times-circle pull-right"></i>
+            </p>
+            <p class="status">
+                <span class="status-label" data-i18n-content="clicktodialStatusLabel"></span>
+                <span id="status" class="status-text"></span>
+            </p>
+        </div>
+    </body>
+</html>

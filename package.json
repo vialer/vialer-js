@@ -1,0 +1,56 @@
+{
+  "name": "click-to-dial",
+  "version": "1.0.0",
+  "description": "click-to-dial web extension for Firefox, Chrome & Electron desktop app.",
+  "main": "click-to-dial.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "desktop": "electron main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voipgrid/click-to-dial.git"
+  },
+  "keywords": [
+    "sip",
+    "javascript",
+    "voipgrid"
+  ],
+  "author": "Devhouse Spindle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/voipgrid/click-to-dial/issues"
+  },
+  "homepage": "https://github.com/voipgrid/click-to-dial#readme",
+  "devDependencies": {
+    "browserify": "^14.1.0",
+    "connect": "^3.6.0",
+    "connect-mount": "^1.0.0",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-add-src": "^0.2.0",
+    "gulp-clean-css": "^3.0.4",
+    "gulp-concat": "^2.6.1",
+    "gulp-envify": "^1.0.0",
+    "gulp-gh-pages": "^0.5.4",
+    "gulp-help": "^1.6.1",
+    "gulp-if-else": "^1.0.3",
+    "gulp-jsdoc3": "^1.0.1",
+    "gulp-livereload": "^3.8.1",
+    "gulp-notify": "^3.0.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-size": "^2.1.0",
+    "gulp-sourcemaps": "^2.5.0",
+    "gulp-uglify": "^3.0.0",
+    "gulp-zip": "^4.0.0",
+    "jsdoc-rtd": "^1.0.3",
+    "run-sequence": "^1.2.2",
+    "serve-static": "^1.12.1",
+    "uglify-es": "^3.0.14",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.9.0",
+    "yargs": "^7.0.2"
+  },
+  "dependencies": {}
+}
