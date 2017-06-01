@@ -30,12 +30,12 @@ class QueuesModule {
                 if (this.sizes && this.sizes.hasOwnProperty(id)) {
                     size = this.sizes[id]
                 }
-                chrome.browserAction.setIcon({path: this.getIconForSize(size)})
+                this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
             } else {
                 // Restore availability icon.
                 if (widgetsData.availability) {
                     this.app.logger.info(`${this}set availability icon`)
-                    chrome.browserAction.setIcon({path: this.app.store.get('widgets').availability.icon})
+                    this.app.browser.browserAction.setIcon({path: this.app.store.get('widgets').availability.icon})
                 }
             }
 
@@ -199,7 +199,7 @@ class QueuesModule {
 
                         // Update icon for toolbarbutton if this queuecallgroup was selected earlier.
                         if (response.id === this.app.store.get('widgets').queues.selected) {
-                            chrome.browserAction.setIcon({path: this.getIconForSize(size)})
+                            this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
                         }
 
                         this.sizes[response.id] = size

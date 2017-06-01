@@ -4,7 +4,7 @@
 const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
 // This style's intention is to hide the icons when printing.
-const printStyle = $(`<link rel="stylesheet" href="${chrome.runtime.getURL('build/css/print.css')}" media="print">`)
+const printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('build/css/print.css')}" media="print">`)
 
 
 class Observer {
@@ -45,7 +45,7 @@ class Observer {
         let iconStyle = {
             // 'background-attachment': 'scroll',  // this is set later, conditionally
             'background-color': 'transparent !important',
-            'background-image': 'url("' + chrome.runtime.getURL('build/img/clicktodial.png') + '")',
+            'background-image': 'url("' + this.app.browser.runtime.getURL('build/img/clicktodial.png') + '")',
             'background-repeat': 'no-repeat',
             'bottom': '-3px !important',
             'background-position': 'center center',
@@ -205,10 +205,10 @@ class Observer {
 
             // Dial the b_number.
             let b_number = $(this).attr('href').substring(4)
-            chrome.runtime.sendMessage({'clicktodial.dial': {'b_number': b_number}})
+            this.app.browser.runtime.sendMessage({'clicktodial.dial': {'b_number': b_number}})
         })
 
-        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        this.app.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request === 'page.observer.stop') {
                 this.app.logger.debug(`${this} page.observer.stop triggered`)
                 // Stop listening to DOM mutations.

@@ -75,14 +75,14 @@ class ClickToDialApp extends App {
 
             if (this.env.extension && this.env.extension.background) {
                 this.logger.info(`${this}set icon to available because of login`)
-                chrome.browserAction.setIcon({path: 'build/img/call-green.png'})
+                this.browser.browserAction.setIcon({path: 'build/img/call-green.png'})
             }
         }
     }
 
 
     translate(messageID, args) {
-        return chrome.i18n.getMessage(messageID, args)
+        return this.browser.i18n.getMessage(messageID, args)
     }
 
 
@@ -90,7 +90,7 @@ class ClickToDialApp extends App {
      * Return the current version of the app.
      */
     version() {
-        return chrome.runtime.getManifest().version
+        return this.browser.runtime.getManifest().version
     }
 }
 

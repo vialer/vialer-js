@@ -75,7 +75,7 @@ class Api {
                         if (window.webkitNotifications) {
                             webkitNotifications.createNotification('', '', this.app.translate('unauthorizedNotificationText')).show()
                         } else {
-                            chrome.notifications.create('unauthorized', {
+                            this.app.browser.notifications.create('unauthorized', {
                                 type: 'basic',
                                 iconUrl: '',
                                 title: this.app.translate('unauthorizedNotificationText'),

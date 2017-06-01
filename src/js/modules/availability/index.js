@@ -82,7 +82,7 @@ class AvailabilityModule {
                 widgetsData.availability.icon = icon
                 this.app.store.set('widgets', widgetsData)
                 if (widgetsData.queues && !widgetsData.queues.selected) {
-                    chrome.browserAction.setIcon({path: icon})
+                    this.app.browser.browserAction.setIcon({path: icon})
                 }
                 let userData = this.app.store.get('user')
                 userData.userdestination.selecteduserdestination.fixeddestination = content.fixeddestination
@@ -151,7 +151,7 @@ class AvailabilityModule {
                 }
                 this.app.logger.info(`${this}setting icon ${icon}`)
                 if (!widgetsData.queues.selected) {
-                    chrome.browserAction.setIcon({path: icon})
+                    this.app.browser.browserAction.setIcon({path: icon})
                 }
 
                 // Save icon in storage.
@@ -176,7 +176,7 @@ class AvailabilityModule {
     reset() {
         this.app.emit('availability.reset')
         this.app.logger.info(`${this}set icon to grey`)
-        chrome.browserAction.setIcon({path: 'build/img/call-gray.png'})
+        this.app.browser.browserAction.setIcon({path: 'build/img/call-gray.png'})
     }
 
 
@@ -212,7 +212,7 @@ class AvailabilityModule {
         if (widgetsData.availability.icon) {
             if (!widgetsData.queues.selected) {
                 this.app.logger.info(`${this}set availability icon`)
-                chrome.browserAction.setIcon({path: widgetsData.availability.icon})
+                this.app.browser.browserAction.setIcon({path: widgetsData.availability.icon})
             }
         }
 
