@@ -60,7 +60,7 @@ class Dialer {
             let notificationCallback = () => {
                 // Without clearing you can't trigger notifications with the same notificationId (quickly).
                 openNotificationTimeout = setTimeout(() => {
-                    chrome.notifications.clear(notificationId, (wasCleared) => {})
+                    this.app.browser.notifications.clear(notificationId, (wasCleared) => {})
                     clearTimeout(openNotificationTimeout)
                     openNotificationTimeout = undefined
                 }, 3000)
@@ -69,11 +69,11 @@ class Dialer {
                 clearTimeout(openNotificationTimeout)
                 openNotificationTimeout = undefined
                 text = text + ' (update)'
-                chrome.notifications.update(notificationId, {title: text}, notificationCallback)
+                this.app.browser.notifications.update(notificationId, {title: text}, notificationCallback)
             } else {
-                chrome.notifications.create(notificationId, {
+                this.app.browser.notifications.create(notificationId, {
                     type: 'basic',
-                    iconUrl: chrome.runtime.getURL('build/img/clicktodial-big.png'),
+                    iconUrl: this.app.browser.runtime.getURL('build/img/clicktodial-big.png'),
                     title: text,
                     message: '',
                 }, notificationCallback)

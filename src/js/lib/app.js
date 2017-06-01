@@ -24,10 +24,17 @@ class App extends EventEmitter {
         this.logger.debug(`${this} init`)
         this.env = this.getEnvironment(options.environment)
 
+        // If browser exists, use browser, otherwise take the Chrome API.
+        if ('browser' in global) {
+            this.browser = browser
+        } else {
+            this.browser = chrome
+        }
+
         // Make the EventEmitter .on method compatible with web extension ipc.
-        if (chrome && chrome.extension) {
+        // if (chrome && chrome.extension) {
             // An Ipc event is coming in. Map it to the EventEmitter.
-            chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (this.verbose) this.logger.debug(`${this}${request.event} triggered`)
                 if (request.data) {
                     // Add extra contextual information about sender to the payload.
@@ -48,7 +55,7 @@ class App extends EventEmitter {
                 })
             }
 
-        }
+        // }
     }
 
 
@@ -62,13 +69,13 @@ class App extends EventEmitter {
      */
     emit(event, data = {}, skipExtension = false, tabId = false, parent = false) {
         if (this.verbose) this.logger.debug(`${this} emit ${event}`)
-        if (chrome.extension && !skipExtension) {
+        if (this.browser.extension && !skipExtension) {
             let payloadArgs = []
             let payloadData = {event: event, data: data}
             payloadArgs.push(payloadData)
 
             if (tabId) {
-                chrome.tabs.sendMessage(tabId, payloadData)
+                this.browser.tabs.sendMessage(tabId, payloadData)
                 return
             } else if (parent) {
                 parent.postMessage({
@@ -81,7 +88,7 @@ class App extends EventEmitter {
             if (data && data.callback) {
                 payloadArgs.push(data.callback)
             }
-            chrome.runtime.sendMessage(...payloadArgs)
+            this.browser.runtime.sendMessage(...payloadArgs)
         } else {
             super.emit(event, data)
         }
@@ -113,7 +120,7 @@ class App extends EventEmitter {
      * Use `app.devMode`to do more things when in dev mode.
      */
     get devMode() {
-        return !('update_url' in chrome.runtime.getManifest())
+        return !('update_url' in this.browser.runtime.getManifest())
     }
 
 

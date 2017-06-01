@@ -44,7 +44,7 @@ class PageActions extends Actions {
         }
 
         this.frame = $('<iframe>', {
-            src: chrome.runtime.getURL(`build/click-to-dial-callstatus.html?callid=${callid}`),
+            src: this.app.browser.runtime.getURL(`build/click-to-dial-callstatus.html?callid=${callid}`),
             style: (function() {
                 // Cannot set !important with .css("property", "value !important"),
                 // so build a string to use as style.

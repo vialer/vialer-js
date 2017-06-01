@@ -147,7 +147,7 @@ class Sip {
         this.app.logger.debug(`${this} startStack`)
         this.callbacks = callbacks
         let userAgent = `WebSIP v${this.app.version()} w/ sipML5 v${this.version()}`
-        if (!('update_url' in chrome.runtime.getManifest())) {
+        if (!('update_url' in this.app.browser.runtime.getManifest())) {
             userAgent += ' (dev=true)'
         }
         let user = this.app.store.get('user')
@@ -331,7 +331,7 @@ class Sip {
         // assume the directory name is "simpl5-{VERSION}"
         let pathPrefix = 'sipml5-'
         let version
-        chrome.runtime.getManifest().background.scripts.forEach((file) => {
+        this.app.browser.runtime.getManifest().background.scripts.forEach((file) => {
             if (file.indexOf('SIPml') > 0) {
                 version = file.substring(file.indexOf(pathPrefix), file.substring(file.indexOf(pathPrefix)).indexOf('/') + file.indexOf(pathPrefix)).substring(pathPrefix.length)
                 return;

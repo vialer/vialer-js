@@ -66,7 +66,7 @@ class PanelsActions extends Actions {
         this.app.on('help', (data) => {
             // Open the plugin wiki page.
             this.app.logger.info(`${this}mainpanel.help`)
-            chrome.tabs.create({url: 'http://wiki.voipgrid.nl/index.php/Chrome_plugin'})
+            this.app.browser.tabs.create({url: 'http://wiki.voipgrid.nl/index.php/Chrome_plugin'})
         })
 
         this.app.on('settings', (data) => {
@@ -86,7 +86,7 @@ class PanelsActions extends Actions {
                 }
 
                 let platformUrl = this.app.api.getPlatformUrl()
-                chrome.tabs.create({url: platformUrl + path})
+                this.app.browser.tabs.create({url: platformUrl + path})
             };
 
             this.app.api.asyncRequest(this.app.api.getUrl('autologin'), null, 'get', {
@@ -283,7 +283,7 @@ class PanelsActions extends Actions {
             this.app.emit('logout.attempt')
         })
         $('#popout').click((e) => {
-            chrome.tabs.create({url: chrome.runtime.getURL('/data/panel/html/popout.html')})
+            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('/data/panel/html/popout.html')})
         })
         $('#help').click((e) => {
             this.app.emit('help')

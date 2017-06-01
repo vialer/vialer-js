@@ -45,9 +45,9 @@ class PageModule {
                 this.app.logger.debug(`${this}setting context menuitem`)
 
                 // Remove all previously added context menus.
-                chrome.contextMenus.removeAll()
+                this.app.browser.contextMenus.removeAll()
                 // Add context menu to dial selected number.
-                this.contextMenuItem = chrome.contextMenus.create({
+                this.contextMenuItem = this.app.browser.contextMenus.create({
                     title: this.app.translate('contextMenuLabel'),
                     contexts: ['selection'],
                     onclick: (info, tab) => {
@@ -66,8 +66,8 @@ class PageModule {
         // Dial given number.
         // Block chrome pages.
         if (new RegExp('^chrome').test(data.sender.tab.url) &&
-            data.sender.tab.url !== chrome.runtime.getURL('data/panel/html/panel.html') &&
-            data.sender.tab.url !== chrome.runtime.getURL('data/panel/html/popout.html')
+            data.sender.tab.url !== this.app.browser.runtime.getURL('data/panel/html/panel.html') &&
+            data.sender.tab.url !== this.app.browser.runtime.getURL('data/panel/html/popout.html')
         ) {
             return
         }
@@ -81,13 +81,13 @@ class PageModule {
 
     reset() {
         if (this.contextMenuItem) {
-            chrome.contextMenus.remove(this.contextMenuItem)
+            this.app.browser.contextMenus.remove(this.contextMenuItem)
         }
 
         if (this.app.store.get('c2d')) {
-            chrome.tabs.query({}, function(tabs) {
+            this.app.browser.tabs.query({}, function(tabs) {
                 tabs.forEach(function(tab) {
-                    chrome.tabs.sendMessage(tab.id, 'page.observer.stop')
+                    this.app.browser.tabs.sendMessage(tab.id, 'page.observer.stop')
                 })
             })
         }
