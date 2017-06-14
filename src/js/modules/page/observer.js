@@ -4,7 +4,7 @@
 const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
 // This style's intention is to hide the icons when printing.
-const printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('build/css/print.css')}" media="print">`)
+
 
 
 class Observer {
@@ -17,6 +17,8 @@ class Observer {
         this.observer = null
         this.handleMutationsTimeout = null
         this.parkedNodes = []
+
+        const printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('build/css/print.css')}" media="print">`)
     }
 
 
@@ -152,7 +154,7 @@ class Observer {
         this.app.logger.debug(`${this} start observing`)
 
         // Inject our print stylesheet.
-        $('head').append(printStyle)
+        $('head').append(this.printStyle)
 
         // Insert icons.
         let before = new Date().getTime()
@@ -196,15 +198,15 @@ class Observer {
         /**
          * Click event handler: dial the number in the attribute `href`.
          */
-        $('body').on('click', '[href^="tel:"]', function(event) {
-            $(this).blur()
+        $('body').on('click', '[href^="tel:"]', (e) => {
+            $(e.currentTarget).blur()
             // Don't do anything with this click in the actual page.
-            event.preventDefault()
-            event.stopPropagation()
-            event.stopImmediatePropagation()
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
 
             // Dial the b_number.
-            let b_number = $(this).attr('href').substring(4)
+            let b_number = $(e.currentTarget).attr('href').substring(4)
             this.app.browser.runtime.sendMessage({'clicktodial.dial': {'b_number': b_number}})
         })
 
@@ -216,7 +218,7 @@ class Observer {
                 // Remove icons.
                 this.undoInsert()
                 // Remove our stylesheet.
-                $(printStyle).remove()
+                $(this.printStyle).remove()
             }
         })
 

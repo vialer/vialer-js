@@ -85,8 +85,8 @@ class PageModule {
         }
 
         if (this.app.store.get('c2d')) {
-            this.app.browser.tabs.query({}, function(tabs) {
-                tabs.forEach(function(tab) {
+            this.app.browser.tabs.query({}, (tabs) => {
+                tabs.forEach((tab) => {
                     this.app.browser.tabs.sendMessage(tab.id, 'page.observer.stop')
                 })
             })
