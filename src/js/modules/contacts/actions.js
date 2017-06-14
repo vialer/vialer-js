@@ -31,7 +31,6 @@ class ContactsActions extends Actions {
             }
         })
 
-
         this.app.on('contacts.connecting', (data) => {
             this.app.logger.debug(`${this}contacts.connecting triggered`)
             $('.contacts .connection-icon').hide().filter('.connecting').css('display', 'inline-block')
@@ -43,8 +42,8 @@ class ContactsActions extends Actions {
             $('.contacts .connection-icon').hide().filter('.no-connection').css('display', 'inline-block')
         })
 
-        this.app.on('contacts.connected', (data) => {
-            this.app.logger.debug(`${this}contacts.connected triggered`)
+        this.app.on('sip:presence_ready', (data) => {
+            this.app.logger.debug(`${this}sip:presence_ready triggered`)
             $('.contacts .connection-icon').hide()
         })
 

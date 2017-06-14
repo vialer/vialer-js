@@ -8,7 +8,7 @@ const Actions = require('../../lib/actions')
  */
 class LoaderActions extends Actions {
     /**
-     * When retrieving data for widget, display an indicator.
+     * Display an indicator when retrieving data for widget.
      */
     busyWidget(widgetOrWidgetName) {
         this.app.logger.debug(`${this}busy widget`)

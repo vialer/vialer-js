@@ -14,58 +14,61 @@ class ContactsModule {
         this.app = app
         this.app.modules.contacts = this
         this.actions = new ContactsActions(app)
+
+        if (this.app.env.extension.background) {
+            this.background()
+        }
     }
 
 
-    initializeSIPmlCallback() {
-        this.app.logger.info(`${this}initializeSIPmlCallback`)
-        this.app.sip.startStack({
-            starting: () => {
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.contacts.status = 'connecting'
-                this.app.store.set('widgets', widgetsData)
-                this.app.emit('contacts.connecting')
-            },
-            failed_to_start: () => {
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.contacts.status = 'failed_to_start'
-                this.app.store.set('widgets', widgetsData)
-                this.app.emit('contacts.failed_to_start')
-            },
-            started: () => {
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.contacts.status = 'connected'
-                this.app.store.set('widgets', widgetsData)
+    /**
+     * Register local events; e.g. events that are triggered from the background
+     * and handled by the background.
+     */
+    background() {
+        this.app.logger.info(`${this}listen for sip events`)
 
-                $.each(widgetsData.contacts.list, (n, contact) => {
-                    setTimeout(() => {
-                        this.app.sip.subscribe('' + contact.account_id)
-                    }, n * 200)
-                })
-                setTimeout(() => {
-                    this.app.emit('contacts.connected')
-                }, widgetsData.contacts.list.length * 200)
-            },
-            stopped: () => {
-                let widgetsData = this.app.store.get('widgets')
-                if (widgetsData) {
-                    widgetsData.contacts.status = 'disconnected'
-                    this.app.store.set('widgets', widgetsData)
-                }
-
-                this.app.emit('contacts.disconnected')
-            },
+        this.app.on('sip:starting', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            widgetsData.contacts.status = 'connecting'
+            this.app.store.set('widgets', widgetsData)
+            this.app.emit('contacts.connecting')
         })
+
+        this.app.on('sip:started', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            widgetsData.contacts.status = 'connected'
+            this.app.store.set('widgets', widgetsData)
+            let accountIds = widgetsData.contacts.list.map((c) => c.account_id)
+            this.app.sip.updatePresence(accountIds, true)
+        })
+
+        this.app.on('sip:failed_to_start', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            widgetsData.contacts.status = 'failed_to_start'
+            this.app.store.set('widgets', widgetsData)
+            this.app.emit('contacts.failed_to_start')
+        })
+
+        this.app.on('sip:stopped', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            if (widgetsData) {
+                widgetsData.contacts.status = 'disconnected'
+                this.app.store.set('widgets', widgetsData)
+            }
+            this.app.emit('contacts.disconnected')
+        })
+
     }
 
 
+    /**
+     * Module load function inits some stuff. The update property is true when
+     * refreshing the plugin.
+     */
     load(update) {
-        if (!this.app.env.extension.background) {
-            return
-        }
-        if (!update) {
-            this.app.timer.registerTimer('contacts.reconnect', this.reconnect)
-        }
+        if (!this.app.env.extension.background) return
+
         let phoneaccountUrl = `${this.app.api.getUrl('phoneaccount')}?active=true&order_by=description`
         this.app.api.asyncRequest(phoneaccountUrl, null, 'get', {
             onComplete: () => {
@@ -98,23 +101,17 @@ class ContactsModule {
                                 if (update) {
                                     this.updateSubscriptions(true)
                                 } else {
-                                    this.startSubscriptions()
+                                    this.app.sip.initStack()
                                 }
                             },
                         })
                     } else {
                         this.app.emit('contacts.empty')
-                        // Cancel active subscriptions.
-                        // this.app.sip.stop();
                     }
                 }
             },
             onNotOk: () => {
-                // Stop reconnection attempts.
-                this.app.timer.stopTimer('contacts.reconnect')
-
-                // Cancel active subscriptions.
-                this.app.sip.stop()
+                this.app.sip.disconnect()
             },
             onUnauthorized: () => {
                 this.app.logger.info(`${this}unauthorized contacts`)
@@ -126,35 +123,9 @@ class ContactsModule {
                 // Display an icon explaining the user lacks permissions to use
                 // this feature of the plugin.
                 this.app.emit('widget.unauthorized', {name: 'contacts'})
-                // Stop reconnection attempts.
-                this.app.timer.stopTimer('contacts.reconnect')
-                // Cancel active subscriptions.
-                this.app.sip.stop()
+                this.app.sip.disconnect()
             },
         })
-    }
-
-
-    /**
-     * Reconnect to presence resource.
-     */
-    reconnect() {
-        if (this.app.timer.getRegisteredTimer('contacts.reconnect')) {
-            this.startSubscriptions()
-        }
-    }
-
-
-    startSubscriptions() {
-        this.app.logger.debug(`${this}startSubscriptions`)
-        // Initialize SIPml if necessary.
-        if (this.app.sip.lib.isInitialized()) {
-            this.initializeSIPmlCallback()
-        } else {
-            this.app.sip.lib.init(this.initializeSIPmlCallback.bind(this), (event) => {
-                this.app.logger.error(`${this}failed to initialize the engine: ${event.message}`)
-            })
-        }
     }
 
 
@@ -164,9 +135,7 @@ class ContactsModule {
         this.app.emit('contacts.empty')
 
         // Stop reconnection attempts.
-        this.app.timer.stopTimer('contacts.reconnect')
-        this.app.timer.unregisterTimer('contacts.reconnect')
-        this.app.sip.stop()
+        this.app.sip.disconnect()
     }
 
 
@@ -205,15 +174,11 @@ class ContactsModule {
     }
 
 
-
     updateSubscriptions(reload) {
-        this.app.logger.info(`${this}updateSubscriptions`)
+        this.app.logger.info(`${this}updateSubscriptions with reload: ${reload}`)
         let widgetsData = this.app.store.get('widgets')
-        let account_ids = []
-        widgetsData.contacts.list.forEach((contact) => {
-            account_ids.push('' + contact.account_id)
-        })
-        this.app.sip.refresh(account_ids, reload)
+        let accountIds = widgetsData.contacts.list.map((c) => c.account_id)
+        this.app.sip.updatePresence(accountIds, reload)
     }
 }
 
