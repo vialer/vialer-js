@@ -16,7 +16,8 @@
         "chrome": true,
         "webkitNotifications": true,
         "tsip_event_code_e": true,
-        "tsip_transport_state_e": true
+        "tsip_transport_state_e": true,
+        "browser": true
     },
     "plugins": [
 

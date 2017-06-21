@@ -31,8 +31,8 @@ class App extends EventEmitter {
             this.browser = chrome
         }
 
-        // Make the EventEmitter .on method compatible with web extension ipc.
-        // if (chrome && chrome.extension) {
+        if (this.browser.extension) {
+            // Make the EventEmitter .on method compatible with web extension ipc.
             // An Ipc event is coming in. Map it to the EventEmitter.
             this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (this.verbose) this.logger.debug(`${this}${request.event} triggered`)
@@ -54,8 +54,7 @@ class App extends EventEmitter {
                     this.emit(e.data.event, e.data.data, true)
                 })
             }
-
-        // }
+        }
     }
 
 

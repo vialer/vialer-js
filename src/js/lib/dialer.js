@@ -115,15 +115,10 @@ class Dialer {
                 }
 
                 let callid = response.callid
-                let timerSuffix = `-${callid}`
-
+                // A silent call means there won't be a visible popup informing the user of the call's status.
+                // This is used  when clicking a voipaccount in the `Collegues` list.
                 if (silent) {
-                    /**
-                     * A silent call means there won't be a visible popup
-                     * informing the user of the call's status. Only in case
-                     * the call failed to connect both sides, a notification
-                     * will show.
-                     */
+                    // A notification will only show in case the call failed to connect both sides.
                     let silentTimerFunction = () => {
                         this.app.api.asyncRequest(`${this.app.api.getUrl('clicktodial')}${callid}/`, null, 'get', {
                             onOk: (_response) => {
@@ -131,8 +126,8 @@ class Dialer {
                                 // Stop after receiving these statuses.
                                 const statuses = ['connected', 'blacklisted', 'disconnected', 'failed_a', 'failed_b']
                                 if (statuses.includes(_response.status)) {
-                                    this.app.timer.stopTimer('callstatus.status' + timerSuffix)
-                                    this.app.timer.unregisterTimer('callstatus.status' + timerSuffix)
+                                    this.app.timer.stopTimer(`callstatus.status-${callid}`)
+                                    this.app.timer.unregisterTimer(`callstatus.status-${callid}`)
                                     // Show status in a notification in case it fails/disconnects.
                                     if (_response.status !== 'connected') {
                                         this.callStatusNotification(_response.status, b_number)
@@ -141,16 +136,16 @@ class Dialer {
                             },
                             onNotOk: () => {
                                 // Clear interval, stop timer.
-                                this.app.timer.stopTimer(`callstatus.status${timerSuffix}`)
-                                this.app.timer.unregisterTimer(`callstatus.status${timerSuffix}`)
+                                this.app.timer.stopTimer(`callstatus.status-${callid}`)
+                                this.app.timer.unregisterTimer(`callstatus.status-${callid}`)
                             },
                         })
                     }
 
-                    this.app.timer.registerTimer('callstatus.status' + timerSuffix, silentTimerFunction)
-                    this.app.timer.setInterval('callstatus.status' + timerSuffix, 1500)
+                    this.app.timer.registerTimer(`callstatus.status-${callid}`, silentTimerFunction)
+                    this.app.timer.setInterval(`callstatus.status-${callid}`, 1500)
                     // Instant start, no need to wait for panels in the browser to be visible.
-                    this.app.timer.startTimer('callstatus.status' + timerSuffix)
+                    this.app.timer.startTimer(`callstatus.status-${callid}`)
                 } else {
                     /**
                      * A non-silent call will display the call's status
@@ -162,7 +157,7 @@ class Dialer {
 
                     // Keep updating the call status to the panel.
                     const timerFunction = () => {
-                        if (this.app.timer.getRegisteredTimer(`callstatus.status${timerSuffix}`)) {
+                        if (this.app.timer.getRegisteredTimer(`callstatus.status-${callid}`)) {
                             this.app.api.asyncRequest(`${this.app.api.getUrl('clicktodial')}${callid}/`, null, 'get', {
                                 onOk: (_response) => {
                                     this.app.logger.info(`${this}clicktodial status:  ${_response.status}`)
@@ -170,8 +165,8 @@ class Dialer {
                                     // Stop after receiving these statuses.
                                     let statuses = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
                                     if (statuses.includes(_response.status)) {
-                                        this.app.timer.stopTimer(`callstatus.status${timerSuffix}`)
-                                        this.app.timer.unregisterTimer(`callstatus.status${timerSuffix}`)
+                                        this.app.timer.stopTimer(`callstatus.status-${callid}`)
+                                        this.app.timer.unregisterTimer(`callstatus.status-${callid}`)
                                     }
                                     // Update panel with latest status.
                                     this.app.emit('callstatus.status', {
@@ -182,15 +177,15 @@ class Dialer {
                                 },
                                 onNotOk: () => {
                                     // Clear interval, stop timer.
-                                    this.app.timer.stopTimer(`callstatus.status${timerSuffix}`)
-                                    this.app.timer.unregisterTimer(`callstatus.status${timerSuffix}`)
+                                    this.app.timer.stopTimer(`callstatus.status-${callid}`)
+                                    this.app.timer.unregisterTimer(`callstatus.status-${callid}`)
                                 },
                             })
                         }
                     }
 
-                    this.app.timer.registerTimer(`callstatus.status${timerSuffix}`, timerFunction)
-                    this.app.timer.setInterval(`callstatus.status${timerSuffix}`, 1500)
+                    this.app.timer.registerTimer(`callstatus.status-${callid}`, timerFunction)
+                    this.app.timer.setInterval(`callstatus.status-${callid}`, 1500)
 
                     // Tab listener.
                     this.app.on('callstatus.onshow', (data) => {
