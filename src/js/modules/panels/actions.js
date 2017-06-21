@@ -176,6 +176,13 @@ class PanelsActions extends Actions {
 
 
     popup() {
+        if (this.app.env.extension && this.app.env.extension.popout) {
+            $('body').addClass('popout')
+            $(() => {
+                this.app.loader.actions.openWidget('contacts')
+            })
+
+        }
         // keep track whether this popup is open or closed
         this.app.store.set('isMainPanelOpen', true)
 
@@ -283,7 +290,7 @@ class PanelsActions extends Actions {
             this.app.emit('logout.attempt')
         })
         $('#popout').click((e) => {
-            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('/data/panel/html/popout.html')})
+            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('/build/click-to-dial-popup.html?popout=true')})
         })
         $('#help').click((e) => {
             this.app.emit('help')

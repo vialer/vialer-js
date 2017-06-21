@@ -176,7 +176,7 @@
         "description": "Tekst zolang er nog geen status bekend is."
     },
     "contextMenuLabel": {
-        "message": "Bel geselecteerde nummer",
+        "message": "Bel het geselecteerde nummer",
         "description": "Tekst voor de optie in het rechtermuisknopmenu."
     },
     "optionsSaveText": {

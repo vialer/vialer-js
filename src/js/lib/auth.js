@@ -21,7 +21,7 @@ class Auth {
         this.app.store.remove('user')
         this.app.modules.panels.resetStorage()
         this.app.modules.panels.resetWidgets()
-        this.app.page.reset()
+        this.app.modules.page.reset()
         this.app.store.remove('username')
         this.app.store.remove('password')
     }

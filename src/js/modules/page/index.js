@@ -81,7 +81,7 @@ class PageModule {
 
     reset() {
         if (this.contextMenuItem) {
-            this.app.browser.contextMenus.remove(this.contextMenuItem)
+            this.app.browser.contextMenus.removeAll()
         }
 
         if (this.app.store.get('c2d')) {

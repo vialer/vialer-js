@@ -49,6 +49,9 @@ class PanelsModule {
     }
 
 
+    reset() {}
+
+
     /**
      * Reset storage.
      */

@@ -16,6 +16,8 @@ class App extends EventEmitter {
         this._listeners = 0
         this.name = options.name
 
+        this.utils = require('./utils')
+
         // Increases verbosity beyond the logger's debug level.
         this.verbose = false
         this.logger = new Logger()
@@ -101,10 +103,21 @@ class App extends EventEmitter {
      */
     getEnvironment(environment) {
         if (environment.extension) {
+            let searchParams = this.utils.parseSearch(location.search)
+            if (searchParams.popout) {
+                environment.extension.popout = true
+            } else {
+                environment.extension.popout = false
+            }
             if (global.chrome) {
                 environment.extension.isChrome = true
+                environment.extension.isFirefox = false
+            } else {
+                environment.extension.isChrome = false
+                environment.extension.isFirefox = true
             }
         }
+
         return environment
     }
 
