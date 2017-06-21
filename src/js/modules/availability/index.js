@@ -58,51 +58,6 @@ class AvailabilityModule {
     }
 
 
-    selectUserdestination(type, id) {
-        let content = {
-            fixeddestination: null,
-            phoneaccount: null,
-        }
-        if (type) {
-            content[type] = id
-        }
-
-        // Save selection.
-        let selecteduserdestinationUrl = this.app.api.getUrl('selecteduserdestination') + this.app.store.get('user').selectedUserdestinationId + '/'
-        this.app.api.asyncRequest(selecteduserdestinationUrl, content, 'put', {
-            onOk: () => {
-                this.app.logger.info(`${this}selected userdestination api request ok`)
-
-                // Set an icon depending on whether the user is available or not.
-                let icon = 'build/img/call-red.png'
-                if (id) {
-                    icon = 'build/img/call-green.png'
-                }
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.availability.icon = icon
-                this.app.store.set('widgets', widgetsData)
-                if (widgetsData.queues && !widgetsData.queues.selected) {
-                    this.app.browser.browserAction.setIcon({path: icon})
-                }
-                let userData = this.app.store.get('user')
-                userData.userdestination.selecteduserdestination.fixeddestination = content.fixeddestination
-                userData.userdestination.selecteduserdestination.phoneaccount = content.phoneaccount
-                this.app.store.set('user', userData)
-            },
-            onNotOk: () => {
-                // Jump back to previously selected (the one currently in cache).
-                this.restore()
-                // FIXME: Show a notification something went wrong?
-            },
-            onUnauthorized: () => {
-                // Jump back to previously selected (the one currently in cache)
-                this.restore()
-                // FIXME: Show a notification something went wrong?
-            },
-        })
-    }
-
-
     /**
      * Do an API request to get an update of the available userdestination
      * options when the module is loaded in the background.
@@ -218,6 +173,67 @@ class AvailabilityModule {
 
         // Restore availability.
         this.app.emit('availability.refresh')
+    }
+
+
+    selectUserdestination(type, id) {
+        let content = {
+            fixeddestination: null,
+            phoneaccount: null,
+        }
+        if (type) {
+            content[type] = id
+        }
+
+        // Save selection.
+        let selecteduserdestinationUrl = this.app.api.getUrl('selecteduserdestination') + this.app.store.get('user').selectedUserdestinationId + '/'
+        this.app.api.asyncRequest(selecteduserdestinationUrl, content, 'put', {
+            onOk: () => {
+                this.app.logger.info(`${this}selected userdestination api request ok`)
+
+                // Set an icon depending on whether the user is available or not.
+                let icon = 'build/img/call-red.png'
+                if (id) {
+                    icon = 'build/img/call-green.png'
+                }
+                let widgetsData = this.app.store.get('widgets')
+                widgetsData.availability.icon = icon
+                this.app.store.set('widgets', widgetsData)
+                if (widgetsData.queues && !widgetsData.queues.selected) {
+                    this.app.browser.browserAction.setIcon({path: icon})
+                }
+                let userData = this.app.store.get('user')
+                userData.userdestination.selecteduserdestination.fixeddestination = content.fixeddestination
+                userData.userdestination.selecteduserdestination.phoneaccount = content.phoneaccount
+                this.app.store.set('user', userData)
+            },
+            onNotOk: () => {
+                // Jump back to previously selected (the one currently in cache).
+                this.restore()
+                // FIXME: Show a notification something went wrong?
+            },
+            onUnauthorized: () => {
+                // Jump back to previously selected (the one currently in cache)
+                this.restore()
+                // FIXME: Show a notification something went wrong?
+            },
+        })
+    }
+
+
+    /**
+     * Enable/disable availability select depending on the choice set
+     * in the radio which asks whether the user is available or not.
+     */
+    toggleAvailabilitySelect() {
+        let isAvailable = $('.availability-toggle [name="availability"]:checked').val() === 'yes'
+        if (isAvailable) {
+            this.app.logger.debug(`${this}user is available`)
+            $('select#statusupdate').prop('disabled', false)
+        } else {
+            this.app.logger.debug(`${this}user is not available`)
+            $('select#statusupdate').prop('disabled', true)
+        }
     }
 
 

@@ -11,11 +11,11 @@ class Actions {
 
         if (this.app.env.extension) {
             if (this.app.env.extension.tab) {
-                this.tab(app)
+                this._tab(app)
             } else if (this.app.env.extension.popup) {
-                this.popup(app)
+                this._popup(app)
             } else if (this.app.env.extension.background) {
-                this.background(app)
+                this._background(app)
             }
         } else {
             // All actions are needed in an app-like setting.
@@ -23,16 +23,13 @@ class Actions {
     }
 
 
-    background() {}
+    _background() {}
 
 
-    popup() {}
+    _popup() {}
 
 
-    tab() {}
-
-
-    reset() {}
+    _tab() {}
 }
 
 module.exports = Actions

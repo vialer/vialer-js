@@ -14,8 +14,6 @@ class QueuesModule {
     constructor(app) {
         this.app = app
         this.app.modules.queues = this
-
-
         this.sizes = {}
         this.queuecallgroups = []
 
@@ -44,6 +42,19 @@ class QueuesModule {
             this.app.store.set('widgets', widgetsData)
             this.app.timer.update('queue.size')
         })
+    }
+
+
+    getIconForSize(size) {
+        let icon = '/build/img/queue.png'
+        if (!isNaN(size)) {
+            if (size < 10) {
+                icon = '/build/img/queue' + size + '.png'
+            } else {
+                icon = '/build/img/queue10.png'
+            }
+        }
+        return icon
     }
 
 
@@ -138,49 +149,10 @@ class QueuesModule {
     }
 
 
-    getIconForSize(size) {
-        let icon = '/build/img/queue.png'
-        if (!isNaN(size)) {
-            if (size < 10) {
-                icon = '/build/img/queue' + size + '.png'
-            } else {
-                icon = '/build/img/queue10.png'
-            }
-        }
-        return icon
-    }
-
-
     setQueueSizesTimer() {
         this.app.timer.registerTimer('queue.size', this.timerFunction.bind(this))
         this.app.timer.setTimeout('queue.size', this.timerTimeout.bind(this), true)
         this.app.timer.startTimer('queue.size')
-    }
-
-
-    /**
-     * Check for queue sizes on a variable timeout.
-     */
-    timerTimeout() {
-        let timeout = 0
-        // Only when authenticated.
-        if (this.app.store.get('user')) {
-            // at least every 20s when a queue is selected
-            if (this.app.store.get('widgets').queues.selected) {
-                timeout = 20000
-            }
-
-            // quicker if the panel is visible and the queues widget is open
-            if (this.app.store.get('isMainPanelOpen')) {
-                this.app.logger.info(`${this} main panel open; using smaller timeout for queues update`)
-                if (this.app.store.get('widgets').isOpen.queues) {
-                    timeout = 5000
-                }
-            }
-        }
-
-        this.app.logger.debug(`${this}timeout for queue.size event: ${timeout}`)
-        return timeout
     }
 
 
@@ -224,6 +196,32 @@ class QueuesModule {
                 })
             })
         }
+    }
+
+
+    /**
+     * Check for queue sizes on a variable timeout.
+     */
+    timerTimeout() {
+        let timeout = 0
+        // Only when authenticated.
+        if (this.app.store.get('user')) {
+            // at least every 20s when a queue is selected
+            if (this.app.store.get('widgets').queues.selected) {
+                timeout = 20000
+            }
+
+            // quicker if the panel is visible and the queues widget is open
+            if (this.app.store.get('isMainPanelOpen')) {
+                this.app.logger.info(`${this} main panel open; using smaller timeout for queues update`)
+                if (this.app.store.get('widgets').isOpen.queues) {
+                    timeout = 5000
+                }
+            }
+        }
+
+        this.app.logger.debug(`${this}timeout for queue.size event: ${timeout}`)
+        return timeout
     }
 
 

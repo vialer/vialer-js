@@ -8,14 +8,13 @@ const Actions = require('../../lib/actions')
  */
 class QueuesActions extends Actions {
 
-    popup() {
+    _popup() {
         if (!('queue' in window.cache)) {
             window.cache.queue = {
                 'list': [],
                 'selected': null,
             }
         }
-
 
         this.app.on('queues.reset', (data) => {
             let list = $('.queues .list')

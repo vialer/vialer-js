@@ -8,9 +8,9 @@ const Actions = require('../../lib/actions')
  */
 class ContactsActions extends Actions {
 
-    background() {}
+    _background() {}
 
-    popup() {
+    _popup() {
         let searchQuery = ''
 
         // This used to be contacts_popout.js

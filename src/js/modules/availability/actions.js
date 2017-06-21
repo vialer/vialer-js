@@ -7,23 +7,8 @@ const Actions = require('../../lib/actions')
  * All UI related actions for Availability.
  */
 class AvailabilityActions extends Actions {
-    /**
-     * Enable/disable availability select depending on the choice set
-     * in the radio which asks whether the user is available or not.
-     */
-    toggleAvailabilitySelect() {
-        let isAvailable = $('.availability-toggle [name="availability"]:checked').val() === 'yes'
-        if (isAvailable) {
-            this.app.logger.debug(`${this}user is available`)
-            $('select#statusupdate').prop('disabled', false)
-        } else {
-            this.app.logger.debug(`${this}user is not available`)
-            $('select#statusupdate').prop('disabled', true)
-        }
-    }
 
-
-    background() {
+    _background() {
         this.app.on('availability.select', (data) => {
             this.app.logger.debug(`${this}availability.select triggered`)
             this.module.selectUserdestination(data.type, data.id)
@@ -39,11 +24,11 @@ class AvailabilityActions extends Actions {
     }
 
 
-    popup() {
+    _popup() {
         // Refresh the availability select.
         this.app.on('availability.refresh', (data) => {
             this.app.logger.debug(`${this}availability.refresh triggered`)
-            this.toggleAvailabilitySelect()
+            this.module.toggleAvailabilitySelect()
         })
 
         // Empties the availability select.
@@ -58,7 +43,7 @@ class AvailabilityActions extends Actions {
             // Which suggests you're not available (based on the available data:
             // no possible destinations).
             $('.availability-toggle [name="availability"][value="no"]').prop('checked', true)
-            this.toggleAvailabilitySelect()
+            this.module.toggleAvailabilitySelect()
         })
 
         // Set the state of the availability select from the emitted data.
@@ -81,7 +66,7 @@ class AvailabilityActions extends Actions {
             // Update the radiobuttons depending on whether a selected option was provided or not.
             $(`.availability-toggle [name="availability"][value="${isAvailable}"]`).prop('checked', true);
             // In turn, check whether to enable/disable the dropdown.
-            this.toggleAvailabilitySelect()
+            this.module.toggleAvailabilitySelect()
         })
 
         /**

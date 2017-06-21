@@ -16,7 +16,7 @@ class ContactsModule {
         this.actions = new ContactsActions(app)
 
         if (this.app.env.extension.background) {
-            this.background()
+            this._background()
         }
     }
 
@@ -25,7 +25,7 @@ class ContactsModule {
      * Register local events; e.g. events that are triggered from the background
      * and handled by the background.
      */
-    background() {
+    _background() {
         this.app.logger.info(`${this}listen for sip events`)
 
         this.app.on('sip:starting', (e) => {

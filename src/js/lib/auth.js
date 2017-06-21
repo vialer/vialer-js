@@ -19,8 +19,8 @@ class Auth {
         this.app.logger.info(`${this}logout`)
         this.app.emit('logout')
         this.app.store.remove('user')
-        this.app.modules.panels.resetStorage()
-        this.app.modules.panels.resetWidgets()
+        this.app.modules.ui.resetWidgetState()
+        this.app.resetModules()
         this.app.modules.page.reset()
         this.app.store.remove('username')
         this.app.store.remove('password')
@@ -68,7 +68,7 @@ class Auth {
         notificationsData.unauthorized = false
         this.app.store.set('notifications', notificationsData)
         // Start loading the widgets.
-        this.app.modules.panels.refreshWidgets(false)
+        this.app.modules.ui.refreshWidgets(false)
         // Setup a listener in case a tabs script wants to watch phone numbers.
         if (this.app.env.extension) {
             if (this.app.env.extension.background) {

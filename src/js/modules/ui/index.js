@@ -1,12 +1,23 @@
 'use strict'
 
-const Actions = require('../../lib/actions')
+const UiActions = require('./actions')
 
 
 /**
- * All UI related actions for the Widgets.
+ * This module holds most of the logic used to interact
+ * with the Click-to-dial UI. It is mainly concerned with generic
+ * actions that change the DOM.
  */
-class LoaderActions extends Actions {
+class UiModule {
+    /**
+     * @param {ClickToDialApp} app - The application object.
+     */
+    constructor(app) {
+        this.actions = new UiActions(app, this)
+        this.app = app
+    }
+
+
     /**
      * Display an indicator when retrieving data for widget.
      */
@@ -22,6 +33,9 @@ class LoaderActions extends Actions {
     }
 
 
+    /**
+     * Popup action; used to close a widget by setting some DOM properties.
+     */
     closeWidget(widgetOrWidgetName) {
         let widget = this.getWidget(widgetOrWidgetName)
         // Cannot rely on just data.('opened') because this is not transparent to CSS.
@@ -42,12 +56,31 @@ class LoaderActions extends Actions {
     }
 
 
+    hideLoginForm() {
+        $('.login-section').addClass('hide')
+    }
+
+
     /**
      * Return a boolean indicating whether widget is open.
      */
     isWidgetOpen(widgetOrWidgetName) {
         let widget = this.getWidget(widgetOrWidgetName)
         return $(widget).data('opened') === true
+    }
+
+
+    /**
+     * Attempt to login.
+     */
+    login() {
+        // Login when form is not empty.
+        if ($('#username').val().trim().length && $('#password').val().length) {
+            this.app.emit('login.attempt', {
+                username: $('#username').val().trim(),
+                password: $('#password').val(),
+            })
+        }
     }
 
 
@@ -70,46 +103,33 @@ class LoaderActions extends Actions {
     }
 
 
-    popup() {
-        /**
-         * Open/close the widget's content when clicking its header
-         * (except when it's busy).
-         */
-        $('html').on('click', '.widget:not(.busy) .widget-header', (e) => {
-            let widget = $(e.currentTarget).closest('[data-opened]')
-            if (this.isWidgetOpen(widget)) {
-                if (!$(e.target).is(':input')) {
-                    this.app.emit('widget.close', {
-                        name: $(widget).data('widget'),
-                    })
-                    this.closeWidget(widget)
-                }
-            } else {
-                this.openWidget(widget)
+    /**
+     * Initialize all widgets.
+     */
+    refreshWidgets(update) {
+        // Resets widget data
+        if (this.app.store.get('widgets') === null) {
+            let widgetData = {isOpen: {}}
+            for (let widget in this.app.modules) {
+                // Initial state for widget.
+                widgetData.isOpen[widget] = false
+                // each widget can share variables here.
+                widgetData[widget] = {}
             }
-        })
+            this.app.store.set('widgets', widgetData)
+        }
 
-        this.app.on('widget.close', (data) => {
-            this.closeWidget(data.name)
-        })
+        // Initial state for mainpanel.
+        if (this.app.store.get('isMainPanelOpen') === null) {
+            this.app.store.set('isMainPanelOpen', false)
+        }
 
-        this.app.on('widget.indicator.start', (data) => {
-            this.busyWidget(data.name)
-        })
+        for (let widget in this.app.modules) {
+            this.app.emit('widget.close', {name: widget})
+            this.app.emit('widget.indicator.start', {name: widget})
+        }
 
-        // Other scripts may open a widget with an event.
-        this.app.on('widget.open', (data) => {
-            this.app.logger.debug(`${this}widget.open`)
-            this.openWidget(data.name)
-        })
-
-        this.app.on('widget.unauthorized', (data) => {
-            this.unauthorizeWidget(data.name)
-        })
-
-        this.app.on('widget.indicator.stop', (data) => {
-            this.resetWidget(data.name)
-        })
+        this.app.reloadModules(update)
     }
 
 
@@ -129,6 +149,43 @@ class LoaderActions extends Actions {
 
 
     /**
+     * Reset widget state from storage.
+     */
+    resetWidgetState() {
+        this.app.store.remove('widgets')
+        this.app.store.remove('isMainPanelOpen')
+    }
+
+
+    /**
+     * Reset the login indicator.
+     */
+    resetLoginButton() {
+        let button = $('.login-button')
+        $(button)
+            .html($(button).data('reset-text'))
+            .prop('disabled', false)
+            .removeClass('loading')
+            .removeClass('failed')
+            .removeClass('info')
+            .removeClass('temporary-text')
+    }
+
+
+    /**
+     * Show/hide the panel's content.
+     */
+    showPanel() {
+        $('.container').removeClass('hide')
+    }
+
+
+    toString() {
+        return `${this.app} [Ui]             `
+    }
+
+
+    /**
      * Show the unauthorized warning for a widget.
      */
     unauthorizeWidget(widgetName) {
@@ -137,10 +194,6 @@ class LoaderActions extends Actions {
         widget.addClass('unauthorized')
     }
 
-
-    toString() {
-        return `${this.app} [LoaderActions]      `
-    }
 }
 
-module.exports = LoaderActions
+module.exports = UiModule

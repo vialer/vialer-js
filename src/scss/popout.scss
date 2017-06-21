@@ -1,4 +1,9 @@
-body.popout {
+html.popout,
+html.popout body {
+    height: 100%;
+}
+
+html.popout body {
     width: auto;
     padding: 0;
     box-sizing: border-box;
@@ -41,65 +46,64 @@ body.popout {
         }
     }
 
-    & .widget {
+    & .widget.contacts {
         border-left: 1px solid #d5d5d5;
         border-right: 1px solid #d5d5d5;
 
-        float: left;
         width: 100%;
         box-sizing: border-box;
+        position: relative;
 
-        &.contacts {
-            border-left: 1px solid transparent;
-            border-right: 1px solid transparent;
-            // flex: 1 0 40px;
+
+        border-left: 1px solid transparent;
+        border-right: 1px solid transparent;
+        // flex: 1 0 40px;
+        display: flex;
+        flex-direction: column;
+
+        .widget-header {
+            flex: 0 0 40px;
+            display: flex;
+            flex-direction: column;
+            margin-left: -1px;
+            margin-right: -1px;
+            border-left: 1px solid #d5d5d5;
+            border-right: 1px solid #d5d5d5;
+        }
+
+        .widget-content {
             display: flex;
             flex-direction: column;
 
-            .widget-header {
-                flex: 0 0 40px;
+            margin-top: -1px;
+            margin-left: -1px;
+            width: 100%;
+
+            .list {
                 display: flex;
-                flex-direction: column;
-                margin-left: -1px;
-                margin-right: -1px;
-                border-left: 1px solid #d5d5d5;
-                border-right: 1px solid #d5d5d5;
-            }
+                flex-flow: column wrap;
+                align-content: flex-start;
 
-            .widget-content {
-                display: flex;
-                flex-direction: column;
+                overflow-x: auto;
+                border-top: 0;
+                max-height: none;
+                width: calc(100vw - 26px);
 
-                margin-top: -1px;
-                margin-left: -1px;
-                width: 100%;
+                @media (max-width: 620px) {
+                    width: auto;
+                    margin-right: -2px;
+                }
 
-                .list {
-                    display: flex;
-                    flex-flow: column wrap;
-                    align-content: flex-start;
+                & .contact {
+                    width: 450px;
+                    box-sizing: border-box;
+                    border-bottom: 0;
+                    border: 1px solid #d5d5d5;
+                    margin-bottom: -1px;
+                    margin-right: -1px;
 
-                    overflow-x: auto;
-                    border-top: 0;
-                    max-height: none;
-                    width: calc(100vw - 26px);
-
-                    @media (max-width: 620px) {
-                        width: auto;
-                        margin-right: -2px;
-                    }
-
-                    & .contact {
-                        width: 450px;
-                        box-sizing: border-box;
-                        border-bottom: 0;
-                        border: 1px solid #d5d5d5;
-                        margin-bottom: -1px;
-                        margin-right: -1px;
-
-                        &.last {
-                            margin-bottom: 0;
-                        }
+                    &.last {
+                        margin-bottom: 0;
                     }
                 }
             }

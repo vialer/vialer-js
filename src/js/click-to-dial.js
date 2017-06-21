@@ -9,12 +9,20 @@ const Sip = require('./lib/sip')
 const Store = require('./lib/store')
 const Timer = require('./lib/timer')
 
-const Loader = require('./modules/loader')
+
+const _modules = [
+    {name: 'availability', Module: require('./modules/availability')},
+    {name: 'contacts', Module: require('./modules/contacts')},
+    {name: 'page', Module: require('./modules/page')},
+    {name: 'ui', Module: require('./modules/ui')},
+    {name: 'queues', Module: require('./modules/queues')},
+]
 
 
 /**
  * This is the main entry point for the Firefox web extension,
- * the Chrome web extension and the Electron desktop app.
+ * the Chrome web extension and the Electron desktop app. It is used
+ * by the extension scripts for background(bg) and popup(ui).
  */
 class ClickToDialApp extends App {
 
@@ -23,7 +31,7 @@ class ClickToDialApp extends App {
 
         // Some caching mechanism.
         window.cache = {}
-
+        this.modules = {}
         this.settings = {
             analyticsId: 'UA-60726618-9',
             platformUrl: 'https://partner.voipgrid.nl/',
@@ -37,10 +45,15 @@ class ClickToDialApp extends App {
             this.sip = new Sip(this)
         }
 
-        if (this.env.extension && !this.env.extension.tab) {
+        if (this.env.extension) {
             this.api = new Api(this)
             this.auth = new Auth(this)
-            this.loader = new Loader(this)
+            // Init these modules.
+            for (let module of _modules) {
+                this.modules[module.name] = new module.Module(this)
+            }
+
+            this.logger.debug(`${this}${this._listeners} listeners registered`)
         }
 
         this.analytics = new Analytics(this, this.settings.analyticsId)
@@ -71,11 +84,52 @@ class ClickToDialApp extends App {
         // Continue last session if credentials are available.
         if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
             this.logger.info(`${this} reusing session`)
-            this.loader.reloadModules()
+            this.reloadModules(false)
 
             if (this.env.extension && this.env.extension.background) {
                 this.logger.info(`${this}set icon to available because of login`)
                 this.browser.browserAction.setIcon({path: 'build/img/call-green.png'})
+            }
+        }
+    }
+
+
+    /**
+     * Reload all modules that have this method implemented.
+     */
+    reloadModules(update) {
+        for (let module in this.modules) {
+            // Use 'load' instead of 'restore' to refresh the data on browser restart.
+            if (this.modules[module].load) {
+                this.logger.debug(`${this}(re)loading module ${module}`)
+                this.modules[module].load(update)
+            }
+        }
+        this.logger.debug(`${this}${this._listeners} listeners registered`)
+    }
+
+
+    /**
+     * Restore all modules that have this method implemented.
+     */
+    restoreModules() {
+        for (let module in this.modules) {
+            if (this.modules[module].restore) {
+                this.logger.debug(`${this}restoring module ${module}`)
+                this.modules[module].restore()
+            }
+        }
+    }
+
+
+    /**
+     * Reset all modules that have this method implemented.
+     */
+    resetModules() {
+        for (let module in this.modules) {
+            this.logger.debug(`${this}resetting module ${module}`)
+            if (this.modules[module].reset) {
+                this.modules[module].reset()
             }
         }
     }
