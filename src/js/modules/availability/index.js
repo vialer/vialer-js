@@ -25,8 +25,8 @@ class AvailabilityModule {
     availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId) {
         this.app.logger.info(`${this}availabilityOptions selected [${selectedFixeddestinationId}, ${selectedPhoneaccountId}]`)
         // Destinations choices.
-        let fixeddestinations = userdestination.fixeddestinations
-        let phoneaccounts = userdestination.phoneaccounts
+        const fixeddestinations = userdestination.fixeddestinations
+        const phoneaccounts = userdestination.phoneaccounts
 
         let options = []
         fixeddestinations.forEach((fixeddestination) => {
@@ -142,20 +142,20 @@ class AvailabilityModule {
         this.app.logger.info(`${this}restoring widget availability`)
 
         // Check if unauthorized.
-        let widgetsData = this.app.store.get('widgets')
+        const widgetsData = this.app.store.get('widgets')
         if (widgetsData.availability.unauthorized) {
             this.app.emit('widget.unauthorized', {name: name})
             return
         }
 
         // Restore options.
-        let userData = this.app.store.get('user')
+        const userData = this.app.store.get('user')
         if (userData) {
-            let userdestination = userData.userdestination
-            let selectedFixeddestinationId = userdestination.selecteduserdestination.fixeddestination
-            let selectedPhoneaccountId = userdestination.selecteduserdestination.phoneaccount
+            const userdestination = userData.userdestination
+            const selectedFixeddestinationId = userdestination.selecteduserdestination.fixeddestination
+            const selectedPhoneaccountId = userdestination.selecteduserdestination.phoneaccount
             this.app.logger.debug(`${this}restoring availability options from ${selectedPhoneaccountId}/${selectedFixeddestinationId}`)
-            let options = this.availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId)
+            const options = this.availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId)
             this.app.emit('availability.reset')
             if (options.length) {
                 this.app.emit('availability.fill_select', {destinations: options})
@@ -176,18 +176,16 @@ class AvailabilityModule {
 
 
     selectUserdestination(type, id) {
-        let content = {
+        let data = {
             fixeddestination: null,
             phoneaccount: null,
         }
-        if (type) {
-            content[type] = id
-        }
+        if (type) data[type] = id
 
         // Save selection.
         let selectedUserdestinationId = this.app.store.get('user').selectedUserdestinationId
 
-        this.app.api.client.put(`api/selecteduserdestination/${selectedUserdestinationId}/`, content)
+        this.app.api.client.put(`api/selecteduserdestination/${selectedUserdestinationId}/`, data)
         .then((res) => {
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 this.app.logger.info(`${this}changed selected userdestination api request ok`)
@@ -204,8 +202,8 @@ class AvailabilityModule {
                     this.app.browser.browserAction.setIcon({path: icon})
                 }
                 let userData = this.app.store.get('user')
-                userData.userdestination.selecteduserdestination.fixeddestination = content.fixeddestination
-                userData.userdestination.selecteduserdestination.phoneaccount = content.phoneaccount
+                userData.userdestination.selecteduserdestination.fixeddestination = data.fixeddestination
+                userData.userdestination.selecteduserdestination.phoneaccount = data.phoneaccount
                 this.app.store.set('user', userData)
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 this._restore()
@@ -219,7 +217,7 @@ class AvailabilityModule {
      * `Are you available` radio button value.
      */
     toggleAvailabilitySelect() {
-        let isAvailable = $('.availability-toggle [name="availability"]:checked').val() === 'yes'
+        const isAvailable = $('.availability-toggle [name="availability"]:checked').val() === 'yes'
         if (isAvailable) {
             this.app.logger.debug(`${this}user is available`)
             $('select#statusupdate').prop('disabled', false)

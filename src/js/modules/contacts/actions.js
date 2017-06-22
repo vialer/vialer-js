@@ -8,12 +8,46 @@ const Actions = require('../../lib/actions')
  */
 class ContactsActions extends Actions {
 
-    _background() {}
+    /**
+     * Register local events; e.g. events that are triggered from the background
+     * and handled by the background.
+     */
+    _background() {
+        this.app.on('sip:starting', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            widgetsData.contacts.status = 'connecting'
+            this.app.store.set('widgets', widgetsData)
+            this.app.emit('contacts.connecting')
+        })
+
+        this.app.on('sip:started', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            widgetsData.contacts.status = 'connected'
+            this.app.store.set('widgets', widgetsData)
+            const accountIds = widgetsData.contacts.list.map((c) => c.account_id)
+            this.app.sip.updatePresence(accountIds, true)
+        })
+
+        this.app.on('sip:failed_to_start', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            widgetsData.contacts.status = 'failed_to_start'
+            this.app.store.set('widgets', widgetsData)
+            this.app.emit('contacts.failed_to_start')
+        })
+
+        this.app.on('sip:stopped', (e) => {
+            let widgetsData = this.app.store.get('widgets')
+            if (widgetsData) {
+                widgetsData.contacts.status = 'disconnected'
+                this.app.store.set('widgets', widgetsData)
+            }
+            this.app.emit('contacts.disconnected')
+        })
+    }
+
 
     _popup() {
         let searchQuery = ''
-
-        // This used to be contacts_popout.js
         // Force size for .contact,
         // useful in case of a popout and the list of contacts
         // is larger in size (height) than the viewport.
@@ -112,21 +146,6 @@ class ContactsActions extends Actions {
         let blink = () => {
             let ringingNow = $('.status-icon.ringing')
             $(ringingNow).toggleClass('available').toggleClass('busy')
-
-
-            // Do the shake only in dev-mode.
-            if (this.app.isDevMode) {
-                // add slight delay before shaking
-                setTimeout(function() {
-                    $(ringingNow).filter('.ringing:not(.shake)')
-                        .each(function(index, element) {
-                            // don't shake everything at the same time
-                            setTimeout(function() {
-                                $(element).addClass('shake')
-                            }, (index * 200))
-                        })
-                }, 400)
-            }
         }
         setInterval(blink, 400)
 
@@ -151,10 +170,9 @@ class ContactsActions extends Actions {
 
         // Search through contacts while typing.
         $('.search-form :input').keyup((e) => {
+            const list = $('.contacts .list')
             searchQuery = $(e.currentTarget).val().trim().toLowerCase()
-            let list = $('.contacts .list')
             $(list).find('.contact.last').removeClass('last')
-
             // Filter list.
             $.each($('.contacts .list .contact'), (index, contact) => {
                 // Hide contact if not a match.

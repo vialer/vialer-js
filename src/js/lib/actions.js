@@ -17,8 +17,6 @@ class Actions {
             } else if (this.app.env.extension.background) {
                 this._background(app)
             }
-        } else {
-            // All actions are needed in an app-like setting.
         }
     }
 

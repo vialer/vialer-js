@@ -92,22 +92,20 @@ class Dialer {
 
     /**
      * Setup the call between the number from the user's
-     * clicktodialaccount and b_number.
+     * clicktodialaccount and the `b number`; the number the user
+     * wants to call..
+     * @param {Number} bNumber - The number the user wants to call.
      */
-    dial(b_number, tab, silent) {
+    dial(bNumber, tab, silent) {
+        // Just make sure b_number is numbers only.
+        bNumber = this.sanitizeNumber(bNumber).replace(/[^\d+]/g, '')
         if (silent) {
-            this.app.logger.info(`${this}calling ${b_number} silently`)
+            this.app.logger.info(`${this}calling ${bNumber} silently`)
         } else {
-            this.app.logger.info(`${this}calling ${b_number}`)
+            this.app.logger.info(`${this}calling ${bNumber}`)
         }
 
-        let content = {
-            // Just make sure b_number is numbers only.
-            b_number: this.sanitizeNumber(b_number).replace(/[^\d+]/g, ''),
-        }
-
-        this.app.api.client.post('api/clicktodial/', content)
-        .then((res) => {
+        this.app.api.client.post('api/clicktodial/', {b_number: bNumber}).then((res) => {
             if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 this.callFailedNotification()
                 return
@@ -138,7 +136,7 @@ class Dialer {
                                     this.app.timer.unregisterTimer(`callstatus.status-${callid}`)
                                     // Show status in a notification in case it fails/disconnects.
                                     if (callStatus !== 'connected') {
-                                        this.callStatusNotification(callStatus, b_number)
+                                        this.callStatusNotification(callStatus, bNumber)
                                     }
                                 }
                             } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
@@ -160,7 +158,7 @@ class Dialer {
                      * couldn't connect both sides, a notification
                      * will show.
                      */
-                    let current_tab = tab.id
+                    const currentTab = tab.id
 
                     // Keep updating the call status to the panel.
                     const timerFunction = () => {
@@ -178,10 +176,10 @@ class Dialer {
                                     }
                                     // Update panel with latest status.
                                     this.app.emit('callstatus.status', {
-                                        status: this.getStatusMessage(callStatus, b_number),
+                                        status: this.getStatusMessage(callStatus, bNumber),
                                         // Extra info to identify call.
                                         callid: callid,
-                                    }, false, current_tab)
+                                    }, false, currentTab)
                                 } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
                                     // Clear interval, stop timer.
                                     this.app.timer.stopTimer(`callstatus.status-${callid}`)
@@ -199,42 +197,41 @@ class Dialer {
                         // Copy the number to the panel.
                         this.app.logger.debug(`${this}copy the number to the callstatus popup`)
                         this.app.emit('callstatus.b_number', {
-                            b_number: b_number,
+                            b_number: bNumber,
                             // Extra info to identify call.
                             callid: callid,
-                        }, false, current_tab)
+                        }, false, currentTab)
 
                         // Copy the initial status.
                         this.app.logger.debug(`${this}copy the initial status to the callstatus popup`)
                         this.app.emit('callstatus.status', {
-                            status: this.getStatusMessage(res.data.status, b_number),
+                            status: this.getStatusMessage(res.data.status, bNumber),
                             // Extra info to identify call.
                             callid: callid,
-                        }, false, current_tab)
+                        }, false, currentTab)
                     })
 
 
                     // Extra info to identify call.
                     this.app.logger.debug(`${this}extra info to identify call.`)
                     // Trigger the callstatus dialog to open.
-                    this.app.emit('callstatus.show', {callid: callid}, false, current_tab)
+                    this.app.emit('callstatus.show', {callid: callid}, false, currentTab)
                 }
             }
         })
-
     }
 
 
-    getStatusMessage(status, b_number) {
+    getStatusMessage(status, bNumber) {
         let messages = {
             'dialing_a': this.app.translate('clicktodialStatusDialingA'),
             'confirm': this.app.translate('clicktodialStatusConfirm'),
-            'dialing_b': this.app.translate('clicktodialStatusDialingB', b_number),
+            'dialing_b': this.app.translate('clicktodialStatusDialingB', bNumber),
             'connected': this.app.translate('clicktodialStatusConnected'),
             'disconnected': this.app.translate('clicktodialStatusDisconnected'),
             'failed_a': this.app.translate('clicktodialStatusFailedA'),
             'blacklisted': this.app.translate('clicktodialStatusBlacklisted'),
-            'failed_b': this.app.translate('clicktodialStatusFailedB', b_number),
+            'failed_b': this.app.translate('clicktodialStatusFailedB', bNumber),
         }
 
         let message = this.app.translate('clicktodialCallingText');

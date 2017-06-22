@@ -12,15 +12,10 @@ class AvailabilityActions extends Actions {
      * Background related tasks for the availability module.
      */
     _background() {
-        this.app.on('availability.select', (data) => {
-            this.app.logger.debug(`${this}availability.select triggered`)
-            this.module.selectUserdestination(data.type, data.id)
-        })
-
         /**
-         * Do the API call to notify the backend, then update the
+         * Update availability by calling the API, then emit
+         * to the popup that the choices need to be updated.
          */
-        // choices in the  popup script.
         this.app.on('availability.update', (data) => {
             this.app.logger.debug(`${this}update selected userdestination and refresh popup`)
             this.module.selectUserdestination(data.type, data.id)
@@ -35,13 +30,11 @@ class AvailabilityActions extends Actions {
     _popup() {
         // Refresh the availability select.
         this.app.on('availability.refresh', (data) => {
-            this.app.logger.debug(`${this}availability.refresh triggered`)
             this.module.toggleAvailabilitySelect()
         })
 
         // Empties the availability select.
         this.app.on('availability.reset', (data) => {
-            this.app.logger.debug(`${this}availability.reset triggered`)
             let list = $('select#statusupdate')
             list.empty()
 
@@ -64,8 +57,8 @@ class AvailabilityActions extends Actions {
             this.app.logger.debug(`${this}fill availability options`)
             list.empty()
 
-            $.each(data.destinations, (index, destination) => {
-                let option = $('<option>').val(destination.value).text(destination.label)
+            data.destinations.forEach((destination, index) => {
+                const option = $('<option>').val(destination.value).text(destination.label)
                 if (destination.selected) {
                     this.app.logger.debug(`${this}selected ${destination.label}`)
                     $(option).prop('selected', true)
@@ -82,7 +75,9 @@ class AvailabilityActions extends Actions {
         })
 
         /**
-         * Change the user's availability.
+         * Change the user's availability by setting the selected
+         * userdestination to null(not available) or to the selected
+         * userdestination.
          */
         $('.availability-toggle input[name="availability"]').change((e) => {
                 // These values are used for val() == 'no' which clears the current destination.
@@ -93,6 +88,7 @@ class AvailabilityActions extends Actions {
                 // Selects the first destination by default.
                 [selectedType, selectedId] = $('[name="selecteddestination"] option:selected').val().split('-')
             }
+
             this.app.emit('availability.update', {id: selectedId, type: selectedType})
         })
 
@@ -101,7 +97,7 @@ class AvailabilityActions extends Actions {
          */
         $('select#statusupdate').change((e) => {
             let [selectedType, selectedId] = $(e.currentTarget).find('option:selected').val().split('-')
-            this.app.emit('availability.select', {id: selectedId, type: selectedType})
+            this.app.emit('availability.update', {id: selectedId, type: selectedType})
         })
     }
 

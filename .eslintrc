@@ -1,9 +1,5 @@
 {
-    "ecmaFeatures": {
-        "arrowFunctions":true,
-        "classes":true,
-        "spread":true
-    },
+    "ecmaVersion": 7,
     "parser": "espree",
     "env": {
         "amd": false,
@@ -12,7 +8,7 @@
         "es6": true
     },
     "globals": {
-        "SIPml": true,
+        "app": true,
         "chrome": true,
         "webkitNotifications": true,
         "tsip_event_code_e": true,

@@ -14,51 +14,6 @@ class ContactsModule {
         this.app = app
         this.app.modules.contacts = this
         this.actions = new ContactsActions(app)
-
-        if (this.app.env.extension.background) {
-            this._background()
-        }
-    }
-
-
-    /**
-     * Register local events; e.g. events that are triggered from the background
-     * and handled by the background.
-     */
-    _background() {
-        this.app.logger.info(`${this}listen for sip events`)
-
-        this.app.on('sip:starting', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'connecting'
-            this.app.store.set('widgets', widgetsData)
-            this.app.emit('contacts.connecting')
-        })
-
-        this.app.on('sip:started', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'connected'
-            this.app.store.set('widgets', widgetsData)
-            let accountIds = widgetsData.contacts.list.map((c) => c.account_id)
-            this.app.sip.updatePresence(accountIds, true)
-        })
-
-        this.app.on('sip:failed_to_start', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'failed_to_start'
-            this.app.store.set('widgets', widgetsData)
-            this.app.emit('contacts.failed_to_start')
-        })
-
-        this.app.on('sip:stopped', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            if (widgetsData) {
-                widgetsData.contacts.status = 'disconnected'
-                this.app.store.set('widgets', widgetsData)
-            }
-            this.app.emit('contacts.disconnected')
-        })
-
     }
 
 

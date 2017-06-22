@@ -7,7 +7,6 @@ const axios = require('axios')
  * Talks to the VoIPGRID API.
  */
 class Api {
-
     /**
      * @param {ClickToDialApp} app - The application object.
      */

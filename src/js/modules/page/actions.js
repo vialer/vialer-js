@@ -5,6 +5,28 @@ const Actions = require('../../lib/actions')
 
 class PageActions extends Actions {
 
+    _background() {
+        // The tab indicates that it's ready to observe. Check if it
+        // should add the icons.
+        this.app.on('page.observer.ready', this.toggleObserve.bind(this))
+        this.app.on('clicktodial.dial', this.dial.bind(this))
+
+        this.app.logger.debug(`${this}setting context menuitem`)
+
+        // Remove all previously added context menus.
+        this.app.browser.contextMenus.removeAll()
+        // Add context menu to dial selected number.
+        this.contextMenuItem = this.app.browser.contextMenus.create({
+            title: this.app.translate('contextMenuLabel'),
+            contexts: ['selection'],
+            onclick: (info, tab) => {
+                this.app.dialer.dial(info.selectionText, tab)
+                this.app.analytics.trackClickToDial('Webpage')
+            },
+        })
+    }
+
+
     _tab() {
         /**
          * Trigger showing the callstatus dialog.

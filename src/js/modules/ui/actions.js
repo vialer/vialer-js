@@ -74,16 +74,13 @@ class UiActions extends Actions {
          */
         this.app.on('settings', (data) => {
             this.app.logger.info(`${this}mainpanel.settings`)
-            this.app.api.client.get('autologin/token/')
+            this.app.api.client.get('api/autologin/token/')
             .then((res) => {
                 let path, token
-                const redirectPath = `client/${this.app.store.get('user').client_id}/user/${this.app.store.get('user').id}/change/#tabs-3`
+                const redirectPath = `client/${this.app.store.get('user').client_id}/user/${this.app.store.get('user').id}/change/#tc0=user-tab-2`
                 if (res.data) token = res.data.token
                 // add token if possible
-                if (token) {
-                    path = `user/autologin/?token=${token}&username=${this.app.store.get('username')}&next=/${redirectPath}`
-                }
-
+                path = `user/autologin/?token=${token}&username=${this.app.store.get('username')}&next=/${redirectPath}`
                 this.app.browser.tabs.create({url: `${this.app.api.getPlatformUrl()}${path}`})
             })
         })

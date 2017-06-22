@@ -27,6 +27,7 @@
     "connect": "^3.6.0",
     "connect-mount": "^1.0.0",
     "del": "^2.2.2",
+    "eslint": "^4.0.0",
     "gulp": "^3.9.1",
     "gulp-add-src": "^0.2.0",
     "gulp-clean-css": "^3.0.4",
