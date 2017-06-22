@@ -146,6 +146,13 @@ class Timer {
     }
 
 
+    stopAllTimers() {
+        for (const timerId of Object.keys(this.registeredTimers)) {
+            this.stopTimer(timerId)
+        }
+    }
+
+
     /**
      * This doubles the retry interval in each run and adds jitter.
      * @param {object} retry - The reference retry object.

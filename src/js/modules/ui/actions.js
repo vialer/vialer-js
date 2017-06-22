@@ -14,22 +14,9 @@ class UiActions extends Actions {
             this.app.browser.tabs.create({url: 'http://wiki.voipgrid.nl/index.php/Chrome_plugin'})
         })
 
-        this.app.on('login.attempt', (data) => {
-            // Attempt to log in.
-            this.app.store.set('username', data.username)
-            this.app.store.set('password', data.password)
-            this.app.emit('login.indicator.start')
-            this.app.auth.login(this.app.store.get('username'), this.app.store.get('password'))
-        })
-
-        this.app.on('logout.attempt', (data) => {
-            this.app.logger.info(`${this}logout.attempt`)
-            this.app.auth.logout()
-        })
-
         this.app.on('widget.close', (data) => {
             // Keep track of closed widgets.
-            this.app.logger.info(`${this}widget.close`)
+            this.app.logger.info(`${this}setting ${data.name} widget state to closed`)
             let widgetData = this.app.store.get('widgets')
             widgetData.isOpen[data.name] = false
             this.app.store.set('widgets', widgetData)
@@ -38,7 +25,7 @@ class UiActions extends Actions {
 
         this.app.on('widget.open', (data) => {
             // Keep track of opened widgets.
-            this.app.logger.info(`${this}widget.open on ${data.name}`)
+            this.app.logger.info(`${this}setting ${data.name} widget state to opened`)
             let widgetData = this.app.store.get('widgets')
             widgetData.isOpen[data.name] = true
             this.app.store.set('widgets', widgetData)
@@ -87,27 +74,23 @@ class UiActions extends Actions {
          */
         this.app.on('settings', (data) => {
             this.app.logger.info(`${this}mainpanel.settings`)
-            let openSettings = (response) => {
-                let path = `client/${this.app.store.get('user').client_id}/user/${this.app.store.get('user').id}/change/#tabs-3`
+            this.app.api.client.get('autologin/token/')
+            .then((res) => {
+                let path, token
+                const redirectPath = `client/${this.app.store.get('user').client_id}/user/${this.app.store.get('user').id}/change/#tabs-3`
+                if (res.data) token = res.data.token
                 // add token if possible
-                if (response.token) {
-                    path = `user/autologin/?token=${response.token}&username=${this.app.store.get('username')}&next=/${path}`
+                if (token) {
+                    path = `user/autologin/?token=${token}&username=${this.app.store.get('username')}&next=/${redirectPath}`
                 }
 
-                let platformUrl = this.app.api.getPlatformUrl()
-                this.app.browser.tabs.create({url: platformUrl + path})
-            };
-
-            this.app.api.asyncRequest(this.app.api.getUrl('autologin'), null, 'get', {
-                onOk: openSettings,
-                onNotOk: openSettings,
+                this.app.browser.tabs.create({url: `${this.app.api.getPlatformUrl()}${path}`})
             })
         })
 
         this.app.on('close', (data) => {
             this.app.logger.info(`${this}mainpanel.close`)
         })
-
 
         this.app.on('panel.dial', (data) => {
             let b_number = data.b_number
@@ -165,9 +148,13 @@ class UiActions extends Actions {
             window.close()
         })
 
+        /**
+         * Emit that we want to logout.
+         */
         $('#logout').click((e) => {
             this.app.emit('logout.attempt')
         })
+
         $('#popout').click((e) => {
             this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('/build/click-to-dial-popup.html?popout=true')})
         })
@@ -254,55 +241,6 @@ class UiActions extends Actions {
             } else {
                 this.module.login()
             }
-        })
-
-        /**
-         * Display an indicator when logging in.
-         */
-        this.app.on('login.indicator.start', (data) => {
-            let button = $('.login-button')
-            $(button).html($(button).data('loading-text')).prop('disabled', true).addClass('loading')
-        })
-
-        /**
-         * Show an error on login fail.
-         */
-        this.app.on('login.failed', (data) => {
-            let button = $('.login-button')
-            $(button)
-                .html($(button).data('failed-text'))
-                .prop('disabled', false)
-                .addClass('failed')
-                .addClass('temporary-text')
-        })
-
-        this.app.on('logout', (data) => {
-            // Hide the main panel.
-            $('.container').addClass('hide')
-            // Show the login form.
-            $('.login-section').removeClass('hide')
-            // Reset the login form input.
-            $('.login-form :input:visible').val('')
-            this.module.resetLoginButton()
-            // Focus the first input field.
-            $('.login-form :input:visible:first').focus()
-
-            // Show a message on logout.
-            let button = $('.login-button')
-            $(button)
-                .html($(button).data('logout-text'))
-                .prop('disabled', false)
-                .addClass('info')
-                .addClass('temporary-text')
-        })
-
-        // After login, show the user's e-mail address.
-        this.app.on('login.success', (data) => {
-            let user = data.user
-            $('#user-name').text(user.email)
-
-            this.module.hideLoginForm()
-            this.module.showPanel()
         })
 
         this.app.on('mainpanel.refresh.start', (data) => {

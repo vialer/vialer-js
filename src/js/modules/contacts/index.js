@@ -69,13 +69,13 @@ class ContactsModule {
     _load(update) {
         if (!this.app.env.extension.background) return
 
-        let phoneaccountUrl = `${this.app.api.getUrl('phoneaccount')}?active=true&order_by=description`
-        this.app.api.asyncRequest(phoneaccountUrl, null, 'get', {
-            onComplete: () => {
-                this.app.emit('widget.indicator.stop', {name: 'contacts'})
-            },
-            onOk: (response) => {
-                let contacts = response.objects
+        this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
+        .then((res) => {
+            this.app.emit('widget.indicator.stop', {name: 'contacts'})
+
+            if (this.app.api.OK_STATUS.includes(res.status)) {
+                let contacts = res.data.objects
+                this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
 
                 // Remove accounts that are not currently registered.
                 for (let i = contacts.length - 1; i >= 0; i--) {
@@ -109,22 +109,23 @@ class ContactsModule {
                         this.app.emit('contacts.empty')
                     }
                 }
-            },
-            onNotOk: () => {
+            } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 this.app.sip.disconnect()
-            },
-            onUnauthorized: () => {
-                this.app.logger.info(`${this}unauthorized contacts`)
-                // Update authorization status.
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.contacts.unauthorized = true
-                this.app.store.set('widgets', widgetsData)
 
-                // Display an icon explaining the user lacks permissions to use
-                // this feature of the plugin.
-                this.app.emit('widget.unauthorized', {name: 'contacts'})
-                this.app.sip.disconnect()
-            },
+                if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
+                    this.app.logger.info(`${this}unauthorized contacts`)
+                    // Update authorization status.
+                    let widgetsData = this.app.store.get('widgets')
+                    widgetsData.contacts.unauthorized = true
+                    this.app.store.set('widgets', widgetsData)
+
+                    // Display an icon explaining the user lacks permissions to use
+                    // this feature of the plugin.
+                    this.app.emit('widget.unauthorized', {name: 'contacts'})
+                    this.app.sip.disconnect()
+                }
+
+            }
         })
     }
 

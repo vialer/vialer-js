@@ -46,18 +46,18 @@ class QueuesModule {
 
 
     _load() {
-        this.app.api.asyncRequest(this.app.api.getUrl('queuecallgroup'), null, 'get', {
-            onComplete: () => {
-                this.app.emit('widget.indicator.stop', {name: 'queues'})
-            },
-            onOk: (response) => {
+        this.app.api.client.get('api/queuecallgroup').then((res) => {
+            this.app.emit('widget.indicator.stop', {name: 'queues'})
+
+            if (this.app.api.OK_STATUS.includes(res.status)) {
                 // Find the id's for queuecallgroups.
-                let queues = response.objects
-
+                let queues = res.data.objects
                 let widgetsData = this.app.store.get('widgets')
-                if (queues.length) {
-                    this.queuecallgroups = []
+                this.queuecallgroups = []
 
+                if (!queues.length) {
+                    this.app.emit('queues.empty')
+                } else {
                     queues.forEach((queue) => {
                         this.queuecallgroups.push(queue.id)
                     })
@@ -73,8 +73,6 @@ class QueuesModule {
                     queues.forEach((queue) => {
                         this.sizes[queue.id] = queue.queue_size
                     })
-                } else {
-                    this.app.emit('queues.empty')
                 }
 
                 // Save queues, sizes and ids in storage.
@@ -83,12 +81,9 @@ class QueuesModule {
                 widgetsData.queues.sizes = this.sizes
                 widgetsData.queues.unauthorized = false
                 this.app.store.set('widgets', widgetsData)
-
                 this.setQueueSizesTimer()
-            },
-            onUnauthorized: () => {
+            } else if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                 this.app.logger.info(`${this}widget.unauthorized: queues`)
-
                 // update authorization status
                 let widgetsData = this.app.store.get('widgets')
                 widgetsData.queues.unauthorized = true
@@ -97,7 +92,7 @@ class QueuesModule {
                 // display an icon explaining the user lacks permissions to use
                 // this feature of the plugin
                 this.app.emit('widget.unauthorized', {name: 'queues'})
-            },
+            }
         })
     }
 
@@ -157,45 +152,47 @@ class QueuesModule {
 
 
     timerFunction() {
-        if (this.queuecallgroups.length) {
-            this.queuecallgroups.forEach((id) => {
-                // FIXME: The current limitation on the server of 20r/m will always reject some
-                // requests (status 503) in case of more than one queuecallgroup.
-                this.app.api.asyncRequest(this.app.api.getUrl('queuecallgroup') + id + '/', null, 'get', {
-                    onOk: (response) => {
-                        let size = parseInt(response.queue_size, 10)
-                        if (isNaN(size)) {
-                            // Queue size is not available.
-                            size = '?'
-                        }
+        if (!this.queuecallgroups.length) return
 
-                        // Update icon for toolbarbutton if this queuecallgroup was selected earlier.
-                        if (response.id === this.app.store.get('widgets').queues.selected) {
-                            this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
-                        }
+        Promise.all(this.queuecallgroups.map((id) => this.app.api.client.get(`api/queuecallgroup/${id}/`)))
+        .then((results) => {
+            this.app.logger.group('callgroup status update')
+            for (const res of results) {
+                if (this.app.api.OK_STATUS.includes(res.status)) {
+                    let queue = res.data
+                    // This may result in an empty queue when logging out.
+                    if (!queue) return
+                    this.app.logger.debug(`${this}updating queue callgroup status for group ${queue.id}`)
 
-                        this.sizes[response.id] = size
-                        this.app.emit('queue.size', {id: response.id, size: size})
+                    queue.queue_size = parseInt(res.data.queue_size, 10)
+                    // Queue size is not available.
+                    if (isNaN(queue.queue_size)) queue.queue_size = '?'
 
-                        // Save sizes in storage.
-                        let widgetsData = this.app.store.get('widgets')
-                        widgetsData.queues.sizes = this.sizes
-                        this.app.store.set('widgets', widgetsData)
-                    },
-                    onUnauthorized: () => {
-                        this.app.logger.debug(`${this}unauthorized queues request`)
-                        // Update authorization status.
-                        let widgetsData = this.app.store.get('widgets')
-                        widgetsData.queues.unauthorized = true
-                        this.app.store.set('widgets', widgetsData)
+                    // Update icon for toolbarbutton if this queuecallgroup was selected earlier.
+                    if (queue.id === this.app.store.get('widgets').queues.selected) {
+                        this.app.browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                    }
 
-                        // Display an icon explaining the user lacks permissions
-                        // to use this feature of the plugin.
-                        this.app.emit('widget.unauthorized', {name: 'queues'})
-                    },
-                })
-            })
-        }
+                    this.sizes[queue.id] = queue.queue_size
+                    this.app.emit('queue.size', {id: queue.id, size: queue.queue_size})
+
+                    // Save sizes in storage.
+                    let widgetsData = this.app.store.get('widgets')
+                    widgetsData.queues.sizes = this.sizes
+                    this.app.store.set('widgets', widgetsData)
+                } else if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
+                    this.app.logger.debug(`${this}unauthorized queues request`)
+                    // Update authorization status.
+                    let widgetsData = this.app.store.get('widgets')
+                    widgetsData.queues.unauthorized = true
+                    this.app.store.set('widgets', widgetsData)
+                    // Display an icon explaining the user lacks permissions
+                    // to use this feature of the plugin.
+                    this.app.emit('widget.unauthorized', {name: 'queues'})
+                }
+            }
+            this.app.logger.groupEnd()
+        })
     }
 
 

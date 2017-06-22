@@ -12,6 +12,16 @@ class Logger {
     }
 
 
+    group(name) {
+        console.group(name)
+    }
+
+
+    groupEnd() {
+        console.groupEnd()
+    }
+
+
     setLevel(level) {
         this.level = this.levels[level]
     }

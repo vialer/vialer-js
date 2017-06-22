@@ -66,14 +66,14 @@ class AvailabilityModule {
         if (!this.app.env.extension.background) {
             return
         }
-        this.app.api.asyncRequest(this.app.api.getUrl('userdestination'), null, 'get', {
-            onComplete: () => {
-                this.app.emit('widget.indicator.stop', {name: 'availability'})
-            },
-            onOk: (response) => {
+
+        this.app.api.client.get('api/userdestination/').then((res) => {
+            this.app.emit('widget.indicator.stop', {name: 'availability'})
+            if (this.app.api.OK_STATUS.includes(res.status)) {
                 this.app.emit('availability.reset')
-                // There is only one userdestination so objects[0] is the right (and only) one.
-                let userdestination = response.objects[0]
+                // There is only one userdestination so objects[0] is the right
+                // (and only) one.
+                let userdestination = res.data.objects[0]
                 let userData = this.app.store.get('user')
                 if (userData) {
                      // Save userdestination in storage.
@@ -112,8 +112,7 @@ class AvailabilityModule {
                 // Save icon in storage.
                 widgetsData.availability.icon = icon
                 this.app.store.set('widgets', widgetsData)
-            },
-            onUnauthorized: () => {
+            } else if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                 this.app.logger.warn(`${this}unauthorized availability request`)
                 // Update authorization status in the store.
                 let widgetsData = this.app.store.get('widgets')
@@ -123,7 +122,7 @@ class AvailabilityModule {
                 // Display an icon explaining the user lacks permissions to use
                 // this feature of the plugin.
                 this.app.emit('widget.unauthorized', {name: 'availability'})
-            },
+            }
         })
     }
 
@@ -186,10 +185,12 @@ class AvailabilityModule {
         }
 
         // Save selection.
-        let selecteduserdestinationUrl = this.app.api.getUrl('selecteduserdestination') + this.app.store.get('user').selectedUserdestinationId + '/'
-        this.app.api.asyncRequest(selecteduserdestinationUrl, content, 'put', {
-            onOk: () => {
-                this.app.logger.info(`${this}selected userdestination api request ok`)
+        let selectedUserdestinationId = this.app.store.get('user').selectedUserdestinationId
+
+        this.app.api.client.put(`api/selecteduserdestination/${selectedUserdestinationId}/`, content)
+        .then((res) => {
+            if (this.app.api.OK_STATUS.includes(res.status)) {
+                this.app.logger.info(`${this}changed selected userdestination api request ok`)
 
                 // Set an icon depending on whether the user is available or not.
                 let icon = 'build/img/call-red.png'
@@ -206,17 +207,9 @@ class AvailabilityModule {
                 userData.userdestination.selecteduserdestination.fixeddestination = content.fixeddestination
                 userData.userdestination.selecteduserdestination.phoneaccount = content.phoneaccount
                 this.app.store.set('user', userData)
-            },
-            onNotOk: () => {
-                // Jump back to previously selected (the one currently in cache).
+            } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 this._restore()
-                // FIXME: Show a notification something went wrong?
-            },
-            onUnauthorized: () => {
-                // Jump back to previously selected (the one currently in cache)
-                this._restore()
-                // FIXME: Show a notification something went wrong?
-            },
+            }
         })
     }
 

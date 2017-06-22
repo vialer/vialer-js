@@ -1,7 +1,6 @@
 'use strict'
 
 const App = require('./lib/app')
-const Auth = require('./lib/auth')
 const Analytics = require('./lib/analytics')
 const Api = require('./lib/api')
 const Dialer = require('./lib/dialer')
@@ -15,6 +14,7 @@ const _modules = [
     {name: 'contacts', Module: require('./modules/contacts')},
     {name: 'page', Module: require('./modules/page')},
     {name: 'ui', Module: require('./modules/ui')},
+    {name: 'user', Module: require('./modules/user')},
     {name: 'queues', Module: require('./modules/queues')},
 ]
 
@@ -47,7 +47,6 @@ class ClickToDialApp extends App {
 
         if (this.env.extension) {
             this.api = new Api(this)
-            this.auth = new Auth(this)
             // Init these modules.
             for (let module of _modules) {
                 this.modules[module.name] = new module.Module(this)
