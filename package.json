@@ -45,6 +45,7 @@
     "jsdoc": "git+https://github.com/jvanveen/jsdoc.git#master",
     "jsdoc-rtd": "^1.0.5",
     "run-sequence": "^1.2.2",
+    "serve-index": "^1.9.0",
     "serve-static": "^1.12.1",
     "uglify-es": "^3.0.14",
     "vinyl-buffer": "^1.0.0",
