@@ -45,20 +45,7 @@ class QueuesModule {
     }
 
 
-    getIconForSize(size) {
-        let icon = '/build/img/queue.png'
-        if (!isNaN(size)) {
-            if (size < 10) {
-                icon = '/build/img/queue' + size + '.png'
-            } else {
-                icon = '/build/img/queue10.png'
-            }
-        }
-        return icon
-    }
-
-
-    load() {
+    _load() {
         this.app.api.asyncRequest(this.app.api.getUrl('queuecallgroup'), null, 'get', {
             onComplete: () => {
                 this.app.emit('widget.indicator.stop', {name: 'queues'})
@@ -115,12 +102,12 @@ class QueuesModule {
     }
 
 
-    reset() {
+    _reset() {
         this.app.emit('queues.reset')
     }
 
 
-    restore() {
+    _restore() {
         this.app.logger.info(`${this}reloading widget queues`)
 
         // Check if unauthorized.
@@ -146,6 +133,19 @@ class QueuesModule {
 
             this.setQueueSizesTimer()
         }
+    }
+
+
+    getIconForSize(size) {
+        let icon = '/build/img/queue.png'
+        if (!isNaN(size)) {
+            if (size < 10) {
+                icon = '/build/img/queue' + size + '.png'
+            } else {
+                icon = '/build/img/queue10.png'
+            }
+        }
+        return icon
     }
 
 

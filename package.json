@@ -35,7 +35,6 @@
     "gulp-gh-pages": "^0.5.4",
     "gulp-help": "^1.6.1",
     "gulp-if-else": "^1.0.3",
-    "gulp-jsdoc3": "^1.0.1",
     "gulp-livereload": "^3.8.1",
     "gulp-notify": "^3.0.0",
     "gulp-sass": "^3.1.0",
@@ -43,7 +42,8 @@
     "gulp-sourcemaps": "^2.5.0",
     "gulp-uglify": "^3.0.0",
     "gulp-zip": "^4.0.0",
-    "jsdoc-rtd": "^1.0.3",
+    "jsdoc": "git+https://github.com/jvanveen/jsdoc.git#master",
+    "jsdoc-rtd": "^1.0.5",
     "run-sequence": "^1.2.2",
     "serve-static": "^1.12.1",
     "uglify-es": "^3.0.14",
@@ -51,5 +51,8 @@
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.9.0",
     "yargs": "^7.0.2"
+  },
+  "dependencies": {
+    "font-awesome": "^4.7.0"
   }
 }

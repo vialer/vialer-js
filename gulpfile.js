@@ -7,6 +7,7 @@ const addsrc = require('gulp-add-src')
 const argv = require('yargs').argv
 const browserify = require('browserify')
 const buffer = require('vinyl-buffer')
+const childExec = require('child_process').exec
 const cleanCSS = require('gulp-clean-css')
 const composer = require('gulp-uglify/composer')
 const concat = require('gulp-concat')
@@ -20,7 +21,6 @@ const gutil = require('gulp-util')
 const http = require('http')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
-const jsdoc = require('gulp-jsdoc3')
 const mount = require('connect-mount')
 
 const notify = require('gulp-notify')
@@ -56,6 +56,7 @@ if (PRODUCTION) gutil.log('(!) Gulp optimized for production')
 gulp.task('assets', 'Move assets to the build directory.', () => {
     return gulp.src('./src/img/**', {base: './src'})
     .pipe(addsrc('./src/fonts/**', {base: './src/'}))
+    .pipe(addsrc(path.join(NODE_PATH, 'font-awesome', 'fonts', '**'), {base: path.join(NODE_PATH, 'font-awesome')}))
     .pipe(addsrc('./src/js/lib/thirdparty/**/*.js', {base: './src/'}))
     .pipe(addsrc('./src/html/*.html', {base: './src/html'}))
     .pipe(addsrc('./src/js/lib/frame.js', {base: './src/'}))
@@ -67,9 +68,10 @@ gulp.task('assets', 'Move assets to the build directory.', () => {
 
 gulp.task('build', 'Metatask that runs all tasks.', (done) => {
     runSequence(
-        'build-clean',
-        ['js-click-to-dial-bg', 'js-click-to-dial-popup', 'js-click-to-dial-tab',
-         'js-click-to-dial-callstatus', 'scss', 'scss-print', 'docs', 'assets']
+        'build-clean', [
+            'js-click-to-dial-bg', 'js-click-to-dial-popup', 'js-click-to-dial-tab',
+            'js-click-to-dial-callstatus', 'scss', 'scss-print', 'docs', 'assets',
+        ]
     , done)
 })
 
@@ -81,20 +83,14 @@ gulp.task('build-clean', `Delete build directory '${BUILD_DIR}'`, (done) => {
 })
 
 
-gulp.task('docs', 'Generate documentation.', (done) => {
-    let completed = () => {
-        if (isWatching) {
-            livereload.changed('headless.js')
-        }
-    }
-
-    let config = require('./.jsdoc.json')
-    return gulp.src([
-        'README.md',
-        '!./src/js/lib/thirdparty/**/*.js',
-        './src/js/**/*.js',
-    ], {read: false})
-    .pipe(jsdoc(config, completed))
+gulp.task('docs', 'Generate documentation', (done) => {
+    let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs`
+    childExec(execCommand, undefined, (err, stdout, stderr) => {
+        if (stderr) gutil.log(stderr)
+        if (stdout) gutil.log(stdout)
+        if (isWatching) livereload.changed()
+        done()
+    })
 })
 
 
@@ -148,8 +144,7 @@ gulp.task('js-click-to-dial-bg', 'Process the main application Javascript.', (do
 
 
 /**
- * The contentscript is the part that's specific for the click-to-dial popup
- * in the extension. It sets some flags for the main application as well.
+ * The popup script runs the main UI for click-to-dial in a popup or popout.
  */
 gulp.task('js-click-to-dial-popup', 'Process contentscript-specific application Javascript.', (done) => {
     if (!bundlers.popup) {
@@ -179,7 +174,7 @@ gulp.task('js-click-to-dial-popup', 'Process contentscript-specific application 
 
 
 /**
- * This part runs in each browser tab.
+ * This code runs in each browser tab.
  */
 gulp.task('js-click-to-dial-tab', 'Process the click-to-dial icons in pages Javascript.', (done) => {
     if (!bundlers.tab) {

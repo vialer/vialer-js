@@ -100,9 +100,9 @@ class ClickToDialApp extends App {
     reloadModules(update) {
         for (let module in this.modules) {
             // Use 'load' instead of 'restore' to refresh the data on browser restart.
-            if (this.modules[module].load) {
+            if (this.modules[module]._load) {
                 this.logger.debug(`${this}(re)loading module ${module}`)
-                this.modules[module].load(update)
+                this.modules[module]._load(update)
             }
         }
         this.logger.debug(`${this}${this._listeners} listeners registered`)
@@ -114,9 +114,9 @@ class ClickToDialApp extends App {
      */
     restoreModules() {
         for (let module in this.modules) {
-            if (this.modules[module].restore) {
+            if (this.modules[module]._restore) {
                 this.logger.debug(`${this}restoring module ${module}`)
-                this.modules[module].restore()
+                this.modules[module]._restore()
             }
         }
     }
@@ -128,8 +128,8 @@ class ClickToDialApp extends App {
     resetModules() {
         for (let module in this.modules) {
             this.logger.debug(`${this}resetting module ${module}`)
-            if (this.modules[module].reset) {
-                this.modules[module].reset()
+            if (this.modules[module]._reset) {
+                this.modules[module]._reset()
             }
         }
     }

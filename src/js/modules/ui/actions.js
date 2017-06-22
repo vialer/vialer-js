@@ -49,10 +49,9 @@ class UiActions extends Actions {
             this.app.restoreModules()
         })
 
-
-
-        // Previously panel module
-        // Stop related timers when the callstatus dialog closes.
+        /**
+         * Stop callstatus timer for callid when the callstatus dialog closes.
+         */
         this.app.on('callstatus.onhide', (data) => {
             this.app.logger.info(`${this}callstatus.onhide`)
             // We no longer need this call's status.
@@ -61,6 +60,11 @@ class UiActions extends Actions {
             this.app.timer.unregisterTimer(`callstatus.status${timerSuffix}`)
         })
 
+        /**
+         * Start callstatus timer function for callid when the callstatus
+         * dialog opens. The timer function updates the call status
+         * periodically.
+         */
         this.app.on('callstatus.onshow', (data) => {
             this.app.logger.info(`${this}callstatus.onshow`)
             // Start updating the call status.

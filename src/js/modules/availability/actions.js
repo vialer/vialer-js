@@ -8,13 +8,18 @@ const Actions = require('../../lib/actions')
  */
 class AvailabilityActions extends Actions {
 
+    /**
+     * Background related tasks for the availability module.
+     */
     _background() {
         this.app.on('availability.select', (data) => {
             this.app.logger.debug(`${this}availability.select triggered`)
             this.module.selectUserdestination(data.type, data.id)
         })
 
-        // Do the API call to notify the backend, then update the
+        /**
+         * Do the API call to notify the backend, then update the
+         */
         // choices in the  popup script.
         this.app.on('availability.update', (data) => {
             this.app.logger.debug(`${this}update selected userdestination and refresh popup`)
@@ -24,6 +29,9 @@ class AvailabilityActions extends Actions {
     }
 
 
+    /**
+     * Popup related tasks for the availability module.
+     */
     _popup() {
         // Refresh the availability select.
         this.app.on('availability.refresh', (data) => {
@@ -46,7 +54,10 @@ class AvailabilityActions extends Actions {
             this.module.toggleAvailabilitySelect()
         })
 
-        // Set the state of the availability select from the emitted data.
+        /**
+         * Set the state of the availability select from the emitted data.
+         * This is either done after an API call or from a cached restore.
+         */
         this.app.on('availability.fill_select', (data) => {
             let isAvailable = 'no'
             let list = $('select#statusupdate')
@@ -63,7 +74,8 @@ class AvailabilityActions extends Actions {
                 option.appendTo(list)
             })
 
-            // Update the radiobuttons depending on whether a selected option was provided or not.
+            // Update the radiobuttons depending on whether a selected option
+            // was provided.
             $(`.availability-toggle [name="availability"][value="${isAvailable}"]`).prop('checked', true);
             // In turn, check whether to enable/disable the dropdown.
             this.module.toggleAvailabilitySelect()

@@ -38,7 +38,7 @@ html.popout body {
             max-width: 450px;
     }
 
-    & .container {
+    .container {
         &:not(.hide) {
             height: 100%;
             display: flex;
@@ -46,14 +46,13 @@ html.popout body {
         }
     }
 
-    & .widget.contacts {
+    .widget.contacts {
         border-left: 1px solid #d5d5d5;
         border-right: 1px solid #d5d5d5;
 
         width: 100%;
         box-sizing: border-box;
         position: relative;
-
 
         border-left: 1px solid transparent;
         border-right: 1px solid transparent;
@@ -110,10 +109,9 @@ html.popout body {
         }
     }
 
-
-    & .widget.contacts {
-        & .empty-list .contact,
-        & .not-found-contacts .contact {
+    .widget.contacts {
+        .empty-list .contact,
+        .not-found-contacts .contact {
             height: 48px;
             box-sizing: border-box;
         }

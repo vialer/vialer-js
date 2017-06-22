@@ -62,7 +62,7 @@ class AvailabilityModule {
      * Do an API request to get an update of the available userdestination
      * options when the module is loaded in the background.
      */
-    load() {
+    _load() {
         if (!this.app.env.extension.background) {
             return
         }
@@ -128,7 +128,7 @@ class AvailabilityModule {
     }
 
 
-    reset() {
+    _reset() {
         this.app.emit('availability.reset')
         this.app.logger.info(`${this}set icon to grey`)
         this.app.browser.browserAction.setIcon({path: 'build/img/call-gray.png'})
@@ -139,7 +139,7 @@ class AvailabilityModule {
      * This is called when the popup refreshes and the background already
      * has processed all availability data.
      */
-    restore() {
+    _restore() {
         this.app.logger.info(`${this}restoring widget availability`)
 
         // Check if unauthorized.
@@ -209,12 +209,12 @@ class AvailabilityModule {
             },
             onNotOk: () => {
                 // Jump back to previously selected (the one currently in cache).
-                this.restore()
+                this._restore()
                 // FIXME: Show a notification something went wrong?
             },
             onUnauthorized: () => {
                 // Jump back to previously selected (the one currently in cache)
-                this.restore()
+                this._restore()
                 // FIXME: Show a notification something went wrong?
             },
         })
@@ -222,8 +222,8 @@ class AvailabilityModule {
 
 
     /**
-     * Enable/disable availability select depending on the choice set
-     * in the radio which asks whether the user is available or not.
+     * Enable or disable the availability select based on the
+     * `Are you available` radio button value.
      */
     toggleAvailabilitySelect() {
         let isAvailable = $('.availability-toggle [name="availability"]:checked').val() === 'yes'

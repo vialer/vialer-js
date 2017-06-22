@@ -5,14 +5,10 @@ const Actions = require('../../lib/actions')
 
 class PageActions extends Actions {
 
-
-    _background() {}
-
-    _popup() {}
-
     _tab() {
-        // Hides the callstatus dialog when clicking anywhere in the page.
-        // $('html').on('click', this.hideFrameOnClick.bind(this))
+        /**
+         * Trigger showing the callstatus dialog.
+         */
         this.app.on('callstatus.show', (data) => {
             this.app.logger.debug(`${this}callstatus.show`)
             this.module.showCallstatus(data.callid)

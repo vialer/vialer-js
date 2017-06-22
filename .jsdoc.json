@@ -10,21 +10,21 @@
         "plugins/markdown"
     ],
     "templates" : {
+        "title": "Click-to-dial",
         "logo": {
-            "url": "https://garage11.io/public/img/logo.png",
+            "url": "../img/clicktodial-big.png",
             "width": "72px",
-            "height": "60px"
+            "height": "72px"
         },
-        "name": "WebSIP",
-        "footerText": "About WebSIP",
+        "name": "Click-to-dial",
+        "footerText": "&copy; Devhouse Spindle",
         "useCollapsibles": true,
         "tabNames": {
-            "api": "API",
+            "api": "Code",
             "tutorials": "Manuals"
         }
     },
     "opts": {
-        "destination": "./docs/build",
         "encoding": "utf8",
         "private": true,
         "recurse": true,

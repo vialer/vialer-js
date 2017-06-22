@@ -21,7 +21,6 @@ class Auth {
         this.app.store.remove('user')
         this.app.modules.ui.resetWidgetState()
         this.app.resetModules()
-        this.app.modules.page.reset()
         this.app.store.remove('username')
         this.app.store.remove('password')
     }
@@ -37,8 +36,7 @@ class Auth {
                 // Reset login button.
                 this.app.emit('login.indicator.stop')
             },
-            onOk: (response) => {
-                var user = response
+            onOk: (user) => {
                 if (user.client) {
                     // Parse and set the client id as a new property.
                     user.client_id = user.client.replace(/[^\d.]/g, '')

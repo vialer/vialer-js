@@ -62,6 +62,21 @@ class PageModule {
     }
 
 
+    _reset() {
+        if (this.contextMenuItem) {
+            this.app.browser.contextMenus.removeAll()
+        }
+
+        if (this.app.store.get('c2d')) {
+            this.app.browser.tabs.query({}, (tabs) => {
+                tabs.forEach((tab) => {
+                    this.app.browser.tabs.sendMessage(tab.id, 'page.observer.stop')
+                })
+            })
+        }
+    }
+
+
     dial(data) {
         // Dial given number.
         // Block chrome pages.
@@ -89,24 +104,9 @@ class PageModule {
     }
 
 
-    reset() {
-        if (this.contextMenuItem) {
-            this.app.browser.contextMenus.removeAll()
-        }
-
-        if (this.app.store.get('c2d')) {
-            this.app.browser.tabs.query({}, (tabs) => {
-                tabs.forEach((tab) => {
-                    this.app.browser.tabs.sendMessage(tab.id, 'page.observer.stop')
-                })
-            })
-        }
-    }
-
-
     /**
-     * A tab triggers this function to set an iframe with a status dialog in
-     * it. The callid is passed to the page using a search string.
+     * A tab triggers this function to show a status dialog. The callid is
+     * passed to the iframe page using a search string.
      */
     showCallstatus(callid) {
         let iframeStyle = {
@@ -190,9 +190,10 @@ class PageModule {
         return `${this.app} [Page]               `
     }
 
+
     /**
      * Start looking for phone numbers in the page if
-     * click to dial is enabled and the user is authenticated
+     * click to dial is enabled and the user is authenticated.
      */
     watch() {
         // for new tabs

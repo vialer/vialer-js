@@ -66,7 +66,7 @@ class ContactsModule {
      * Module load function inits some stuff. The update property is true when
      * refreshing the plugin.
      */
-    load(update) {
+    _load(update) {
         if (!this.app.env.extension.background) return
 
         let phoneaccountUrl = `${this.app.api.getUrl('phoneaccount')}?active=true&order_by=description`
@@ -129,7 +129,7 @@ class ContactsModule {
     }
 
 
-    reset() {
+    _reset() {
         this.app.logger.info(`${this}reset`)
         this.app.emit('contacts.reset')
         this.app.emit('contacts.empty')
@@ -139,7 +139,7 @@ class ContactsModule {
     }
 
 
-    restore() {
+    _restore() {
         this.app.logger.info(`${this}reloading widget contacts`)
         // Check if unauthorized.
         let widgetsData = this.app.store.get('widgets')
