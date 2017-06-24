@@ -5,7 +5,7 @@
   "main": "click-to-dial.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "desktop": "electron main.js"
+    "desktop": "electron --js-flags='--harmony-async-await' src/js/desktop.js"
   },
   "repository": {
     "type": "git",

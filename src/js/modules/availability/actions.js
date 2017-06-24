@@ -39,7 +39,7 @@ class AvailabilityActions extends Actions {
             list.empty()
 
             // Add the unselected option.
-            let option = $('<option value="">').text(this.app.translate('noAvailabilityOptionsText'))
+            let option = $('<option value="">').text(this.app.i18n.translate('noAvailabilityOptionsText'))
             option.appendTo(list)
             // Which suggests you're not available (based on the available data:
             // no possible destinations).

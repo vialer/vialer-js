@@ -1,24 +1,27 @@
 'use strict'
 
 const EventEmitter = require('events').EventEmitter
+const I18n = require('./i18n')
 const Logger = require('./logger')
 const Store = require('./store')
 
 /**
- * This is the minimal App class that all parts of the click-to-dial
- * application use(tab, contentscript, background and popout). It sets
- * some basic properties that can be reused, like a logger, a basic
- * eventemitter and some environmental properties.
+ * This is the minimal class that all parts of the click-to-dial
+ * application inherit from(tab, contentscript, background, popup/out).
+ * It sets some basic properties that can be reused, like a logger, store,
+ * an IPC eventemitter and some environmental properties.
  */
 class Skeleton extends EventEmitter {
 
     constructor(options) {
         super()
         this._listeners = 0
-        this.name = options.name
-
-        this.store = new Store(this)
         this.utils = require('./utils')
+        this.env = this.getEnvironment(options.environment)
+
+        this.name = options.name
+        this.store = new Store(this)
+
 
         // Increases verbosity beyond the logger's debug level.
         this.verbose = false
@@ -26,16 +29,10 @@ class Skeleton extends EventEmitter {
         // Sets the verbosity of the logger.
         this.logger.setLevel('debug')
         this.logger.debug(`${this} init`)
-        this.env = this.getEnvironment(options.environment)
 
-        // If browser exists, use browser, otherwise take the Chrome API.
-        if ('browser' in global) {
-            this.browser = browser
-        } else {
-            this.browser = chrome
-        }
+        this.i18n = new I18n(this)
 
-        if (this.browser.extension) {
+        if (this.browser && this.browser.extension) {
             // Make the EventEmitter .on method compatible with web extension ipc.
             // An Ipc event is coming in. Map it to the EventEmitter.
             this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -59,6 +56,14 @@ class Skeleton extends EventEmitter {
                 })
             }
         }
+    }
+
+
+    /**
+     * Use `app.devMode`to do more things when in dev mode.
+     */
+    get devMode() {
+        return !('update_url' in this.browser.runtime.getManifest())
     }
 
 
@@ -104,6 +109,14 @@ class Skeleton extends EventEmitter {
      * @param {Object} environment - The environment properties passed to the Constructor.
      */
     getEnvironment(environment) {
+        // If browser exists, use browser, otherwise take the Chrome API.
+        if ('browser' in global) {
+            this.browser = browser
+        } else if ('chrome' in global) {
+            this.browser = chrome
+        } else {
+            this.browser = null
+        }
         if (environment.extension) {
             let searchParams = this.utils.parseSearch(location.search)
             if (searchParams.popout) {
@@ -127,14 +140,6 @@ class Skeleton extends EventEmitter {
     on(event, callback) {
         this._listeners += 1
         super.on(event, callback)
-    }
-
-
-    /**
-     * Use `app.devMode`to do more things when in dev mode.
-     */
-    get devMode() {
-        return !('update_url' in this.browser.runtime.getManifest())
     }
 
 

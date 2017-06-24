@@ -74,12 +74,12 @@ class Api {
             // Don't show more than once per login session.
             if (!this.app.store.get('notifications').hasOwnProperty('unauthorized') || !this.app.store.get('notifications').unauthorized) {
                 if (window.webkitNotifications) {
-                    webkitNotifications.createNotification('', '', this.app.translate('unauthorizedNotificationText')).show()
+                    webkitNotifications.createNotification('', '', this.app.i18n.translate('unauthorizedNotificationText')).show()
                 } else {
                     this.app.browser.notifications.create('unauthorized', {
                         type: 'basic',
                         iconUrl: '',
-                        title: this.app.translate('unauthorizedNotificationText'),
+                        title: this.app.i18n.translate('unauthorizedNotificationText'),
                         message: '',
                     }, () => {})
                 }

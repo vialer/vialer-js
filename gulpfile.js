@@ -58,7 +58,7 @@ const jsEntry = (name) => {
             bundlers[name] = browserify({
                 cache: {},
                 debug: !PRODUCTION,
-                entries: path.join(__dirname, 'src', 'js', `click-to-dial-${name}.js`),
+                entries: path.join(__dirname, 'src', 'js', `${name}.js`),
                 packageCache: {},
             })
             if (isWatching) bundlers[name].plugin(watchify)
@@ -66,10 +66,9 @@ const jsEntry = (name) => {
         bundlers[name].bundle()
         .on('error', notify.onError('Error: <%= error.message %>'))
         .on('end', () => {
-            if (isWatching) livereload.changed(`click-to-dial-${name}.js`)
             done()
         })
-        .pipe(source(`click-to-dial-${name}.js`))
+        .pipe(source(`${name}.js`))
         .pipe(buffer())
         .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
         .pipe(envify({NODE_ENV: NODE_ENV}))
@@ -77,7 +76,7 @@ const jsEntry = (name) => {
 
         .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
         .pipe(gulp.dest('./build/js/'))
-        .pipe(size(extend({title: `click-to-dial-${name}.js`}, sizeOptions)))
+        .pipe(size(extend({title: `${name}.js`}, sizeOptions)))
     }
 }
 
@@ -148,19 +147,23 @@ gulp.task('docs-deploy', 'Push the docs build directory to github pages.', funct
 
 
 gulp.task('js', 'Metatask that builds all JavaScript tasks.', [
-    'js-click-to-dial-bg',
-    'js-click-to-dial-options',
-    'js-click-to-dial-popup',
-    'js-click-to-dial-tab',
-    'js-click-to-dial-callstatus',
-])
+    'js-bg',
+    'js-callstatus',
+    'js-options',
+    'js-popup',
+    'js-tab',
+    'js-web',
+], (done) => {
+    if (isWatching) livereload.changed('web.js')
+    done()
+})
 
-gulp.task('js-click-to-dial-bg', 'Generate the extension background entry js.', jsEntry('bg'))
-gulp.task('js-click-to-dial-callstatus', 'Generate the callstatus entry js.', jsEntry('callstatus'))
-gulp.task('js-click-to-dial-options', 'Generate the options js.', jsEntry('options'))
-gulp.task('js-click-to-dial-popup', 'Generate the popup/popout entry js.', jsEntry('popup'))
-gulp.task('js-click-to-dial-tab', 'Generate the tab contentscript entry js.', jsEntry('tab'))
-
+gulp.task('js-bg', 'Generate the extension background entry js.', jsEntry('bg'))
+gulp.task('js-callstatus', 'Generate the callstatus entry js.', jsEntry('callstatus'))
+gulp.task('js-options', 'Generate the options js.', jsEntry('options'))
+gulp.task('js-popup', 'Generate the popup/popout entry js.', jsEntry('popup'))
+gulp.task('js-tab', 'Generate the tab contentscript entry js.', jsEntry('tab'))
+gulp.task('js-web', 'Generate the web version entry js.', jsEntry('web'))
 
 gulp.task('scss', 'Metatask that builds all scss.', [
     'scss-main',
@@ -186,11 +189,7 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
         `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
         path.join(__dirname, 'src', 'js', '**', '*.js'),
     ], () => {
-        gulp.start('js-click-to-dial-bg')
-        gulp.start('js-click-to-dial-options')
-        gulp.start('js-click-to-dial-popup')
-        gulp.start('js-click-to-dial-tab')
-        gulp.start('js-click-to-dial-callstatus')
+        gulp.start('js')
         if (WITHDOCS) gulp.start('docs')
     })
 

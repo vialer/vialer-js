@@ -17,6 +17,9 @@ class Actions {
             } else if (this.app.env.extension.background) {
                 this._background(app)
             }
+        } else {
+            this._background(app)
+            this._popup(app)
         }
     }
 

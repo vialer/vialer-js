@@ -11,13 +11,13 @@
     "browser_action": {
         "default_icon": "img/call-gray.png",
         "default_title": "Click-to-dial",
-        "default_popup": "click-to-dial-popup.html"
+        "default_popup": "popup.html"
     },
     "background": {
         "scripts": [
             "js/lib/thirdparty/SIPml-api.js",
             "js/lib/thirdparty/jquery/jquery.js",
-            "js/click-to-dial-bg.js"
+            "js/bg.js"
         ]
     },
     "permissions": [
@@ -36,20 +36,20 @@
             ],
             "js": [
                 "js/lib/thirdparty/zepto.min.js",
-                "js/click-to-dial-tab.js"
+                "js/tab.js"
             ],
             "run_at": "document_end",
             "all_frames": true
         }
     ],
     "options_ui": {
-        "page": "click-to-dial-options.html",
+        "page": "options.html",
         "chrome_style": true
     },
     "web_accessible_resources": [
         "img/*.png",
         "css/*.css",
-        "click-to-dial-callstatus.html",
+        "callstatus.html",
         "js/*.map"
     ],
     "default_locale": "en"

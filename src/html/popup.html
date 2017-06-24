@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<!--doctype is required for the extension popup auto-height -->
+<html lang="nl" class="no-scroll">
+    <head>
+        <title data-i18n-content="extDescription"></title>
+        <meta charset="utf-8" />
+        <link href="fonts/font-awesome.css" rel="stylesheet" />
+        <link href="fonts/open-sans.css" rel="stylesheet" />
+        <link href="css/styles.css" rel="stylesheet" />
+        <script src="js/lib/thirdparty/jquery/jquery.js"></script>
+    </head>
+    <body class="no-select">
+        <div class="login-section">
+            <form class="login-form">
+                <label for="username" data-i18n-content="loginFormUsernameLabel"></label>
+                <input id="username" type="text" tabindex="1" />
+                <label for="password" data-i18n-content="loginFormPasswordLabel"></label>
+                <input id="password" type="password" tabindex="2" />
+                <button id="login" type="button" class="login-button" data-link="login" data-i18n-attrs='{"data-failed-text": "loginFormLoginFailedText", "data-logout-text": "loginFormLogoutText", "data-loading-text": "loginFormLoadingText", "data-reset-text": "loginFormLoginButtonText"}' data-i18n-content="loginFormLoginButtonText"></button>
+            </form>
+        </div>
+        <div class="container hide">
+            <div class="account-info">
+                <div class="pull-right">
+                    <span id="logout" data-link="logout" class="logout" data-i18n-content="logoutLinkText"></span>
+                    <span class="shortcuts">
+                        <i id="close" class="fa pull-right fa-times-circle" data-i18n-title="closePanelTitle"></i>
+                        <i id="settings" class="fa pull-right fa-cog" data-link="settings" data-i18n-title="openSettingsTitle"></i>
+                        <i id="refresh" class="fa pull-right fa-refresh" data-i18n-title="refreshPanelTitle"></i>
+                        <i id="help" class="fa pull-right fa-question-circle" data-link="help" data-i18n-title="openHelpTitle"></i>
+                        <i id="popout" class="fa pull-right flip-horizontal fa-external-link" data-i18n-title="popoutTitle"></i>
+                    </span>
+                </div>
+                <span id="user-name" class="user-name"></span>
+            </div>
+            <div class="widget availability" data-opened="false" data-widget="availability">
+                <div class="widget-header no-select">
+                    <h3 class="widget-title">
+                        <i class="fa fa-fw fa-phone-square fa-vertical-align widget-icon"></i>
+                        <i class="fa fa-fw fa-spinner fa-spin fa-vertical-align busy-icon"></i>
+                        <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align unauthorized-icon"></i>
+                        <span data-i18n-content="availabilityWidgetTitle"></span>
+                    </h3>
+                </div>
+                <div class="widget-content hide">
+                    <form class="form form-inline">
+                        <div class="form-group availability-toggle">
+                            <label data-i18n-content="availabilityOptionsTitle"></label>
+                            <div class="radio">
+                                <label>
+                                    <input id="yes" type="radio" name="availability" class="form-control" value="yes" checked="checked" /> <span data-i18n-content="availabilityOptionYES"></span>
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input id="no" type="radio" name="availability" class="form-control" value="no" /> <span data-i18n-content="availabilityOptionNO"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group availability-destination">
+                            <select id="statusupdate" class="form-control" name="selecteddestination"></select>
+                        </div>
+                    </form>
+                </div>
+                <div class="unauthorized-warning hide" data-i18n-content="availabilityUnauthorizedWarning"></div>
+            </div>
+            <div class="widget contacts" data-opened="false" data-widget="contacts">
+                <div class="widget-header no-select">
+                    <h3 class="widget-title">
+                        <i class="fa fa-fw fa-group fa-vertical-align widget-icon"></i>
+                        <i class="fa fa-fw fa-spinner fa-spin fa-vertical-align busy-icon"></i>
+                        <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align unauthorized-icon"></i>
+                        <i class="fa fa-fw fa-triangle fa-chain-broken fa-vertical-align connecting connection-icon" data-i18n-title="contactsConnectingTitle"></i>
+                        <i class="fa fa-fw fa-triangle fa-chain-broken fa-vertical-align no-connection connection-icon" data-i18n-title="contactsNoConnectionTitle"></i>
+                        <span data-i18n-content="contactsWidgetTitle"></span>
+
+                        <form class="form form-inline search-form">
+                            <i class="fa fa-search pull-left search-button"></i>
+                            <input id="search-query" type="search" name="search" class="form-control search-query" disabled="disabled" />
+                        </form>
+                    </h3>
+                </div>
+                <div class="widget-content hide">
+                    <ul class="template hide">
+                        <li class="contact">
+                            <div class="status-icon pull-left">
+                                <i class="fa fa-phone-square"></i>
+                            </div>
+                            <div class="info">
+                                <div class="name"></div>
+                                <br />
+                                <div class="extension"></div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="list">
+                    </ul>
+                    <ul class="empty-list hide">
+                        <li class="contact">
+                            <div class="status-icon pull-left">
+                                <i class="fa"></i>
+                            </div>
+                            <div class="info">
+                                <div class="name">
+                                    <span class="text" data-i18n-content="noContactsText"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="not-found-contacts hide">
+                        <li class="contact">
+                            <div class="status-icon pull-left">
+                                <i class="fa"></i>
+                            </div>
+                            <div class="info">
+                                <div class="name">
+                                    <span class="text" data-i18n-content="noContactsFoundText"></span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="unauthorized-warning hide" data-i18n-content="contactsUnauthorizedWarning"></div>
+            </div>
+            <div class="widget queues" data-opened="false" data-widget="queues">
+                <div class="widget-header no-select">
+                    <h3 class="widget-title">
+                        <i class="fa fa-fw fa-clock-o fa-vertical-align widget-icon"></i>
+                        <i class="fa fa-fw fa-spinner fa-spin fa-vertical-align busy-icon"></i>
+                        <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align unauthorized-icon"></i>
+                        <span data-i18n-content="queuesWidgetTitle"></span>
+                    </h3>
+                </div>
+                <div class="widget-content hide">
+                    <ul class="template hide">
+                        <li class="queue">
+                            <span class="indicator">?</span>
+                            <span class="text"></span>
+                            <span class="code"></span>
+                        </li>
+                    </ul>
+                    <ul class="list">
+                    </ul>
+                    <ul class="empty-list hide">
+                        <li class="queue">
+                            <span class="indicator">?</span>
+                            <span class="text" data-i18n-content="noQueuesText"></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="unauthorized-warning hide" data-i18n-content="queuesUnauthorizedWarning"></div>
+            </div>
+        </div>
+    </body>
+    <script src="js/popup.js"></script>
+</html>

@@ -24,7 +24,7 @@ const _modules = [
  * the Chrome web extension and the Electron desktop app. It is used
  * by the extension scripts for background(bg) and popup(ui).
  */
-class ClickToDialApp extends Skeleton {
+class App extends Skeleton {
 
     constructor(options) {
         super(options)
@@ -41,22 +41,25 @@ class ClickToDialApp extends Skeleton {
 
         this.store = new Store(this)
 
-        if (this.env.extension && this.env.extension.background) {
+        if (this.env.extension) {
+            // Only the background script in an extension has a sip stack.
+            if (this.env.extension.background) {
+                this.api = new Api(this)
+                this.sip = new Sip(this)
+            }
+        } else {
+            this.api = new Api(this)
             this.sip = new Sip(this)
         }
 
-        if (this.env.extension) {
-            this.api = new Api(this)
-            // Init these modules.
-            for (let module of _modules) {
-                this.modules[module.name] = new module.Module(this)
-            }
-
-            this.logger.debug(`${this}${this._listeners} listeners registered`)
+        // Init these modules.
+        for (let module of _modules) {
+            this.modules[module.name] = new module.Module(this)
         }
 
-        this.analytics = new Analytics(this, this.settings.analyticsId)
+        this.logger.debug(`${this}${this._listeners} listeners registered`)
 
+        this.analytics = new Analytics(this, this.settings.analyticsId)
         this.dialer = new Dialer(this)
         this.timer = new Timer(this)
 
@@ -134,11 +137,6 @@ class ClickToDialApp extends Skeleton {
     }
 
 
-    translate(messageID, args) {
-        return this.browser.i18n.getMessage(messageID, args)
-    }
-
-
     /**
      * Return the current version of the app.
      */
@@ -147,4 +145,4 @@ class ClickToDialApp extends Skeleton {
     }
 }
 
-module.exports = ClickToDialApp
+module.exports = App

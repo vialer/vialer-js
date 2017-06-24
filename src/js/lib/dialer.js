@@ -51,7 +51,7 @@ class Dialer {
         let openNotificationTimeout
         if (!text) {
             notificationId = 'failed-call'
-            text = this.app.translate('callFailedNotificationText')
+            text = this.app.i18n.translate('callFailedNotificationText')
         }
 
         if (window.webkitNotifications) {
@@ -224,17 +224,17 @@ class Dialer {
 
     getStatusMessage(status, bNumber) {
         let messages = {
-            'dialing_a': this.app.translate('clicktodialStatusDialingA'),
-            'confirm': this.app.translate('clicktodialStatusConfirm'),
-            'dialing_b': this.app.translate('clicktodialStatusDialingB', bNumber),
-            'connected': this.app.translate('clicktodialStatusConnected'),
-            'disconnected': this.app.translate('clicktodialStatusDisconnected'),
-            'failed_a': this.app.translate('clicktodialStatusFailedA'),
-            'blacklisted': this.app.translate('clicktodialStatusBlacklisted'),
-            'failed_b': this.app.translate('clicktodialStatusFailedB', bNumber),
+            'dialing_a': this.app.i18n.translate('clicktodialStatusDialingA'),
+            'confirm': this.app.i18n.translate('clicktodialStatusConfirm'),
+            'dialing_b': this.app.i18n.translate('clicktodialStatusDialingB', bNumber),
+            'connected': this.app.i18n.translate('clicktodialStatusConnected'),
+            'disconnected': this.app.i18n.translate('clicktodialStatusDisconnected'),
+            'failed_a': this.app.i18n.translate('clicktodialStatusFailedA'),
+            'blacklisted': this.app.i18n.translate('clicktodialStatusBlacklisted'),
+            'failed_b': this.app.i18n.translate('clicktodialStatusFailedB', bNumber),
         }
 
-        let message = this.app.translate('clicktodialCallingText');
+        let message = this.app.i18n.translate('clicktodialCallingText');
         if (messages.hasOwnProperty(status)) {
             message = messages[status]
         }
