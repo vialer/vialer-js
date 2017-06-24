@@ -18,30 +18,6 @@ class QueuesModule {
         this.queuecallgroups = []
 
         this.actions = new QueuesActions(app, this)
-
-        // Keep track of selected queue.
-        this.app.on('queue.select', (data) => {
-            let widgetsData = this.app.store.get('widgets')
-            let id = data.id
-            if (id) {
-                let size = NaN
-                if (this.sizes && this.sizes.hasOwnProperty(id)) {
-                    size = this.sizes[id]
-                }
-                this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
-            } else {
-                // Restore availability icon.
-                if (widgetsData.availability) {
-                    this.app.logger.info(`${this}set availability icon`)
-                    this.app.browser.browserAction.setIcon({path: this.app.store.get('widgets').availability.icon})
-                }
-            }
-
-            // Save selected queue id in storage.
-            widgetsData.queues.selected = id
-            this.app.store.set('widgets', widgetsData)
-            this.app.timer.update('queue.size')
-        })
     }
 
 
@@ -132,12 +108,12 @@ class QueuesModule {
 
 
     getIconForSize(size) {
-        let icon = '/build/img/queue.png'
+        let icon = '/img/queue.png'
         if (!isNaN(size)) {
             if (size < 10) {
-                icon = '/build/img/queue' + size + '.png'
+                icon = '/img/queue' + size + '.png'
             } else {
-                icon = '/build/img/queue10.png'
+                icon = '/img/queue10.png'
             }
         }
         return icon

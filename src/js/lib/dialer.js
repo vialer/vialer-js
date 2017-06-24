@@ -73,7 +73,7 @@ class Dialer {
             } else {
                 this.app.browser.notifications.create(notificationId, {
                     type: 'basic',
-                    iconUrl: this.app.browser.runtime.getURL('build/img/clicktodial-big.png'),
+                    iconUrl: this.app.browser.runtime.getURL('img/clicktodial-big.png'),
                     title: text,
                     message: '',
                 }, notificationCallback)

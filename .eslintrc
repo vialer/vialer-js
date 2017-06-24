@@ -9,11 +9,12 @@
     },
     "globals": {
         "app": true,
+        "browser": true,
         "chrome": true,
-        "webkitNotifications": true,
+        "translate": true,
         "tsip_event_code_e": true,
         "tsip_transport_state_e": true,
-        "browser": true
+        "webkitNotifications": true 
     },
     "plugins": [
 

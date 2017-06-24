@@ -1,14 +1,14 @@
 'use strict'
 
-const App = require('./lib/app')
-const Page = require('./modules/page')
 const Observer = require('./modules/page/observer')
+const Page = require('./modules/page')
+const Skeleton = require('./lib/skeleton')
 const Walker = require('./modules/page/walker')
 
 require('./modules/page/parsers/dutch')
 
 
-class TabsApp extends App {
+class TabsApp extends Skeleton {
 
     constructor(options) {
         super(options)

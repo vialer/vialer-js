@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 const extend = require('util')._extend
 const path = require('path')
@@ -41,7 +41,6 @@ const NODE_PATH = process.env.NODE_PATH || path.join(__dirname, 'node_modules')
 const PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
 const WITHDOCS = argv.docs ? argv.docs : false
 
-const deployMode = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
 const minifier = composer(uglifyEs, console)
 
 let bundlers = {bg: null, popup: null, tab: null, callstatus: null}
@@ -50,41 +49,89 @@ let sizeOptions = {showTotal: true, showFiles: true}
 
 if (PRODUCTION) gutil.log('(!) Gulp optimized for production')
 
+/**
+ * Generic browserify task used for multiple entrypoints.
+ */
+const jsEntry = (name) => {
+    return (done) => {
+        if (!bundlers[name]) {
+            bundlers[name] = browserify({
+                cache: {},
+                debug: !PRODUCTION,
+                entries: path.join(__dirname, 'src', 'js', `click-to-dial-${name}.js`),
+                packageCache: {},
+            })
+            if (isWatching) bundlers[name].plugin(watchify)
+        }
+        bundlers[name].bundle()
+        .on('error', notify.onError('Error: <%= error.message %>'))
+        .on('end', () => {
+            if (isWatching) livereload.changed(`click-to-dial-${name}.js`)
+            done()
+        })
+        .pipe(source(`click-to-dial-${name}.js`))
+        .pipe(buffer())
+        .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
+        .pipe(envify({NODE_ENV: NODE_ENV}))
+        .pipe(ifElse(PRODUCTION, () => minifier()))
+
+        .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
+        .pipe(gulp.dest('./build/js/'))
+        .pipe(size(extend({title: `click-to-dial-${name}.js`}, sizeOptions)))
+    }
+}
 
 /**
- * Copies all required assets to the build directory.
+ * Generic scss task used for multiple entrypoints.
  */
-gulp.task('assets', 'Move assets to the build directory.', () => {
+const scssEntry = (name) => {
+    return () => {
+        return gulp.src(`./src/scss/${name}.scss`)
+        .pipe(sass({
+            includePaths: NODE_PATH,
+            sourceMap: !PRODUCTION,
+            sourceMapContents: !PRODUCTION,
+            sourceMapEmbed: !PRODUCTION,
+        }))
+        .on('error', notify.onError('Error: <%= error.message %>'))
+        .pipe(concat(`${name}.css`))
+        .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 0})))
+        .pipe(gulp.dest('./build/css'))
+        .pipe(size(extend({title: `scss-${name}`}, sizeOptions)))
+        .pipe(ifElse(isWatching, livereload))
+    }
+}
+
+
+gulp.task('assets', 'Copy extension assets to the build directory.', () => {
     return gulp.src('./src/img/**', {base: './src'})
+    .pipe(addsrc('./manifest.json'))
+    .pipe(addsrc('./LICENSE'))
+    .pipe(addsrc('./README.md'))
+    .pipe(addsrc('./src/_locales/**', {base: './src/'}))
     .pipe(addsrc('./src/fonts/**', {base: './src/'}))
     .pipe(addsrc(path.join(NODE_PATH, 'font-awesome', 'fonts', '**'), {base: path.join(NODE_PATH, 'font-awesome')}))
     .pipe(addsrc('./src/js/lib/thirdparty/**/*.js', {base: './src/'}))
     .pipe(addsrc('./src/html/*.html', {base: './src/html'}))
-    .pipe(addsrc('./src/js/lib/frame.js', {base: './src/'}))
     .pipe(gulp.dest('./build/'))
     .pipe(size(extend({title: 'assets'}, sizeOptions)))
     .pipe(ifElse(isWatching, livereload))
 })
 
 
-gulp.task('build', 'Metatask that runs all tasks.', (done) => {
-    runSequence(
-        'build-clean', [
-            'js-click-to-dial-bg', 'js-click-to-dial-popup', 'js-click-to-dial-tab',
-            'js-click-to-dial-callstatus', 'scss', 'scss-print', 'docs', 'assets',
-        ]
-    , done)
+gulp.task('build', 'Clears existing build and regenerate a new one.', (done) => {
+    runSequence('build-clean', ['assets', 'docs', 'js', 'scss'], done)
 })
 
 
-gulp.task('build-clean', `Delete build directory '${BUILD_DIR}'`, (done) => {
+gulp.task('build-clean', `Destroy build directory (${BUILD_DIR}).`, (done) => {
     del([path.join(BUILD_DIR, '**')], {
         force: true,
     }).then(() => done())
 })
 
 
-gulp.task('docs', 'Generate documentation', (done) => {
+gulp.task('docs', 'Generate documentation.', (done) => {
     let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs`
     childExec(execCommand, undefined, (err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
@@ -95,205 +142,35 @@ gulp.task('docs', 'Generate documentation', (done) => {
 })
 
 
-/**
- * Update the hosted github pages from the current docs build directory.
- */
-gulp.task('docs-deploy', function() {
+gulp.task('docs-deploy', 'Push the docs build directory to github pages.', function() {
     return gulp.src('./docs/build/**/*').pipe(ghPages())
 })
 
 
 gulp.task('js', 'Metatask that builds all JavaScript tasks.', [
     'js-click-to-dial-bg',
+    'js-click-to-dial-options',
     'js-click-to-dial-popup',
     'js-click-to-dial-tab',
     'js-click-to-dial-callstatus',
 ])
 
-
-/**
- * This is the main application. It runs in the background, but also
- * in the contentscript. Functionality of the main application is
- * determined with a `global.contentscript` flag.
- */
-gulp.task('js-click-to-dial-bg', 'Process the main application Javascript.', (done) => {
-    if (!bundlers.bg) {
-        bundlers.bg = browserify({
-            cache: {},
-            debug: !PRODUCTION,
-            entries: path.join(__dirname, 'src', 'js', 'click-to-dial-bg.js'),
-            packageCache: {},
-        })
-        if (isWatching) bundlers.bg.plugin(watchify)
-    }
-    bundlers.bg.bundle()
-    .on('error', notify.onError('Error: <%= error.message %>'))
-    .on('end', () => {
-        if (isWatching) livereload.changed('click-to-dial.js')
-        done()
-    })
-    .pipe(source('click-to-dial-bg.js'))
-    .pipe(buffer())
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
-    .pipe(envify({NODE_ENV: NODE_ENV}))
-    .pipe(ifElse(PRODUCTION, () => minifier()))
-
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
-    .pipe(gulp.dest('./build/js/'))
-    .pipe(size(extend({title: 'js-click-to-dial-bg'}, sizeOptions)))
-})
+gulp.task('js-click-to-dial-bg', 'Generate the extension background entry js.', jsEntry('bg'))
+gulp.task('js-click-to-dial-callstatus', 'Generate the callstatus entry js.', jsEntry('callstatus'))
+gulp.task('js-click-to-dial-options', 'Generate the options js.', jsEntry('options'))
+gulp.task('js-click-to-dial-popup', 'Generate the popup/popout entry js.', jsEntry('popup'))
+gulp.task('js-click-to-dial-tab', 'Generate the tab contentscript entry js.', jsEntry('tab'))
 
 
-/**
- * The popup script runs the main UI for click-to-dial in a popup or popout.
- */
-gulp.task('js-click-to-dial-popup', 'Process contentscript-specific application Javascript.', (done) => {
-    if (!bundlers.popup) {
-        bundlers.popup = browserify({
-            cache: {},
-            debug: !PRODUCTION,
-            entries: path.join(__dirname, 'src', 'js', 'click-to-dial-popup.js'),
-            packageCache: {},
-        })
-        if (isWatching) bundlers.popup.plugin(watchify)
-    }
-    bundlers.popup.bundle()
-    .on('error', notify.onError('Error: <%= error.message %>'))
-    .on('end', () => {
-        if (isWatching) livereload.changed('click-to-dial-popup.js')
-        done()
-    })
-    .pipe(source('click-to-dial-popup.js'))
-    .pipe(buffer())
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
-    .pipe(envify({NODE_ENV: NODE_ENV}))
-    .pipe(ifElse(PRODUCTION, () => minifier()))
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
-    .pipe(gulp.dest('./build/js/'))
-    .pipe(size(extend({title: 'js-click-to-dial-popup'}, sizeOptions)))
-})
+gulp.task('scss', 'Metatask that builds all scss.', [
+    'scss-main',
+    'scss-options',
+    'scss-print',
+])
 
-
-/**
- * This code runs in each browser tab.
- */
-gulp.task('js-click-to-dial-tab', 'Process the click-to-dial icons in pages Javascript.', (done) => {
-    if (!bundlers.tab) {
-        bundlers.tab = browserify({
-            cache: {},
-            debug: !PRODUCTION,
-            entries: path.join(__dirname, 'src', 'js', 'click-to-dial-tab.js'),
-            packageCache: {},
-        })
-        if (isWatching) bundlers.tab.plugin(watchify)
-    }
-    bundlers.tab.bundle()
-    .on('error', notify.onError('Error: <%= error.message %>'))
-    .on('end', () => {
-        if (isWatching) livereload.changed('click-to-dial-tab.js')
-        done()
-    })
-    .pipe(source('click-to-dial-tab.js'))
-    .pipe(buffer())
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
-    .pipe(envify({NODE_ENV: NODE_ENV}))
-    .pipe(ifElse(PRODUCTION, () => minifier()))
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
-    .pipe(gulp.dest('./build/js/'))
-    .pipe(size(extend({title: 'js-click-to-dial-tab'}, sizeOptions)))
-})
-
-
-/**
- * This part runs in each browser tab.
- */
-gulp.task('js-click-to-dial-callstatus', 'Process the click-to-dial callstatus javascript.', (done) => {
-    if (!bundlers.callstatus) {
-        bundlers.callstatus = browserify({
-            cache: {},
-            debug: !PRODUCTION,
-            entries: path.join(__dirname, 'src', 'js', 'click-to-dial-callstatus.js'),
-            packageCache: {},
-        })
-        if (isWatching) bundlers.callstatus.plugin(watchify)
-    }
-    bundlers.callstatus.bundle()
-    .on('error', notify.onError('Error: <%= error.message %>'))
-    .on('end', () => {
-        if (isWatching) livereload.changed('click-to-dial-callstatus.js')
-        done()
-    })
-    .pipe(source('click-to-dial-callstatus.js'))
-    .pipe(buffer())
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
-    .pipe(envify({NODE_ENV: NODE_ENV}))
-    .pipe(ifElse(PRODUCTION, () => minifier()))
-    .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
-    .pipe(gulp.dest('./build/js/'))
-    .pipe(size(extend({title: 'js-click-to-dial-callstatus'}, sizeOptions)))
-})
-
-
-
-/**
- * Generate one css file out of all app styles.scss files and it's imports.
- */
-gulp.task('scss', 'Find all scss files from the apps directory, concat them and save as one css file.', () => {
-    return gulp.src('./src/scss/styles.scss')
-    .pipe(sass({
-        includePaths: NODE_PATH,
-        sourceMap: !PRODUCTION,
-        sourceMapContents: !PRODUCTION,
-        sourceMapEmbed: !PRODUCTION,
-    }))
-    .on('error', notify.onError('Error: <%= error.message %>'))
-    .pipe(concat('styles.css'))
-    .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 0})))
-    .pipe(gulp.dest('./build/css'))
-    .pipe(size(extend({title: 'scss'}, sizeOptions)))
-    .pipe(ifElse(isWatching, livereload))
-})
-
-
-/**
- * Generate one css file out of all app styles.scss files and it's imports.
- */
-gulp.task('scss-print', 'Compiles print sass to css.', () => {
-    return gulp.src('./src/scss/print.scss')
-    .pipe(sass({
-        includePaths: NODE_PATH,
-        sourceMap: !PRODUCTION,
-        sourceMapContents: !PRODUCTION,
-        sourceMapEmbed: !PRODUCTION,
-    }))
-    .on('error', notify.onError('Error: <%= error.message %>'))
-    .pipe(concat('print.css'))
-    .pipe(ifElse(deployMode, () => cleanCSS({
-        advanced: true,
-    })))
-    .pipe(gulp.dest('./build/css'))
-    .pipe(size(extend({title: 'scss-print'}, sizeOptions)))
-    .pipe(ifElse(isWatching, livereload))
-})
-
-
-
-//build ditributable and sourcemaps after other tasks completed
-gulp.task('zip', ['build'], function() {
-    const manifest = require('./manifest')
-    const distFileName = `${manifest.name.toLowerCase()}-v${manifest.version}.zip`
-    // Build distributable extension.
-    return gulp.src([
-        'LICENSE',
-        'README.md',
-        './build/**',
-        './chrome/**',
-        './_locales/**',
-    ], {base: './'})
-    .pipe(addsrc('./manifest.json'))
-    .pipe(zip(distFileName))
-    .pipe(gulp.dest('./'))
-});
+gulp.task('scss-main', 'Compiles UI sass to css.', scssEntry('styles'))
+gulp.task('scss-options', 'Compiles extension options sass to css.', scssEntry('options'))
+gulp.task('scss-print', 'Compiles print sass to css.', scssEntry('print'))
 
 
 gulp.task('watch', 'Start a development server and watch for changes.', () => {
@@ -305,8 +182,12 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
     app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
     http.createServer(app).listen(8999)
 
-    gulp.watch(path.join(__dirname, 'src', 'js', '**', '*.js'), () => {
+    gulp.watch([
+        `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
+        path.join(__dirname, 'src', 'js', '**', '*.js'),
+    ], () => {
         gulp.start('js-click-to-dial-bg')
+        gulp.start('js-click-to-dial-options')
         gulp.start('js-click-to-dial-popup')
         gulp.start('js-click-to-dial-tab')
         gulp.start('js-click-to-dial-callstatus')
@@ -314,7 +195,6 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
     })
 
     if (WITHDOCS) {
-        gutil.log('Watching documentation')
         gutil.log('Watching documentation')
         gulp.watch([
             path.join(__dirname, '.jsdoc.json'),
@@ -325,6 +205,29 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
         })
     }
 
-    gulp.watch(path.join(__dirname, 'src', 'html', '**', '*.html'), ['assets'])
-    gulp.watch(path.join(__dirname, 'src', 'scss', '**', '*.scss'), ['scss', 'scss-print'])
+    gulp.watch([
+        path.join(__dirname, 'manifest.json'),
+        path.join(__dirname, 'src', '_locales', '**', '*.json'),
+        path.join(__dirname, 'src', 'html', '**', '*.html'),
+        path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
+    ], ['assets'])
+
+    gulp.watch([
+        `!${path.join(__dirname, 'src', 'scss', 'options.scss')}`,
+        path.join(__dirname, 'src', 'scss', '**', '*.scss'),
+    ], ['scss-main', 'scss-print'])
+
+    gulp.watch(path.join(__dirname, 'src', 'scss', 'options.scss'), ['scss-options'])
+})
+
+
+gulp.task('zip', 'Generate a ditributable extension zip file.', ['build'], function() {
+    const manifest = require('./manifest')
+    const distFileName = `${manifest.name.toLowerCase()}-v${manifest.version}.zip`
+    // Build distributable extension.
+    return gulp.src([
+        './build/**',
+    ], {base: './build'})
+    .pipe(zip(distFileName))
+    .pipe(gulp.dest('./'))
 })

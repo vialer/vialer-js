@@ -7,10 +7,9 @@ const Actions = require('../../lib/actions')
  * All UI related actions for Contacts.
  */
 class ContactsActions extends Actions {
-
     /**
-     * Register local events; e.g. events that are triggered from the background
-     * and handled by the background.
+     * Register local events; e.g. events that are triggered
+     * from the background and handled by the background.
      */
     _background() {
         this.app.on('sip:starting', (e) => {

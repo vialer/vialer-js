@@ -15,9 +15,12 @@ class UserModule {
 
 
     /**
-     *  Make an api call to authenticate and save the credentials in storage.
+     * Make an api call with the current basic authentication to retrieve
+     * profile information with. Save the credentials in storage when the call
+     * is succesful, otherwise remove the credentials from the store.
      */
     login(username, password) {
+        this.app.api.setupClient(username, password)
         this.app.api.client.get('api/permission/systemuser/profile/').then((res) => {
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 let user = res.data
@@ -65,6 +68,7 @@ class UserModule {
         this.app.store.remove('username')
         this.app.store.remove('password')
         this.app.emit('logout.success')
+        this.app.api.setupClient()
     }
 }
 

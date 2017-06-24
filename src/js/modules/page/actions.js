@@ -8,8 +8,8 @@ class PageActions extends Actions {
     _background() {
         // The tab indicates that it's ready to observe. Check if it
         // should add the icons.
-        this.app.on('page.observer.ready', this.toggleObserve.bind(this))
-        this.app.on('clicktodial.dial', this.dial.bind(this))
+        this.app.on('page.observer.ready', this.module.toggleObserve.bind(this.module))
+        this.app.on('clicktodial.dial', this.module.dial.bind(this.module))
 
         this.app.logger.debug(`${this}setting context menuitem`)
 

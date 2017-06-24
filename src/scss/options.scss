@@ -1,0 +1,36 @@
+body {
+    overflow: auto;
+}
+
+.field {
+    margin-bottom: 10px;
+    label + input {
+        clear: both;
+        display: block;
+    }
+    
+    input[type=text] {
+        width: 100%;
+    }
+}
+
+.actions {
+    margin: 15px 0;
+    
+    button {
+        height: 25px;
+    }
+    
+    #status {
+        float: right;
+        display: block;
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+        
+        &.hide {
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+        line-height: 25px;
+    }
+}

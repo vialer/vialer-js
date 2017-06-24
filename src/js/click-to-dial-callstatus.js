@@ -1,9 +1,9 @@
 'use strict'
 
-const App = require('./lib/app')
+const Skeleton = require('./lib/skeleton')
 
 
-class CallStatusApp extends App {
+class CallStatusApp extends Skeleton {
 
     /**
      * When the app initializes, it's already assumed to be active and open.

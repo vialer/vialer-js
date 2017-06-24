@@ -17,8 +17,6 @@ class Observer {
         this.observer = null
         this.handleMutationsTimeout = null
         this.parkedNodes = []
-
-        const printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('build/css/print.css')}" media="print">`)
     }
 
 
@@ -47,7 +45,7 @@ class Observer {
         let iconStyle = {
             // 'background-attachment': 'scroll',  // this is set later, conditionally
             'background-color': 'transparent !important',
-            'background-image': 'url("' + this.app.browser.runtime.getURL('build/img/clicktodial.png') + '")',
+            'background-image': 'url("' + this.app.browser.runtime.getURL('img/clicktodial.png') + '")',
             'background-repeat': 'no-repeat',
             'bottom': '-3px !important',
             'background-position': 'center center',

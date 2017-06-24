@@ -8,6 +8,32 @@ const Actions = require('../../lib/actions')
  */
 class QueuesActions extends Actions {
 
+    _background() {
+        // Keep track of selected queue.
+        this.app.on('queue.select', (data) => {
+            let widgetsData = this.app.store.get('widgets')
+            let id = data.id
+            if (id) {
+                let size = NaN
+                if (this.module.sizes && this.module.sizes.hasOwnProperty(id)) {
+                    size = this.module.sizes[id]
+                }
+                this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
+            } else {
+                // Restore availability icon.
+                if (widgetsData.availability) {
+                    this.app.logger.info(`${this}set availability icon`)
+                    this.app.browser.browserAction.setIcon({path: this.app.store.get('widgets').availability.icon})
+                }
+            }
+
+            // Save selected queue id in storage.
+            widgetsData.queues.selected = id
+            this.app.store.set('widgets', widgetsData)
+            this.app.timer.update('queue.size')
+        })
+    }
+
     _popup() {
         if (!('queue' in window.cache)) {
             window.cache.queue = {

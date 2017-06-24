@@ -1,144 +1,150 @@
 'use strict'
 
-const EventEmitter = require('events').EventEmitter
-const Logger = require('./logger')
+const Analytics = require('./analytics')
+const Api = require('./api')
+const Dialer = require('./dialer')
+const Skeleton = require('./skeleton')
+const Sip = require('./sip')
+const Store = require('./store')
+const Timer = require('./timer')
+
+
+const _modules = [
+    {name: 'availability', Module: require('../modules/availability')},
+    {name: 'contacts', Module: require('../modules/contacts')},
+    {name: 'page', Module: require('../modules/page')},
+    {name: 'ui', Module: require('../modules/ui')},
+    {name: 'user', Module: require('../modules/user')},
+    {name: 'queues', Module: require('../modules/queues')},
+]
+
 
 /**
- * This is the minimal App class that all parts of the click-to-dial
- * application use(tab, contentscript, background and popout). It sets
- * some basic properties that can be reused, like a logger, a basic
- * eventemitter and some environmental properties.
+ * This is the main entry point for the Firefox web extension,
+ * the Chrome web extension and the Electron desktop app. It is used
+ * by the extension scripts for background(bg) and popup(ui).
  */
-class App extends EventEmitter {
+class ClickToDialApp extends Skeleton {
 
     constructor(options) {
-        super()
-        this._listeners = 0
-        this.name = options.name
+        super(options)
 
-        this.utils = require('./utils')
-
-        // Increases verbosity beyond the logger's debug level.
-        this.verbose = false
-        this.logger = new Logger()
-        // Sets the verbosity of the logger.
-        this.logger.setLevel('debug')
-        this.logger.debug(`${this} init`)
-        this.env = this.getEnvironment(options.environment)
-
-        // If browser exists, use browser, otherwise take the Chrome API.
-        if ('browser' in global) {
-            this.browser = browser
-        } else {
-            this.browser = chrome
+        // Some caching mechanism.
+        window.cache = {}
+        this.modules = {}
+        this.settings = {
+            analyticsId: 'UA-60726618-9',
+            platformUrl: 'https://partner.voipgrid.nl/',
+            realm: 'websocket.voipgrid.nl',
+            c2d: 'true',
         }
 
-        if (this.browser.extension) {
-            // Make the EventEmitter .on method compatible with web extension ipc.
-            // An Ipc event is coming in. Map it to the EventEmitter.
-            this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-                if (this.verbose) this.logger.debug(`${this}${request.event} triggered`)
-                if (request.data) {
-                    // Add extra contextual information about sender to the payload.
-                    request.data.sender = sender
-                    // It may have a callback, but functions can't pass through
-                    // the request.data, so map sendResponse.
-                    request.data.callback = sendResponse
+        this.store = new Store(this)
+
+        if (this.env.extension && this.env.extension.background) {
+            this.sip = new Sip(this)
+        }
+
+        if (this.env.extension) {
+            this.api = new Api(this)
+            // Init these modules.
+            for (let module of _modules) {
+                this.modules[module.name] = new module.Module(this)
+            }
+
+            this.logger.debug(`${this}${this._listeners} listeners registered`)
+        }
+
+        this.analytics = new Analytics(this, this.settings.analyticsId)
+
+        this.dialer = new Dialer(this)
+        this.timer = new Timer(this)
+
+        // Store settings to localstorage.
+        for (let key in this.settings) {
+            if (this.settings.hasOwnProperty(key)) {
+                if (this.store.get(key) === null) {
+                    this.store.set(key, this.settings[key])
                 }
-                this.emit(request.event, request.data, true)
-            })
+            }
+        }
 
-            // Allows parent scripts to use the same EventEmitter syntax.
-            if (this.env.extension && this.env.extension.tab) {
-                this.logger.info(`${this} added plain message listener`)
-                window.addEventListener('message', (e) => {
-                    if (this.verbose) this.logger.debug(`${this}${e.data.event} triggered`)
-                    this.emit(e.data.event, e.data.data, true)
-                })
+        // Checkout the contents of localstorage.
+        if (this.verbose) {
+            let localStorageDump = `${this} localstorage contains...\n`
+            for (let i = 0; i < localStorage.length; i++) {
+                localStorageDump += `${localStorage.key(i)}=${localStorage.getItem(localStorage.key(i))}\n`
+            }
+            this.logger.debug(localStorageDump)
+        }
+
+        // Keep track of some notifications.
+        this.store.set('notifications', {})
+        // Continue last session if credentials are available.
+        if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
+            this.logger.info(`${this} reusing session`)
+            this.reloadModules(false)
+
+            if (this.env.extension && this.env.extension.background) {
+                this.logger.info(`${this}set icon to available because of login`)
+                this.browser.browserAction.setIcon({path: 'img/call-green.png'})
             }
         }
     }
 
 
     /**
-     * Modified emit method which makes it compatible with web extension ipc.
-     * Without tabId or parent, the event is emitted on the runtime, which
-     * includes listeners for the popout and the background script. The tabId
-     * or the parent are specific when an event needs to be emitted on
-     * either a tab content script or from a loaded tab content script to
-     * it's parent.
+     * Reload all modules that have this method implemented.
      */
-    emit(event, data = {}, skipExtension = false, tabId = false, parent = false) {
-        if (this.verbose) this.logger.debug(`${this} emit ${event}`)
-        if (this.browser.extension && !skipExtension) {
-            let payloadArgs = []
-            let payloadData = {event: event, data: data}
-            payloadArgs.push(payloadData)
-
-            if (tabId) {
-                this.browser.tabs.sendMessage(tabId, payloadData)
-                return
-            } else if (parent) {
-                parent.postMessage({
-                    event: event,
-                    data: data,
-                }, '*')
-                return
+    reloadModules(update) {
+        for (let module in this.modules) {
+            // Use 'load' instead of 'restore' to refresh the data on browser restart.
+            if (this.modules[module]._load) {
+                this.logger.debug(`${this}(re)loading module ${module}`)
+                this.modules[module]._load(update)
             }
+        }
+        this.logger.debug(`${this}${this._listeners} listeners registered`)
+    }
 
-            if (data && data.callback) {
-                payloadArgs.push(data.callback)
+
+    /**
+     * Restore all modules that have this method implemented.
+     */
+    restoreModules() {
+        for (let module in this.modules) {
+            if (this.modules[module]._restore) {
+                this.logger.debug(`${this}restoring module ${module}`)
+                this.modules[module]._restore()
             }
-            this.browser.runtime.sendMessage(...payloadArgs)
-        } else {
-            super.emit(event, data)
         }
     }
 
 
     /**
-     * Sets environmental properties, used to distinguish between
-     * webextension, regular webapp or Electron app.
-     * @param {Object} environment - The environment properties passed to the Constructor.
+     * Reset all modules that have this method implemented.
      */
-    getEnvironment(environment) {
-        if (environment.extension) {
-            let searchParams = this.utils.parseSearch(location.search)
-            if (searchParams.popout) {
-                environment.extension.popout = true
-            } else {
-                environment.extension.popout = false
-            }
-            if (global.chrome) {
-                environment.extension.isChrome = true
-                environment.extension.isFirefox = false
-            } else {
-                environment.extension.isChrome = false
-                environment.extension.isFirefox = true
+    resetModules() {
+        for (let module in this.modules) {
+            this.logger.debug(`${this}resetting module ${module}`)
+            if (this.modules[module]._reset) {
+                this.modules[module]._reset()
             }
         }
-
-        return environment
     }
 
 
-    on(event, callback) {
-        this._listeners += 1
-        super.on(event, callback)
+    translate(messageID, args) {
+        return this.browser.i18n.getMessage(messageID, args)
     }
 
 
     /**
-     * Use `app.devMode`to do more things when in dev mode.
+     * Return the current version of the app.
      */
-    get devMode() {
-        return !('update_url' in this.browser.runtime.getManifest())
-    }
-
-
-    toString() {
-        return `[${this.name}]`
+    version() {
+        return this.browser.runtime.getManifest().version
     }
 }
 
-module.exports = App
+module.exports = ClickToDialApp

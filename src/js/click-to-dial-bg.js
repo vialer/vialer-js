@@ -6,7 +6,7 @@
  * part separated.
  */
 
-const ClickToDialApp = require('./click-to-dial')
+const ClickToDialApp = require('./lib/app')
 
 global.app = new ClickToDialApp({
     name: 'Background',

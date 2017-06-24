@@ -19,46 +19,6 @@ class AvailabilityModule {
 
 
     /**
-     * Build an array of availability data that can be used to build
-     * the availability select.
-     */
-    availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId) {
-        this.app.logger.info(`${this}availabilityOptions selected [${selectedFixeddestinationId}, ${selectedPhoneaccountId}]`)
-        // Destinations choices.
-        const fixeddestinations = userdestination.fixeddestinations
-        const phoneaccounts = userdestination.phoneaccounts
-
-        let options = []
-        fixeddestinations.forEach((fixeddestination) => {
-            let option = {
-                value: `fixeddestination-${fixeddestination.id}`,
-                label: `${fixeddestination.phonenumber}/${fixeddestination.description}`,
-            }
-            if (parseInt(fixeddestination.id) === parseInt(selectedFixeddestinationId)) {
-                this.app.logger.debug(`${this}set selected fixeddestination ${selectedFixeddestinationId}`)
-                option.selected = true
-            }
-            // Add fixed destination to options.
-            options.push(option)
-        })
-        phoneaccounts.forEach((phoneaccount) => {
-            let option = {
-                value: `phoneaccount-${phoneaccount.id}`,
-                label: `${phoneaccount.internal_number}/${phoneaccount.description}`,
-            }
-            if (parseInt(phoneaccount.id) === parseInt(selectedPhoneaccountId)) {
-                this.app.logger.debug(`${this}set selected phoneaccount ${selectedPhoneaccountId}`)
-                option.selected = true
-            }
-            // Add phone account to options.
-            options.push(option)
-        })
-
-        return options
-    }
-
-
-    /**
      * Do an API request to get an update of the available userdestination
      * options when the module is loaded in the background.
      */
@@ -100,9 +60,9 @@ class AvailabilityModule {
                 }
 
                 // Set an icon depending on whether the user is available or not.
-                let icon = 'build/img/call-red.png'
+                let icon = 'img/call-red.png'
                 if (selectedFixeddestinationId || selectedPhoneaccountId) {
-                    icon = 'build/img/call-green.png'
+                    icon = 'img/call-green.png'
                 }
                 this.app.logger.info(`${this}setting icon ${icon}`)
                 if (!widgetsData.queues.selected) {
@@ -130,7 +90,7 @@ class AvailabilityModule {
     _reset() {
         this.app.emit('availability.reset')
         this.app.logger.info(`${this}set icon to grey`)
-        this.app.browser.browserAction.setIcon({path: 'build/img/call-gray.png'})
+        this.app.browser.browserAction.setIcon({path: 'img/call-gray.png'})
     }
 
 
@@ -175,6 +135,46 @@ class AvailabilityModule {
     }
 
 
+    /**
+     * Build an array of availability data that can be used to build
+     * the availability select.
+     */
+    availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId) {
+        this.app.logger.info(`${this}availabilityOptions selected [${selectedFixeddestinationId}, ${selectedPhoneaccountId}]`)
+        // Destinations choices.
+        const fixeddestinations = userdestination.fixeddestinations
+        const phoneaccounts = userdestination.phoneaccounts
+
+        let options = []
+        fixeddestinations.forEach((fixeddestination) => {
+            let option = {
+                value: `fixeddestination-${fixeddestination.id}`,
+                label: `${fixeddestination.phonenumber}/${fixeddestination.description}`,
+            }
+            if (parseInt(fixeddestination.id) === parseInt(selectedFixeddestinationId)) {
+                this.app.logger.debug(`${this}set selected fixeddestination ${selectedFixeddestinationId}`)
+                option.selected = true
+            }
+            // Add fixed destination to options.
+            options.push(option)
+        })
+        phoneaccounts.forEach((phoneaccount) => {
+            let option = {
+                value: `phoneaccount-${phoneaccount.id}`,
+                label: `${phoneaccount.internal_number}/${phoneaccount.description}`,
+            }
+            if (parseInt(phoneaccount.id) === parseInt(selectedPhoneaccountId)) {
+                this.app.logger.debug(`${this}set selected phoneaccount ${selectedPhoneaccountId}`)
+                option.selected = true
+            }
+            // Add phone account to options.
+            options.push(option)
+        })
+
+        return options
+    }
+
+
     selectUserdestination(type, id) {
         let data = {
             fixeddestination: null,
@@ -191,9 +191,9 @@ class AvailabilityModule {
                 this.app.logger.info(`${this}changed selected userdestination api request ok`)
 
                 // Set an icon depending on whether the user is available or not.
-                let icon = 'build/img/call-red.png'
+                let icon = 'img/call-red.png'
                 if (id) {
-                    icon = 'build/img/call-green.png'
+                    icon = 'img/call-green.png'
                 }
                 let widgetsData = this.app.store.get('widgets')
                 widgetsData.availability.icon = icon
