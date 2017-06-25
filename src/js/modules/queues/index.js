@@ -22,6 +22,8 @@ class QueuesModule {
 
 
     _load() {
+        if (this.app.env.extension && !this.app.env.extension.background) return
+
         this.app.api.client.get('api/queuecallgroup').then((res) => {
             this.app.emit('widget.indicator.stop', {name: 'queues'})
 
@@ -145,8 +147,10 @@ class QueuesModule {
                     if (isNaN(queue.queue_size)) queue.queue_size = '?'
 
                     // Update icon for toolbarbutton if this queuecallgroup was selected earlier.
-                    if (queue.id === this.app.store.get('widgets').queues.selected) {
-                        this.app.browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                    if (this.app.env.extension) {
+                        if (queue.id === this.app.store.get('widgets').queues.selected) {
+                            this.app.browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                        }
                     }
 
                     this.sizes[queue.id] = queue.queue_size

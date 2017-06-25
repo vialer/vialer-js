@@ -5,14 +5,16 @@ class I18n {
         this.app = app
         if (this.app.env.extension && !this.app.env.extension.background) {
             $(() => this.processPage())
+        } else {
+            $(() => this.processPage())
         }
     }
 
 
     translate(messageID, args) {
-        if (this.app.browser.i18n) {
+        if (this.app.env.extension) {
             return this.app.browser.i18n.getMessage(messageID, args)
-        } 
+        }
     }
 
 

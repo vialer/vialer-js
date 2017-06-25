@@ -141,7 +141,8 @@ class App extends Skeleton {
      * Return the current version of the app.
      */
     version() {
-        return this.browser.runtime.getManifest().version
+        const _package = require('../../package.json')
+        return _package.version
     }
 }
 

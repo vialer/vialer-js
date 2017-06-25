@@ -18,12 +18,19 @@ class QueuesActions extends Actions {
                 if (this.module.sizes && this.module.sizes.hasOwnProperty(id)) {
                     size = this.module.sizes[id]
                 }
-                this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
+
+                if (this.app.env.extension) {
+                    this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
+                }
             } else {
                 // Restore availability icon.
                 if (widgetsData.availability) {
-                    this.app.logger.info(`${this}set availability icon`)
-                    this.app.browser.browserAction.setIcon({path: this.app.store.get('widgets').availability.icon})
+                    if (this.app.env.extension) {
+                        this.app.logger.info(`${this}set availability icon`)
+                        this.app.browser.browserAction.setIcon({
+                            path: this.app.store.get('widgets').availability.icon,
+                        })
+                    }
                 }
             }
 

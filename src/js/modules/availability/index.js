@@ -23,9 +23,7 @@ class AvailabilityModule {
      * options when the module is loaded in the background.
      */
     _load() {
-        if (!this.app.env.extension.background) {
-            return
-        }
+        if (this.app.env.extension && !this.app.env.extension.background) return
 
         this.app.api.client.get('api/userdestination/').then((res) => {
             this.app.emit('widget.indicator.stop', {name: 'availability'})
@@ -65,8 +63,11 @@ class AvailabilityModule {
                     icon = 'img/call-green.png'
                 }
                 this.app.logger.info(`${this}setting icon ${icon}`)
-                if (!widgetsData.queues.selected) {
-                    this.app.browser.browserAction.setIcon({path: icon})
+
+                if (this.app.env.extension) {
+                    if (!widgetsData.queues.selected) {
+                        this.app.browser.browserAction.setIcon({path: icon})
+                    }
                 }
 
                 // Save icon in storage.
@@ -90,7 +91,7 @@ class AvailabilityModule {
     _reset() {
         this.app.emit('availability.reset')
         this.app.logger.info(`${this}set icon to grey`)
-        this.app.browser.browserAction.setIcon({path: 'img/call-gray.png'})
+        if (this.app.env.extension) this.app.browser.browserAction.setIcon({path: 'img/call-gray.png'})
     }
 
 
@@ -110,7 +111,7 @@ class AvailabilityModule {
 
         // Restore options.
         const userData = this.app.store.get('user')
-        if (userData) {
+        if (userData && userData.userdestination) {
             const userdestination = userData.userdestination
             const selectedFixeddestinationId = userdestination.selecteduserdestination.fixeddestination
             const selectedPhoneaccountId = userdestination.selecteduserdestination.phoneaccount
@@ -126,9 +127,12 @@ class AvailabilityModule {
         if (widgetsData.availability.icon) {
             if (!widgetsData.queues.selected) {
                 this.app.logger.info(`${this}set availability icon`)
-                this.app.browser.browserAction.setIcon({path: widgetsData.availability.icon})
+                if (this.app.env.extension) {
+                    this.app.browser.browserAction.setIcon({path: widgetsData.availability.icon})
+                }
             }
         }
+
 
         // Restore availability.
         this.app.emit('availability.refresh')
@@ -198,9 +202,13 @@ class AvailabilityModule {
                 let widgetsData = this.app.store.get('widgets')
                 widgetsData.availability.icon = icon
                 this.app.store.set('widgets', widgetsData)
-                if (widgetsData.queues && !widgetsData.queues.selected) {
-                    this.app.browser.browserAction.setIcon({path: icon})
+
+                if (this.app.env.extension) {
+                    if (widgetsData.queues && !widgetsData.queues.selected) {
+                        this.app.browser.browserAction.setIcon({path: icon})
+                    }
                 }
+
                 let userData = this.app.store.get('user')
                 userData.userdestination.selecteduserdestination.fixeddestination = data.fixeddestination
                 userData.userdestination.selecteduserdestination.phoneaccount = data.phoneaccount

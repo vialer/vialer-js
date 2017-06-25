@@ -22,7 +22,7 @@ class ContactsModule {
      * refreshing the plugin.
      */
     _load(update) {
-        if (!this.app.env.extension.background) return
+        if (this.app.env.extension && !this.app.env.extension.background) return
 
         this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         .then((res) => {

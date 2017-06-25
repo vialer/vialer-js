@@ -14,7 +14,7 @@ class PageActions extends Actions {
         this.app.logger.debug(`${this}setting context menuitem`)
 
         // Remove all previously added context menus.
-        if (this.app.browser.contextMenus) {
+        if (this.app.env.extension) {
             this.app.browser.contextMenus.removeAll()
             // Add context menu to dial selected number.
             this.contextMenuItem = this.app.browser.contextMenus.create({

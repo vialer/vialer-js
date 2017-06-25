@@ -108,9 +108,8 @@ class UiActions extends Actions {
             this.module.busyWidget(data.name)
         })
 
-        // Other scripts may open a widget with an event.
-        this.app.on('widget.open', (data) => {
-            this.app.logger.debug(`${this}widget.open`)
+        this.app.on('ui.widget.open', (data) => {
+            this.app.logger.debug(`${this}ui.widget.open`)
             this.module.openWidget(data.name)
         })
 
@@ -166,7 +165,8 @@ class UiActions extends Actions {
         })
 
 
-        // Previously panels module
+        // The popout behaves different from the popover. The contacts
+        // widget is open by default.
         if (this.app.env.extension && this.app.env.extension.popout) {
             $('html').addClass('popout')
             $(() => {
@@ -191,11 +191,13 @@ class UiActions extends Actions {
             this.app.logger.debug(`${this}no saved state`)
         }
 
-        $(window).unload(() => {
+
+        $(window).on('beforeunload', function(e) {
             this.app.store.set('isMainPanelOpen', false)
         })
 
-        // focus the first input field
+
+        // Focus the first input field.
         $('.login-form :input:visible:first').focus()
 
         /**

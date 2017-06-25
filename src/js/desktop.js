@@ -16,24 +16,25 @@ const url = require('url')
 let mainWindow
 
 function createWindow() {
-    let tray = new Tray(path.join(__dirname, 'src', 'img', 'clicktodial.png'))
+    console.log(__dirname)
+    let tray = new Tray(path.join(__dirname, 'img', 'clicktodial.png'))
     tray.setToolTip('This is my application.')
 
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 350,
+        width: 400,
         height: 600,
-        resizable: false,
+        resizable: true,
         title: 'Click-to-dial',
         autoHideMenuBar: true,
     })
 
-    mainWindow.setIcon(path.join(__dirname, 'src', 'img', 'clicktodial.png'))
+    mainWindow.setIcon(path.join(__dirname, 'img', 'clicktodial.png'))
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'build', 'index.html'),
+        pathname: path.join(__dirname, 'web.html'),
         protocol: 'file:',
         slashes: true,
     }))

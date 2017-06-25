@@ -49,10 +49,10 @@ class UiModule {
      * object or finding it by class name.
      */
     getWidget(widgetOrWidgetName) {
-        if (widgetOrWidgetName instanceof jQuery) {
+        if (widgetOrWidgetName instanceof $) {
             return widgetOrWidgetName
         }
-        return $('.container:not(.static) .widget.' + widgetOrWidgetName)
+        return $(`.container:not(.static) .widget.${widgetOrWidgetName}`)
     }
 
 

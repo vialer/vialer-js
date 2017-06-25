@@ -130,6 +130,14 @@ gulp.task('build-clean', `Destroy build directory (${BUILD_DIR}).`, (done) => {
 })
 
 
+gulp.task('desktop', 'Copy desktop js to the root build dir.', () => {
+    return gulp.src('./src/js/desktop.js', {base: './src/js/'})
+    .pipe(gulp.dest('./build/'))
+    .pipe(size(extend({title: 'desktop'}, sizeOptions)))
+    .pipe(ifElse(isWatching, livereload))
+})
+
+
 gulp.task('docs', 'Generate documentation.', (done) => {
     let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs`
     childExec(execCommand, undefined, (err, stdout, stderr) => {
@@ -163,6 +171,7 @@ gulp.task('js-callstatus', 'Generate the callstatus entry js.', jsEntry('callsta
 gulp.task('js-options', 'Generate the options js.', jsEntry('options'))
 gulp.task('js-popup', 'Generate the popup/popout entry js.', jsEntry('popup'))
 gulp.task('js-tab', 'Generate the tab contentscript entry js.', jsEntry('tab'))
+gulp.task('js-vendor', 'Build vendor javascript.', jsEntry('vendor'))
 gulp.task('js-web', 'Generate the web version entry js.', jsEntry('web'))
 
 gulp.task('scss', 'Metatask that builds all scss.', [
@@ -184,10 +193,11 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
     app.use('/', serveIndex('build/', {'icons': false}))
     app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
     http.createServer(app).listen(8999)
-
     gulp.watch([
-        `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
         path.join(__dirname, 'src', 'js', '**', '*.js'),
+        `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
+        `!${path.join(__dirname, 'src', 'js', 'desktop.js')}`,
+        `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
     ], () => {
         gulp.start('js')
         if (WITHDOCS) gulp.start('docs')
@@ -210,6 +220,9 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
         path.join(__dirname, 'src', 'html', '**', '*.html'),
         path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
     ], ['assets'])
+
+    gulp.watch(path.join(__dirname, 'src', 'js', 'desktop.js'), ['desktop'])
+    gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
 
     gulp.watch([
         `!${path.join(__dirname, 'src', 'scss', 'options.scss')}`,

@@ -56,10 +56,7 @@ class Sip {
         }
         SIPml.init((e) => {
             this.app.logger.debug(`${this}starting SIP stack`)
-            let userAgent = `Click-to-dial v${this.app.version()} w/ sipML5 v${this.version()}`
-            if (!('update_url' in this.app.browser.runtime.getManifest())) {
-                userAgent += ' (dev=true)'
-            }
+            let userAgent = `Click-to-dial v${this.app.version()}`
             let user = this.app.store.get('user')
 
             this.sipStack = new SIPml.Stack({
@@ -290,23 +287,6 @@ class Sip {
 
             this.app.emit('sip:presence_ready')
         }
-    }
-
-
-    /**
-     * Parse the version of SIPml from the path it is included.
-     */
-    version() {
-        // assume the directory name is "simpl5-{VERSION}"
-        let pathPrefix = 'sipml5-'
-        let version
-        this.app.browser.runtime.getManifest().background.scripts.forEach((file) => {
-            if (file.indexOf('SIPml') > 0) {
-                version = file.substring(file.indexOf(pathPrefix), file.substring(file.indexOf(pathPrefix)).indexOf('/') + file.indexOf(pathPrefix)).substring(pathPrefix.length)
-                return;
-            }
-        })
-        return version
     }
 }
 
