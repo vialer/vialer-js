@@ -163,6 +163,7 @@ class ContactsActions extends Actions {
         $('.contacts').on('click', '.status-icon, .name, .extension', (e) => {
             let extension = $(e.currentTarget).closest('.contact').find('.extension').text()
             if (extension && extension.length) {
+                console.log("DIAL!!!!")
                 this.app.emit('panel.dial', {'b_number': extension})
             }
         });

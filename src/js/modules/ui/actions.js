@@ -90,10 +90,7 @@ class UiActions extends Actions {
         })
 
         this.app.on('panel.dial', (data) => {
-            let b_number = data.b_number
-            let tab = null
-            let silent = true
-            this.app.dialer.dial(b_number, tab, silent)
+            this.app.modules.dialer.dial(data.b_number, null, null)
             this.app.analytics.trackClickToDial('Colleagues')
         })
     }

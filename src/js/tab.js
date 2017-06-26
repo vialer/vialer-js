@@ -1,29 +1,24 @@
 'use strict'
 
-const Observer = require('./modules/page/observer')
-const Page = require('./modules/page')
-const Skeleton = require('./lib/skeleton')
-const Walker = require('./modules/page/walker')
+const App = require('./lib/app')
+const Observer = require('./modules/dialer/observer')
 
-require('./modules/page/parsers/dutch')
+require('./modules/dialer/parsers/dutch')
+
+const _modules = [
+    {name: 'dialer', Module: require('./modules/dialer')},
+]
 
 
-class TabsApp extends Skeleton {
+class TabsApp extends App {
 
     constructor(options) {
         super(options)
         this.verbose = true
-        this.walker = new Walker(this)
-        this.observer = new Observer(this, this.walker)
-
-        this.page = new Page(this)
-        this.page.watch()
-        $(() => this.observer.events())
     }
 }
 
 global.app = new TabsApp({
-    name: 'Tabs',
     environment: {
         extension: {
             background: false,
@@ -32,4 +27,6 @@ global.app = new TabsApp({
             callstatus: false,
         },
     },
+    modules: _modules,
+    name: 'Tabs',
 })

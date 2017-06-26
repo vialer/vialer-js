@@ -11,7 +11,6 @@ class Observer {
 
     constructor(app, walker) {
         this.app = app
-        this.app.logger.info(`${this} init`)
         this.walker = walker
         // Search and insert icons after mutations.
         this.observer = null
@@ -77,7 +76,7 @@ class Observer {
         let icon = this.iconElement.cloneNode(false)
         // Add properties unique for "number".
         icon.setAttribute('data-number', number)
-        icon.href = `javascript:clicktodial(${number})`
+        icon.classList.add(`c2d-icon-${number}`)
         // Wrap in element so ".innerHTML" contains the icon HTML.
         let wrapper = document.createElement('p')
         wrapper.appendChild(icon)
@@ -150,15 +149,12 @@ class Observer {
 
     doRun() {
         this.app.logger.debug(`${this} start observing`)
-
         // Inject our print stylesheet.
         $('head').append(this.printStyle)
-
         // Insert icons.
         let before = new Date().getTime()
         this.doInsert()
         this.app.logger.debug(`${this} doInsert (doRun) took`, new Date().getTime() - before)
-
         // Start listening to DOM mutations.
         this.startObserver()
     }
@@ -173,78 +169,6 @@ class Observer {
     }
 
 
-    events() {
-        /**
-         * Click event handler: dial the number in the attribute `data-number`.
-         */
-        $('body').on('click', `.${phoneIconClassName}`, (e) => {
-            if ($(e.currentTarget).attr('data-number') && $(e.currentTarget).parents(`.${phoneElementClassName}`).length) {
-                // remove focus
-                $(e.currentTarget).blur()
-
-                // Don't do anything with this click in the actual page.
-                e.preventDefault()
-                e.stopPropagation()
-                e.stopImmediatePropagation()
-
-                // dial
-                let b_number = $(e.currentTarget).attr('data-number')
-                this.app.emit('clicktodial.dial', {'b_number': b_number})
-            }
-        })
-
-        /**
-         * Click event handler: dial the number in the attribute `href`.
-         */
-        $('body').on('click', '[href^="tel:"]', (e) => {
-            $(e.currentTarget).blur()
-            // Don't do anything with this click in the actual page.
-            e.preventDefault()
-            e.stopPropagation()
-            e.stopImmediatePropagation()
-
-            // Dial the b_number.
-            let b_number = $(e.currentTarget).attr('href').substring(4)
-            this.app.browser.runtime.sendMessage({'clicktodial.dial': {'b_number': b_number}})
-        })
-
-        this.app.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            if (request === 'page.observer.stop') {
-                this.app.logger.debug(`${this} page.observer.stop triggered`)
-                // Stop listening to DOM mutations.
-                this.stopObserver()
-                // Remove icons.
-                this.undoInsert()
-                // Remove our stylesheet.
-                $(this.printStyle).remove()
-            }
-        })
-
-        // Signal this script has been loaded and ready to look for phone numbers.
-        this.app.emit('page.observer.ready', {
-            callback: (response) => {
-                // Fill the contact list.
-                if (response && response.hasOwnProperty('observe')) {
-                    let observe = response.observe
-                    if (!observe) return
-
-                    this.app.logger.debug(`${this} page.observer.ready emitted`, window.location.href)
-
-                    if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
-                        // This hidden iframe might become visible, wait for this to happen.
-                        $(window).on('resize', () => {
-                            this.doRun()
-                            // No reason to wait for more resize events.
-                            $(window).off('resize')
-                        })
-                    } else {
-                        this.doRun()
-                    }
-                }
-            },
-        })
-    }
-
 
     /**
      * Process parked DOM mutations.
@@ -253,7 +177,6 @@ class Observer {
         // Copy and clear parkedNodes.
         let _parkedNodes = this.parkedNodes.slice()
         this.parkedNodes = []
-
         // Handle mutations if it probably isn't too much to handle
         // (current limit is totally random)
         if (_parkedNodes.length < 151) {
@@ -273,7 +196,7 @@ class Observer {
                                 this.app.logger.debug(`${this} doInsert (handleMutations) took 0 - removed node`)
                             }
                         }
-                    }, 0) // push back execution to the end on the current event stack
+                    }, 0) // Push back execution to the end on the current event stack.
                 })(i)
             }
         }
@@ -317,7 +240,6 @@ class Observer {
 
         if (this.observer) {
             this.observer.observe(document.body, {
-                // characterData: true,
                 childList: true,
                 subtree: true,
             })

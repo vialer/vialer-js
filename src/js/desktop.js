@@ -16,7 +16,6 @@ const url = require('url')
 let mainWindow
 
 function createWindow() {
-    console.log(__dirname)
     let tray = new Tray(path.join(__dirname, 'img', 'clicktodial.png'))
     tray.setToolTip('This is my application.')
 

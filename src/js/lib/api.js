@@ -54,7 +54,6 @@ class Api {
         }, (err) => {
             // Reject all status codes from 500.
             if (err.response.status >= 500) {
-                // We got an API error. Show the default oops page.
                 return Promise.reject(err)
             }
             // All other error codes are part of the normal application flow.

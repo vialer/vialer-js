@@ -42,14 +42,6 @@ class UserModule {
                 this.app.store.set('notifications', notificationsData)
                 // Start loading the widgets.
                 this.app.modules.ui.refreshWidgets(false)
-                // Setup a listener in case a tabs script wants to watch phone numbers.
-                if (this.app.env.extension) {
-                    if (this.app.env.extension.background) {
-                        this.app.modules.page.watch()
-                    }
-                } else {
-                    this.app.modules.page.watch()
-                }
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 // Remove credentials from the store.
                 this.app.store.remove('username')

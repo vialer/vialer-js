@@ -267,7 +267,7 @@ class Sip {
         const accountIdsWithState = accountIds.filter((accountId) => accountId in this.states)
         const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
 
-        // Update allready known and connected account presences first.
+        // Update already known and connected account presences first.
         for (let accountId of accountIdsWithState) {
             this.app.emit('contacts.sip', {
                 'account_id': accountId,
@@ -285,8 +285,10 @@ class Sip {
                 this.unsubscribePresence(accountId)
             }
 
-            // Don't do this in parallel, so the websocket server
-            // is a bit more relieved.
+            // Don't do this in parallel, to keep the load on the websocket
+            // server low. Also subscribePresence has a fixed timeout before
+            // it resolves the connected state, to further slow down the
+            // presence requests.
             for (const accountId of accountIdsWithoutState) {
                 await this.subscribePresence(accountId)
             }

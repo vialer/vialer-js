@@ -123,7 +123,7 @@
         "message": "Om gebruik te kunnen maken van klik&bel moet eerst ingelogd worden door op het icoontje op de toolbar te klikken en je gegevens in te vullen.",
         "description": "Tekst van de notificatie die wordt getoond wanneer bij het aanroepen van de API op de server de status '401 Unauthorized' wordt ontvangen."
     },
-    "callFailedNotificationText": {
+    "callStatusNotificationText": {
         "message": "Het is niet gelukt om het gesprek op te zetten",
         "description": "Tekst van de notificatie die wordt getoond wanneer het niet lukte een gesprek op te zetten."
     },

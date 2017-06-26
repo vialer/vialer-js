@@ -8,8 +8,16 @@
 
 const ClickToDialApp = require('./lib/app')
 
+const _modules = [
+    {name: 'availability', Module: require('./modules/availability')},
+    {name: 'contacts', Module: require('./modules/contacts')},
+    {name: 'dialer', Module: require('./modules/dialer')},
+    {name: 'ui', Module: require('./modules/ui')},
+    {name: 'user', Module: require('./modules/user')},
+    {name: 'queues', Module: require('./modules/queues')},
+]
+
 global.app = new ClickToDialApp({
-    name: 'Popup',
     environment: {
         extension: {
             background: false,
@@ -18,4 +26,6 @@ global.app = new ClickToDialApp({
             callstatus: false,
         },
     },
+    modules: _modules,
+    name: 'Popup',
 })

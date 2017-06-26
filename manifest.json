@@ -15,8 +15,8 @@
     },
     "background": {
         "scripts": [
+            "js/vendor.js",
             "js/lib/thirdparty/SIPml-api.js",
-            "js/lib/thirdparty/jquery/jquery.js",
             "js/bg.js"
         ]
     },
@@ -35,7 +35,7 @@
                 "<all_urls>"
             ],
             "js": [
-                "js/lib/thirdparty/zepto.min.js",
+                "js/vendor.js",
                 "js/tab.js"
             ],
             "run_at": "document_end",

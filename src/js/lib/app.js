@@ -2,21 +2,11 @@
 
 const Analytics = require('./analytics')
 const Api = require('./api')
-const Dialer = require('./dialer')
+
 const Skeleton = require('./skeleton')
 const Sip = require('./sip')
 const Store = require('./store')
 const Timer = require('./timer')
-
-
-const _modules = [
-    {name: 'availability', Module: require('../modules/availability')},
-    {name: 'contacts', Module: require('../modules/contacts')},
-    {name: 'page', Module: require('../modules/page')},
-    {name: 'ui', Module: require('../modules/ui')},
-    {name: 'user', Module: require('../modules/user')},
-    {name: 'queues', Module: require('../modules/queues')},
-]
 
 
 /**
@@ -53,14 +43,14 @@ class App extends Skeleton {
         }
 
         // Init these modules.
-        for (let module of _modules) {
+        for (let module of options.modules) {
             this.modules[module.name] = new module.Module(this)
         }
 
         this.logger.debug(`${this}${this._listeners} listeners registered`)
 
         this.analytics = new Analytics(this, this.settings.analyticsId)
-        this.dialer = new Dialer(this)
+
         this.timer = new Timer(this)
 
         // Store settings to localstorage.

@@ -1,92 +1,92 @@
 'use strict'
 
+const DialerActions = require('./actions')
+
 
 /**
  * The Dialer takes care of actually dialing a phonenumber and updating
  * the status about a call.
  */
-class Dialer {
-    /**
-     * @param {ClickToDialApp} app - The application object.
-     */
-    constructor(app) {
+class DialerModule {
+
+    constructor(app, background = true) {
         this.app = app
-        this.app.logger.debug(`${this}init`)
+        // Hardcoded blacklist of sites because there is not yet a solution
+        // that works for chrome and firefox using exclude site-urls.
+        //
+        // These sites are blocked primarily because they are javascript-heavy
+        // which in turn leads to 100% cpu usage when trying to parse all the
+        // mutations for too many seconds making it not responsive.
+        //
+        // the content script still tracks <a href="tel:xxxx"> elements.
+        this.blacklist = [
+            '^chrome',
+            // we prefer not to add icons in documents
+            '^https?.*docs\\.google\\.com.*$',
+            '^https?.*drive\\.google\\.com.*$',
+
+            // pages on these websites tend to grow too large to parse them in a reasonable amount of time
+            '^https?.*bitbucket\\.org.*$',
+            '^https?.*github\\.com.*$',
+            '^https?.*rbcommons\\.com.*$',
+
+            // this site has at least tel: support and uses javascript to open a new web page
+            // when clicking the anchor element wrapping the inserted icon
+            '^https?.*slack\\.com.*$',
+        ]
+
+        this.actions = new DialerActions(app, this)
     }
 
 
-    /**
-     * Return a number trimmed from white space.
-     */
-    trimNumber(number) {
-        // Force possible int to string.
-        number = '' + number
-
-        // Remove white space characters.
-        return number.replace(/ /g, '');
-    }
-
-    /**
-     * Process number to return a callable phone number.
-     */
-    sanitizeNumber(number) {
-        number = this.trimNumber(number)
-
-        // Make numbers like +31(0) work.
-        let digitsOnly = number.replace(/[^\d]/g, '')
-        if (digitsOnly.substring(0, 3) === '310') {
-            if (number.substring(3, 6) === '(0)') {
-                number = number.replace(/^\+31\(0\)/, '+31')
-            }
+    _reset() {
+        if (this.contextMenuItem) {
+            this.app.browser.contextMenus.removeAll()
         }
 
-        return number
+        if (this.app.store.get('c2d')) {
+            this.app.browser.tabs.query({}, (tabs) => {
+                tabs.forEach((tab) => {
+                    this.app.browser.tabs.sendMessage(tab.id, 'page.observer.stop')
+                })
+            })
+        }
     }
 
 
     /**
-     * Display a notification regarding what happened to a call.
+     * Display a notification regarding what happened to a call. This is
+     * only used when calling silently, without the status dialog(through the
+     * colleagues list).
      */
-    callFailedNotification(notificationId, text) {
+    callStatusNotification(notificationId, text) {
         let openNotificationTimeout
         if (!text) {
             notificationId = 'failed-call'
-            text = this.app.i18n.translate('callFailedNotificationText')
+            text = this.app.i18n.translate('callStatusNotificationText')
         }
 
-        if (window.webkitNotifications) {
-            webkitNotifications.createNotification('', '', text).show()
-        } else {
-            let notificationCallback = () => {
-                // Without clearing you can't trigger notifications with the same notificationId (quickly).
-                openNotificationTimeout = setTimeout(() => {
-                    this.app.browser.notifications.clear(notificationId, (wasCleared) => {})
-                    clearTimeout(openNotificationTimeout)
-                    openNotificationTimeout = undefined
-                }, 3000)
-            }
-            if (openNotificationTimeout) {
+        let notificationCallback = () => {
+            // Without clearing you can't trigger notifications with the same notificationId (quickly).
+            openNotificationTimeout = setTimeout(() => {
+                this.app.browser.notifications.clear(notificationId, (wasCleared) => {})
                 clearTimeout(openNotificationTimeout)
                 openNotificationTimeout = undefined
-                text = text + ' (update)'
-                this.app.browser.notifications.update(notificationId, {title: text}, notificationCallback)
-            } else {
-                this.app.browser.notifications.create(notificationId, {
-                    type: 'basic',
-                    iconUrl: this.app.browser.runtime.getURL('img/clicktodial-big.png'),
-                    title: text,
-                    message: '',
-                }, notificationCallback)
-            }
+            }, 3000)
         }
-    }
-
-
-    /**
-     * Display a notification with a call's status.
-     */
-    callStatusNotification(status, b_number) {
-        this.callFailedNotification('call-status', this.getStatusMessage(status, b_number))
+        if (openNotificationTimeout) {
+            clearTimeout(openNotificationTimeout)
+            openNotificationTimeout = undefined
+            text = `${text} (update)`
+            this.app.browser.notifications.update(notificationId, {title: text}, notificationCallback)
+        } else {
+            this.app.browser.notifications.create(notificationId, {
+                type: 'basic',
+                iconUrl: this.app.browser.runtime.getURL('img/clicktodial-big.png'),
+                title: text,
+                message: '',
+            }, notificationCallback)
+        }
     }
 
 
@@ -95,6 +95,8 @@ class Dialer {
      * clicktodialaccount and the `b number`; the number the user
      * wants to call..
      * @param {Number} bNumber - The number the user wants to call.
+     * @param {Tab} tab - The tab from which the call was initialized.
+     * @param {Boolean} silent - Used when a call is done without having a status dialog.
      */
     dial(bNumber, tab, silent) {
         // Just make sure b_number is numbers only.
@@ -107,23 +109,25 @@ class Dialer {
 
         this.app.api.client.post('api/clicktodial/', {b_number: bNumber}).then((res) => {
             if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-                this.callFailedNotification()
+                this.callStatusNotification()
                 return
             }
 
             if (this.app.api.OK_STATUS.includes(res.status)) {
-                // this callid is used to find the call status, so without it: stop now
+                // This callid is used to find the call status, so without it: stop now
                 let callid
                 if (res.data) callid = res.data.callid
                 if (!callid) {
-                    this.callFailedNotification()
+                    this.callStatusNotification()
                     return
                 }
 
-                // A silent call means there won't be a visible popup informing the user of the call's status.
-                // This is used  when clicking a voipaccount in the `Collegues` list.
+                // A silent call means there won't be a visible popup informing
+                // the user of the call's status. This is used when clicking a
+                // voipaccount in the `Collegues` list.
                 if (silent) {
-                    // A notification will only show in case the call failed to connect both sides.
+                    // A notification will only show in case the call failed to
+                    // connect both sides.
                     let silentTimerFunction = () => {
                         this.app.api.client.get(`api/clicktodial/${callid}/`).then((_res) => {
                             if (this.app.api.OK_STATUS.includes(_res.status)) {
@@ -136,7 +140,7 @@ class Dialer {
                                     this.app.timer.unregisterTimer(`callstatus.status-${callid}`)
                                     // Show status in a notification in case it fails/disconnects.
                                     if (callStatus !== 'connected') {
-                                        this.callStatusNotification(callStatus, bNumber)
+                                        this.callStatusNotification(callStatus, this.getStatusMessage(status, bNumber))
                                     }
                                 }
                             } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
@@ -243,10 +247,132 @@ class Dialer {
     }
 
 
+    /**
+     * Hide panel when clicking outside the iframe.
+     */
+    hideFrameOnClick(event) {
+        $(this.frame).remove()
+        delete this.frame
+        this.app.emit('callstatus.onhide', {
+            // Extra info to identify call.
+            callid: this.callid,
+        })
+    }
+
+
+    /**
+     * Process number to return a callable phone number.
+     */
+    sanitizeNumber(number) {
+        number = this.trimNumber(number)
+
+        // Make numbers like +31(0) work.
+        let digitsOnly = number.replace(/[^\d]/g, '')
+        if (digitsOnly.substring(0, 3) === '310') {
+            if (number.substring(3, 6) === '(0)') {
+                number = number.replace(/^\+31\(0\)/, '+31')
+            }
+        }
+
+        return number
+    }
+
+
+    /**
+     * A tab triggers this function to show a status dialog. The callid is
+     * passed to the iframe page using a search string.
+     */
+    showCallstatus(callid) {
+        // Inline style for the injected callstatus iframe.
+        let iframeStyle = {
+            'border-radius': '5px',
+            'bottom': '0',
+            'box-shadow': 'rgba(0,0,0,0.25) 0 0 0 2038px, rgba(0,0,0,0.25) 0 10px 20px',
+            'height': '79px',
+            'left': '0',
+            'margin': 'auto',
+            'min-height': '0',
+            'position': 'fixed',
+            'right': '0',
+            'top': '0',
+            'width': '320px',
+            'z-index': '2147483647',
+        }
+
+        this.frame = $('<iframe>', {
+            src: this.app.browser.runtime.getURL(`callstatus.html?callid=${callid}`),
+            style: (function() {
+                // Cannot set !important with .css("property", "value !important"),
+                // so build a string to use as style.
+                let style = ''
+                for (let property in iframeStyle) {
+                    style += `${property}: ${iframeStyle[property]} !important; `
+                }
+                return style
+            }()),
+            scrolling: false,
+        })
+
+        $(this.frame).hide().on('load', (e) => {
+            $(this.frame).show()
+        })
+        $('html').append(this.frame)
+    }
+
+
+    /**
+     * Switch tab click-to-dial icon observer on or off, based on
+     * whether the user is logged in and has click-to-dial
+     * This event is sent when the contentScriptFiles are loaded.
+     */
+    toggleObserve(data) {
+        if (!data.sender.tab) return
+        if (!this.app.store.get('user')) {
+            this.app.logger.info(`${this}not observing because user is not logged in: ${data.sender.tab.url}`)
+            data.callback({observe: false})
+            return
+        }
+
+        if (!this.app.store.get('c2d')) {
+            this.app.logger.info(`${this}not observing because icons are disabled: ${data.sender.tab.url}`)
+            data.callback({observe: false})
+            return
+        }
+
+        // Test if one of the blacklisted sites matches.
+        let blacklisted = false
+        for (let i = 0; i < this.blacklist.length; i++) {
+            if (new RegExp(this.blacklist[i]).test(data.sender.tab.url)) {
+                blacklisted = true
+                break
+            }
+        }
+
+        if (blacklisted) {
+            this.app.logger.info(`${this}not observing because this site is blacklisted: ${data.sender.tab.url}`)
+            data.callback({observe: false})
+        } else {
+            this.app.logger.info(`${this}observing ${data.sender.tab.url}`)
+            data.callback({observe: true})
+        }
+    }
+
+
     toString() {
-        return `${this.app} [Dialer]             `
+        return `${this.app} [Page]               `
+    }
+
+
+    /**
+     * Return a number trimmed from white space.
+     */
+    trimNumber(number) {
+        // Force possible int to string.
+        number = '' + number
+
+        // Remove white space characters.
+        return number.replace(/ /g, '');
     }
 }
 
-
-module.exports = Dialer
+module.exports = DialerModule

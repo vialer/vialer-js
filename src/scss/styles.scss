@@ -5,8 +5,8 @@
 $fa-font-path: "/fonts";
 @import "font-awesome/scss/font-awesome";
 
-$FontPathOpenSans: "/fonts";
-@import "npm-font-open-sans/open-sans.scss";
+$FontPathOpenSans: "/fonts";  // sass-lint:disable-line variable-name-format
+@import "npm-font-open-sans/open-sans.scss";  // sass-lint:disable-line clean-import-paths
 
 
 // Styling specifically for the click-to-dial callstatus popup.
@@ -18,8 +18,8 @@ $FontPathOpenSans: "/fonts";
     font-size: 12px;
     box-shadow: rgba(0, 0, 0, 0.25) 0 0 0 2038px, rgba(0, 0, 0, 0.25) 0 10px 20px;
     // Center popup.
-    margin-left: 0px;
-    margin-top: 0px;
+    margin-left: 0;
+    margin-top: 0;
     position: fixed;
 
     .heading {
