@@ -21,26 +21,8 @@ class App extends Skeleton {
 
         // Some caching mechanism.
         window.cache = {}
-        this.settings = {
-            analyticsId: 'UA-60726618-9',
-            platformUrl: 'https://partner.voipgrid.nl/',
-            realm: 'websocket.voipgrid.nl',
-            c2d: 'true',
-        }
 
         this.store = new Store(this)
-
-        if (this.env.extension) {
-            // Only the background script in an extension has a sip stack.
-            if (this.env.extension.background) {
-                this.analytics = new Analytics(this, this.settings.analyticsId)
-                this.api = new Api(this)
-                this.sip = new Sip(this)
-            }
-        } else {
-            this.api = new Api(this)
-            this.sip = new Sip(this)
-        }
 
         this.logger.debug(`${this}${this._listeners} listeners registered`)
         this.timer = new Timer(this)
@@ -74,6 +56,30 @@ class App extends Skeleton {
                 this.logger.info(`${this}set icon to available because of login`)
                 this.browser.browserAction.setIcon({path: 'img/call-green.png'})
             }
+        }
+    }
+
+
+    /**
+     * Setup the SIP stack, before loading any modules.
+     */
+    _init() {
+        if (this.env.extension) {
+            this.settings = {
+                analyticsId: 'UA-60726618-9',
+                platformUrl: 'https://partner.voipgrid.nl/',
+                realm: 'websocket.voipgrid.nl',
+                c2d: 'true',
+            }
+            // Only the background script in an extension has a sip stack.
+            if (this.env.extension.background) {
+                this.analytics = new Analytics(this, this.settings.analyticsId)
+                this.api = new Api(this)
+                this.sip = new Sip(this)
+            }
+        } else {
+            this.api = new Api(this)
+            this.sip = new Sip(this)
         }
     }
 

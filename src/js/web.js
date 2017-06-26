@@ -16,7 +16,6 @@ const _modules = [
 ]
 
 document.addEventListener('DOMContentLoaded', () => {
-
     global.app = new ClickToDialApp({
         environment: {
             extension: false,

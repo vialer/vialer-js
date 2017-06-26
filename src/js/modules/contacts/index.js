@@ -131,7 +131,6 @@ class ContactsModule {
 
 
     updateSubscriptions(reload) {
-        this.app.logger.info(`${this}updateSubscriptions with reload: ${reload}`)
         let widgetsData = this.app.store.get('widgets')
         let accountIds = widgetsData.contacts.list.map((c) => c.account_id)
         this.app.sip.updatePresence(accountIds, reload)

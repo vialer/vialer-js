@@ -26,6 +26,7 @@ class Skeleton extends EventEmitter {
         this.i18n = new I18n(this)
         this.logger = new Logger()
 
+        this._init()
         // Init these modules.
         for (let module of options.modules) {
             this.modules[module.name] = new module.Module(this)
@@ -62,6 +63,14 @@ class Skeleton extends EventEmitter {
                 })
             }
         }
+    }
+
+    /**
+     * This method may be overriden to initialize logic before loading
+     * modules, e.g. like initializing a sip stack.
+     */
+    _init() {
+
     }
 
 

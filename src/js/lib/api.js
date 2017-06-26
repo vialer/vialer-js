@@ -12,7 +12,6 @@ class Api {
      */
     constructor(app) {
         this.app = app
-
         this.OK_STATUS = [200, 201, 202, 204]
         this.NOTOK_STATUS = [401, 403]
         this.UNAUTHORIZED_STATUS = [401]

@@ -49,7 +49,7 @@ class UiActions extends Actions {
          *  - platformUrl + user/autologin/?token=*token*&username=*username*&next=/ + path (with token)
          *  - platformUrl + path (without token)
          */
-        this.app.on('settings', (data) => {
+        this.app.on('ui:settings', (data) => {
             this.app.logger.info(`${this}mainpanel.settings`)
             this.app.api.client.get('api/autologin/token/')
             .then((res) => {
@@ -152,7 +152,7 @@ class UiActions extends Actions {
             this.app.emit('ui:ui.refresh')
         })
         $('#settings').click((e) => {
-            this.app.emit('settings')
+            this.app.emit('ui:settings')
         })
 
 
