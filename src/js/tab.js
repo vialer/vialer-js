@@ -1,7 +1,6 @@
 'use strict'
 
-const App = require('./lib/app')
-const Observer = require('./modules/dialer/observer')
+const Skeleton = require('./lib/skeleton')
 
 require('./modules/dialer/parsers/dutch')
 
@@ -10,7 +9,7 @@ const _modules = [
 ]
 
 
-class TabsApp extends App {
+class TabsApp extends Skeleton {
 
     constructor(options) {
         super(options)

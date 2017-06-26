@@ -42,8 +42,8 @@ class QueuesActions extends Actions {
     }
 
     _popup() {
-        if (!('queue' in window.cache)) {
-            window.cache.queue = {
+        if (!('queue' in this.app.cache)) {
+            this.app.cache.queue = {
                 'list': [],
                 'selected': null,
             }
@@ -64,14 +64,14 @@ class QueuesActions extends Actions {
             let queues = data.queues
             let selectedQueue = data.selectedQueue
             $('.queues .empty-list').addClass('hide')
-            if (window.cache.queue.list === queues && window.cache.queue.selected === selectedQueue) {
+            if (this.app.cache.queue.list === queues && this.app.cache.queue.selected === selectedQueue) {
                 // No changes so exit early.
                 this.app.logger.debug(`${this}no new queue data`)
                 return
             }
             // Update cache.
-            window.cache.queue.list = queues
-            window.cache.queue.selected = selectedQueue
+            this.app.cache.queue.list = queues
+            this.app.cache.queue.selected = selectedQueue
 
             // Clear list.
             let list = $('.queues .list')
@@ -124,7 +124,7 @@ class QueuesActions extends Actions {
                 }
             }
 
-            window.cache.queue.selected = queueId
+            this.app.cache.queue.selected = queueId
             this.app.emit('queue.select', {id: queueId})
         })
     }

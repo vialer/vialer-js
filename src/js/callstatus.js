@@ -56,12 +56,6 @@ class CallStatusApp extends Skeleton {
             // Extra info to identify call.
             callid: this.callid,
         })
-
-        // Emit to the tab script parent.
-        // this.emit('callstatus.onshow', {
-        //     // Extra info to identify call.
-        //     callid: this.callid,
-        // }, false, false, parent)
     }
 
 
@@ -81,16 +75,10 @@ class CallStatusApp extends Skeleton {
         }
         element.appendChild(document.createTextNode(text))
     }
-
-
-    showCallstatus(e) {
-
-    }
 }
 
 
 global.app = new CallStatusApp({
-    name: 'CallStatus',
     environment: {
         extension: {
             background: false,
@@ -99,4 +87,6 @@ global.app = new CallStatusApp({
             callstatus: true,
         },
     },
+    modules: [],
+    name: 'CallStatus',
 })

@@ -219,7 +219,10 @@ class DialerModule {
                     // Extra info to identify call.
                     this.app.logger.debug(`${this}extra info to identify call.`)
                     // Trigger the callstatus dialog to open.
-                    this.app.emit('callstatus.show', {callid: callid}, false, currentTab)
+                    this.app.emit('callstatus.show', {
+                        callid: callid,
+                        b_number: bNumber,
+                    }, false, currentTab)
                 }
             }
         })

@@ -7,6 +7,7 @@ const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
 const Walker = require('./walker')
 
+
 class DialerActions extends Actions {
 
     _background() {
@@ -52,6 +53,11 @@ class DialerActions extends Actions {
 
         // Hides the callstatus popup.
         this.app.on('callstatus.hide', (data) => {
+            // Re-enable the c2d icons again.
+            $(`.${phoneIconClassName}`).each((i, el) => {
+                $(el).attr('disabled', false)
+            })
+
             this.app.logger.debug(`${this}callstatus.hide triggered`)
             $(this.module.frame).remove()
             delete this.module.frame
@@ -71,8 +77,11 @@ class DialerActions extends Actions {
                 $(e.currentTarget).attr('data-number') &&
                 $(e.currentTarget).parents(`.${phoneElementClassName}`).length
             ) {
-                // Disable until the callstatus popup is ready.
-                $(e.currentTarget).attr('disabled', true)
+                // Disable all c2d icons until the callstatus
+                // popup is closed again.
+                $(`.${phoneIconClassName}`).each((i, el) => {
+                    $(el).attr('disabled', true)
+                })
                 $(e.currentTarget).blur()
 
                 // Don't do anything with this click in the actual page.

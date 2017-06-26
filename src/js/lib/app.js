@@ -21,7 +21,6 @@ class App extends Skeleton {
 
         // Some caching mechanism.
         window.cache = {}
-        this.modules = {}
         this.settings = {
             analyticsId: 'UA-60726618-9',
             platformUrl: 'https://partner.voipgrid.nl/',
@@ -34,6 +33,7 @@ class App extends Skeleton {
         if (this.env.extension) {
             // Only the background script in an extension has a sip stack.
             if (this.env.extension.background) {
+                this.analytics = new Analytics(this, this.settings.analyticsId)
                 this.api = new Api(this)
                 this.sip = new Sip(this)
             }
@@ -42,15 +42,7 @@ class App extends Skeleton {
             this.sip = new Sip(this)
         }
 
-        // Init these modules.
-        for (let module of options.modules) {
-            this.modules[module.name] = new module.Module(this)
-        }
-
         this.logger.debug(`${this}${this._listeners} listeners registered`)
-
-        this.analytics = new Analytics(this, this.settings.analyticsId)
-
         this.timer = new Timer(this)
 
         // Store settings to localstorage.

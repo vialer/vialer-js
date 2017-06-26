@@ -15,22 +15,28 @@ class Skeleton extends EventEmitter {
 
     constructor(options) {
         super()
+        this.cache = {}
         this._listeners = 0
         this.utils = require('./utils')
         this.env = this.getEnvironment(options.environment)
+        this.modules = {}
 
         this.name = options.name
         this.store = new Store(this)
+        this.i18n = new I18n(this)
+        this.logger = new Logger()
 
+        // Init these modules.
+        for (let module of options.modules) {
+            this.modules[module.name] = new module.Module(this)
+        }
 
         // Increases verbosity beyond the logger's debug level.
         this.verbose = false
-        this.logger = new Logger()
         // Sets the verbosity of the logger.
         this.logger.setLevel('debug')
         this.logger.debug(`${this} init`)
 
-        this.i18n = new I18n(this)
 
         if (this.browser && this.browser.extension) {
             // Make the EventEmitter .on method compatible with web extension ipc.
