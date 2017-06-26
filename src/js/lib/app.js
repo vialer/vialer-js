@@ -141,7 +141,7 @@ class App extends Skeleton {
      * Return the current version of the app.
      */
     version() {
-        const _package = require('../../package.json')
+        const _package = require('../../../package.json')
         return _package.version
     }
 }
