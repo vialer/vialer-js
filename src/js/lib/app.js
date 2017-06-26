@@ -64,13 +64,13 @@ class App extends Skeleton {
      * Setup the SIP stack, before loading any modules.
      */
     _init() {
+        this.settings = {
+            analyticsId: 'UA-60726618-9',
+            platformUrl: 'https://partner.voipgrid.nl/',
+            realm: 'websocket.voipgrid.nl',
+            c2d: 'true',
+        }
         if (this.env.extension) {
-            this.settings = {
-                analyticsId: 'UA-60726618-9',
-                platformUrl: 'https://partner.voipgrid.nl/',
-                realm: 'websocket.voipgrid.nl',
-                c2d: 'true',
-            }
             // Only the background script in an extension has a sip stack.
             if (this.env.extension.background) {
                 this.analytics = new Analytics(this, this.settings.analyticsId)
