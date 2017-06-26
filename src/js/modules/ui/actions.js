@@ -152,7 +152,7 @@ class UiActions extends Actions {
         })
 
         $('#popout').click((e) => {
-            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('click-to-dial-popup.html?popout=true')})
+            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('popup.html?popout=true')})
         })
         $('#help').click((e) => {
             this.app.emit('help')
