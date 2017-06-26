@@ -17,10 +17,9 @@ class Sip {
     constructor(app) {
         this.app = app
         this.app.logger.debug(`${this}init`)
-        this.lib = SIPml
         // Set the verbosity of the Sip library. Useful when you need to
         // debug SIP messages. Supported values are: info, warn, error and fatal.
-        this.lib.setDebugLevel('error')
+        SIPml.setDebugLevel('error')
 
         this.reconnect = true
         this.states = {}
@@ -32,7 +31,6 @@ class Sip {
      * Graceful stop, do not reconnect automatically.
      */
     disconnect() {
-        this.app.logger.debug(`${this}disconnect`)
         this.reconnect = false
         this.states = {}
         this.subscriptions = {}
@@ -43,8 +41,13 @@ class Sip {
                 this.unsubscribePresence(accountId)
             })
         }
-        if (this.sipStack) {
-            this.sipStack.stop()
+        if (this._sip) {
+            // A succesful disconnect returns 0.
+            if (this._sip.stop(0) === 0) {
+                this.app.logger.debug(`${this}disconnect`)
+            }
+        } else {
+            this.app.logger.debug(`${this}not (yet) connected`)
         }
     }
 
@@ -54,8 +57,9 @@ class Sip {
      */
     initStack() {
         this.app.logger.debug(`${this}init SIP stack`)
-        if (this.sipStack) {
-            this.sipStack.start()
+        this.stopped = false
+        if (this._sip) {
+            this._sip.start()
             return
         }
         SIPml.init((e) => {
@@ -63,7 +67,7 @@ class Sip {
             let userAgent = `Click-to-dial v${this.app.version()}`
             let user = this.app.store.get('user')
 
-            this.sipStack = new SIPml.Stack({
+            this._sip = new SIPml.Stack({
                 realm: this.app.settings.realm, // domain name
                 impi: user.email, // authorization name (IMS Private Identity)
                 impu: `sip:${user.email}@${this.app.settings.realm}`, // valid SIP Uri (IMS Public Identity)
@@ -80,7 +84,7 @@ class Sip {
                     { name: 'Organization', value: 'VoIPGRID'},
                 ],
             })
-            this.sipStack.start()
+            this._sip.start()
         } , (event) => {
             this.app.logger.error(`${this}failed to initialize the engine: ${event.message}`)
         })
@@ -92,22 +96,19 @@ class Sip {
      * @param {Event} e - Catch-all event when SipML UA tries to connect to the websocket proxy.
      */
     sipStatusEvent(e) {
-        let lastEvent
         let retry
         let retryTimeoutDefault = {interval: 2500, limit: 9000000}
-
-        if ([tsip_event_code_e.STACK_FAILED_TO_STOP, tsip_event_code_e.STACK_STOPPED].indexOf(e.o_event.i_code) < 0) {
-            lastEvent = e
-        }
 
         this.status = e.type
 
         switch (e.o_event.i_code) {
         case tsip_event_code_e.STACK_STARTING:
             this.app.emit('sip:starting', e, true)
+            if (this.app.env.extension) this.app.emit('sip:starting', {})
             break
         case tsip_event_code_e.STACK_FAILED_TO_START:
             this.app.emit('sip:failed_to_start', e, true)
+            if (this.app.env.extension) this.app.emit('sip:failed_to_start', {})
 
             if (this.reconnect) {
                 if (!this.retry) this.retry = Object.assign({}, retryTimeoutDefault)
@@ -119,15 +120,18 @@ class Sip {
             // Reset the retry timer.
             this.retry = Object.assign({}, retryTimeoutDefault)
             this.app.emit('sip:started', e, true)
+            if (this.app.env.extension) this.app.emit('sip:started', {})
             break
         case tsip_event_code_e.STACK_STOPPED:
-            if (lastEvent) {
-                if (lastEvent.o_event.o_stack.network.o_transport.stop) {
-                    lastEvent.o_event.o_stack.network.o_transport.stop()
-                }
-                lastEvent = undefined
+            // This event is triggered twice somehow. Flag is resetted when
+            // connected again.
+            if (this.stopped) {
+                // Emitted within the context of the bg script.
+                this.app.emit('sip:stopped', {}, true)
+                if (this.app.env.extension) this.app.emit('sip:stopped', {})
             }
-            this.app.emit('sip:stopped', e, true)
+
+            this.stopped = true
             break
         }
     }
@@ -180,7 +184,7 @@ class Sip {
                 }
 
                 // Broadcast presence for account.
-                this.app.emit('contacts.sip', {
+                this.app.emit('sip:presence.update', {
                     'account_id': accountId,
                     'state': state,
                 })
@@ -202,7 +206,7 @@ class Sip {
         return new Promise((resolve, reject) => {
             // Keep reference to prevent subscribing multiple times.
             this.app.logger.debug(`${this}subscribe ${accountId}`)
-            this.subscriptions[accountId] = this.sipStack.newSession('subscribe', {
+            this.subscriptions[accountId] = this._sip.newSession('subscribe', {
                 expires: 3600,
                 events_listener: {
                     events: '*',
@@ -243,7 +247,7 @@ class Sip {
     unsubscribePresence(accountId) {
         this.app.logger.debug(`${this} unsubscribe`)
         if (this.subscriptions.hasOwnProperty(accountId)) {
-            if (this.sipStack && this.sipStack.o_stack.e_state === tsip_transport_state_e.STARTED) {
+            if (this._sip && this._sip.o_stack.e_state === tsip_transport_state_e.STARTED) {
                 this.subscriptions[accountId].unsubscribe()
             }
             delete this.subscriptions[accountId]
@@ -269,7 +273,7 @@ class Sip {
 
         // Update already known and connected account presences first.
         for (let accountId of accountIdsWithState) {
-            this.app.emit('contacts.sip', {
+            this.app.emit('sip:presence.update', {
                 'account_id': accountId,
                 'state': this.states[accountId].state,
             })
@@ -293,7 +297,7 @@ class Sip {
                 await this.subscribePresence(accountId)
             }
 
-            this.app.emit('sip:presence_ready')
+            this.app.emit('sip:presences.updated')
         }
     }
 }

@@ -26,7 +26,7 @@ class ContactsModule {
 
         this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         .then((res) => {
-            this.app.emit('widget.indicator.stop', {name: 'contacts'})
+            this.app.emit('ui:widget.reset', {name: 'contacts'})
 
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 let contacts = res.data.objects
@@ -46,11 +46,11 @@ class ContactsModule {
                     widgetsData.contacts.status = 'connecting'
                     this.app.store.set('widgets', widgetsData)
 
-                    this.app.emit('contacts.connecting')
+                    this.app.emit('contacts:connecting')
 
                     if (contacts.length) {
-                        this.app.emit('contacts.reset')
-                        this.app.emit('contacts.fill', {
+                        this.app.emit('contacts:reset')
+                        this.app.emit('contacts:fill', {
                             contacts: contacts,
                             callback: () => {
                                 if (update) {
@@ -61,7 +61,7 @@ class ContactsModule {
                             },
                         })
                     } else {
-                        this.app.emit('contacts.empty')
+                        this.app.emit('contacts:empty')
                     }
                 }
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
@@ -76,7 +76,7 @@ class ContactsModule {
 
                     // Display an icon explaining the user lacks permissions to use
                     // this feature of the plugin.
-                    this.app.emit('widget.unauthorized', {name: 'contacts'})
+                    this.app.emit('ui:widget.unauthorized', {name: 'contacts'})
                     this.app.sip.disconnect()
                 }
 
@@ -87,8 +87,8 @@ class ContactsModule {
 
     _reset() {
         this.app.logger.info(`${this}reset`)
-        this.app.emit('contacts.reset')
-        this.app.emit('contacts.empty')
+        this.app.emit('contacts:reset')
+        this.app.emit('contacts:empty')
 
         // Stop reconnection attempts.
         this.app.sip.disconnect()
@@ -101,26 +101,26 @@ class ContactsModule {
         let widgetsData = this.app.store.get('widgets')
         if (widgetsData.contacts.unauthorized) {
             this.app.logger.debug(`${this}unauthorized to restore`)
-            this.app.emit('widget.unauthorized', {name: 'contacts'})
+            this.app.emit('ui:widget.unauthorized', {name: 'contacts'})
         } else {
             this.app.logger.info(`${this}restoring contacts`)
             // Restore contacts.
             let contacts = widgetsData.contacts.list
             if (contacts && contacts.length) {
-                this.app.emit('contacts.reset')
-                this.app.emit('contacts.fill', {
+                this.app.emit('contacts:reset')
+                this.app.emit('contacts:fill', {
                     contacts: contacts,
                     callback: () => {
                         this.updateSubscriptions(false)
                     },
                 })
             } else {
-                this.app.emit('contacts.empty')
+                this.app.emit('contacts:empty')
             }
         }
 
         if (widgetsData.contacts.status) {
-            this.app.emit('contacts.' + widgetsData.contacts.status)
+            this.app.emit('contacts:' + widgetsData.contacts.status)
         }
     }
 

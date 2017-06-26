@@ -25,7 +25,7 @@ class QueuesModule {
         if (this.app.env.extension && !this.app.env.extension.background) return
 
         this.app.api.client.get('api/queuecallgroup').then((res) => {
-            this.app.emit('widget.indicator.stop', {name: 'queues'})
+            this.app.emit('ui:widget.reset', {name: 'queues'})
 
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 // Find the id's for queuecallgroups.
@@ -34,14 +34,14 @@ class QueuesModule {
                 this.queuecallgroups = []
 
                 if (!queues.length) {
-                    this.app.emit('queues.empty')
+                    this.app.emit('queues:empty')
                 } else {
                     queues.forEach((queue) => {
                         this.queuecallgroups.push(queue.id)
                     })
 
-                    this.app.emit('queues.reset')
-                    this.app.emit('queues.fill', {
+                    this.app.emit('queues:reset')
+                    this.app.emit('queues:fill', {
                         queues: queues,
                         selectedQueue: this.app.store.get('widgets').queues.selected,
                     })
@@ -61,7 +61,7 @@ class QueuesModule {
                 this.app.store.set('widgets', widgetsData)
                 this.setQueueSizesTimer()
             } else if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
-                this.app.logger.info(`${this}widget.unauthorized: queues`)
+                this.app.logger.info(`${this}ui:widget.unauthorized: queues`)
                 // update authorization status
                 let widgetsData = this.app.store.get('widgets')
                 widgetsData.queues.unauthorized = true
@@ -69,14 +69,14 @@ class QueuesModule {
 
                 // display an icon explaining the user lacks permissions to use
                 // this feature of the plugin
-                this.app.emit('widget.unauthorized', {name: 'queues'})
+                this.app.emit('ui:widget.unauthorized', {name: 'queues'})
             }
         })
     }
 
 
     _reset() {
-        this.app.emit('queues.reset')
+        this.app.emit('queues:reset')
     }
 
 
@@ -86,7 +86,7 @@ class QueuesModule {
         // Check if unauthorized.
         let widgetsData = this.app.store.get('widgets')
         if (widgetsData.queues.unauthorized) {
-            this.app.emit('widget.unauthorized', {name: 'queues'})
+            this.app.emit('ui:widget.unauthorized', {name: 'queues'})
         } else {
             // Restore ids and sizes.
             this.queuecallgroups = widgetsData.queues.queuecallgroups
@@ -95,13 +95,13 @@ class QueuesModule {
             // Restore queues list.
             let queues = widgetsData.queues.list
             if (queues && queues.length) {
-                this.app.emit('queues.reset')
-                this.app.emit('queues.fill', {
+                this.app.emit('queues:reset')
+                this.app.emit('queues:fill', {
                     queues: queues,
                     selectedQueue: widgetsData.queues.selected,
                 })
             } else {
-                this.app.emit('queues.empty')
+                this.app.emit('queues:empty')
             }
 
             this.setQueueSizesTimer()
@@ -154,7 +154,7 @@ class QueuesModule {
                     }
 
                     this.sizes[queue.id] = queue.queue_size
-                    this.app.emit('queue.size', {id: queue.id, size: queue.queue_size})
+                    this.app.emit('queues:queue.size', {id: queue.id, size: queue.queue_size})
 
                     // Save sizes in storage.
                     let widgetsData = this.app.store.get('widgets')
@@ -168,7 +168,7 @@ class QueuesModule {
                     this.app.store.set('widgets', widgetsData)
                     // Display an icon explaining the user lacks permissions
                     // to use this feature of the plugin.
-                    this.app.emit('widget.unauthorized', {name: 'queues'})
+                    this.app.emit('ui:widget.unauthorized', {name: 'queues'})
                 }
             }
             this.app.logger.groupEnd()

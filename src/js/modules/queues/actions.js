@@ -10,7 +10,7 @@ class QueuesActions extends Actions {
 
     _background() {
         // Keep track of selected queue.
-        this.app.on('queue.select', (data) => {
+        this.app.on('queues:queue.select', (data) => {
             let widgetsData = this.app.store.get('widgets')
             let id = data.id
             if (id) {
@@ -49,18 +49,12 @@ class QueuesActions extends Actions {
             }
         }
 
-        this.app.on('queues.reset', (data) => {
-            let list = $('.queues .list')
-            list.empty()
-            $('.queues .empty-list').addClass('hide')
-        })
-
-        this.app.on('queues.empty', (data) => {
+        this.app.on('queues:empty', (data) => {
             $('.queues .empty-list').removeClass('hide')
         })
 
         // Fill the queue list.
-        this.app.on('queues.fill', (data) => {
+        this.app.on('queues:fill', (data) => {
             let queues = data.queues
             let selectedQueue = data.selectedQueue
             $('.queues .empty-list').addClass('hide')
@@ -96,8 +90,14 @@ class QueuesActions extends Actions {
             })
         })
 
+        this.app.on('queues:reset', (data) => {
+            let list = $('.queues .list')
+            list.empty()
+            $('.queues .empty-list').addClass('hide')
+        })
+
         // Update the size for a queue.
-        this.app.on('queue.size', (data) => {
+        this.app.on('queues:queue.size', (data) => {
             let id = data.id
             let size = data.size
 
@@ -125,7 +125,7 @@ class QueuesActions extends Actions {
             }
 
             this.app.cache.queue.selected = queueId
-            this.app.emit('queue.select', {id: queueId})
+            this.app.emit('queues:queue.select', {id: queueId})
         })
     }
 

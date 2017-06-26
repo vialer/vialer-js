@@ -3,8 +3,6 @@
 // Identify our elements with these class names.
 const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
-// This style's intention is to hide the icons when printing.
-
 
 
 class Observer {
@@ -16,6 +14,8 @@ class Observer {
         this.observer = null
         this.handleMutationsTimeout = null
         this.parkedNodes = []
+
+        this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/print.css')}" media="print">`)
     }
 
 
@@ -33,6 +33,7 @@ class Observer {
     get iconElement() {
         let a = document.createElement('a')
         a.setAttribute('style', this.iconStyle)
+        a.setAttribute('href', '')
         a.classList.add(phoneIconClassName)
         return a
     }

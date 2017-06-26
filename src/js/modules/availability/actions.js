@@ -19,7 +19,7 @@ class AvailabilityActions extends Actions {
         this.app.on('availability.update', (data) => {
             this.app.logger.debug(`${this}update selected userdestination and refresh popup`)
             this.module.selectUserdestination(data.type, data.id)
-            this.app.emit('availability.refresh')
+            this.app.emit('availability:refresh')
         })
     }
 
@@ -29,12 +29,12 @@ class AvailabilityActions extends Actions {
      */
     _popup() {
         // Refresh the availability select.
-        this.app.on('availability.refresh', (data) => {
+        this.app.on('availability:refresh', (data) => {
             this.module.toggleAvailabilitySelect()
         })
 
         // Empties the availability select.
-        this.app.on('availability.reset', (data) => {
+        this.app.on('availability:reset', (data) => {
             let list = $('select#statusupdate')
             list.empty()
 
@@ -51,7 +51,7 @@ class AvailabilityActions extends Actions {
          * Set the state of the availability select from the emitted data.
          * This is either done after an API call or from a cached restore.
          */
-        this.app.on('availability.fill_select', (data) => {
+        this.app.on('availability:fill_select', (data) => {
             let isAvailable = 'no'
             let list = $('select#statusupdate')
             this.app.logger.debug(`${this}fill availability options`)

@@ -76,7 +76,7 @@ class UiModule {
     login() {
         // Login when form is not empty.
         if ($('#username').val().trim().length && $('#password').val().length) {
-            this.app.emit('login.attempt', {
+            this.app.emit('user:login.attempt', {
                 username: $('#username').val().trim(),
                 password: $('#password').val(),
             })
@@ -94,7 +94,7 @@ class UiModule {
         // Cannot rely on just data.('opened') because this is not transparent to CSS.
         $(widget).data('opened', true).attr('data-opened', true)
         // Inform the background that a widget is opened.
-        this.app.emit('widget.open', {name: data.widget})
+        this.app.emit('ui:widget.open', {name: data.widget})
         if (widget.hasClass('unauthorized')) {
             $(widget).find('.unauthorized-warning').show(10)
         } else {
@@ -125,8 +125,8 @@ class UiModule {
         }
 
         for (let widget in this.app.modules) {
-            this.app.emit('widget.close', {name: widget})
-            this.app.emit('widget.indicator.start', {name: widget})
+            this.app.emit('ui:widget.close', {name: widget})
+            this.app.emit('ui:widget.busy', {name: widget})
         }
 
         this.app.reloadModules(update)

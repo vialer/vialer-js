@@ -35,7 +35,7 @@ class UserModule {
 
                 // Perform some actions on login.
                 this.app.logger.info(`${this}login success`)
-                this.app.emit('login.success', {user: user})
+                this.app.emit('user:login.success', {user: user})
                 // Reset seen notifications.
                 let notificationsData = this.app.store.get('notifications')
                 notificationsData.unauthorized = false
@@ -46,7 +46,7 @@ class UserModule {
                 // Remove credentials from the store.
                 this.app.store.remove('username')
                 this.app.store.remove('password')
-                this.app.emit('login.failed')
+                this.app.emit('user:login.failed')
             }
         })
     }
@@ -59,7 +59,7 @@ class UserModule {
         this.app.resetModules()
         this.app.store.remove('username')
         this.app.store.remove('password')
-        this.app.emit('logout.success')
+        this.app.emit('user:logout.success')
         this.app.api.setupClient()
     }
 }

@@ -11,16 +11,34 @@ const Walker = require('./walker')
 class DialerActions extends Actions {
 
     _background() {
-        // The tab indicates that it's ready to observe. Check if it should add icons.
-        this.app.on('page.observer.ready', this.module.toggleObserve.bind(this.module))
+        /**
+         * Stop callstatus timer for callid when the callstatus dialog closes.
+         */
+        this.app.on('dialer:callstatus.onhide', (data) => {
+            // We no longer need this call's status.
+            let timerSuffix = `-${data.callid}`
+            this.app.timer.stopTimer(`callstatus.status${timerSuffix}`)
+            this.app.timer.unregisterTimer(`callstatus.status${timerSuffix}`)
+        })
+
+        /**
+         * Start callstatus timer function for callid when the callstatus
+         * dialog opens. The timer function updates the call status
+         * periodically.
+         */
+        this.app.on('dialer:callstatus.onshow', (data) => {
+            this.app.timer.startTimer(`dialer:callstatus.status-${data.callid}`)
+        })
 
         // An event from a tab page, requesting to dial a number.
-        this.app.on('clicktodial.dial', (data) => {
+        this.app.on('dialer:dial', (data) => {
             this.app.modules.dialer.dial(data.b_number, data.sender.tab)
             this.app.analytics.trackClickToDial('Webpage')
         })
 
-        this.app.logger.debug(`${this}setting context menuitem`)
+
+        // The tab indicates that it's ready to observe. Check if it should add icons.
+        this.app.on('dialer:observer.ready', this.module.toggleObserve.bind(this.module))
 
         // Remove all previously added context menus.
         if (this.app.env.extension) {
@@ -46,26 +64,32 @@ class DialerActions extends Actions {
         /**
          * Trigger showing the callstatus dialog.
          */
-        this.app.on('callstatus.show', (data) => {
-            this.app.logger.debug(`${this}callstatus.show`)
+        this.app.on('dialer:callstatus.show', (data) => {
             this.module.showCallstatus(data.callid)
         })
 
         // Hides the callstatus popup.
-        this.app.on('callstatus.hide', (data) => {
+        this.app.on('dialer:callstatus.hide', (data) => {
             // Re-enable the c2d icons again.
             $(`.${phoneIconClassName}`).each((i, el) => {
                 $(el).attr('disabled', false)
             })
 
-            this.app.logger.debug(`${this}callstatus.hide triggered`)
             $(this.module.frame).remove()
             delete this.module.frame
         })
 
-        this.app.on('callstatus.onshow', (data) => {
-            this.app.logger.debug(`${this}callstatus.onshow triggered`)
+        this.app.on('dialer:callstatus.onshow', (data) => {
             this.module.callid = data.callid
+        })
+
+        this.app.on('dialer:observer.stop', (data) => {
+            // Stop listening to DOM mutations.
+            this.module.observer.stopObserver()
+            // Remove icons.
+            this.module.observer.undoInsert()
+            // Remove our stylesheet.
+            $(this.module.observer.printStyle).remove()
         })
 
         /**
@@ -90,7 +114,7 @@ class DialerActions extends Actions {
                 e.stopImmediatePropagation()
 
                 const b_number = $(e.currentTarget).attr('data-number')
-                this.app.emit('clicktodial.dial', {
+                this.app.emit('dialer:dial', {
                     b_number: b_number,
                 })
             }
@@ -108,30 +132,17 @@ class DialerActions extends Actions {
 
             // Dial the b_number.
             const b_number = $(e.currentTarget).attr('href').substring(4)
-            this.app.emit('clicktodial.dial', {'b_number': b_number})
+            this.app.emit('dialer:dial', {'b_number': b_number})
         })
 
-        this.app.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            if (request === 'page.observer.stop') {
-                this.app.logger.debug(`${this} page.observer.stop triggered`)
-                // Stop listening to DOM mutations.
-                this.stopObserver()
-                // Remove icons.
-                this.undoInsert()
-                // Remove our stylesheet.
-                $(this.printStyle).remove()
-            }
-        })
 
         // Signal this script has been loaded and ready to look for phone numbers.
-        this.app.emit('page.observer.ready', {
+        this.app.emit('dialer:observer.ready', {
             callback: (response) => {
                 // Fill the contact list.
                 if (response && response.hasOwnProperty('observe')) {
                     let observe = response.observe
                     if (!observe) return
-
-                    this.app.logger.debug(`${this} page.observer.ready emitted`, window.location.href)
 
                     if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
                         // This hidden iframe might become visible, wait for this to happen.

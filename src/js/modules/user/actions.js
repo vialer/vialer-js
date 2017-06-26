@@ -9,16 +9,15 @@ const Actions = require('../../lib/actions')
 class UserActions extends Actions {
 
     _background() {
-        this.app.on('login.attempt', (data) => {
+        this.app.on('user:login.attempt', (data) => {
             // Attempt to log in.
             this.app.store.set('username', data.username)
             this.app.store.set('password', data.password)
-            this.app.emit('login.in_progress')
+            this.app.emit('user:login.in_progress')
             this.module.login(this.app.store.get('username'), this.app.store.get('password'))
         })
 
-        this.app.on('logout.attempt', (data) => {
-            this.app.logger.info(`${this}logout.attempt`)
+        this.app.on('user:logout.attempt', (data) => {
             this.module.logout()
         })
     }
@@ -28,7 +27,7 @@ class UserActions extends Actions {
         /**
          * Show an error on login fail.
          */
-        this.app.on('login.failed', (data) => {
+        this.app.on('user:login.failed', (data) => {
             let button = $('.login-button')
             $(button)
                 .html($(button).data('failed-text'))
@@ -40,13 +39,13 @@ class UserActions extends Actions {
         /**
          * Display an indicator when logging in.
          */
-        this.app.on('login.in_progress', (data) => {
+        this.app.on('user:login.in_progress', (data) => {
             let button = $('.login-button')
             $(button).html($(button).data('loading-text')).prop('disabled', true).addClass('loading')
         })
 
         // After login, show the user's e-mail address.
-        this.app.on('login.success', (data) => {
+        this.app.on('user:login.success', (data) => {
             let user = data.user
             $('#user-name').text(user.email)
 
@@ -54,7 +53,7 @@ class UserActions extends Actions {
             this.app.modules.ui.showPanel()
         })
 
-        this.app.on('logout.success', (data) => {
+        this.app.on('user:logout.success', (data) => {
             // Hide the main panel.
             $('.container').addClass('hide')
             // Show the login form.

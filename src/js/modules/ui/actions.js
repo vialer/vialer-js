@@ -14,7 +14,7 @@ class UiActions extends Actions {
             this.app.browser.tabs.create({url: 'http://wiki.voipgrid.nl/index.php/Chrome_plugin'})
         })
 
-        this.app.on('widget.close', (data) => {
+        this.app.on('ui:widget.close', (data) => {
             // Keep track of closed widgets.
             this.app.logger.info(`${this}setting ${data.name} widget state to closed`)
             let widgetData = this.app.store.get('widgets')
@@ -23,7 +23,7 @@ class UiActions extends Actions {
             this.app.timer.update('queue.size')
         })
 
-        this.app.on('widget.open', (data) => {
+        this.app.on('ui:widget.open', (data) => {
             // Keep track of opened widgets.
             this.app.logger.info(`${this}setting ${data.name} widget state to opened`)
             let widgetData = this.app.store.get('widgets')
@@ -32,38 +32,15 @@ class UiActions extends Actions {
             this.app.timer.update('queue.size')
         })
 
-        this.app.on('restore', (data) => {
+        this.app.on('ui:ui.restore', (data) => {
             this.app.restoreModules()
         })
 
-        /**
-         * Stop callstatus timer for callid when the callstatus dialog closes.
-         */
-        this.app.on('callstatus.onhide', (data) => {
-            this.app.logger.info(`${this}callstatus.onhide`)
-            // We no longer need this call's status.
-            let timerSuffix = `-${data.callid}`
-            this.app.timer.stopTimer(`callstatus.status${timerSuffix}`)
-            this.app.timer.unregisterTimer(`callstatus.status${timerSuffix}`)
-        })
-
-        /**
-         * Start callstatus timer function for callid when the callstatus
-         * dialog opens. The timer function updates the call status
-         * periodically.
-         */
-        this.app.on('callstatus.onshow', (data) => {
-            this.app.logger.info(`${this}callstatus.onshow`)
-            // Start updating the call status.
-            let timerSuffix = `-${data.callid}`
-            this.app.timer.startTimer(`callstatus.status${timerSuffix}`)
-        })
-
-        this.app.on('refresh', (data) => {
+        this.app.on('ui:ui.refresh', (data) => {
             this.app.logger.info(`${this}mainpanel.refresh`)
-            this.app.emit('mainpanel.refresh.start')
+            this.app.emit('ui:mainpanel.loading')
             this.module.refreshWidgets(true)
-            this.app.emit('mainpanel.refresh.stop')
+            this.app.emit('ui:mainpanel.ready')
         })
 
         /**
@@ -97,25 +74,42 @@ class UiActions extends Actions {
 
 
     _popup() {
-        this.app.on('widget.close', (data) => {
+        this.app.on('ui:widget.close', (data) => {
             this.module.closeWidget(data.name)
         })
 
-        this.app.on('widget.indicator.start', (data) => {
+        this.app.on('ui:widget.busy', (data) => {
             this.module.busyWidget(data.name)
         })
 
         this.app.on('ui.widget.open', (data) => {
-            this.app.logger.debug(`${this}ui.widget.open`)
             this.module.openWidget(data.name)
         })
 
-        this.app.on('widget.unauthorized', (data) => {
+        // Hack in popout to display bottom border.
+        this.app.on('ui:widget.open', (data) => {
+            if (data.name === 'contacts') {
+                $('.contacts .list .contact:visible:last').addClass('last')
+            }
+        })
+
+        this.app.on('ui:widget.reset', (data) => {
+            this.module.resetWidget(data.name)
+        })
+
+        this.app.on('ui:widget.unauthorized', (data) => {
             this.module.unauthorizeWidget(data.name)
         })
 
-        this.app.on('widget.indicator.stop', (data) => {
-            this.module.resetWidget(data.name)
+        this.app.on('ui:mainpanel.loading', (data) => {
+            $('#refresh').addClass('fa-spin')
+        })
+
+        // Spin refresh icon while reloading widgets.
+        this.app.on('ui:mainpanel.ready', (data) => {
+            setTimeout(() => {
+                $('#refresh').removeClass('fa-spin')
+            }, 200)
         })
 
         /**
@@ -126,7 +120,7 @@ class UiActions extends Actions {
             let widget = $(e.currentTarget).closest('[data-opened]')
             if (this.module.isWidgetOpen(widget)) {
                 if (!$(e.target).is(':input')) {
-                    this.app.emit('widget.close', {
+                    this.app.emit('ui:widget.close', {
                         name: $(widget).data('widget'),
                     })
                     this.module.closeWidget(widget)
@@ -145,7 +139,7 @@ class UiActions extends Actions {
          * Emit that we want to logout.
          */
         $('#logout').click((e) => {
-            this.app.emit('logout.attempt')
+            this.app.emit('user:logout.attempt')
         })
 
         $('#popout').click((e) => {
@@ -155,7 +149,7 @@ class UiActions extends Actions {
             this.app.emit('help')
         })
         $('#refresh').click((e) => {
-            this.app.emit('refresh')
+            this.app.emit('ui:ui.refresh')
         })
         $('#settings').click((e) => {
             this.app.emit('settings')
@@ -179,7 +173,7 @@ class UiActions extends Actions {
          * is by reading data from storage and present them as they were.
          */
         if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
-            this.app.emit('restore')
+            this.app.emit('ui:ui.restore')
             let user = this.app.store.get('user')
             $('#user-name').text(user.email)
             this.module.hideLoginForm()
@@ -237,17 +231,6 @@ class UiActions extends Actions {
             } else {
                 this.module.login()
             }
-        })
-
-        this.app.on('mainpanel.refresh.start', (data) => {
-            $('#refresh').addClass('fa-spin')
-        })
-
-        // Spin refresh icon while reloading widgets.
-        this.app.on('mainpanel.refresh.stop', (data) => {
-            setTimeout(() => {
-                $('#refresh').removeClass('fa-spin')
-            }, 200)
         })
     }
 

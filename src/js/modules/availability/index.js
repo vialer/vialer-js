@@ -26,9 +26,9 @@ class AvailabilityModule {
         if (this.app.env.extension && !this.app.env.extension.background) return
 
         this.app.api.client.get('api/userdestination/').then((res) => {
-            this.app.emit('widget.indicator.stop', {name: 'availability'})
+            this.app.emit('ui:widget.reset', {name: 'availability'})
             if (this.app.api.OK_STATUS.includes(res.status)) {
-                this.app.emit('availability.reset')
+                this.app.emit('availability:reset')
                 // There is only one userdestination so objects[0] is the right
                 // (and only) one.
                 let userdestination = res.data.objects[0]
@@ -54,7 +54,7 @@ class AvailabilityModule {
 
                 // Fill the dropdown with these choices.
                 if (options.length) {
-                    this.app.emit('availability.fill_select', {destinations: options})
+                    this.app.emit('availability:fill_select', {destinations: options})
                 }
 
                 // Set an icon depending on whether the user is available or not.
@@ -82,14 +82,14 @@ class AvailabilityModule {
 
                 // Display an icon explaining the user lacks permissions to use
                 // this feature of the plugin.
-                this.app.emit('widget.unauthorized', {name: 'availability'})
+                this.app.emit('ui:widget.unauthorized', {name: 'availability'})
             }
         })
     }
 
 
     _reset() {
-        this.app.emit('availability.reset')
+        this.app.emit('availability:reset')
         this.app.logger.info(`${this}set icon to grey`)
         if (this.app.env.extension) this.app.browser.browserAction.setIcon({path: 'img/call-gray.png'})
     }
@@ -105,7 +105,7 @@ class AvailabilityModule {
         // Check if unauthorized.
         const widgetsData = this.app.store.get('widgets')
         if (widgetsData.availability.unauthorized) {
-            this.app.emit('widget.unauthorized', {name: name})
+            this.app.emit('ui:widget.unauthorized', {name: name})
             return
         }
 
@@ -117,9 +117,9 @@ class AvailabilityModule {
             const selectedPhoneaccountId = userdestination.selecteduserdestination.phoneaccount
             this.app.logger.debug(`${this}restoring availability options from ${selectedPhoneaccountId}/${selectedFixeddestinationId}`)
             const options = this.availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId)
-            this.app.emit('availability.reset')
+            this.app.emit('availability:reset')
             if (options.length) {
-                this.app.emit('availability.fill_select', {destinations: options})
+                this.app.emit('availability:fill_select', {destinations: options})
             }
         }
 
@@ -135,7 +135,7 @@ class AvailabilityModule {
 
 
         // Restore availability.
-        this.app.emit('availability.refresh')
+        this.app.emit('availability:refresh')
     }
 
 

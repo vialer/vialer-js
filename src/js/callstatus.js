@@ -24,7 +24,7 @@ class CallStatusApp extends Skeleton {
             }
         })
 
-        this.on('callstatus.status', (data) => {
+        this.on('dialer:callstatus.status', (data) => {
             if (data.callid === this.callid) {
                 this.logger.info(`${this} callstatus.status triggered`)
                 var status = data.status
@@ -35,9 +35,9 @@ class CallStatusApp extends Skeleton {
             }
         })
 
-        this.on('callstatus.hide', (data) => {
+        this.on('dialer:callstatus.hide', (data) => {
             if (data.callid === this.callid) {
-                this.logger.info(`${this} callstatus.hide triggered`)
+                this.logger.info(`${this} dialer:callstatus.hide triggered`)
                 this.hideCallstatus()
             }
         })
@@ -52,7 +52,7 @@ class CallStatusApp extends Skeleton {
 
         // Indication to the tab script that it's active.
         // Emit to the background.
-        this.emit('callstatus.onshow', {
+        this.emit('dialer:callstatus.onshow', {
             // Extra info to identify call.
             callid: this.callid,
         })
@@ -61,7 +61,7 @@ class CallStatusApp extends Skeleton {
 
     hideCallstatus(e) {
         this.logger.info(`${this} closing callstatus dialog`)
-        this.emit('callstatus.hide', {
+        this.emit('dialer:callstatus.hide', {
             callid: this.callid,
         }, false, false, parent)
     }

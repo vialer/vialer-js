@@ -12,11 +12,10 @@ class ContactsActions extends Actions {
      * from the background and handled by the background.
      */
     _background() {
-        this.app.on('sip:starting', (e) => {
+        this.app.on('sip:failed_to_start', (e) => {
             let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'connecting'
+            widgetsData.contacts.status = 'failed_to_start'
             this.app.store.set('widgets', widgetsData)
-            this.app.emit('contacts.connecting')
         })
 
         this.app.on('sip:started', (e) => {
@@ -27,11 +26,10 @@ class ContactsActions extends Actions {
             this.app.sip.updatePresence(accountIds, true)
         })
 
-        this.app.on('sip:failed_to_start', (e) => {
+        this.app.on('sip:starting', (e) => {
             let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'failed_to_start'
+            widgetsData.contacts.status = 'connecting'
             this.app.store.set('widgets', widgetsData)
-            this.app.emit('contacts.failed_to_start')
         })
 
         this.app.on('sip:stopped', (e) => {
@@ -40,7 +38,6 @@ class ContactsActions extends Actions {
                 widgetsData.contacts.status = 'disconnected'
                 this.app.store.set('widgets', widgetsData)
             }
-            this.app.emit('contacts.disconnected')
         })
     }
 
@@ -57,61 +54,13 @@ class ContactsActions extends Actions {
         resizeContacts()
         $(window).resize(resizeContacts)
 
-        // Hack in popout to display bottom border.
-        this.app.on('widget.open', (data) => {
-            if (data.name === 'contacts') {
-                $('.contacts .list .contact:visible:last').addClass('last')
-            }
-        })
-
-        this.app.on('contacts.connecting', (data) => {
-            this.app.logger.debug(`${this}contacts.connecting triggered`)
-            $('.contacts .connection-icon').hide().filter('.connecting').css('display', 'inline-block')
-            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
-        })
-
-        this.app.on('contacts.failed_to_start', (data) => {
-            this.app.logger.debug(`${this}contacts.failed_to_start triggered`)
-            $('.contacts .connection-icon').hide().filter('.no-connection').css('display', 'inline-block')
-        })
-
-        this.app.on('sip:presence_ready', (data) => {
-            this.app.logger.debug(`${this}sip:presence_ready triggered`)
-            $('.contacts .connection-icon').hide()
-        })
-
-        this.app.on('contacts.disconnected', (data) => {
-            this.app.logger.debug(`${this}contacts.disconnected triggered`)
-            $('.contacts .connection-icon').hide().filter('.connecting').css('display', 'inline-block')
-            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
-        })
-
-        this.app.on('contacts.sip', (data) => {
-            this.app.logger.debug(`${this}contacts.sip triggered`)
-            let account_id = data.account_id
-            let state = data.state
-            $(`#sip${account_id} .status-icon`).removeClass('available unavailable busy ringing shake').addClass(state)
-        })
-
-        this.app.on('contacts.reset', (data) => {
-            let list = $('.contacts .list')
-            list.empty()
-            $('.widget.contacts .empty-list').addClass('hide')
-
-            // Reset search.
-            searchQuery = ''
-            $('.search-form :input').val(searchQuery)
-            $('.widget.contacts .contact').removeClass('hide')
-        })
-
-        this.app.on('contacts.empty', (data) => {
+        this.app.on('contacts:empty', (data) => {
             $('.widget.contacts .empty-list').removeClass('hide')
             $('.contacts .search-query').attr('disabled', 'disabled')
         })
 
         // Fill the contact list.
-        this.app.on('contacts.fill', (data) => {
-            this.app.logger.info(`${this}contacts.fill triggered`)
+        this.app.on('contacts:fill', (data) => {
             let contacts = data.contacts
             $('.widget.contacts .empty-list').addClass('hide')
             $('.contacts .search-query').removeAttr('disabled')
@@ -133,13 +82,48 @@ class ContactsActions extends Actions {
 
             // Hack in popout to display bottom border.
             $('.contacts .list .contact:visible:last').addClass('last')
-
             // Trigger the callback function to receive presence data
             // after the list is fully built.
             data.callback({})
             // Hide element.
             $('embed').hide()
         })
+
+        this.app.on('contacts:reset', (data) => {
+            let list = $('.contacts .list')
+            list.empty()
+            $('.widget.contacts .empty-list').addClass('hide')
+
+            // Reset search.
+            searchQuery = ''
+            $('.search-form :input').val(searchQuery)
+            $('.widget.contacts .contact').removeClass('hide')
+        })
+
+        this.app.on('sip:failed_to_start', (data) => {
+            $('.contacts .connection-icon').hide().filter('.no-connection').css('display', 'inline-block')
+        })
+
+        this.app.on('sip:presence.update', (data) => {
+            let account_id = data.account_id
+            let state = data.state
+            $(`#sip${account_id} .status-icon`).removeClass('available unavailable busy ringing shake').addClass(state)
+        })
+
+        this.app.on('sip:presences.updated', (data) => {
+            $('.contacts .connection-icon').hide()
+        })
+
+        this.app.on('sip:starting', () => {
+            $('.contacts .connection-icon').hide().filter('.connecting').css('display', 'inline-block')
+            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
+        })
+
+        this.app.on('sip:stopped', (e) => {
+            $('.contacts .connection-icon').hide().filter('.connecting').css('display', 'inline-block')
+            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
+        })
+
 
         // Blink every phone icon with class "ringing".
         let blink = () => {
@@ -163,7 +147,6 @@ class ContactsActions extends Actions {
         $('.contacts').on('click', '.status-icon, .name, .extension', (e) => {
             let extension = $(e.currentTarget).closest('.contact').find('.extension').text()
             if (extension && extension.length) {
-                console.log("DIAL!!!!")
                 this.app.emit('panel.dial', {'b_number': extension})
             }
         });
