@@ -57,6 +57,7 @@
   "dependencies": {
     "axios": "^0.16.2",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.2.1"
+    "jquery": "^3.2.1",
+    "npm-font-open-sans": "^1.0.3"
   }
 }

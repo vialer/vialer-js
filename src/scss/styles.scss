@@ -2,6 +2,13 @@
 @import "panel";
 @import "popout";
 
+$fa-font-path: "/fonts";
+@import "font-awesome/scss/font-awesome";
+
+$FontPathOpenSans: "/fonts";
+@import "npm-font-open-sans/open-sans.scss";
+
+
 // Styling specifically for the click-to-dial callstatus popup.
 .voipgrid-status {
     width: 100%;

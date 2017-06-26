@@ -1,5 +1,9 @@
 'use strict'
 
+// Wait x miliseconds before resolving the subscribe event,
+// to prevent the server from being hammered.
+const SUBSCRIBE_DELAY = 200
+
 
 /**
  * The SIP class takes care of all SIP communication in the background.
@@ -137,10 +141,12 @@ class Sip {
      */
     subscribeEvent(e, accountId, resolve) {
         if (e.type === 'connected') {
-            resolve({
-                accountId: accountId,
-                event: e,
-            })
+            setTimeout(() => {
+                resolve({
+                    accountId: accountId,
+                    event: e,
+                })
+            }, SUBSCRIBE_DELAY)
         } else if (e.type === 'i_notify') {
             let parser = new DOMParser()
             let xmlDoc = parser ? parser.parseFromString(e.getContentString(), 'text/xml') : null
