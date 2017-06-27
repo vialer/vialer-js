@@ -62,6 +62,11 @@ class UserModule {
         this.app.emit('user:logout.success')
         this.app.api.setupClient()
     }
+
+
+    toString() {
+        return `${this.app}[user] `
+    }
 }
 
 module.exports = UserModule

@@ -12,10 +12,8 @@ class DialerActions extends Actions {
          * Stop callstatus timer for callid when the callstatus dialog closes.
          */
         this.app.on('dialer:callstatus.onhide', (data) => {
-            // We no longer need this call's status.
-            let timerSuffix = `-${data.callid}`
-            this.app.timer.stopTimer(`callstatus.status${timerSuffix}`)
-            this.app.timer.unregisterTimer(`callstatus.status${timerSuffix}`)
+            this.app.timer.stopTimer(`dialer:status.update-${data.callid}`)
+            this.app.timer.unregisterTimer(`dialer:status.update-${data.callid}`)
         })
 
         /**
@@ -24,7 +22,7 @@ class DialerActions extends Actions {
          * periodically.
          */
         this.app.on('dialer:callstatus.onshow', (data) => {
-            this.app.timer.startTimer(`callstatus:status.update-${data.callid}`)
+            this.app.timer.startTimer(`dialer:status.update-${data.callid}`)
         })
 
         // An event from a tab page, requesting to dial a number.
@@ -80,7 +78,7 @@ class DialerActions extends Actions {
 
 
     toString() {
-        return `${this.app} [PageActions]        `
+        return `${this.module}[actions] `
     }
 }
 

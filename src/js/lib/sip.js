@@ -16,7 +16,6 @@ class Sip {
      */
     constructor(app) {
         this.app = app
-        this.app.logger.debug(`${this}init`)
         // Set the verbosity of the Sip library. Useful when you need to
         // debug SIP messages. Supported values are: info, warn, error and fatal.
         SIPml.setDebugLevel('error')
@@ -205,7 +204,6 @@ class Sip {
     subscribePresence(accountId) {
         return new Promise((resolve, reject) => {
             // Keep reference to prevent subscribing multiple times.
-            this.app.logger.debug(`${this}subscribe ${accountId}`)
             this.subscriptions[accountId] = this._sip.newSession('subscribe', {
                 expires: 3600,
                 events_listener: {
@@ -235,7 +233,7 @@ class Sip {
 
 
     toString() {
-        return `${this.app} [Sip]               `
+        return `${this.app}[sip] `
     }
 
 
@@ -264,10 +262,6 @@ class Sip {
      * @param {Boolean} complement - Complement missing presence states.
      */
     async updatePresence(accountIds, complement) {
-        let widgetsData = this.app.store.get('widgets')
-        widgetsData.contacts.status = undefined
-        this.app.store.set('widgets', widgetsData)
-
         const accountIdsWithState = accountIds.filter((accountId) => accountId in this.states)
         const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
 

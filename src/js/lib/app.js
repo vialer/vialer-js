@@ -3,8 +3,8 @@
 const Analytics = require('./analytics')
 const Api = require('./api')
 
-const Skeleton = require('./skeleton')
 const Sip = require('./sip')
+const Skeleton = require('./skeleton')
 const Store = require('./store')
 const Timer = require('./timer')
 
@@ -23,8 +23,6 @@ class App extends Skeleton {
         window.cache = {}
 
         this.store = new Store(this)
-
-        this.logger.debug(`${this}${this._listeners} listeners registered`)
         this.timer = new Timer(this)
 
         // Store settings to localstorage.
@@ -38,7 +36,7 @@ class App extends Skeleton {
 
         // Checkout the contents of localstorage.
         if (this.verbose) {
-            let localStorageDump = `${this} localstorage contains...\n`
+            let localStorageDump = `${this}localstorage contains...\n`
             for (let i = 0; i < localStorage.length; i++) {
                 localStorageDump += `${localStorage.key(i)}=${localStorage.getItem(localStorage.key(i))}\n`
             }
@@ -49,11 +47,10 @@ class App extends Skeleton {
         this.store.set('notifications', {})
         // Continue last session if credentials are available.
         if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
-            this.logger.info(`${this} reusing session`)
+            this.logger.info(`${this}reusing existing session from existing credentials`)
             this.reloadModules(false)
 
             if (this.env.extension && this.env.extension.background) {
-                this.logger.info(`${this}set icon to available because of login`)
                 this.browser.browserAction.setIcon({path: 'img/call-green.png'})
             }
         }

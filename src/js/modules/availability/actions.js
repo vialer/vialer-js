@@ -103,7 +103,7 @@ class AvailabilityActions extends Actions {
 
 
     toString() {
-        return `${this.app} [AvailabilityActions] `
+        return `${this.module}[actions] `
     }
 }
 

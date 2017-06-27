@@ -173,7 +173,7 @@ class Timer {
 
 
     toString() {
-        return `${this.app} [Timer]             `
+        return `${this.app}[timer] `
     }
 }
 

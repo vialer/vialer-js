@@ -17,18 +17,18 @@ class UiActions extends Actions {
         this.app.on('ui:widget.close', (data) => {
             // Keep track of closed widgets.
             this.app.logger.info(`${this}setting ${data.name} widget state to closed`)
-            let widgetData = this.app.store.get('widgets')
-            widgetData.isOpen[data.name] = false
-            this.app.store.set('widgets', widgetData)
+            let widgetState = this.app.store.get('widgets')
+            widgetState.isOpen[data.name] = false
+            this.app.store.set('widgets', widgetState)
             this.app.timer.update('queue.size')
         })
 
         this.app.on('ui:widget.open', (data) => {
             // Keep track of opened widgets.
             this.app.logger.info(`${this}setting ${data.name} widget state to opened`)
-            let widgetData = this.app.store.get('widgets')
-            widgetData.isOpen[data.name] = true
-            this.app.store.set('widgets', widgetData)
+            let widgetState = this.app.store.get('widgets')
+            widgetState.isOpen[data.name] = true
+            this.app.store.set('widgets', widgetState)
             this.app.timer.update('queue.size')
         })
 
@@ -62,7 +62,7 @@ class UiActions extends Actions {
             })
         })
 
-        this.app.on('close', (data) => {
+        this.app.on('ui:mainpanel.close', (data) => {
             this.app.logger.info(`${this}mainpanel.close`)
         })
 
@@ -131,7 +131,7 @@ class UiActions extends Actions {
         })
 
         $('#close').click((e) => {
-            this.app.emit('close')
+            this.app.emit('ui:mainpanel.close')
             window.close()
         })
 
@@ -236,7 +236,7 @@ class UiActions extends Actions {
 
 
     toString() {
-        return `${this.app} [UiActions]      `
+        return `${this.module}[actions] `
     }
 }
 

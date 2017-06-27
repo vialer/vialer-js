@@ -35,11 +35,11 @@ class Skeleton extends EventEmitter {
         // Increases verbosity beyond the logger's debug level.
         this.verbose = false
         // Sets the verbosity of the logger.
-        this.logger.setLevel('debug')
-        this.logger.debug(`${this} init`)
+        this.logger.setLevel(options.debugLevel)
+        this.logger.info(`${this}start app with debug-level ${options.debugLevel}`)
 
 
-        if (this.browser && this.browser.extension) {
+        if (this.env.extension) {
             // Make the EventEmitter .on method compatible with web extension ipc.
             // An Ipc event is coming in. Map it to the EventEmitter.
             this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -50,14 +50,23 @@ class Skeleton extends EventEmitter {
                     // the request.data, so map sendResponse.
                     request.data.callback = sendResponse
                 }
-                // Only emit
-                this.emit(request.event, request.data, true)
+                // You must pass an allFrames option to the data, in order
+                // to emit an event to a tab's observer script(s) as well.
+                // This check exists so that not all background or popup emitted
+                // ipc events to a tab end up in the observer event handling.
+                if (this.env.extension.callstatus || this.env.extension.observer) {
+                    if (request.data.allFrames) {
+                        this.emit(request.event, request.data, true)
+                    }
+                } else {
+                    this.emit(request.event, request.data, true)
+                }
             })
 
             // Allows parent scripts to use the same EventEmitter syntax.
-            if (this.env.extension && this.env.extension.tab) {
+            if (this.env.extension.tab) {
                 window.addEventListener('message', (e) => {
-                    if (this.verbose) this.logger.debug(`${this} emit ${event} from child`)
+                    if (this.verbose) this.logger.debug(`${this}emit '${event}' event from child`)
                     this.emit(e.data.event, e.data.data, true)
                 })
             }
@@ -97,11 +106,11 @@ class Skeleton extends EventEmitter {
             payloadArgs.push(payloadData)
 
             if (tabId) {
-                this.logger.debug(`${this} emit ipc ${event} to tab ${tabId}`)
+                this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
                 this.browser.tabs.sendMessage(tabId, payloadData)
                 return
             } else if (parent) {
-                this.logger.debug(`${this} emit ipc ${event} to parent`)
+                this.logger.debug(`${this}emit ipc event '${event}' to parent`)
                 parent.postMessage({
                     event: event,
                     data: data,
@@ -112,10 +121,10 @@ class Skeleton extends EventEmitter {
             if (data && data.callback) {
                 payloadArgs.push(data.callback)
             }
-            this.logger.debug(`${this} emit ipc ${event}`)
+            this.logger.debug(`${this}emit ipc event '${event}'`)
             this.browser.runtime.sendMessage(...payloadArgs)
         } else {
-            this.logger.debug(`${this} emit local ${event}`)
+            this.logger.debug(`${this}emit local event '${event}'`)
             super.emit(event, data)
         }
     }
@@ -162,7 +171,7 @@ class Skeleton extends EventEmitter {
 
 
     toString() {
-        return `[${this.name}]`
+        return `[${this.name}] `
     }
 }
 

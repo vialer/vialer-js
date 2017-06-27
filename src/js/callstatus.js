@@ -11,20 +11,19 @@ class CallStatusApp extends Skeleton {
     constructor(options) {
         super(options)
         this.verbose = true
-        this.logger.info(`${this} starting application`)
+        this.logger.info(`${this}starting application`)
         // Get the callid from the opened url.
         this.callid = window.location.href.match(/callid\=([^&]+)/)[1]
 
         this.on('callstatus:set_bnumber', (data) => {
             if (data.callid === this.callid) {
-                this.logger.info(`${this} callstatus:set_bnumber triggered`)
+                this.logger.info(`${this}callstatus:set_bnumber triggered`)
                 this.setText(document.getElementById('number'), data.b_number)
             }
         })
 
         this.on('callstatus:status.update', (data) => {
             if (data.callid === this.callid) {
-                this.logger.info(`${this} callstatus:status.update triggered`)
                 if (data.status) {
                     this.setText(document.getElementById('status'), data.status)
                 }
@@ -34,8 +33,7 @@ class CallStatusApp extends Skeleton {
         $('.voipgrid-status .close').on('click', this.hideCallstatus.bind(this))
         $(window).on('beforeunload', this.hideCallstatus.bind(this))
 
-        // Indication to the tab script that it's active.
-        // Emit to the background.
+        // Indication to the tab parent script that it's active.
         this.emit('dialer:callstatus.onshow', {
             // Extra info to identify call.
             callid: this.callid,
@@ -44,7 +42,7 @@ class CallStatusApp extends Skeleton {
 
 
     hideCallstatus(e) {
-        this.logger.info(`${this} closing callstatus dialog`)
+        this.logger.info(`${this}closing callstatus dialog`)
         this.emit('dialer:callstatus.hide', {
             callid: this.callid,
         }, false, false, parent)
@@ -52,7 +50,7 @@ class CallStatusApp extends Skeleton {
 
 
     setText(element, text) {
-        this.logger.debug(`${this} set text '${text}'`)
+        this.logger.debug(`${this}setting status text '${text}'`)
         while (element.firstChild !== null) {
             // Remove all existing content.
             element.removeChild(element.firstChild)
@@ -63,6 +61,7 @@ class CallStatusApp extends Skeleton {
 
 
 global.app = new CallStatusApp({
+    debugLevel: 'debug',
     environment: {
         extension: {
             background: false,
@@ -72,5 +71,5 @@ global.app = new CallStatusApp({
         },
     },
     modules: [],
-    name: 'CallStatusApp',
+    name: 'callstatus',
 })

@@ -17,10 +17,11 @@ const _modules = [
 
 document.addEventListener('DOMContentLoaded', () => {
     global.app = new ClickToDialApp({
+        debugLevel: 'debug',
         environment: {
             extension: false,
         },
         modules: _modules,
-        name: 'WebApp',
+        name: 'web',
     })
 })

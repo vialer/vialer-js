@@ -62,7 +62,7 @@ class Api {
 
 
     toString() {
-        return `${this.app} [Api]                `
+        return `${this.app}[api] `
     }
 
 

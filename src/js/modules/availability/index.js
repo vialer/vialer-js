@@ -47,10 +47,10 @@ class AvailabilityModule {
 
                 // Build options for the availability dropdown.
                 let options = this.availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId)
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.availability.options = options
-                widgetsData.availability.unauthorized = false
-                this.app.store.set('widgets', widgetsData)
+                let widgetState = this.app.store.get('widgets')
+                widgetState.availability.options = options
+                widgetState.availability.unauthorized = false
+                this.app.store.set('widgets', widgetState)
 
                 // Fill the dropdown with these choices.
                 if (options.length) {
@@ -65,20 +65,20 @@ class AvailabilityModule {
                 this.app.logger.info(`${this}setting icon ${icon}`)
 
                 if (this.app.env.extension) {
-                    if (!widgetsData.queues.selected) {
+                    if (!widgetState.queues.selected) {
                         this.app.browser.browserAction.setIcon({path: icon})
                     }
                 }
 
                 // Save icon in storage.
-                widgetsData.availability.icon = icon
-                this.app.store.set('widgets', widgetsData)
+                widgetState.availability.icon = icon
+                this.app.store.set('widgets', widgetState)
             } else if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                 this.app.logger.warn(`${this}unauthorized availability request`)
                 // Update authorization status in the store.
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.availability.unauthorized = true
-                this.app.store.set('widgets', widgetsData)
+                let widgetState = this.app.store.get('widgets')
+                widgetState.availability.unauthorized = true
+                this.app.store.set('widgets', widgetState)
 
                 // Display an icon explaining the user lacks permissions to use
                 // this feature of the plugin.
@@ -100,11 +100,9 @@ class AvailabilityModule {
      * has processed all availability data.
      */
     _restore() {
-        this.app.logger.info(`${this}restoring widget availability`)
-
         // Check if unauthorized.
-        const widgetsData = this.app.store.get('widgets')
-        if (widgetsData.availability.unauthorized) {
+        const widgetState = this.app.store.get('widgets')
+        if (widgetState.availability.unauthorized) {
             this.app.emit('ui:widget.unauthorized', {name: name})
             return
         }
@@ -124,11 +122,11 @@ class AvailabilityModule {
         }
 
         // Restore icon.
-        if (widgetsData.availability.icon) {
-            if (!widgetsData.queues.selected) {
+        if (widgetState.availability.icon) {
+            if (!widgetState.queues.selected) {
                 this.app.logger.info(`${this}set availability icon`)
                 if (this.app.env.extension) {
-                    this.app.browser.browserAction.setIcon({path: widgetsData.availability.icon})
+                    this.app.browser.browserAction.setIcon({path: widgetState.availability.icon})
                 }
             }
         }
@@ -199,12 +197,12 @@ class AvailabilityModule {
                 if (id) {
                     icon = 'img/call-green.png'
                 }
-                let widgetsData = this.app.store.get('widgets')
-                widgetsData.availability.icon = icon
-                this.app.store.set('widgets', widgetsData)
+                let widgetState = this.app.store.get('widgets')
+                widgetState.availability.icon = icon
+                this.app.store.set('widgets', widgetState)
 
                 if (this.app.env.extension) {
-                    if (widgetsData.queues && !widgetsData.queues.selected) {
+                    if (widgetState.queues && !widgetState.queues.selected) {
                         this.app.browser.browserAction.setIcon({path: icon})
                     }
                 }
@@ -237,7 +235,7 @@ class AvailabilityModule {
 
 
     toString() {
-        return `${this.app} [Availability]       `
+        return `${this.app}[availability] `
     }
 }
 

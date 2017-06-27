@@ -11,7 +11,7 @@ class QueuesActions extends Actions {
     _background() {
         // Keep track of selected queue.
         this.app.on('queues:queue.select', (data) => {
-            let widgetsData = this.app.store.get('widgets')
+            let widgetState = this.app.store.get('widgets')
             let id = data.id
             if (id) {
                 let size = NaN
@@ -24,7 +24,7 @@ class QueuesActions extends Actions {
                 }
             } else {
                 // Restore availability icon.
-                if (widgetsData.availability) {
+                if (widgetState.availability) {
                     if (this.app.env.extension) {
                         this.app.logger.info(`${this}set availability icon`)
                         this.app.browser.browserAction.setIcon({
@@ -35,8 +35,8 @@ class QueuesActions extends Actions {
             }
 
             // Save selected queue id in storage.
-            widgetsData.queues.selected = id
-            this.app.store.set('widgets', widgetsData)
+            widgetState.queues.selected = id
+            this.app.store.set('widgets', widgetState)
             this.app.timer.update('queue.size')
         })
     }
@@ -131,7 +131,7 @@ class QueuesActions extends Actions {
 
 
     toString() {
-        return `${this.app} [QueuesActions]     `
+        return `${this.module}[actions] `
     }
 
 }

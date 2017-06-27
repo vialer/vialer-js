@@ -140,9 +140,8 @@ class UiModule {
         this.app.logger.debug(`${this}reset widget`)
         let widget = this.getWidget(widgetOrWidgetName)
         $(widget).removeClass('busy').removeClass('unauthorized')
-        let isOpen = this.isWidgetOpen(widget)
         this.closeWidget(widget)
-        if (isOpen) {
+        if (this.isWidgetOpen(widget)) {
             this.openWidget(widget)
         }
     }
@@ -181,7 +180,7 @@ class UiModule {
 
 
     toString() {
-        return `${this.app} [Ui]             `
+        return `${this.app}[ui] `
     }
 
 
@@ -189,7 +188,7 @@ class UiModule {
      * Show the unauthorized warning for a widget.
      */
     unauthorizeWidget(widgetName) {
-        let widget = this.getWidget(widgetName)
+        const widget = this.getWidget(widgetName)
         this.resetWidget(widget)
         widget.addClass('unauthorized')
     }

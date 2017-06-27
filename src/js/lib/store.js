@@ -39,7 +39,7 @@ class Store {
 
 
     toString() {
-        return `${this.app} [Store]              `
+        return `${this.app}[store] `
     }
 }
 

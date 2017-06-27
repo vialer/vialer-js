@@ -161,7 +161,6 @@ gulp.task('js', 'Metatask that builds all JavaScript tasks.', [
     'js-options',
     'js-popup',
     'js-tab',
-    'js-vendor',
     'js-web',
 ], (done) => {
     if (isWatching) livereload.changed('web.js')

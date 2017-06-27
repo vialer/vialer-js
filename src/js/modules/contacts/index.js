@@ -39,12 +39,12 @@ class ContactsModule {
                     }
                 }
 
-                let widgetsData = this.app.store.get('widgets')
-                if (widgetsData) {
-                    widgetsData.contacts.list = contacts
-                    widgetsData.contacts.unauthorized = false
-                    widgetsData.contacts.status = 'connecting'
-                    this.app.store.set('widgets', widgetsData)
+                let widgetState = this.app.store.get('widgets')
+                if (widgetState) {
+                    widgetState.contacts.list = contacts
+                    widgetState.contacts.unauthorized = false
+                    widgetState.contacts.status = 'connecting'
+                    this.app.store.set('widgets', widgetState)
 
                     this.app.emit('contacts:connecting')
 
@@ -70,9 +70,9 @@ class ContactsModule {
                 if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                     this.app.logger.info(`${this}unauthorized contacts`)
                     // Update authorization status.
-                    let widgetsData = this.app.store.get('widgets')
-                    widgetsData.contacts.unauthorized = true
-                    this.app.store.set('widgets', widgetsData)
+                    let widgetState = this.app.store.get('widgets')
+                    widgetState.contacts.unauthorized = true
+                    this.app.store.set('widgets', widgetState)
 
                     // Display an icon explaining the user lacks permissions to use
                     // this feature of the plugin.
@@ -96,16 +96,15 @@ class ContactsModule {
 
 
     _restore() {
-        this.app.logger.info(`${this}reloading widget contacts`)
         // Check if unauthorized.
-        let widgetsData = this.app.store.get('widgets')
-        if (widgetsData.contacts.unauthorized) {
+        let widgetState = this.app.store.get('widgets')
+        if (widgetState.contacts.unauthorized) {
             this.app.logger.debug(`${this}unauthorized to restore`)
             this.app.emit('ui:widget.unauthorized', {name: 'contacts'})
         } else {
             this.app.logger.info(`${this}restoring contacts`)
             // Restore contacts.
-            let contacts = widgetsData.contacts.list
+            let contacts = widgetState.contacts.list
             if (contacts && contacts.length) {
                 this.app.emit('contacts:reset')
                 this.app.emit('contacts:fill', {
@@ -118,21 +117,17 @@ class ContactsModule {
                 this.app.emit('contacts:empty')
             }
         }
-
-        if (widgetsData.contacts.status) {
-            this.app.emit('contacts:' + widgetsData.contacts.status)
-        }
     }
 
 
     toString() {
-        return `${this.app} [Contacts]           `
+        return `${this.app}[contacts] `
     }
 
 
     updateSubscriptions(reload) {
-        let widgetsData = this.app.store.get('widgets')
-        let accountIds = widgetsData.contacts.list.map((c) => c.account_id)
+        let widgetState = this.app.store.get('widgets')
+        let accountIds = widgetState.contacts.list.map((c) => c.account_id)
         this.app.sip.updatePresence(accountIds, reload)
     }
 }

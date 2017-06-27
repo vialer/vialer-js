@@ -23,12 +23,17 @@ class Analytics {
     }
 
 
+    toString() {
+        return `${this.app}[analytics] `
+    }
+
+
     /**
      * A function that will POST a Click-to-Dial Event to Google Analytics.
      * @param {String} origin - Label that will be given to the event.
      */
     trackClickToDial(origin) {
-        this.app.logger.debug('Analytics: send call event')
+        this.app.logger.debug(`${this}send call event`)
         ga('send', 'event', 'Calls', 'Initiate ConnectAB', origin)
     }
 }

@@ -23,7 +23,7 @@ class ObserverModule {
 
         this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/print.css')}" media="print">`)
 
-        this.app.on('observer:observing.stop', (data) => {
+        this.app.on('observer:stop', (data) => {
             // Stop listening to DOM mutations.
             this.stopObserver()
             // Remove icons.
@@ -179,7 +179,7 @@ class ObserverModule {
         // but block reasonably sized pages to prevent locking the page
         let childrenLength = $(root).find('*').length  // no lookup costs
         if (childrenLength < 2001) {
-            this.app.logger.debug(`${this} scanning ${childrenLength} elements`)
+            this.app.logger.debug(`${this}scanning ${childrenLength} elements`)
 
             this.walker.walkTheDOM(root, (node) => {
                 let curNode = node
@@ -220,7 +220,7 @@ class ObserverModule {
                 })
             })
         } else {
-            this.app.logger.debug(`${this} not scanning ${childrenLength} elements`)
+            this.app.logger.debug(`${this}not scanning ${childrenLength} elements`)
         }
 
         if (pause) {
@@ -230,13 +230,13 @@ class ObserverModule {
 
 
     doRun() {
-        this.app.logger.debug(`${this} start observing`)
+        this.app.logger.debug(`${this}start observing`)
         // Inject our print stylesheet.
         $('head').append(this.printStyle)
         // Insert icons.
         let before = new Date().getTime()
         this.doInsert()
-        this.app.logger.debug(`${this} doInsert (doRun) took`, new Date().getTime() - before)
+        this.app.logger.debug(`${this}doInsert (doRun) took`, new Date().getTime() - before)
         // Start listening to DOM mutations.
         this.startObserver()
     }
@@ -262,7 +262,7 @@ class ObserverModule {
         // Handle mutations if it probably isn't too much to handle
         // (current limit is totally random)
         if (_parkedNodes.length < 151) {
-            this.app.logger.debug(`${this} Processing ${_parkedNodes.length} parked nodes.`)
+            this.app.logger.debug(`${this}processing ${_parkedNodes.length} parked nodes.`)
             let batchSize = 40  // random size
             for (let i = 0; i < Math.ceil(_parkedNodes.length / batchSize); i++) {
                 ((index) => {
@@ -273,9 +273,9 @@ class ObserverModule {
                             if (stillInDocument) {
                                 let before = new Date().getTime()
                                 this.doInsert(node)
-                                this.app.logger.debug(`${this} doInsert (handleMutations) took`, new Date().getTime() - before)
+                                this.app.logger.debug(`${this}doInsert (handleMutations) took`, new Date().getTime() - before)
                             } else {
-                                this.app.logger.debug(`${this} doInsert (handleMutations) took 0 - removed node`)
+                                this.app.logger.debug(`${this}doInsert (handleMutations) took 0 - removed node`)
                             }
                         }
                     }, 0) // Push back execution to the end on the current event stack.
@@ -340,7 +340,7 @@ class ObserverModule {
 
 
     toString() {
-        return `${this.app} [Observer]           `
+        return `${this.app}[observer] `
     }
 
 

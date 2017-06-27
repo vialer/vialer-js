@@ -50,7 +50,7 @@ class Logger {
 
     debug(...args) {
         if (this.level >= this.levels.debug) {
-            args[0] = `%c ${args[0]}`
+            args[0] = `%c${args[0]}`
             args.push('color: #999')
             console.log(...args)
         }

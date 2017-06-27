@@ -13,30 +13,30 @@ class ContactsActions extends Actions {
      */
     _background() {
         this.app.on('sip:failed_to_start', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'failed_to_start'
-            this.app.store.set('widgets', widgetsData)
+            let widgetState = this.app.store.get('widgets')
+            widgetState.contacts.status = 'failed_to_start'
+            this.app.store.set('widgets', widgetState)
         })
 
         this.app.on('sip:started', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'connected'
-            this.app.store.set('widgets', widgetsData)
-            const accountIds = widgetsData.contacts.list.map((c) => c.account_id)
+            let widgetState = this.app.store.get('widgets')
+            widgetState.contacts.status = 'connected'
+            this.app.store.set('widgets', widgetState)
+            const accountIds = widgetState.contacts.list.map((c) => c.account_id)
             this.app.sip.updatePresence(accountIds, true)
         })
 
         this.app.on('sip:starting', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            widgetsData.contacts.status = 'connecting'
-            this.app.store.set('widgets', widgetsData)
+            let widgetState = this.app.store.get('widgets')
+            widgetState.contacts.status = 'connecting'
+            this.app.store.set('widgets', widgetState)
         })
 
         this.app.on('sip:stopped', (e) => {
-            let widgetsData = this.app.store.get('widgets')
-            if (widgetsData) {
-                widgetsData.contacts.status = 'disconnected'
-                this.app.store.set('widgets', widgetsData)
+            let widgetState = this.app.store.get('widgets')
+            if (widgetState) {
+                widgetState.contacts.status = 'disconnected'
+                this.app.store.set('widgets', widgetState)
             }
         })
     }
@@ -187,7 +187,7 @@ class ContactsActions extends Actions {
 
 
     toString() {
-        return `${this.app} [ContactsActions]    `
+        return `${this.module}[actions] `
     }
 }
 

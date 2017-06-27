@@ -73,6 +73,11 @@ class UserActions extends Actions {
                 .addClass('temporary-text')
         })
     }
+
+
+    toString() {
+        return `${this.module}[actions] `
+    }
 }
 
 module.exports = UserActions
