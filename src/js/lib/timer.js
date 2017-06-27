@@ -32,7 +32,7 @@ class Timer {
             return registeredTimers[timerId]
         }
 
-        this.app.logger.warn(`${this} no such timer ${timerId}`)
+        this.app.logger.warn(`${this}no such timer ${timerId}`)
         return null
     }
 
@@ -49,7 +49,7 @@ class Timer {
 
 
     registerTimer(timerId, timerFunction) {
-        this.app.logger.debug(`${this} register timer ${timerId}`)
+        this.app.logger.debug(`${this}register timer ${timerId}`)
         registeredTimers[timerId] = {
             function: timerFunction,
             interval: null,  // interval in miliseconds
@@ -79,7 +79,7 @@ class Timer {
 
 
     setTimeout(timerId, timeout, reset) {
-        this.app.logger.debug(`${this} set timeout for ${timerId}`)
+        this.app.logger.debug(`${this}set timeout for ${timerId}`)
         if (this.getRegisteredTimer(timerId)) {
             registeredTimers[timerId].timeout = timeout
             // *reset* indicates whether to re-run *timerFunction* after
@@ -94,13 +94,13 @@ class Timer {
             let timerFunction = registeredTimers[timerId].function
             if (registeredTimers[timerId].interval) {
                 registeredTimers[timerId].timer.interval = setInterval(timerFunction, registeredTimers[timerId].interval)
-                this.app.logger.debug(`${this} start timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
+                this.app.logger.debug(`${this}start timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
             }
 
             let timeout = registeredTimers[timerId].timeout
             if (typeof timeout === 'function') {
                 timeout = timeout()
-                this.app.logger.debug(`${this} using timeout ${timeout}`)
+                this.app.logger.debug(`${this}using timeout ${timeout}`)
             }
             if (timeout) {
                 if (registeredTimers[timerId].reset) {
@@ -131,17 +131,17 @@ class Timer {
     stopTimer(timerId) {
         if (this.getRegisteredTimer(timerId)) {
             if (registeredTimers[timerId].timer.interval) {
-                this.app.logger.info(`${this} clearing interval timer ${timerId}`)
+                this.app.logger.info(`${this}clearing interval timer ${timerId}`)
                 clearInterval(registeredTimers[timerId].timer.interval)
                 registeredTimers[timerId].timer.interval = null
             }
             if (registeredTimers[timerId].timer.timeout) {
-                this.app.logger.info(`${this} clearing timeout timer ${timerId}`)
+                this.app.logger.info(`${this}clearing timeout timer ${timerId}`)
                 clearTimeout(registeredTimers[timerId].timer.timeout)
                 registeredTimers[timerId].timer.timeout = null
             }
         } else {
-            this.app.logger.debug(`${this} no such timer: ${timerId}`)
+            this.app.logger.debug(`${this}no such timer: ${timerId}`)
         }
     }
 
@@ -167,7 +167,7 @@ class Timer {
         }
 
         retry.timeout = retry.interval + jitter(retry.interval, 30)
-        this.app.logger.debug(`${this} increase timeout interval to '${retry.interval}'`)
+        this.app.logger.debug(`${this}increase timeout interval to '${retry.interval}'`)
         return retry
     }
 
