@@ -43,5 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 options: true,
             },
         },
+        modules: [],
     })
 })

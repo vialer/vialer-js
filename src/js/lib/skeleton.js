@@ -68,9 +68,9 @@ class Skeleton extends EventEmitter {
 
             // Allows parent scripts to use the same EventEmitter syntax.
             if (this.env.extension.tab) {
-                window.addEventListener('message', (e) => {
+                window.addEventListener('message', (event) => {
                     if (this.verbose) this.logger.debug(`${this}emit '${event}' event from child`)
-                    this.emit(e.data.event, e.data.data, true)
+                    this.emit(event.data.event, event.data.data, true)
                 })
             }
         }
@@ -140,13 +140,12 @@ class Skeleton extends EventEmitter {
      */
     getEnvironment(environment) {
         // If browser exists, use browser, otherwise take the Chrome API.
-        if ('browser' in global) {
-            this.browser = browser
-        } else if ('chrome' in global) {
+        if ('chrome' in global) {
             this.browser = chrome
         } else {
-            this.browser = null
+            this.browser = browser
         }
+
         if (environment.extension) {
             let searchParams = this.utils.parseSearch(location.search)
             if (searchParams.popout) {
