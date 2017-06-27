@@ -39,11 +39,10 @@ class Skeleton extends EventEmitter {
         this.logger.debug(`${this} init`)
 
 
-        if (this.browser && this.browser.extension) {
+        if (this.browser && this.browser.extension && !this.env.extension.observer) {
             // Make the EventEmitter .on method compatible with web extension ipc.
             // An Ipc event is coming in. Map it to the EventEmitter.
             this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-                if (this.verbose) this.logger.debug(`${this}${request.event} triggered`)
                 if (request.data) {
                     // Add extra contextual information about sender to the payload.
                     request.data.sender = sender
@@ -51,6 +50,7 @@ class Skeleton extends EventEmitter {
                     // the request.data, so map sendResponse.
                     request.data.callback = sendResponse
                 }
+                // Only emit
                 this.emit(request.event, request.data, true)
             })
 
@@ -58,7 +58,7 @@ class Skeleton extends EventEmitter {
             if (this.env.extension && this.env.extension.tab) {
                 this.logger.info(`${this} added plain message listener`)
                 window.addEventListener('message', (e) => {
-                    if (this.verbose) this.logger.debug(`${this}${e.data.event} triggered`)
+                    if (this.verbose) this.logger.debug(`${this}${e.data.event} triggered from child frame`)
                     this.emit(e.data.event, e.data.data, true)
                 })
             }
@@ -90,9 +90,9 @@ class Skeleton extends EventEmitter {
      * either a tab content script or from a loaded tab content script to
      * it's parent.
      */
-    emit(event, data = {}, skipExtension = false, tabId = false, parent = false) {
-        if (this.verbose) this.logger.debug(`${this} emit ${event}`)
-        if (this.browser.extension && !skipExtension) {
+    emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
+
+        if (this.browser.extension && !noIpc) {
             let payloadArgs = []
             let payloadData = {event: event, data: data}
             payloadArgs.push(payloadData)

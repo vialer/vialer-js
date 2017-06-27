@@ -2,10 +2,7 @@
 
 const Actions = require('../../lib/actions')
 
-const Observer = require('./observer')
-const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
-const Walker = require('./walker')
 
 
 class DialerActions extends Actions {
@@ -27,12 +24,12 @@ class DialerActions extends Actions {
          * periodically.
          */
         this.app.on('dialer:callstatus.onshow', (data) => {
-            this.app.timer.startTimer(`dialer:callstatus.status-${data.callid}`)
+            this.app.timer.startTimer(`callstatus:status.update-${data.callid}`)
         })
 
         // An event from a tab page, requesting to dial a number.
         this.app.on('dialer:dial', (data) => {
-            this.app.modules.dialer.dial(data.b_number, data.sender.tab)
+            this.module.dial(data.b_number, data.sender.tab)
             this.app.analytics.trackClickToDial('Webpage')
         })
 
@@ -58,9 +55,6 @@ class DialerActions extends Actions {
 
 
     _tab() {
-        this.module.walker = new Walker(this.app)
-        this.module.observer = new Observer(this.app, this.module.walker)
-
         /**
          * Trigger showing the callstatus dialog.
          */
@@ -90,72 +84,6 @@ class DialerActions extends Actions {
             this.module.observer.undoInsert()
             // Remove our stylesheet.
             $(this.module.observer.printStyle).remove()
-        })
-
-        /**
-         * Handle a click on a click-to-dial icon next to a phonenumber on a
-         * page. Use the number in the attribute `data-number`.
-         */
-        $('body').on('click', `.${phoneIconClassName}`, (e) => {
-            if (!$(e.currentTarget).attr('disabled') &&
-                $(e.currentTarget).attr('data-number') &&
-                $(e.currentTarget).parents(`.${phoneElementClassName}`).length
-            ) {
-                // Disable all c2d icons until the callstatus
-                // popup is closed again.
-                $(`.${phoneIconClassName}`).each((i, el) => {
-                    $(el).attr('disabled', true)
-                })
-                $(e.currentTarget).blur()
-
-                // Don't do anything with this click in the actual page.
-                e.preventDefault()
-                e.stopPropagation()
-                e.stopImmediatePropagation()
-
-                const b_number = $(e.currentTarget).attr('data-number')
-                this.app.emit('dialer:dial', {
-                    b_number: b_number,
-                })
-            }
-        })
-
-        /**
-         * Click event handler: dial the number in the attribute `href`.
-         */
-        $('body').on('click', '[href^="tel:"]', (e) => {
-            $(e.currentTarget).blur()
-            // Don't do anything with this click in the actual page.
-            e.preventDefault()
-            e.stopPropagation()
-            e.stopImmediatePropagation()
-
-            // Dial the b_number.
-            const b_number = $(e.currentTarget).attr('href').substring(4)
-            this.app.emit('dialer:dial', {'b_number': b_number})
-        })
-
-
-        // Signal this script has been loaded and ready to look for phone numbers.
-        this.app.emit('dialer:observer.ready', {
-            callback: (response) => {
-                // Fill the contact list.
-                if (response && response.hasOwnProperty('observe')) {
-                    let observe = response.observe
-                    if (!observe) return
-
-                    if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
-                        // This hidden iframe might become visible, wait for this to happen.
-                        $(window).on('resize', () => {
-                            this.module.observer.doRun()
-                            // No reason to wait for more resize events.
-                            $(window).off('resize')
-                        })
-                    } else {
-                        this.module.observer.doRun()
-                    }
-                }
-            },
         })
     }
 

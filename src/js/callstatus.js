@@ -15,40 +15,24 @@ class CallStatusApp extends Skeleton {
         // Get the callid from the opened url.
         this.callid = window.location.href.match(/callid\=([^&]+)/)[1]
 
-        this.on('callstatus.b_number', (data) => {
+        this.on('callstatus:set_bnumber', (data) => {
             if (data.callid === this.callid) {
-                this.logger.info(`${this} callstatus.b_number triggered`)
-                var number = data.b_number
-                var numberElement = document.getElementById('number')
-                this.setText(numberElement, number)
+                this.logger.info(`${this} callstatus:set_bnumber triggered`)
+                this.setText(document.getElementById('number'), data.b_number)
             }
         })
 
-        this.on('dialer:callstatus.status', (data) => {
+        this.on('callstatus:status.update', (data) => {
             if (data.callid === this.callid) {
-                this.logger.info(`${this} callstatus.status triggered`)
-                var status = data.status
-                if (status) {
-                    var statusElement = document.getElementById('status')
-                    this.setText(statusElement, status)
+                this.logger.info(`${this} callstatus:status.update triggered`)
+                if (data.status) {
+                    this.setText(document.getElementById('status'), data.status)
                 }
             }
         })
 
-        this.on('dialer:callstatus.hide', (data) => {
-            if (data.callid === this.callid) {
-                this.logger.info(`${this} dialer:callstatus.hide triggered`)
-                this.hideCallstatus()
-            }
-        })
-
-        $(() => {
-            $('.voipgrid-status .close').on('click', this.hideCallstatus.bind(this))
-        })
-
-        $(window).on('beforeunload', (e) => {
-            this.hideCallstatus()
-        })
+        $('.voipgrid-status .close').on('click', this.hideCallstatus.bind(this))
+        $(window).on('beforeunload', this.hideCallstatus.bind(this))
 
         // Indication to the tab script that it's active.
         // Emit to the background.
@@ -88,5 +72,5 @@ global.app = new CallStatusApp({
         },
     },
     modules: [],
-    name: 'CallStatus',
+    name: 'CallStatusApp',
 })

@@ -4,18 +4,89 @@
 const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
 
+const Walker = require('./walker')
+require('./parsers/dutch')
 
-class Observer {
 
-    constructor(app, walker) {
+/**
+ * Injected in all pages and all frames.
+ */
+class ObserverModule {
+
+    constructor(app) {
         this.app = app
-        this.walker = walker
+        this.walker = new Walker(this.app)
         // Search and insert icons after mutations.
         this.observer = null
         this.handleMutationsTimeout = null
         this.parkedNodes = []
 
         this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/print.css')}" media="print">`)
+
+        // Signal this script has been loaded and ready to look for phone numbers.
+        this.app.emit('dialer:observer.ready', {
+            callback: (response) => {
+                // Fill the contact list.
+                if (response && response.hasOwnProperty('observe')) {
+                    let observe = response.observe
+                    if (!observe) return
+
+                    if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
+                        // This hidden iframe might become visible, wait for this to happen.
+                        $(window).on('resize', () => {
+                            this.doRun()
+                            // No reason to wait for more resize events.
+                            $(window).off('resize')
+                        })
+                    } else {
+                        this.doRun()
+                    }
+                }
+            },
+        })
+
+        /**
+         * Handle a click on a click-to-dial icon next to a phonenumber on a
+         * page. Use the number in the attribute `data-number`.
+         */
+        $('body').on('click', `.${phoneIconClassName}`, (e) => {
+            if (!$(e.currentTarget).attr('disabled') &&
+                $(e.currentTarget).attr('data-number') &&
+                $(e.currentTarget).parents(`.${phoneElementClassName}`).length
+            ) {
+                // Disable all c2d icons until the callstatus
+                // popup is closed again.
+                $(`.${phoneIconClassName}`).each((i, el) => {
+                    $(el).attr('disabled', true)
+                })
+                $(e.currentTarget).blur()
+
+                // Don't do anything with this click in the actual page.
+                e.preventDefault()
+                e.stopPropagation()
+                e.stopImmediatePropagation()
+
+                const b_number = $(e.currentTarget).attr('data-number')
+                this.app.emit('dialer:dial', {
+                    b_number: b_number,
+                })
+            }
+        })
+
+        /**
+         * Click event handler: dial the number in the attribute `href`.
+         */
+        $('body').on('click', '[href^="tel:"]', (e) => {
+            $(e.currentTarget).blur()
+            // Don't do anything with this click in the actual page.
+            e.preventDefault()
+            e.stopPropagation()
+            e.stopImmediatePropagation()
+
+            // Dial the b_number.
+            const b_number = $(e.currentTarget).attr('href').substring(4)
+            this.app.emit('dialer:dial', {'b_number': b_number})
+        })
     }
 
 
@@ -269,4 +340,4 @@ class Observer {
     }
 }
 
-module.exports = Observer
+module.exports = ObserverModule

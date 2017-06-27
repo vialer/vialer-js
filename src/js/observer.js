@@ -2,13 +2,12 @@
 
 const Skeleton = require('./lib/skeleton')
 
-
 const _modules = [
-    {name: 'dialer', Module: require('./modules/dialer')},
+    {name: 'observer', Module: require('./modules/observer')},
 ]
 
 
-class TabsApp extends Skeleton {
+class ObserverApp extends Skeleton {
 
     constructor(options) {
         super(options)
@@ -16,15 +15,16 @@ class TabsApp extends Skeleton {
     }
 }
 
-global.app = new TabsApp({
+global.app = new ObserverApp({
     environment: {
         extension: {
             background: false,
             popup: false,
-            tab: true,
+            tab: false,
             callstatus: false,
+            observer: true,
         },
     },
     modules: _modules,
-    name: 'TabsApp',
+    name: 'ObserverApp',
 })

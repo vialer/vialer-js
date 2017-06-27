@@ -27,5 +27,5 @@ global.app = new ClickToDialApp({
         },
     },
     modules: _modules,
-    name: 'Popup',
+    name: 'PopupApp',
 })

@@ -21,6 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
             extension: false,
         },
         modules: _modules,
-        name: 'Desktop',
+        name: 'WebApp',
     })
 })

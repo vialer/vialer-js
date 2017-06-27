@@ -138,8 +138,8 @@ class DialerModule {
                                 // Stop after receiving these statuses.
                                 const statuses = ['connected', 'blacklisted', 'disconnected', 'failed_a', 'failed_b']
                                 if (statuses.includes(callStatus)) {
-                                    this.app.timer.stopTimer(`dialer:callstatus.status-${callid}`)
-                                    this.app.timer.unregisterTimer(`dialer:callstatus.status-${callid}`)
+                                    this.app.timer.stopTimer(`callstatus:status.update-${callid}`)
+                                    this.app.timer.unregisterTimer(`callstatus:status.update-${callid}`)
                                     // Show status in a notification in case it fails/disconnects.
                                     if (callStatus !== 'connected') {
                                         this.callStatusNotification(callStatus, this.getStatusMessage(status, bNumber))
@@ -147,16 +147,16 @@ class DialerModule {
                                 }
                             } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
                                 // Clear interval, stop timer.
-                                this.app.timer.stopTimer(`dialer:callstatus.status-${callid}`)
-                                this.app.timer.unregisterTimer(`dialer:callstatus.status-${callid}`)
+                                this.app.timer.stopTimer(`callstatus:status.update-${callid}`)
+                                this.app.timer.unregisterTimer(`callstatus:status.update-${callid}`)
                             }
                         })
                     }
 
-                    this.app.timer.registerTimer(`dialer:callstatus.status-${callid}`, silentTimerFunction)
-                    this.app.timer.setInterval(`dialer:callstatus.status-${callid}`, 1500)
+                    this.app.timer.registerTimer(`callstatus:status.update-${callid}`, silentTimerFunction)
+                    this.app.timer.setInterval(`callstatus:status.update-${callid}`, 1500)
                     // Instant start, no need to wait for panels in the browser to be visible.
-                    this.app.timer.startTimer(`dialer:callstatus.status-${callid}`)
+                    this.app.timer.startTimer(`callstatus:status.update-${callid}`)
                 } else {
                     /**
                      * A non-silent call will display the call's status
@@ -168,7 +168,7 @@ class DialerModule {
 
                     // Keep updating the call status to the panel.
                     const timerFunction = () => {
-                        if (this.app.timer.getRegisteredTimer(`dialer:callstatus.status-${callid}`)) {
+                        if (this.app.timer.getRegisteredTimer(`callstatus:status.update-${callid}`)) {
                             this.app.api.client.get(`api/clicktodial/${callid}/`).then((_res) => {
                                 if (this.app.api.OK_STATUS.includes(_res.status)) {
                                     const callStatus = _res.data.status
@@ -177,32 +177,32 @@ class DialerModule {
                                     // Stop after receiving these statuses.
                                     let statuses = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
                                     if (statuses.includes(callStatus)) {
-                                        this.app.timer.stopTimer(`dialer:callstatus.status-${callid}`)
-                                        this.app.timer.unregisterTimer(`dialer:callstatus.status-${callid}`)
+                                        this.app.timer.stopTimer(`callstatus:status.update-${callid}`)
+                                        this.app.timer.unregisterTimer(`callstatus:status.update-${callid}`)
                                     }
                                     // Update panel with latest status.
-                                    this.app.emit('dialer:callstatus.status', {
+                                    this.app.emit('callstatus:status.update', {
                                         status: this.getStatusMessage(callStatus, bNumber),
                                         // Extra info to identify call.
                                         callid: callid,
                                     }, false, currentTab)
                                 } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
                                     // Clear interval, stop timer.
-                                    this.app.timer.stopTimer(`dialer:callstatus.status-${callid}`)
-                                    this.app.timer.unregisterTimer(`dialer:callstatus.status-${callid}`)
+                                    this.app.timer.stopTimer(`callstatus:status.update-${callid}`)
+                                    this.app.timer.unregisterTimer(`callstatus:status.update-${callid}`)
                                 }
                             })
                         }
                     }
 
-                    this.app.timer.registerTimer(`dialer:callstatus.status-${callid}`, timerFunction)
-                    this.app.timer.setInterval(`dialer:callstatus.status-${callid}`, 1500)
+                    this.app.timer.registerTimer(`callstatus:status.update-${callid}`, timerFunction)
+                    this.app.timer.setInterval(`callstatus:status.update-${callid}`, 1500)
 
                     // Tab listener.
                     this.app.on('dialer:callstatus.onshow', (data) => {
                         // Copy the number to the panel.
                         this.app.logger.debug(`${this}copy the number to the callstatus popup`)
-                        this.app.emit('callstatus.b_number', {
+                        this.app.emit('callstatus:set_bnumber', {
                             b_number: bNumber,
                             // Extra info to identify call.
                             callid: callid,
@@ -210,7 +210,7 @@ class DialerModule {
 
                         // Copy the initial status.
                         this.app.logger.debug(`${this}copy the initial status to the callstatus popup`)
-                        this.app.emit('dialer:callstatus.status', {
+                        this.app.emit('callstatus:status.update', {
                             status: this.getStatusMessage(res.data.status, bNumber),
                             // Extra info to identify call.
                             callid: callid,
@@ -364,7 +364,7 @@ class DialerModule {
 
 
     toString() {
-        return `${this.app} [Page]               `
+        return `${this.app} [Dialer]               `
     }
 
 

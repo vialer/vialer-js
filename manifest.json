@@ -39,6 +39,17 @@
                 "js/tab.js"
             ],
             "run_at": "document_end",
+            "all_frames": false
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "js/vendor.js",
+                "js/observer.js"
+            ],
+            "run_at": "document_end",
             "all_frames": true
         }
     ],

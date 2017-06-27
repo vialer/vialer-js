@@ -157,6 +157,7 @@ gulp.task('docs-deploy', 'Push the docs build directory to github pages.', funct
 gulp.task('js', 'Metatask that builds all JavaScript tasks.', [
     'js-bg',
     'js-callstatus',
+    'js-observer',
     'js-options',
     'js-popup',
     'js-tab',
@@ -169,6 +170,7 @@ gulp.task('js', 'Metatask that builds all JavaScript tasks.', [
 
 gulp.task('js-bg', 'Generate the extension background entry js.', jsEntry('bg'))
 gulp.task('js-callstatus', 'Generate the callstatus entry js.', jsEntry('callstatus'))
+gulp.task('js-observer', 'Generate the observer js.', jsEntry('observer'))
 gulp.task('js-options', 'Generate the options js.', jsEntry('options'))
 gulp.task('js-popup', 'Generate the popup/popout entry js.', jsEntry('popup'))
 gulp.task('js-tab', 'Generate the tab contentscript entry js.', jsEntry('tab'))
