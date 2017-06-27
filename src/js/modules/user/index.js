@@ -34,14 +34,14 @@ class UserModule {
                 this.app.store.set('user', user)
 
                 // Perform some actions on login.
-                this.app.logger.info(`${this}login success`)
-                this.app.emit('user:login.success', {user: user})
+                this.app.emit('user:login.success', {user: user}, 'both')
                 // Reset seen notifications.
                 let notificationsData = this.app.store.get('notifications')
                 notificationsData.unauthorized = false
                 this.app.store.set('notifications', notificationsData)
                 // Start loading the widgets.
                 this.app.modules.ui.refreshWidgets(false)
+                this.app.logger.info(`${this}login successful`)
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 // Remove credentials from the store.
                 this.app.store.remove('username')

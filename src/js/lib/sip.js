@@ -102,13 +102,10 @@ class Sip {
 
         switch (e.o_event.i_code) {
         case tsip_event_code_e.STACK_STARTING:
-            this.app.emit('sip:starting', e, true)
-            if (this.app.env.extension) this.app.emit('sip:starting', {})
+            this.app.emit('sip:starting', {}, 'both')
             break
         case tsip_event_code_e.STACK_FAILED_TO_START:
-            this.app.emit('sip:failed_to_start', e, true)
-            if (this.app.env.extension) this.app.emit('sip:failed_to_start', {})
-
+            this.app.emit('sip:failed_to_start', {}, 'both')
             if (this.reconnect) {
                 if (!this.retry) this.retry = Object.assign({}, retryTimeoutDefault)
                 setTimeout(this.initStack.bind(this), this.retry.interval)
@@ -118,18 +115,15 @@ class Sip {
         case tsip_event_code_e.STACK_STARTED:
             // Reset the retry timer.
             this.retry = Object.assign({}, retryTimeoutDefault)
-            this.app.emit('sip:started', e, true)
-            if (this.app.env.extension) this.app.emit('sip:started', {})
+            this.app.emit('sip:started', {}, 'both')
             break
         case tsip_event_code_e.STACK_STOPPED:
             // This event is triggered twice somehow. Flag is resetted when
             // connected again.
             if (this.stopped) {
                 // Emitted within the context of the bg script.
-                this.app.emit('sip:stopped', {}, true)
-                if (this.app.env.extension) this.app.emit('sip:stopped', {})
+                this.app.emit('sip:stopped', {}, 'both')
             }
-
             this.stopped = true
             break
         }

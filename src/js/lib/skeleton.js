@@ -103,7 +103,7 @@ class Skeleton extends EventEmitter {
      */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
 
-        if (this.browser.extension && !noIpc) {
+        if (this.browser.extension && (!noIpc || noIpc === 'both')) {
             let payloadArgs = []
             let payloadData = {event: event, data: data}
             payloadArgs.push(payloadData)
@@ -114,10 +114,7 @@ class Skeleton extends EventEmitter {
                 return
             } else if (parent) {
                 this.logger.debug(`${this}emit ipc event '${event}' to parent`)
-                parent.postMessage({
-                    event: event,
-                    data: data,
-                }, '*')
+                parent.postMessage({event: event, data: data}, '*')
                 return
             }
 
@@ -126,7 +123,9 @@ class Skeleton extends EventEmitter {
             }
             this.logger.debug(`${this}emit ipc event '${event}'`)
             this.browser.runtime.sendMessage(...payloadArgs)
-        } else {
+        }
+
+        if (noIpc) {
             this.logger.debug(`${this}emit local event '${event}'`)
             super.emit(event, data)
         }

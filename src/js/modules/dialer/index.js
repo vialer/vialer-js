@@ -330,11 +330,10 @@ class DialerModule {
 
 
     /**
-     * Switch tab click-to-dial icon observer on or off, based on
-     * whether the user is logged in and has click-to-dial
-     * This event is sent when the contentScriptFiles are loaded.
+     * Determine if the DOM observer and c2d icons should be switched on
+     * or off. The callback is done to the observer script.
      */
-    toggleObserve(data) {
+    determineObserve(data) {
         if (!data.sender.tab) return
         if (!this.app.store.get('user')) {
             this.app.logger.info(`${this}not observing because user is not logged in: ${data.sender.tab.url}`)

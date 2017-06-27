@@ -9,6 +9,21 @@ class DialerActions extends Actions {
 
     _background() {
         /**
+         * Emit to each tab's running observer scripts that we want to
+         * observe the DOM and add icons to phonenumbers.
+         */
+        this.app.on('user:login.success', (data) => {
+            // Only if the setting is enabled.
+            if (this.app.store.get('c2d')) {
+                this.app.browser.tabs.query({}, (tabs) => {
+                    tabs.forEach((tab) => {
+                        this.app.emit('observer:start', {frame: 'observer'}, false, tab.id)
+                    })
+                })
+            }
+        })
+
+        /**
          * Stop callstatus timer for callid when the callstatus dialog closes.
          */
         this.app.on('dialer:callstatus.onhide', (data) => {
@@ -32,8 +47,9 @@ class DialerActions extends Actions {
         })
 
 
-        // The tab indicates that it's ready to observe. Check if it should add icons.
-        this.app.on('dialer:observer.ready', this.module.toggleObserve.bind(this.module))
+        // The observer script indicates that it's ready to observe.
+        // Check if it should add icons.
+        this.app.on('dialer:observer.ready', this.module.determineObserve.bind(this.module))
 
         // Remove all previously added context menus.
         if (this.app.env.extension) {

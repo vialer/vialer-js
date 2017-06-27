@@ -5,7 +5,6 @@ const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
 
 const Walker = require('./walker')
-require('./parsers/dutch')
 
 
 /**
@@ -15,6 +14,7 @@ class ObserverModule {
 
     constructor(app) {
         this.app = app
+        this.parsers = require('./parsers')
         this.walker = new Walker(this.app)
         // Search and insert icons after mutations.
         this.observer = null
@@ -23,8 +23,11 @@ class ObserverModule {
 
         this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/print.css')}" media="print">`)
 
+        /**
+         * Stop listening to DOM mutations. Triggered when
+         * the user logs out.
+         */
         this.app.on('observer:stop', (data) => {
-            // Stop listening to DOM mutations.
             this.stopObserver()
             // Remove icons.
             this.undoInsert()
@@ -32,8 +35,15 @@ class ObserverModule {
             $(this.observer.printStyle).remove()
         })
 
+        this.app.on('observer:start', (data) => {
+            // Stop listening to DOM mutations.
+            this.processPage()
+        })
 
-        // Signal this script has been loaded and ready to look for phone numbers.
+
+        /**
+         *Signal this script has been loaded and ready to look for phone numbers.
+         */
         this.app.emit('dialer:observer.ready', {
             callback: (response) => {
                 // Fill the contact list.
@@ -44,12 +54,12 @@ class ObserverModule {
                     if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
                         // This hidden iframe might become visible, wait for this to happen.
                         $(window).on('resize', () => {
-                            this.doRun()
+                            this.processPage()
                             // No reason to wait for more resize events.
                             $(window).off('resize')
                         })
                     } else {
-                        this.doRun()
+                        this.processPage()
                     }
                 }
             },
@@ -84,7 +94,8 @@ class ObserverModule {
         })
 
         /**
-         * Click event handler: dial the number in the attribute `href`.
+         * Handle the event when a link is clicked that contains
+         * <a href="tel:"></a>.
          */
         $('body').on('click', '[href^="tel:"]', (e) => {
             $(e.currentTarget).blur()
@@ -94,12 +105,16 @@ class ObserverModule {
             e.stopImmediatePropagation()
 
             // Dial the b_number.
-            const b_number = $(e.currentTarget).attr('href').substring(4)
-            this.app.emit('dialer:dial', {'b_number': b_number})
+            const bNumber = $(e.currentTarget).attr('href').substring(4)
+            this.app.emit('dialer:dial', {b_number: bNumber})
         })
     }
 
 
+    /**
+     * Returns a new `<ctd></ctd>` node, that will wrap the phonenumber
+     * and the click-to-dial icon.
+     */
     get ctdNode() {
         let ctd = document.createElement('ctd')
         ctd.setAttribute('style', 'font-style: inherit; font-family: inherit;')
@@ -121,12 +136,9 @@ class ObserverModule {
 
 
     get iconStyle() {
-        // Cannot set !important with `.css("property", "value !important"),`
-        // so build a string to use as style.
         let iconStyle = {
-            // 'background-attachment': 'scroll',  // this is set later, conditionally
             'background-color': 'transparent !important',
-            'background-image': 'url("' + this.app.browser.runtime.getURL('img/clicktodial.png') + '")',
+            'background-image': `url("${this.app.browser.runtime.getURL('img/clicktodial.png')}")`,
             'background-repeat': 'no-repeat',
             'bottom': '-3px !important',
             'background-position': 'center center',
@@ -144,7 +156,7 @@ class ObserverModule {
         }
         let style = ''
         for (let property in iconStyle) {
-            style += property + ': ' + iconStyle[property] + '; '
+            style += `${property}: ${iconStyle[property]}; `
         }
         return style
     }
@@ -166,55 +178,52 @@ class ObserverModule {
     }
 
 
+    /**
+     *
+     */
     doInsert(root) {
         let pause = !!root
-
-        if (pause) {
-            this.stopObserver()
-        }
-
+        if (pause) this.stopObserver()
         root = root || document.body
 
-        // walk the DOM looking for elements to parse
-        // but block reasonably sized pages to prevent locking the page
+        // Walk the DOM looking for elements to parse, but block reasonably
+        // sized pages to prevent locking the page.
         let childrenLength = $(root).find('*').length  // no lookup costs
         if (childrenLength < 2001) {
             this.app.logger.debug(`${this}scanning ${childrenLength} elements`)
 
-            this.walker.walkTheDOM(root, (node) => {
-                let curNode = node
+            this.walker.walkTheDOM(root, (currentNode) => {
                 // Scan using every available parser.
-                window.parsers.forEach((localeParser) => {
+                this.parsers.forEach((localeParser) => {
                     let parser = localeParser[1]()
-
-                    // transform Text node to HTML-capable node, to
+                    // Transform Text node to HTML-capable node, to
                     // - deal with html-entities (&nbsp;, &lt;, etc.) since
-                    // they mess up the start/end from
-                    // matches when reading from node.data, and
+                    // they mess up the start/end from matches when reading
+                    // from node.data, and
                     // - enable inserting the icon html (doesn't work with a text node)
                     let replacementNode = this.ctdNode.cloneNode(false)
-                    replacementNode.textContent = node.data
-                    replacementNode.innerHTML = this.escapeHTML(node.data)
+                    replacementNode.textContent = currentNode.data
+                    replacementNode.innerHTML = this.escapeHTML(currentNode.data)
 
                     let matches = parser.parse(replacementNode.innerHTML)
                     if (matches.length) {
-                        if (!parser.isBlockingNode(curNode.previousElementSibling) &&
-                                !parser.isBlockingNode(curNode.parentNode.previousElementSibling)) {
+                        if (!parser.isBlockingNode(currentNode.previousElementSibling) &&
+                                !parser.isBlockingNode(currentNode.parentNode.previousElementSibling)) {
 
                             matches.reverse().forEach((match) => {
                                 let numberIconElement = this.createNumberIconElement(match.number)
 
                                 // prefix icon with match (==number)
                                 let originalText = replacementNode.innerHTML.slice(match.start, match.end)
-                                numberIconElement.innerHTML = originalText + ' ' + numberIconElement.innerHTML
+                                numberIconElement.innerHTML = `${originalText} ${numberIconElement.innerHTML}`
 
                                 let before = replacementNode.innerHTML.slice(0, match.start)
                                 let after = replacementNode.innerHTML.slice(match.end)
                                 replacementNode.innerHTML = before + numberIconElement.innerHTML + after
                             })
 
-                            node.parentNode.insertBefore(replacementNode, node)
-                            node.parentNode.removeChild(node)
+                            currentNode.parentNode.insertBefore(replacementNode, currentNode)
+                            currentNode.parentNode.removeChild(currentNode)
                         }
                     }
                 })
@@ -224,21 +233,24 @@ class ObserverModule {
         }
 
         if (pause) {
-            this.startObserver()
+            this.observePage()
         }
     }
 
 
-    doRun() {
+    /**
+     * Injects icons in the page and start observing the page for changes.
+     */
+    processPage() {
         this.app.logger.debug(`${this}start observing`)
         // Inject our print stylesheet.
         $('head').append(this.printStyle)
         // Insert icons.
-        let before = new Date().getTime()
+        const before = new Date().getTime()
         this.doInsert()
-        this.app.logger.debug(`${this}doInsert (doRun) took`, new Date().getTime() - before)
+        this.app.logger.debug(`${this}doInsert (processPage) took`, new Date().getTime() - before)
         // Start listening to DOM mutations.
-        this.startObserver()
+        this.observePage()
     }
 
 
@@ -246,7 +258,7 @@ class ObserverModule {
      * Escape HTML chars when assigning text to innerHTML.
      */
     escapeHTML(str) {
-        let replacements = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' }
+        const replacements = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' }
         return str.replace(/[&"<>]/g, (m) => replacements[m])
     }
 
@@ -289,7 +301,7 @@ class ObserverModule {
      * Observer start: listen for DOM mutations and let `handleMutations`
      * process them.
      */
-    startObserver() {
+    observePage() {
         if (!this.observer) {
             this.observer = new MutationObserver((mutations) => {
                 if (this.handleMutationsTimeout) {
@@ -345,8 +357,13 @@ class ObserverModule {
 
 
     undoInsert() {
-        // remove icons from page
-        $(`.${phoneIconClassName}`).remove()
+        // Restore the original numbers by removing all ctd nodes and replace
+        // the content of it's parent by the ctd node's text, containing the
+        // phonenumber.
+        $('ctd').each((i, el) => {
+            const phoneNumber = $(el).text().replace(/ /g, '')
+            $(el).parent().empty().text(phoneNumber)
+        })
     }
 }
 
