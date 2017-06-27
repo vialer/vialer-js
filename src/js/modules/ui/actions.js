@@ -67,7 +67,7 @@ class UiActions extends Actions {
         })
 
         this.app.on('panel.dial', (data) => {
-            this.app.modules.dialer.dial(data.b_number, null, null)
+            this.app.modules.dialer.dial(data.b_number, null, true)
             this.app.analytics.trackClickToDial('Colleagues')
         })
     }
