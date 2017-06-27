@@ -59,11 +59,6 @@ $FontPathOpenSans: "/fonts";  // sass-lint:disable-line variable-name-format
 
 }
 
-
-/**
- * General styling, not used for parts of this plugin in particular.
- */
-
 /* Prevent firefox from showing the cursor: text for normal elements like divs etc. */
 .no-select {
     -webkit-user-select: none;
@@ -71,7 +66,7 @@ $FontPathOpenSans: "/fonts";  // sass-lint:disable-line variable-name-format
     user-select: none;
 }
 
-/* Hide elements */
+// Hide elements.
 .hide {
     display: none;
 }

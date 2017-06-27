@@ -23,6 +23,16 @@ class ObserverModule {
 
         this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/print.css')}" media="print">`)
 
+        this.app.on('observer:observing.stop', (data) => {
+            // Stop listening to DOM mutations.
+            this.stopObserver()
+            // Remove icons.
+            this.undoInsert()
+            // Remove our stylesheet.
+            $(this.observer.printStyle).remove()
+        })
+
+
         // Signal this script has been loaded and ready to look for phone numbers.
         this.app.emit('dialer:observer.ready', {
             callback: (response) => {

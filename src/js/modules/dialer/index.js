@@ -49,7 +49,7 @@ class DialerModule {
         if (this.app.store.get('c2d')) {
             this.app.browser.tabs.query({}, (tabs) => {
                 tabs.forEach((tab) => {
-                    this.app.emit('dialer:observer.stop', {}, false, tab.id)
+                    this.app.emit('observer:observing.stop', {}, false, tab.id)
                 })
             })
         }

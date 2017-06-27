@@ -76,15 +76,6 @@ class DialerActions extends Actions {
         this.app.on('dialer:callstatus.onshow', (data) => {
             this.module.callid = data.callid
         })
-
-        this.app.on('dialer:observer.stop', (data) => {
-            // Stop listening to DOM mutations.
-            this.module.observer.stopObserver()
-            // Remove icons.
-            this.module.observer.undoInsert()
-            // Remove our stylesheet.
-            $(this.module.observer.printStyle).remove()
-        })
     }
 
 

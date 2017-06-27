@@ -39,7 +39,7 @@ class Skeleton extends EventEmitter {
         this.logger.debug(`${this} init`)
 
 
-        if (this.browser && this.browser.extension && !this.env.extension.observer) {
+        if (this.browser && this.browser.extension) {
             // Make the EventEmitter .on method compatible with web extension ipc.
             // An Ipc event is coming in. Map it to the EventEmitter.
             this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -56,9 +56,8 @@ class Skeleton extends EventEmitter {
 
             // Allows parent scripts to use the same EventEmitter syntax.
             if (this.env.extension && this.env.extension.tab) {
-                this.logger.info(`${this} added plain message listener`)
                 window.addEventListener('message', (e) => {
-                    if (this.verbose) this.logger.debug(`${this}${e.data.event} triggered from child frame`)
+                    if (this.verbose) this.logger.debug(`${this} emit ${event} from child`)
                     this.emit(e.data.event, e.data.data, true)
                 })
             }
@@ -98,9 +97,11 @@ class Skeleton extends EventEmitter {
             payloadArgs.push(payloadData)
 
             if (tabId) {
+                this.logger.debug(`${this} emit ipc ${event} to tab ${tabId}`)
                 this.browser.tabs.sendMessage(tabId, payloadData)
                 return
             } else if (parent) {
+                this.logger.debug(`${this} emit ipc ${event} to parent`)
                 parent.postMessage({
                     event: event,
                     data: data,
@@ -111,8 +112,10 @@ class Skeleton extends EventEmitter {
             if (data && data.callback) {
                 payloadArgs.push(data.callback)
             }
+            this.logger.debug(`${this} emit ipc ${event}`)
             this.browser.runtime.sendMessage(...payloadArgs)
         } else {
+            this.logger.debug(`${this} emit local ${event}`)
             super.emit(event, data)
         }
     }
