@@ -50,17 +50,20 @@ class Skeleton extends EventEmitter {
                     // the request.data, so map sendResponse.
                     request.data.callback = sendResponse
                 }
-                // You must pass an allFrames option to the data, in order
-                // to emit an event to a tab's observer script(s) as well.
-                // This check exists so that not all background or popup emitted
-                // ipc events to a tab end up in the observer event handling.
+                // The frame option can be used to specifically target a callstatus
+                // or observer script. Otherwise the event is ignored, because
+                // otherwise all events emitted on the tab will also be processed by
+                // the callstatus and observer scripts.
                 if (this.env.extension.callstatus || this.env.extension.observer) {
-                    if (request.data.allFrames) {
+                    if (this.env.extension.callstatus && request.data.frame && request.data.frame === 'callstatus') {
+                        this.emit(request.event, request.data, true)
+                    } else if (this.env.extension.observer && request.data.frame && request.data.frame === 'observer') {
                         this.emit(request.event, request.data, true)
                     }
                 } else {
                     this.emit(request.event, request.data, true)
                 }
+
             })
 
             // Allows parent scripts to use the same EventEmitter syntax.

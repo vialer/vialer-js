@@ -50,7 +50,7 @@ class DialerModule {
             this.app.browser.tabs.query({}, (tabs) => {
                 tabs.forEach((tab) => {
                     // Emit all observers on the tab to stop.
-                    this.app.emit('observer:stop', {allFrames: true}, false, tab.id)
+                    this.app.emit('observer:stop', {frame: 'observer'}, false, tab.id)
                 })
             })
         }
@@ -183,7 +183,7 @@ class DialerModule {
                                     }
                                     // Update panel with latest status.
                                     this.app.emit('callstatus:status.update', {
-                                        allFrames: true,
+                                        frame: 'callstatus',
                                         status: this.getStatusMessage(callStatus, bNumber),
                                         // Extra info to identify call.
                                         callid: callid,
@@ -205,7 +205,7 @@ class DialerModule {
                         // Copy the number to the panel.
                         this.app.logger.debug(`${this}copy the number to the callstatus popup`)
                         this.app.emit('callstatus:set_bnumber', {
-                            allFrames: true,
+                            frame: 'callstatus',
                             b_number: bNumber,
                             // Extra info to identify call.
                             callid: callid,
@@ -214,7 +214,7 @@ class DialerModule {
                         // Copy the initial status.
                         this.app.logger.debug(`${this}copy the initial status to the callstatus popup`)
                         this.app.emit('callstatus:status.update', {
-                            allFrames: true,
+                            frame: 'callstatus',
                             status: this.getStatusMessage(res.data.status, bNumber),
                             // Extra info to identify call.
                             callid: callid,
