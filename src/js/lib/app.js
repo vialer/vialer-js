@@ -75,6 +75,7 @@ class App extends Skeleton {
                 this.sip = new Sip(this)
             }
         } else {
+            this.analytics = new Analytics(this, this.settings.analyticsId)
             this.api = new Api(this)
             this.sip = new Sip(this)
         }

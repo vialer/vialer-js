@@ -13,8 +13,9 @@ class DialerActions extends Actions {
          * observe the DOM and add icons to phonenumbers.
          */
         this.app.on('user:login.success', (data) => {
-            // Only if the setting is enabled.
             if (this.app.store.get('c2d')) {
+                // Only notify tabs in the context of an extension.
+                if (!this.app.env.extension) return
                 this.app.browser.tabs.query({}, (tabs) => {
                     tabs.forEach((tab) => {
                         this.app.emit('observer:start', {frame: 'observer'}, false, tab.id)

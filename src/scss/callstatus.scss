@@ -1,0 +1,49 @@
+// Styling specifically for the click-to-dial callstatus popup.
+.callstatus {
+    width: 100%;
+    height: 81px;
+    background: #fff;
+    font-family: "Open Sans", "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0 0 0 2038px, rgba(0, 0, 0, 0.25) 0 10px 20px;
+    // Center popup.
+    margin-left: 0;
+    margin-top: 0;
+    position: fixed;
+
+    .heading {
+        color: #3c3c50;
+        background: linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+        border-bottom: 1px solid #d5d5d5;
+        line-height: 40px;
+        height: 40px;
+        margin: 0;
+        padding: 0 6px;
+        letter-spacing: 0.2px;
+        font-size: 14px;
+
+        // Force fixed height to include border-width.
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .status {
+        margin: 0;
+        padding: 12px;
+    }
+
+    .status-label {
+        color: #99c225;
+        font-weight: bold;
+        font-size: 12px;
+    }
+
+    .close {
+        cursor: pointer;
+        font-size: 13px;
+        line-height: 40px;
+        margin-right: 4px;
+    }
+
+}

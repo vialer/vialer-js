@@ -30,7 +30,7 @@ class ObserverModule {
         this.app.on('observer:stop', (data) => {
             this.stopObserver()
             // Remove icons.
-            this.undoInsert()
+            this.restorePhonenumbers()
             // Remove our stylesheet.
             $(this.observer.printStyle).remove()
         })
@@ -360,7 +360,7 @@ class ObserverModule {
      * Restore the original numbers by replacing all ctd nodes with a new
      * text node containing the phonenumber.
      */
-    undoInsert() {
+    restorePhonenumbers() {
         document.querySelectorAll('ctd').forEach((el) => {
             el.parentNode.replaceChild(document.createTextNode(el.textContent), el)
         })

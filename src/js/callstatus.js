@@ -30,7 +30,7 @@ class CallStatusApp extends Skeleton {
             }
         })
 
-        $('.voipgrid-status .close').on('click', this.hideCallstatus.bind(this))
+        $('.callstatus .close').on('click', this.hideCallstatus.bind(this))
         $(window).on('beforeunload', this.hideCallstatus.bind(this))
 
         // Indication to the tab parent script that it's active.

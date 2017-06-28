@@ -47,6 +47,7 @@ class DialerModule {
         // Emit to each tab's running observer scripts that we don't want to
         // observe anymore.
         if (this.app.store.get('c2d')) {
+            if (!this.app.env.extension) return
             this.app.browser.tabs.query({}, (tabs) => {
                 tabs.forEach((tab) => {
                     // Emit all observers on the tab to stop.

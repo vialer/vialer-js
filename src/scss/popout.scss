@@ -1,9 +1,9 @@
-html.popout,
-html.popout body {
+.popout,
+.popout body {
     height: 100%;
 }
 
-html.popout body {
+.popout body {
     width: auto;
     padding: 0;
     box-sizing: border-box;
@@ -35,7 +35,7 @@ html.popout body {
 
     & > div {
         min-width: 361px;
-            max-width: 450px;
+        max-width: 450px;
     }
 
     .container {

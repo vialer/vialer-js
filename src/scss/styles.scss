@@ -1,5 +1,8 @@
 @import "normalize";
-@import "panel";
+@import "availability";
+@import "callstatus";
+@import "contacts";
+@import "queues";
 @import "popout";
 
 $fa-font-path: "/fonts";
@@ -9,57 +12,270 @@ $FontPathOpenSans: "/fonts";  // sass-lint:disable-line variable-name-format
 @import "npm-font-open-sans/open-sans.scss";  // sass-lint:disable-line clean-import-paths
 
 
-// Styling specifically for the click-to-dial callstatus popup.
-.voipgrid-status {
-    width: 100%;
-    height: 81px;
+// Styling for the login form and panel.
+html {
     background: #fff;
-    font-family: "Open Sans", "Helvetica Neue", Arial, sans-serif;
-    font-size: 12px;
-    box-shadow: rgba(0, 0, 0, 0.25) 0 0 0 2038px, rgba(0, 0, 0, 0.25) 0 10px 20px;
-    // Center popup.
-    margin-left: 0;
-    margin-top: 0;
-    position: fixed;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 
-    .heading {
-        color: #3c3c50;
-        background: linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
-        border-bottom: 1px solid #d5d5d5;
-        line-height: 40px;
-        height: 40px;
-        margin: 0;
-        padding: 0 6px;
-        letter-spacing: 0.2px;
-        font-size: 14px;
+html,
+body {
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+body {
+    color: #3c3c50;
+    font: 13px/1.7em "Open Sans";
+    width: 400px;
+}
+
+.no-scroll {
+    overflow-y: hidden;
+}
+
+
+input {
+    &[type="text"],
+    &[type="password"],
+    [type="search"] {
+        border: 1px solid #d5d5d5;
+        border-radius: 2px;
+        height: 32px;
+        padding: 0 12px;
 
         // Force fixed height to include border-width.
         -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
     }
+}
 
-    .status {
-        margin: 0;
-        padding: 12px;
-    }
+.login-section,
+.container .account-info {
+    padding: 10px;
+    line-height: 19px;
+}
 
-    .status-label {
-        color: #99c225;
+
+.login-form {
+    label {
         font-weight: bold;
-        font-size: 12px;
+        display: block;
+        margin-bottom: 4px;
     }
 
-    .close {
-        cursor: pointer;
-        font-size: 13px;
-        line-height: 40px;
-        margin-right: 4px;
+    button,
+    input {
+        width: 100%;
+        margin-bottom: 7px;
+        box-sizing: border-box;
     }
 
 }
 
-/* Prevent firefox from showing the cursor: text for normal elements like divs etc. */
+
+.login-button {
+    background: #3c3c50;
+    color: #fff;
+    border: 0;
+    height: 40px;
+    display: block;
+    margin-top: 5px;
+    border-radius: 4px;
+
+    &:active {
+        padding: 0;
+    }
+
+    &:hover {
+        background: #334;
+    }
+
+    .loading {
+        background: #3c3c50;
+    }
+
+    .failed {
+        background: #f2dede;
+        color: #a94442;
+        border: 1px solid #ebccd1;
+    }
+
+    .info {
+        background: #d9edf7;
+        color: #31708f;
+        border: 1px solid #bce8f1;
+    }
+}
+
+.flip-horizontal {
+    transform: scaleX(-1);
+}
+
+// Different cursor for clickable stuff.
+.shortcuts i,
+.logout,
+.widget .widget-header {
+    cursor: pointer;
+}
+
+
+// Account-info: username, logout, help button etc.
+.account-info .user-name {
+    // don't wrap but put dots at the end if it doesn't fit.
+    white-space: nowrap;
+    overflow: hidden;
+    width: calc(100% - 150px);
+    display: inline-block;
+    text-overflow: ellipsis;
+}
+
+.logout {
+    font-size: 11px;
+    font-weight: bold;
+    float: left;
+
+    & :hover {
+        text-decoration: underline;
+    }
+}
+
+
+// Widgets styling.
+.widget {
+    .widget-title {
+        font-size: 14px;
+        font-weight: normal;
+        line-height: 40px;
+        margin: 0;
+        padding: 0 10px;
+        background-position: right center;
+        background-repeat: no-repeat;
+        position: relative;
+
+        .fa {
+            margin-right: .3em;
+        }
+    }
+
+    // Show different icons depending on whether the widget is open.
+    &[data-opened="true"] .widget-title {
+        background-image: url("../img/arrow-up.png");
+    }
+
+    &[data-opened="false"] .widget-title {
+        background-image: url("../img/arrow-down.png");
+    }
+
+    .widget-header {
+        border-top: 1px solid #d5d5d5;
+        border-bottom: 1px solid #d5d5d5;
+        margin-top: -1px;
+
+        // Set a gradient background for widget headers.
+        background-color: #f3f3f3;
+        background-repeat: repeat-x;
+        background-image: linear-gradient(to bottom, #fafafa, #e9e9e9);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fffafafa", endColorstr="#ffe9e9e9", GradientType=0);
+    }
+
+    .widget-icon {
+        display: inline-block;
+    }
+
+    &.busy .widget-icon {
+        display: none;
+    }
+
+    &.unauthorized .widget-icon {
+        display: none;
+    }
+
+    .busy-icon {
+        display: none;
+    }
+
+    &.busy .busy-icon {
+        display: inline-block;
+    }
+
+    .unauthorized-icon {
+        display: none;
+    }
+
+    &.unauthorized .unauthorized-icon {
+        display: inline-block;
+    }
+
+    &.unauthorized .widget-content {
+        display: none;
+    }
+
+    .unauthorized-warning {
+        display: none;
+    }
+}
+
+.container.static .widget[data-opened] .widget-title {
+    background-image: none;
+}
+
+
+.widget-content {
+    .form {
+        padding: 2px 10px 14px;
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+    }
+
+    .form-inline .radio {
+        display: inline-block;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+
+
+    .widget-content li {
+        list-style-type: none;
+        cursor: pointer;
+
+        &:nth-child(2n+1) {
+            background-color: #f9f9f9;
+        }
+    }
+
+    .empty-list li {
+        cursor: auto;
+        overflow: hidden;
+    }
+}
+
+
+.unauthorized-warning {
+    padding: 14px 10px 14px;
+    font-size: 14px;
+}
+
+.status-icon.busy .fa,
+.status-icon.ringing .fa {
+    color: #ea0000;
+}
+
+.status-icon.available .fa {
+    color: #008000;
+}
+
+// Prevent firefox from showing the cursor: text for normal elements like divs etc.
 .no-select {
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -71,12 +287,12 @@ $FontPathOpenSans: "/fonts";  // sass-lint:disable-line variable-name-format
     display: none;
 }
 
-/* Resize fa icons */
+// Resize fa icons.
 .fa {
     font-size: 19px;
-}
 
-.fa.fa-vertical-align {
-    margin-top: -3px;
-    vertical-align: middle;
+    &.fa-vertical-align {
+        margin-top: -3px;
+        vertical-align: middle;
+    }
 }
