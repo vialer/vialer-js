@@ -17,13 +17,15 @@ class Skeleton extends EventEmitter {
         super()
         this.cache = {}
         this._listeners = 0
+
         this.utils = require('./utils')
         this.env = this.getEnvironment(options.environment)
+
         this.modules = {}
 
         this.name = options.name
         this.store = new Store(this)
-        this.i18n = new I18n(this)
+        this.i18n = new I18n(this, options.i18n)
         this.logger = new Logger()
 
         this._init()
@@ -102,7 +104,6 @@ class Skeleton extends EventEmitter {
      * it's parent.
      */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
-
         if (this.browser.extension && (!noIpc || noIpc === 'both')) {
             let payloadArgs = []
             let payloadData = {event: event, data: data}
@@ -124,8 +125,9 @@ class Skeleton extends EventEmitter {
             this.logger.debug(`${this}emit ipc event '${event}'`)
             this.browser.runtime.sendMessage(...payloadArgs)
         }
-
-        if (noIpc) {
+        // The web version will always use a local emitter, no matter what
+        // the value is of `noIpc`. An extension may do both.
+        if (!this.browser.extension || noIpc) {
             this.logger.debug(`${this}emit local event '${event}'`)
             super.emit(event, data)
         }

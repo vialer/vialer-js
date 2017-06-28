@@ -100,7 +100,6 @@ class Timer {
             let timeout = registeredTimers[timerId].timeout
             if (typeof timeout === 'function') {
                 timeout = timeout()
-                this.app.logger.debug(`${this}using timeout ${timeout}`)
             }
             if (timeout) {
                 if (registeredTimers[timerId].reset) {
@@ -123,6 +122,7 @@ class Timer {
                     this.stopTimer(timerId)
                     registeredTimers[timerId].timer.timeout = setTimeout(timerFunction, timeout)
                 }
+                this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
             }
         }
     }

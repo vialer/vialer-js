@@ -119,7 +119,7 @@ gulp.task('assets', 'Copy extension assets to the build directory.', () => {
 
 
 gulp.task('build', 'Clears existing build and regenerate a new one.', (done) => {
-    runSequence('build-clean', ['assets', 'docs', 'js', 'scss'], done)
+    runSequence('build-clean', ['assets', 'docs', 'js-app', 'js-vendor', 'scss'], done)
 })
 
 
@@ -154,7 +154,7 @@ gulp.task('docs-deploy', 'Push the docs build directory to github pages.', funct
 })
 
 
-gulp.task('js', 'Metatask that builds all JavaScript tasks.', [
+gulp.task('js-app', 'Metatask that builds all JavaScript tasks.', [
     'js-bg',
     'js-callstatus',
     'js-observer',
@@ -201,7 +201,7 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
         `!${path.join(__dirname, 'src', 'js', 'desktop.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
     ], () => {
-        gulp.start('js')
+        gulp.start('js-app')
         if (WITHDOCS) gulp.start('docs')
     })
 

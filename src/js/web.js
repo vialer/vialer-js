@@ -1,9 +1,11 @@
 'use strict'
 
 /**
- * Run the click-to-dial app as an Electron desktop app.
+ * This is the click-to-dial app that runs all scripts
+ * combined, replacing all ipc messaging with local
+ * event emitters. This version also runs in Electron as
+ * a desktop app.
  */
-// global._messages = require('../_locales/en/messages.json')
 const ClickToDialApp = require('./lib/app')
 
 const _modules = [
@@ -21,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         environment: {
             extension: false,
         },
+        i18n: require('../_locales/en/messages.json'),
         modules: _modules,
         name: 'web',
     })

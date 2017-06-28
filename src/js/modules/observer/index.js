@@ -356,13 +356,13 @@ class ObserverModule {
     }
 
 
+    /**
+     * Restore the original numbers by replacing all ctd nodes with a new
+     * text node containing the phonenumber.
+     */
     undoInsert() {
-        // Restore the original numbers by removing all ctd nodes and replace
-        // the content of it's parent by the ctd node's text, containing the
-        // phonenumber.
-        $('ctd').each((i, el) => {
-            const phoneNumber = $(el).text().replace(/ /g, '')
-            $(el).parent().empty().text(phoneNumber)
+        document.querySelectorAll('ctd').forEach((el) => {
+            el.parentNode.replaceChild(document.createTextNode(el.textContent), el)
         })
     }
 }

@@ -1,8 +1,10 @@
 'use strict'
 
 class I18n {
-    constructor(app) {
+    constructor(app, messages = false) {
         this.app = app
+        this.messages = messages
+
         if (this.app.env.extension && !this.app.env.extension.background) {
             $(() => this.processPage())
         } else {
@@ -14,6 +16,10 @@ class I18n {
     translate(messageID, args) {
         if (this.app.env.extension) {
             return this.app.browser.i18n.getMessage(messageID, args)
+        } else {
+            if (messageID in this.messages) {
+                return this.messages[messageID].message
+            }
         }
     }
 

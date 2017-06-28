@@ -130,7 +130,10 @@ class QueuesModule {
 
 
     timerFunction() {
-        if (!this.queuecallgroups.length) return
+        if (!this.queuecallgroups.length) {
+            this.app.logger.warn(`${this}no queue callgroup found`)
+            return
+        }
 
         Promise.all(this.queuecallgroups.map((id) => this.app.api.client.get(`api/queuecallgroup/${id}/`)))
         .then((results) => {
