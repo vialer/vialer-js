@@ -37,9 +37,11 @@ class Skeleton extends EventEmitter {
         // Increases verbosity beyond the logger's debug level.
         this.verbose = false
         // Sets the verbosity of the logger.
-        this.logger.setLevel(options.debugLevel)
-        this.logger.info(`${this}start app with debug-level ${options.debugLevel}`)
-
+        if (process.env.NODE_ENV === 'production') {
+            this.logger.setLevel('warn')
+        } else {
+            this.logger.setLevel('debug')
+        }
 
         if (this.env.extension) {
             // Make the EventEmitter .on method compatible with web extension ipc.
@@ -104,7 +106,7 @@ class Skeleton extends EventEmitter {
      * it's parent.
      */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
-        if (this.browser.extension && (!noIpc || noIpc === 'both')) {
+        if (this.env.extension && (!noIpc || noIpc === 'both')) {
             let payloadArgs = []
             let payloadData = {event: event, data: data}
             payloadArgs.push(payloadData)
@@ -127,7 +129,7 @@ class Skeleton extends EventEmitter {
         }
         // The web version will always use a local emitter, no matter what
         // the value is of `noIpc`. An extension may do both.
-        if (!this.browser.extension || noIpc) {
+        if (!this.env.extension || noIpc) {
             this.logger.debug(`${this}emit local event '${event}'`)
             super.emit(event, data)
         }
@@ -141,10 +143,12 @@ class Skeleton extends EventEmitter {
      */
     getEnvironment(environment) {
         // If browser exists, use browser, otherwise take the Chrome API.
-        if ('chrome' in global) {
-            this.browser = chrome
+        if (window.browser) {
+            this.browser = window.browser
+        } else if (window.chrome) {
+            this.browser = window.chrome
         } else {
-            this.browser = browser
+            this.browser = null
         }
 
         if (environment.extension) {

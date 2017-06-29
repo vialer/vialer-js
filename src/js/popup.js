@@ -18,7 +18,6 @@ const _modules = [
 ]
 
 global.app = new ClickToDialApp({
-    debugLevel: 'debug',
     environment: {
         extension: {
             background: false,

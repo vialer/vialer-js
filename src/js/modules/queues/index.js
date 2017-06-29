@@ -137,13 +137,11 @@ class QueuesModule {
 
         Promise.all(this.queuecallgroups.map((id) => this.app.api.client.get(`api/queuecallgroup/${id}/`)))
         .then((results) => {
-            this.app.logger.group('callgroup status update')
             for (const res of results) {
                 if (this.app.api.OK_STATUS.includes(res.status)) {
                     let queue = res.data
                     // This may result in an empty queue when logging out.
                     if (!queue) return
-                    this.app.logger.debug(`${this}updating queue callgroup status for group ${queue.id}`)
 
                     queue.queue_size = parseInt(res.data.queue_size, 10)
                     // Queue size is not available.
@@ -174,7 +172,6 @@ class QueuesModule {
                     this.app.emit('ui:widget.unauthorized', {name: 'queues'})
                 }
             }
-            this.app.logger.groupEnd()
         })
     }
 
@@ -193,14 +190,12 @@ class QueuesModule {
 
             // quicker if the panel is visible and the queues widget is open
             if (this.app.store.get('isMainPanelOpen')) {
-                this.app.logger.info(`${this}main panel open; using smaller timeout for queues update`)
                 if (this.app.store.get('widgets').isOpen.queues) {
                     timeout = 5000
                 }
             }
         }
 
-        this.app.logger.debug(`${this}timeout for queue.size event: ${timeout}`)
         return timeout
     }
 

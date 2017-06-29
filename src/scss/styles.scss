@@ -2,22 +2,9 @@
 @import "availability";
 @import "callstatus";
 @import "contacts";
+@import "fonts";
 @import "queues";
 @import "popout";
-
-$fa-font-path: "/fonts";
-@import "font-awesome/scss/font-awesome";
-
-$FontPathOpenSans: "/fonts";  // sass-lint:disable-line variable-name-format
-@import "npm-font-open-sans/open-sans.scss";  // sass-lint:disable-line clean-import-paths
-
-
-// Styling for the login form and panel.
-html {
-    background: #fff;
-    overflow-x: hidden;
-    overflow-y: auto;
-}
 
 html,
 body {
@@ -25,12 +12,18 @@ body {
     margin: 0;
     overflow-x: hidden;
     overflow-y: auto;
+    position: relative;
+}
+
+// The maximum browser-enforced height for a chrome popup is 600px.
+html {
+    width: 400px;
 }
 
 body {
     color: #3c3c50;
     font: 13px/1.7em "Open Sans";
-    width: 400px;
+    width: 100%;
 }
 
 .no-scroll {

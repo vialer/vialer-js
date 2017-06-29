@@ -20,7 +20,7 @@ class QueuesActions extends Actions {
                 }
 
                 if (this.app.env.extension) {
-                    this.app.browser.browserAction.setIcon({path: this.getIconForSize(size)})
+                    this.app.browser.browserAction.setIcon({path: this.module.getIconForSize(size)})
                 }
             } else {
                 // Restore availability icon.

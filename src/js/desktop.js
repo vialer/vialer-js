@@ -9,6 +9,7 @@ const BrowserWindow = electron.BrowserWindow
 
 const path = require('path')
 const url = require('url')
+const {ipcMain} = require('electron')
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -22,21 +23,33 @@ function createWindow() {
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
+        show: false,
+        height: 186,
         width: 400,
-        height: 600,
-        resizable: true,
         title: 'Click-to-dial',
         autoHideMenuBar: true,
+        useContentSize: true,
+        resizable: false,
+    })
+
+    ipcMain.on('resize-window', (event, data) => {
+        const currentSize = mainWindow.getContentSize()
+        if (data.height !== currentSize[1]) {
+            mainWindow.setContentSize(data.width, data.height, false)
+        }
     })
 
     mainWindow.setIcon(path.join(__dirname, 'img', 'clicktodial.png'))
-
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'web.html'),
         protocol: 'file:',
         slashes: true,
     }))
+
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show()
+    })
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {

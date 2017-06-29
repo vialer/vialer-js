@@ -110,6 +110,9 @@ class ContactsActions extends Actions {
             $(`#sip${account_id} .status-icon`).removeClass('available unavailable busy ringing shake').addClass(state)
         })
 
+        /**
+         * Hide the sip presence update indicator.
+         */
         this.app.on('sip:presences.updated', (data) => {
             $('.contacts .connection-icon').hide()
         })
@@ -124,24 +127,12 @@ class ContactsActions extends Actions {
             $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
         })
 
-
         // Blink every phone icon with class "ringing".
         let blink = () => {
             let ringingNow = $('.status-icon.ringing')
             $(ringingNow).toggleClass('available').toggleClass('busy')
         }
         setInterval(blink, 400)
-
-        let fade = function() {
-            let icon = $('.connecting.connection-icon:visible')
-            if ($(icon).css('opacity') === '0') {
-                icon.fadeTo(400, 1.0)
-            } else {
-                icon.fadeTo(400, 0)
-            }
-        };
-        setInterval(fade, 1000)
-
 
         // Call a contact when clicking on one.
         $('.contacts').on('click', '.status-icon, .name, .extension', (e) => {

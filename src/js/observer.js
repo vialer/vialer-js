@@ -16,7 +16,6 @@ class ObserverApp extends Skeleton {
 }
 
 global.app = new ObserverApp({
-    debugLevel: 'debug',
     environment: {
         extension: {
             background: false,

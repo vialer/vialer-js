@@ -1,0 +1,37 @@
+$fa-font-path: "../fonts";
+@import "font-awesome/scss/font-awesome";
+
+@font-face {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-style: normal;
+    src: url("/fonts/OpenSans-Regular.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Open Sans";
+    font-weight: bold;
+    font-style: normal;
+    src: url("/fonts/OpenSans-Bold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Open Sans";
+    font-weight: normal;
+    font-style: italic;
+    src: url("/fonts/OpenSans-Italic.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Open Sans";
+    font-weight: 600;
+    font-style: normal;
+    src: url("/fonts/OpenSans-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Open Sans";
+    font-weight: 600;
+    font-style: italic;
+    src: url("/fonts/OpenSans-SemiboldItalic.woff2") format("woff2");
+}

@@ -61,6 +61,7 @@ class UserModule {
         this.app.store.remove('password')
         this.app.emit('user:logout.success')
         this.app.api.setupClient()
+        this.app.timer.stopAllTimers()
     }
 
 

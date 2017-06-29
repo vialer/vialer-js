@@ -17,7 +17,6 @@ class TabsApp extends Skeleton {
 }
 
 global.app = new TabsApp({
-    debugLevel: 'debug',
     environment: {
         extension: {
             background: false,

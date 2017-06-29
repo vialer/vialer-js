@@ -32,7 +32,6 @@ class OptionsApp extends Skeleton {
 
 document.addEventListener('DOMContentLoaded', () => {
     global.app = new OptionsApp({
-        debugLevel: 'debug',
         name: 'options',
         environment: {
             extension: {

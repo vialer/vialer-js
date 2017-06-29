@@ -94,13 +94,12 @@ class Timer {
             let timerFunction = registeredTimers[timerId].function
             if (registeredTimers[timerId].interval) {
                 registeredTimers[timerId].timer.interval = setInterval(timerFunction, registeredTimers[timerId].interval)
-                this.app.logger.debug(`${this}start timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
+                this.app.logger.debug(`${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
             }
 
             let timeout = registeredTimers[timerId].timeout
-            if (typeof timeout === 'function') {
-                timeout = timeout()
-            }
+            if (typeof timeout === 'function') timeout = timeout()
+
             if (timeout) {
                 if (registeredTimers[timerId].reset) {
                     let resetFunction = () => {
@@ -131,12 +130,12 @@ class Timer {
     stopTimer(timerId) {
         if (this.getRegisteredTimer(timerId)) {
             if (registeredTimers[timerId].timer.interval) {
-                this.app.logger.info(`${this}clearing interval timer ${timerId}`)
+                this.app.logger.debug(`${this}clearing interval timer ${timerId}`)
                 clearInterval(registeredTimers[timerId].timer.interval)
                 registeredTimers[timerId].timer.interval = null
             }
             if (registeredTimers[timerId].timer.timeout) {
-                this.app.logger.info(`${this}clearing timeout timer ${timerId}`)
+                this.app.logger.debug(`${this}clearing timeout timer ${timerId}`)
                 clearTimeout(registeredTimers[timerId].timer.timeout)
                 registeredTimers[timerId].timer.timeout = null
             }
@@ -148,6 +147,7 @@ class Timer {
 
     stopAllTimers() {
         for (const timerId of Object.keys(this.registeredTimers)) {
+            this.app.logger.debug(`${this}remove remaining timer '${timerId}'`)
             this.stopTimer(timerId)
         }
     }

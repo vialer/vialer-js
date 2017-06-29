@@ -15,12 +15,14 @@ const connect = require('connect')
 const del = require('del')
 
 const envify = require('gulp-envify')
+const flatten = require('gulp-flatten')
 const ghPages = require('gulp-gh-pages')
 const gulp = require('gulp-help')(require('gulp'), {})
 const gutil = require('gulp-util')
 const http = require('http')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
+const imagemin = require('gulp-imagemin')
 const mount = require('connect-mount')
 
 const notify = require('gulp-notify')
@@ -94,7 +96,7 @@ const scssEntry = (name) => {
         }))
         .on('error', notify.onError('Error: <%= error.message %>'))
         .pipe(concat(`${name}.css`))
-        .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 0})))
+        .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
         .pipe(gulp.dest('./build/css'))
         .pipe(size(extend({title: `scss-${name}`}, sizeOptions)))
         .pipe(ifElse(isWatching, livereload))
@@ -102,14 +104,28 @@ const scssEntry = (name) => {
 }
 
 
-gulp.task('assets', 'Copy extension assets to the build directory.', () => {
-    return gulp.src('./src/img/**', {base: './src'})
+gulp.task('fonts', 'Copy fonts to the build directory.', () => {
+    const fontAwesomePath = path.join(NODE_PATH, 'font-awesome', 'fonts')
+    const opensansPath = path.join(NODE_PATH, 'npm-font-open-sans', 'fonts')
+    return gulp.src(path.join(fontAwesomePath, 'fontawesome-webfont.woff2'))
+    .pipe(addsrc(path.join(opensansPath, 'Bold', 'OpenSans-Bold.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'Italic', 'OpenSans-Italic.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'SemiBold', 'OpenSans-Semibold.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'SemiBoldItalic', 'OpenSans-SemiboldItalic.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'Regular', 'OpenSans-Regular.woff2')))
+    .pipe(flatten())
+    .pipe(gulp.dest('./build/fonts'))
+    .pipe(size(extend({title: 'fonts'}, sizeOptions)))
+})
+
+
+gulp.task('assets', 'Copy extension assets to the build directory.', ['fonts'], () => {
+    return gulp.src('./src/img/{*.png,*.jpg}', {base: './src'})
+    .pipe(ifElse(PRODUCTION, imagemin))
     .pipe(addsrc('./manifest.json'))
     .pipe(addsrc('./LICENSE'))
     .pipe(addsrc('./README.md'))
     .pipe(addsrc('./src/_locales/**', {base: './src/'}))
-    .pipe(addsrc(path.join(NODE_PATH, 'font-awesome', 'fonts', '**'), {base: path.join(NODE_PATH, 'font-awesome')}))
-    .pipe(addsrc(path.join(NODE_PATH, 'npm-font-open-sans', 'fonts', '**'), {base: path.join(NODE_PATH, 'npm-font-open-sans')}))
     .pipe(addsrc('./src/js/lib/thirdparty/**/*.js', {base: './src/'}))
     .pipe(addsrc('./src/html/*.html', {base: './src/html'}))
     .pipe(gulp.dest('./build/'))

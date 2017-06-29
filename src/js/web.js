@@ -6,7 +6,21 @@
  * event emitters. This version also runs in Electron as
  * a desktop app.
  */
+
 const ClickToDialApp = require('./lib/app')
+
+window.ResizeSensor = require('css-element-queries').ResizeSensor
+
+let isElectron
+
+try {
+    // Skip electron from transpilation.
+    let electronNamespace = 'electron'
+    window.electron = require(electronNamespace)
+    isElectron = true
+} catch (e) {
+    isElectron = false
+}
 
 const _modules = [
     {name: 'availability', Module: require('./modules/availability')},
@@ -18,10 +32,25 @@ const _modules = [
 ]
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Set content height for electron.
+    if (isElectron) {
+        electron.ipcRenderer.send('resize-window', {
+            height: document.body.clientHeight,
+            width: document.body.clientWidth,
+        })
+
+        ResizeSensor(document.body, (e) => {
+            electron.ipcRenderer.send('resize-window', {
+                height: document.body.clientHeight,
+                width: document.body.clientWidth,
+            })
+        })
+    }
+
     global.app = new ClickToDialApp({
-        debugLevel: 'debug',
         environment: {
             extension: false,
+            electron: isElectron,
         },
         i18n: require('../_locales/en/messages.json'),
         modules: _modules,

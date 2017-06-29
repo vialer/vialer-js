@@ -61,7 +61,6 @@ class CallStatusApp extends Skeleton {
 
 
 global.app = new CallStatusApp({
-    debugLevel: 'debug',
     environment: {
         extension: {
             background: false,

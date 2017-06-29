@@ -12,6 +12,10 @@
         // Force fixed height to include border-width.
         box-sizing: border-box;
 
+        &:hover {
+            cursor: pointer;
+        }
+
         &.selected {
             background-image: url("../img/selected.png");
         }
