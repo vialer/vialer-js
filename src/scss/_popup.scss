@@ -8,7 +8,7 @@
 
 html,
 body {
-    background: #fff !important;
+    background: #fff;
     padding: 0;
     margin: 0;
     overflow-x: hidden;
@@ -16,15 +16,10 @@ body {
     position: relative;
 }
 
-// The maximum browser-enforced height for a chrome popup is 600px.
-html {
-    width: 400px;
-}
-
 body {
     color: #3c3c50;
     font: 13px/1.7em "Open Sans";
-    width: 100%;
+    width: 400px;
 }
 
 .no-scroll {
