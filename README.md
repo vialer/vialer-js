@@ -23,7 +23,8 @@ user session.
 
     npm i -g web-ext
     gulp build --target firefox
-    web-ext run --source-dir build/firefox
+    web-ext run --source-dir build/firefox  
+
 
 ## Electron
 Build click-to-dial as a desktop app and run it. It requires electron to be
@@ -43,3 +44,12 @@ are normally not allowed to pass cross-domain. Start chromium like:
 
 Then visit `http://localhost:8999/electron/electron_webview.html`. Use livereload
 for instant reloads while editing scss files.
+
+
+# Usage
+
+You can use npm scripts to run the extension in your preferred environment:
+
+    npm run chromium
+    npm run electron
+    npm run firefox
