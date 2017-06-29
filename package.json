@@ -1,11 +1,13 @@
 {
   "name": "click-to-dial",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "click-to-dial web extension for Firefox, Chrome & Electron desktop app.",
-  "main": "click-to-dial.js",
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "desktop": "electron --js-flags='--harmony-async-await' build/desktop.js"
+    "electron": "electron --js-flags='--harmony-async-await' build/electron/electron_main.js"
   },
   "repository": {
     "type": "git",
@@ -45,6 +47,7 @@
     "gulp-zip": "^4.0.0",
     "jsdoc": "git+https://github.com/jvanveen/jsdoc.git#master",
     "jsdoc-rtd": "^1.0.5",
+    "mkdirp": "^0.5.1",
     "run-sequence": "^1.2.2",
     "serve-index": "^1.9.0",
     "serve-static": "^1.12.1",

@@ -1,6 +1,7 @@
 'use strict'
 
-const extend = require('util')._extend
+const {_extend, promisify} = require('util')
+const fs = require('fs')
 const path = require('path')
 
 const addsrc = require('gulp-add-src')
@@ -23,6 +24,8 @@ const http = require('http')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
 const imagemin = require('gulp-imagemin')
+const mkdirp = require('mkdirp')
+const minifier = composer(require('uglify-es'), console)
 const mount = require('connect-mount')
 
 const notify = require('gulp-notify')
@@ -33,23 +36,34 @@ const serveStatic = require('serve-static')
 const size = require('gulp-size')
 const source = require('vinyl-source-stream')
 const sourcemaps = require('gulp-sourcemaps')
-const uglifyEs = require('uglify-es')
 const watchify = require('watchify')
 const zip = require('gulp-zip')
 
 const BUILD_DIR = process.env.BUILD_DIR || path.join(__dirname, 'build')
+const BUILD_TARGET = argv.target ? argv.target : 'chrome'
+const BUILD_TARGETS = ['chrome', 'firefox', 'electron']
 const NODE_ENV = process.env.NODE_ENV || 'development'
 const NODE_PATH = process.env.NODE_PATH || path.join(__dirname, 'node_modules')
 const PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
 const WITHDOCS = argv.docs ? argv.docs : false
 
-const minifier = composer(uglifyEs, console)
+const writeFileAsync = promisify(fs.writeFile)
 
 let bundlers = {bg: null, popup: null, tab: null, callstatus: null}
 let isWatching
 let sizeOptions = {showTotal: true, showFiles: true}
 
+
+// Verify that the build target is valid.
+if (!BUILD_TARGETS.includes(BUILD_TARGET)) {
+    gutil.log(`Invalid build target: ${BUILD_TARGET}`)
+    process.exit()
+}
+
+// Notify about some essential build presets.
 if (PRODUCTION) gutil.log('(!) Gulp optimized for production')
+gutil.log(`Build target: ${BUILD_TARGET}`)
+
 
 /**
  * Generic browserify task used for multiple entrypoints.
@@ -77,8 +91,8 @@ const jsEntry = (name) => {
         .pipe(ifElse(PRODUCTION, () => minifier()))
 
         .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
-        .pipe(gulp.dest('./build/js/'))
-        .pipe(size(extend({title: `${name}.js`}, sizeOptions)))
+        .pipe(gulp.dest(`./build/${BUILD_TARGET}/js`))
+        .pipe(size(_extend({title: `${name}.js`}, sizeOptions)))
     }
 }
 
@@ -97,60 +111,36 @@ const scssEntry = (name) => {
         .on('error', notify.onError('Error: <%= error.message %>'))
         .pipe(concat(`${name}.css`))
         .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
-        .pipe(gulp.dest('./build/css'))
-        .pipe(size(extend({title: `scss-${name}`}, sizeOptions)))
+        .pipe(gulp.dest(`./build/${BUILD_TARGET}/css`))
+        .pipe(size(_extend({title: `scss-${name}`}, sizeOptions)))
         .pipe(ifElse(isWatching, livereload))
     }
 }
 
 
-gulp.task('fonts', 'Copy fonts to the build directory.', () => {
-    const fontAwesomePath = path.join(NODE_PATH, 'font-awesome', 'fonts')
-    const opensansPath = path.join(NODE_PATH, 'npm-font-open-sans', 'fonts')
-    return gulp.src(path.join(fontAwesomePath, 'fontawesome-webfont.woff2'))
-    .pipe(addsrc(path.join(opensansPath, 'Bold', 'OpenSans-Bold.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'Italic', 'OpenSans-Italic.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'SemiBold', 'OpenSans-Semibold.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'SemiBoldItalic', 'OpenSans-SemiboldItalic.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'Regular', 'OpenSans-Regular.woff2')))
-    .pipe(flatten())
-    .pipe(gulp.dest('./build/fonts'))
-    .pipe(size(extend({title: 'fonts'}, sizeOptions)))
-})
-
-
-gulp.task('assets', 'Copy extension assets to the build directory.', ['fonts'], () => {
+gulp.task('assets', 'Copy click-to-dial assets to the build directory.', ['fonts'], () => {
     return gulp.src('./src/img/{*.png,*.jpg}', {base: './src'})
     .pipe(ifElse(PRODUCTION, imagemin))
-    .pipe(addsrc('./manifest.json'))
     .pipe(addsrc('./LICENSE'))
     .pipe(addsrc('./README.md'))
     .pipe(addsrc('./src/_locales/**', {base: './src/'}))
     .pipe(addsrc('./src/js/lib/thirdparty/**/*.js', {base: './src/'}))
-    .pipe(addsrc('./src/html/*.html', {base: './src/html'}))
-    .pipe(gulp.dest('./build/'))
-    .pipe(size(extend({title: 'assets'}, sizeOptions)))
+    .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
+    .pipe(size(_extend({title: 'assets'}, sizeOptions)))
     .pipe(ifElse(isWatching, livereload))
 })
 
 
-gulp.task('build', 'Clears existing build and regenerate a new one.', (done) => {
-    runSequence('build-clean', ['assets', 'docs', 'js-app', 'js-vendor', 'scss'], done)
+gulp.task('build', 'Clean existing build and regenerate a new one.', (done) => {
+    if (BUILD_TARGET !== 'electron') runSequence('build-clean', ['assets', 'html', 'js-vendor', 'js-webext', 'scss'], done)
+    else runSequence('build-clean', ['assets', 'html', 'js-electron-main', 'js-electron-webview', 'scss'], done)
 })
 
 
-gulp.task('build-clean', `Destroy build directory (${BUILD_DIR}).`, (done) => {
-    del([path.join(BUILD_DIR, '**')], {
-        force: true,
-    }).then(() => done())
-})
-
-
-gulp.task('desktop', 'Copy desktop js to the root build dir.', () => {
-    return gulp.src('./src/js/desktop.js', {base: './src/js/'})
-    .pipe(gulp.dest('./build/'))
-    .pipe(size(extend({title: 'desktop'}, sizeOptions)))
-    .pipe(ifElse(isWatching, livereload))
+gulp.task('build-clean', `Clean build directory ${path.join(BUILD_DIR, BUILD_TARGET)}`, (done) => {
+    del([path.join(BUILD_DIR, BUILD_TARGET, '**')], {force: true}).then(() => {
+        mkdirp(path.join(BUILD_DIR, BUILD_TARGET), done)
+    })
 })
 
 
@@ -170,54 +160,118 @@ gulp.task('docs-deploy', 'Push the docs build directory to github pages.', funct
 })
 
 
-gulp.task('js-app', 'Metatask that builds all JavaScript tasks.', [
-    'js-bg',
-    'js-callstatus',
-    'js-observer',
-    'js-options',
-    'js-popup',
-    'js-tab',
-    'js-web',
+gulp.task('fonts', 'Copy fonts to the build directory.', () => {
+    const fontAwesomePath = path.join(NODE_PATH, 'font-awesome', 'fonts')
+    const opensansPath = path.join(NODE_PATH, 'npm-font-open-sans', 'fonts')
+    return gulp.src(path.join(fontAwesomePath, 'fontawesome-webfont.woff2'))
+    .pipe(addsrc(path.join(opensansPath, 'Bold', 'OpenSans-Bold.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'Italic', 'OpenSans-Italic.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'SemiBold', 'OpenSans-Semibold.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'SemiBoldItalic', 'OpenSans-SemiboldItalic.woff2')))
+    .pipe(addsrc(path.join(opensansPath, 'Regular', 'OpenSans-Regular.woff2')))
+    .pipe(flatten())
+    .pipe(gulp.dest(`./build/${BUILD_TARGET}/fonts`))
+    .pipe(size(_extend({title: 'fonts'}, sizeOptions)))
+})
+
+
+gulp.task('html', 'Add html to the build directory.', () => {
+    let target = 'electron'
+    if (BUILD_TARGET !== 'electron') target = 'webext'
+    return gulp.src(path.join('src', 'html', `${target}*.html`))
+    .pipe(ifElse(!PRODUCTION, () => addsrc(path.join('src', 'html', 'test.html'))))
+    .pipe(flatten())
+    .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
+})
+
+
+gulp.task('js-electron', [
+    'js-electron-main',
+    'js-electron-webview',
 ], (done) => {
     if (isWatching) livereload.changed('web.js')
     done()
 })
+gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-electron-webview'], () => {
+    return gulp.src('./src/js/electron_main.js', {base: './src/js/'})
+    .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
+    .pipe(size(_extend({title: 'electron-main'}, sizeOptions)))
+    .pipe(ifElse(isWatching, livereload))
+})
+gulp.task('js-electron-webview', 'Generate electron webview js.', jsEntry('electron_webview'))
 
-gulp.task('js-bg', 'Generate the extension background entry js.', jsEntry('bg'))
-gulp.task('js-callstatus', 'Generate the callstatus entry js.', jsEntry('callstatus'))
-gulp.task('js-observer', 'Generate the observer js.', jsEntry('observer'))
-gulp.task('js-options', 'Generate the options js.', jsEntry('options'))
-gulp.task('js-popup', 'Generate the popup/popout entry js.', jsEntry('popup'))
-gulp.task('js-tab', 'Generate the tab contentscript entry js.', jsEntry('tab'))
-gulp.task('js-vendor', 'Build vendor javascript.', jsEntry('vendor'))
-gulp.task('js-web', 'Generate the web version entry js.', jsEntry('web'))
 
-gulp.task('scss', 'Metatask that builds all scss.', [
-    'scss-main',
-    'scss-options',
-    'scss-print',
+gulp.task('js-vendor', 'Generate third-party vendor js.', jsEntry('vendor'))
+
+
+gulp.task('js-webext', 'Generate webextension js.', [
+    'js-webext-bg',
+    'js-webext-callstatus',
+    'js-webext-observer',
+    'js-webext-options',
+    'js-webext-popup',
+    'js-webext-tab',
+    `manifest-webext-${BUILD_TARGET}`,
+], (done) => {
+    if (isWatching) livereload.changed('web.js')
+    done()
+})
+gulp.task('js-webext-bg', 'Generate the extension background entry js.', jsEntry('webext_bg'))
+gulp.task('js-webext-callstatus', 'Generate the callstatus entry js.', jsEntry('webext_callstatus'))
+gulp.task('js-webext-observer', 'Generate webextension observer js which runs in all tab frames.', jsEntry('webext_observer'))
+gulp.task('js-webext-options', 'Generate webextension options js.', jsEntry('webext_options'))
+gulp.task('js-webext-popup', 'Generate webextension popup/popout js.', jsEntry('webext_popup'))
+gulp.task('js-webext-tab', 'Generate webextension tab js.', jsEntry('webext_tab'))
+
+
+gulp.task('manifest-webext-chrome', 'Generate a web-extension manifest for Chrome.', (done) => {
+    const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
+    let manifest = require('./src/manifest.json')
+    manifest.options_ui.chrome_style = true
+    writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
+})
+
+
+gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Firefox.', (done) => {
+    const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
+    let manifest = require('./src/manifest.json')
+    manifest.options_ui.browser_style = true
+    manifest.applications = {
+        gecko: {
+            id: 'click-to-dial@web-extensions',
+        },
+    }
+    writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
+})
+
+
+gulp.task('scss', 'Compile all css.', [
+    'scss-webext',
+    'scss-webext-callstatus',
+    'scss-webext-options',
+    'scss-webext-print',
 ])
 
-gulp.task('scss-main', 'Compiles UI sass to css.', scssEntry('styles'))
-gulp.task('scss-options', 'Compiles extension options sass to css.', scssEntry('options'))
-gulp.task('scss-print', 'Compiles print sass to css.', scssEntry('print'))
+gulp.task('scss-webext', 'Generate popover webextension css.', scssEntry('webext'))
+gulp.task('scss-webext-callstatus', 'Generate webextension callstatus dialog css.', scssEntry('webext_callstatus'))
+gulp.task('scss-webext-options', 'Generate webextension options css.', scssEntry('webext_options'))
+gulp.task('scss-webext-print', 'Generate webextension print css.', scssEntry('webext_print'))
 
 
-gulp.task('watch', 'Start a development server and watch for changes.', () => {
+gulp.task('watch', 'Start development server and watch for changes.', () => {
+    const app = connect()
     isWatching = true
     livereload.listen({silent: false})
-    const app = connect()
     app.use(serveStatic(path.join(__dirname, 'build')))
-    app.use('/', serveIndex('build/', {'icons': false}))
+    app.use('/', serveIndex(path.join(__dirname, 'build'), {'icons': false}))
     app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
     http.createServer(app).listen(8999)
     gulp.watch([
         path.join(__dirname, 'src', 'js', '**', '*.js'),
         `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
-        `!${path.join(__dirname, 'src', 'js', 'desktop.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
     ], () => {
-        gulp.start('js-app')
+        if (BUILD_TARGET !== 'electron') gulp.start('js-webext')
         if (WITHDOCS) gulp.start('docs')
     })
 
@@ -233,31 +287,33 @@ gulp.task('watch', 'Start a development server and watch for changes.', () => {
     }
 
     gulp.watch([
-        path.join(__dirname, 'manifest.json'),
         path.join(__dirname, 'src', '_locales', '**', '*.json'),
         path.join(__dirname, 'src', 'html', '**', '*.html'),
         path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
     ], ['assets'])
 
-    gulp.watch(path.join(__dirname, 'src', 'js', 'desktop.js'), ['desktop'])
+    gulp.watch(path.join(__dirname, 'src', 'js', 'electron_main.js'), ['electron-main'])
+    gulp.watch(path.join(__dirname, 'src', 'manifest.json'), [`manifest-webext-${BUILD_TARGET}`])
     gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
 
     gulp.watch([
-        `!${path.join(__dirname, 'src', 'scss', 'options.scss')}`,
-        path.join(__dirname, 'src', 'scss', '**', '*.scss'),
-    ], ['scss-main', 'scss-print'])
+        path.join(__dirname, 'src', 'scss', 'webext.scss'),
+        path.join(__dirname, 'src', 'scss', '_*.scss'),
+    ], ['scss-webext'])
 
-    gulp.watch(path.join(__dirname, 'src', 'scss', 'options.scss'), ['scss-options'])
+    gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_callstatus.scss'), ['scss-webext-callstatus'])
+    gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_options.scss'), ['scss-webext-options'])
+    gulp.watch([path.join(__dirname, 'src', 'scss', 'webext_print.scss')], ['scss-webext-print'])
 })
 
 
-gulp.task('zip', 'Generate a ditributable extension zip file.', ['build'], function() {
-    const manifest = require('./manifest')
-    const distFileName = `${manifest.name.toLowerCase()}-v${manifest.version}.zip`
+gulp.task('zip', 'Generate a zip file from the build dir. Useful for extension distribution.', ['build'], function() {
+    const _package = require('./package')
+    const distributionName = `${_package.name.toLowerCase()}-${BUILD_TARGET}-${_package.version}.zip`
     // Build distributable extension.
     return gulp.src([
-        './build/**',
-    ], {base: './build'})
-    .pipe(zip(distFileName))
-    .pipe(gulp.dest('./'))
+        `./build/${BUILD_TARGET}/**`,
+    ], {base: `./build/${BUILD_TARGET}`})
+    .pipe(zip(distributionName))
+    .pipe(gulp.dest('./build'))
 })

@@ -14,7 +14,7 @@
         "translate": true,
         "tsip_event_code_e": true,
         "tsip_transport_state_e": true,
-        "webkitNotifications": true 
+        "webkitNotifications": true
     },
     "plugins": [
 
@@ -84,7 +84,7 @@
         "no-path-concat": 0,
         "no-plusplus": 0,
         "no-process-env": 0,
-        "no-process-exit": 2,
+        "no-process-exit": 0,
         "no-proto": 2,
         "no-redeclare": 2,
         "no-regex-spaces": 2,
