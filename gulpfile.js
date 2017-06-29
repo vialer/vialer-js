@@ -133,7 +133,7 @@ gulp.task('assets', 'Copy click-to-dial assets to the build directory.', ['fonts
 
 gulp.task('build', 'Clean existing build and regenerate a new one.', (done) => {
     if (BUILD_TARGET !== 'electron') runSequence('build-clean', ['assets', 'html', 'js-vendor', 'js-webext', 'scss'], done)
-    else runSequence('build-clean', ['assets', 'html', 'js-electron-main', 'js-electron-webview', 'scss'], done)
+    else runSequence('build-clean', ['assets', 'html', 'js-electron-main', 'js-electron-webview', 'js-vendor', 'scss'], done)
 })
 
 
@@ -188,6 +188,7 @@ gulp.task('html', 'Add html to the build directory.', () => {
 gulp.task('js-electron', [
     'js-electron-main',
     'js-electron-webview',
+    'js-vendor',
 ], (done) => {
     if (isWatching) livereload.changed('web.js')
     done()

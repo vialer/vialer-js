@@ -7,9 +7,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "electron": "electron --js-flags='--harmony-async-await' build/electron/electron_main.js",
-    "chromium": "chromium --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
-    "firefox": "web-ext run --source-dir build/firefox"   
+    "electron": "gulp build --target electron;electron --js-flags='--harmony-async-await' build/electron/electron_main.js",
+    "chromium": "gulp build --target chrome;chromium --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
+    "firefox": "gulp build --target firefox;web-ext run --source-dir build/firefox"   
   },
   "repository": {
     "type": "git",
