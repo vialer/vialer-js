@@ -20,6 +20,10 @@ body {
         &[type="checkbox"] {
             margin-top: -3px;
             margin-right: 5px;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
 
         &[type="text"] {
@@ -34,6 +38,10 @@ body {
     button {
         height: 25px;
         font-weight: bold;
+
+        &:hover {
+            cursor: pointer;
+        }
     }
 
     #status {
