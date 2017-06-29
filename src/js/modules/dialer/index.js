@@ -310,7 +310,7 @@ class DialerModule {
         }
 
         this.frame = $('<iframe>', {
-            src: this.app.browser.runtime.getURL(`callstatus.html?callid=${callid}`),
+            src: this.app.browser.runtime.getURL(`webext_callstatus.html?callid=${callid}`),
             style: (function() {
                 // Cannot set !important with .css("property", "value !important"),
                 // so build a string to use as style.

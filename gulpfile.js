@@ -270,6 +270,8 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         path.join(__dirname, 'src', 'js', '**', '*.js'),
         `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
+        `!${path.join(__dirname, 'src', 'js', 'electron_main.js')}`,
+        `!${path.join(__dirname, 'src', 'js', 'electron_webview.js')}`,
     ], () => {
         if (BUILD_TARGET !== 'electron') gulp.start('js-webext')
         if (WITHDOCS) gulp.start('docs')
@@ -292,18 +294,24 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
     ], ['assets'])
 
-    gulp.watch(path.join(__dirname, 'src', 'js', 'electron_main.js'), ['electron-main'])
-    gulp.watch(path.join(__dirname, 'src', 'manifest.json'), [`manifest-webext-${BUILD_TARGET}`])
+    if (BUILD_TARGET === 'electron') {
+        gulp.watch([
+            path.join(__dirname, 'src', 'js', 'electron_main.js'),
+            path.join(__dirname, 'src', 'js', 'electron_webview.js'),
+        ], ['js-electron-main', 'js-electron-webview'])
+    } else {
+        gulp.watch(path.join(__dirname, 'src', 'manifest.json'), [`manifest-webext-${BUILD_TARGET}`])
+        gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_callstatus.scss'), ['scss-webext-callstatus'])
+        gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_options.scss'), ['scss-webext-options'])
+        gulp.watch([path.join(__dirname, 'src', 'scss', 'webext_print.scss')], ['scss-webext-print'])
+    }
+
     gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
 
     gulp.watch([
         path.join(__dirname, 'src', 'scss', 'webext.scss'),
         path.join(__dirname, 'src', 'scss', '_*.scss'),
     ], ['scss-webext'])
-
-    gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_callstatus.scss'), ['scss-webext-callstatus'])
-    gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_options.scss'), ['scss-webext-options'])
-    gulp.watch([path.join(__dirname, 'src', 'scss', 'webext_print.scss')], ['scss-webext-print'])
 })
 
 

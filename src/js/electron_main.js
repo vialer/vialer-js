@@ -42,7 +42,7 @@ function createWindow() {
     mainWindow.setIcon(path.join(__dirname, 'img', 'clicktodial.png'))
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'web.html'),
+        pathname: path.join(__dirname, 'electron_webview.html'),
         protocol: 'file:',
         slashes: true,
     }))

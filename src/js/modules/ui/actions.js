@@ -143,7 +143,7 @@ class UiActions extends Actions {
         })
 
         $('#popout').click((e) => {
-            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('popup.html?popout=true')})
+            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('webext_popup.html?popout=true')})
         })
         $('#help').click((e) => {
             this.app.emit('help')
@@ -169,7 +169,7 @@ class UiActions extends Actions {
         this.app.store.set('isMainPanelOpen', true)
 
         /**
-         * default_popup (panel.html) is reloaded every time, so the only way to 'persist' the data
+         * Popup is reloaded every time, so the only way to 'persist' the data
          * is by reading data from storage and present them as they were.
          */
         if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
