@@ -45,6 +45,7 @@ const BUILD_TARGETS = ['chrome', 'firefox', 'electron']
 const NODE_ENV = process.env.NODE_ENV || 'development'
 const NODE_PATH = process.env.NODE_PATH || path.join(__dirname, 'node_modules')
 const PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
+const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
 
 const writeFileAsync = promisify(fs.writeFile)
@@ -149,7 +150,7 @@ gulp.task('docs', 'Generate documentation.', (done) => {
     childExec(execCommand, undefined, (err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
         if (stdout) gutil.log(stdout)
-        if (isWatching) livereload.changed()
+        if (isWatching) livereload.changed('rtd.js')
         done()
     })
 })
@@ -287,6 +288,16 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         ], () => {
             gulp.start('docs')
         })
+    }
+
+    if (WATCHLINKED) {
+        gutil.log('Watching linked development packages')
+        gulp.watch([
+            path.join(NODE_PATH, 'jsdoc-rtd', 'static', 'styles', '*.css'),
+            path.join(NODE_PATH, 'jsdoc-rtd', 'static', 'js', '*.js'),
+            path.join(NODE_PATH, 'jsdoc-rtd', 'publish.js'),
+            path.join(NODE_PATH, 'jsdoc-rtd', 'tmpl', '**', '*.tmpl'),
+        ], ['docs'])
     }
 
     gulp.watch([

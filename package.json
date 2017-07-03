@@ -48,7 +48,7 @@
     "gulp-uglify": "^3.0.0",
     "gulp-zip": "^4.0.0",
     "jsdoc": "git+https://github.com/jvanveen/jsdoc.git#master",
-    "jsdoc-rtd": "^1.0.5",
+    "jsdoc-rtd": "^1.0.10",
     "mkdirp": "^0.5.1",
     "run-sequence": "^1.2.2",
     "serve-index": "^1.9.0",
