@@ -13,31 +13,16 @@ class Api {
     constructor(app) {
         this.app = app
         this.OK_STATUS = [200, 201, 202, 204]
-        this.NOTOK_STATUS = [401, 403]
+        this.NOTOK_STATUS = [401, 403, 'Network Error']
         this.UNAUTHORIZED_STATUS = [401]
         this.setupClient(this.app.store.get('username'), this.app.store.get('password'))
     }
-
-
-    getPlatformUrl() {
-        let platformUrl = this.app.store.get('platformUrl')
-        if (platformUrl && platformUrl.length && platformUrl.lastIndexOf('/') !== platformUrl.length - 1) {
-            // Force trailing slash.
-            platformUrl = platformUrl + '/'
-        } else {
-            // Set a default platform url when it's not set.
-            platformUrl = 'https://partner.voipgrid.nl/'
-            this.app.store.set('platformUrl', platformUrl)
-        }
-        return platformUrl
-    }
-
 
     /**
      * Set a http client with or without basic authentication.
      */
     setupClient(username, password) {
-        let clientOptions = {baseURL: this.getPlatformUrl()}
+        let clientOptions = {baseURL: this.app.store.get('platformUrl')}
         if (username && password) {
             this.app.logger.info(`${this}Set api client with basic auth for user ${username}`)
             clientOptions.auth = {
@@ -51,6 +36,10 @@ class Api {
         this.client.interceptors.response.use(function(response) {
             return response
         }, (err) => {
+            // Catch Network Errors.
+            if(err.message == 'Network Error') {
+                return Promise.resolve({'status': 'Network Error'})
+            }
             // Reject all status codes from 500.
             if (err.response.status >= 500) {
                 return Promise.reject(err)

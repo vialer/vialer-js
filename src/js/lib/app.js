@@ -63,8 +63,8 @@ class App extends Skeleton {
     _init() {
         this.settings = {
             analyticsId: 'UA-60726618-9',
-            platformUrl: 'https://partner.voipgrid.nl/',
             realm: 'websocket.voipgrid.nl',
+            platformUrl: this.getPlatformUrl(),
             c2d: 'true',
         }
         if (this.env.extension) {
@@ -79,6 +79,27 @@ class App extends Skeleton {
             this.api = new Api(this)
             this.sip = new Sip(this)
         }
+    }
+
+
+    /**
+     * Get platform URL from storage or set default.
+     */
+    getPlatformUrl() {
+        let platformUrl = this.store.get('platformUrl')
+
+        if(!platformUrl) {
+            // Set a default platform url when it's not set.
+            platformUrl = 'https://partner.voipgrid.nl/'
+            this.store.set('platformUrl', platformUrl)
+        }
+
+        // Force trailing slash.
+        if (platformUrl && platformUrl.length && platformUrl.lastIndexOf('/') !== platformUrl.length - 1) {
+            platformUrl = platformUrl + '/'
+        }
+
+        return platformUrl
     }
 
 
