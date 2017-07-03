@@ -1,5 +1,3 @@
-'use strict'
-
 class I18n {
     constructor(app, messages = false) {
         this.app = app
@@ -19,7 +17,7 @@ class I18n {
         } else {
             if (messageID in this.messages) {
                 return this.messages[messageID].message
-            }
+            } else return messageID
         }
     }
 

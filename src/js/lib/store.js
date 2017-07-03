@@ -1,6 +1,3 @@
-'use strict'
-
-
 /**
  * A meaningful description.
  */

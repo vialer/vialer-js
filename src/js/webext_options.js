@@ -1,5 +1,3 @@
-'use strict'
-
 const Skeleton = require('./lib/skeleton')
 
 class OptionsApp extends Skeleton {
@@ -11,7 +9,7 @@ class OptionsApp extends Skeleton {
     }
 
     saveOptions() {
-        let c2d = document.getElementById('c2d').checked;
+        let c2d = document.getElementById('c2d').checked
         let platformUrl = document.getElementById('platformUrl').value
         this.store.set('c2d', c2d)
         this.store.set('platformUrl', platformUrl)

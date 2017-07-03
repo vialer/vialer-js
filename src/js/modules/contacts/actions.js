@@ -1,5 +1,3 @@
-'use strict'
-
 const Actions = require('../../lib/actions')
 
 
@@ -140,7 +138,7 @@ class ContactsActions extends Actions {
             if (extension && extension.length) {
                 this.app.emit('panel.dial', {'b_number': extension})
             }
-        });
+        })
 
         // Search through contacts while typing.
         $('.search-form :input').keyup((e) => {

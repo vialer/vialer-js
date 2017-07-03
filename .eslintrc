@@ -1,6 +1,10 @@
 {
-    "ecmaVersion": 7,
     "parser": "espree",
+    "parserOptions": {
+        "ecmaVersion": 7,
+        "sourceType": "module",
+        "ecmaFeatures": {}
+    },
     "env": {
         "amd": false,
         "browser": true,
@@ -14,7 +18,8 @@
         "translate": true,
         "tsip_event_code_e": true,
         "tsip_transport_state_e": true,
-        "webkitNotifications": true
+        "webkitNotifications": true,
+        "electron": true
     },
     "plugins": [
 
@@ -166,7 +171,7 @@
         "quotes": [1, "single"],
         "radix": 0,
         "require-yield": 0,
-        "semi": 0,
+        "semi": [2, "never"],
         "semi-spacing": [2, {"before": false, "after": true}],
         "sort-vars": [2, {"ignoreCase": true}],
         "space-before-function-paren": [2, "never"],

@@ -1,5 +1,3 @@
-'use strict'
-
 const Skeleton = require('./lib/skeleton')
 
 const _modules = [

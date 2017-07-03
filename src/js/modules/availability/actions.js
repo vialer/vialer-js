@@ -1,5 +1,3 @@
-'use strict'
-
 const Actions = require('../../lib/actions')
 
 
@@ -69,7 +67,7 @@ class AvailabilityActions extends Actions {
 
             // Update the radiobuttons depending on whether a selected option
             // was provided.
-            $(`.availability-toggle [name="availability"][value="${isAvailable}"]`).prop('checked', true);
+            $(`.availability-toggle [name="availability"][value="${isAvailable}"]`).prop('checked', true)
             // In turn, check whether to enable/disable the dropdown.
             this.module.toggleAvailabilitySelect()
         })

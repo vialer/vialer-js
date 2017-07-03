@@ -1,5 +1,3 @@
-'use strict'
-
 const UiActions = require('./actions')
 
 
@@ -13,13 +11,14 @@ class UiModule {
      * @param {ClickToDialApp} app - The application object.
      */
     constructor(app) {
-        this.actions = new UiActions(app, this)
         this.app = app
+        this.actions = new UiActions(app, this)
     }
 
 
     /**
-     * Display an indicator when retrieving data for widget.
+     * Display a loading indicator on the widget, used when
+     * retrieving data for widget.
      */
     busyWidget(widgetOrWidgetName) {
         this.app.logger.debug(`${this}busy widget`)
@@ -91,10 +90,24 @@ class UiModule {
         this.app.logger.debug(`${this}open widget`)
         let widget = this.getWidget(widgetOrWidgetName)
         const data = widget.data()
-        // Cannot rely on just data.('opened') because this is not transparent to CSS.
-        $(widget).data('opened', true).attr('data-opened', true)
-        // Inform the background that a widget is opened.
-        this.app.emit('ui:widget.open', {name: data.widget})
+        const widgetName = data.widget
+
+        let widgetState = this.app.store.get('widgets')
+        // Opening widgets act as an accordeon. All other widgets are closed,
+        // except the widget that needs to be open.
+        for (const moduleName of Object.keys(widgetState.isOpen)) {
+            let _widget = this.getWidget(widgetOrWidgetName)
+            if (moduleName !== widgetName) {
+                widgetState.isOpen[moduleName] = false
+                this.closeWidget(moduleName)
+            } else {
+                widgetState.isOpen[moduleName] = true
+                $(_widget).data('opened', true).attr('data-opened', true)
+            }
+        }
+        this.app.store.set('widgets', widgetState)
+
+        this.app.emit('ui:widget.open', {name: widgetName})
         if (widget.hasClass('unauthorized')) {
             $(widget).find('.unauthorized-warning').show(10)
         } else {
@@ -104,19 +117,19 @@ class UiModule {
 
 
     /**
-     * Initialize all widgets.
+     * Initialize all widgets. Called from the refresh button in the popup.
      */
-    refreshWidgets(update) {
-        // Resets widget data
+    refreshWidgets(reloadModules) {
+        // Reset widget data when none can be found.
         if (this.app.store.get('widgets') === null) {
-            let widgetData = {isOpen: {}}
+            let widgetState = {isOpen: {}}
             for (let widget in this.app.modules) {
                 // Initial state for widget.
-                widgetData.isOpen[widget] = false
+                widgetState.isOpen[widget] = false
                 // each widget can share variables here.
-                widgetData[widget] = {}
+                widgetState[widget] = {}
             }
-            this.app.store.set('widgets', widgetData)
+            this.app.store.set('widgets', widgetState)
         }
 
         // Initial state for mainpanel.
@@ -129,7 +142,7 @@ class UiModule {
             this.app.emit('ui:widget.busy', {name: widget})
         }
 
-        this.app.reloadModules(update)
+        this.app.reloadModules(reloadModules)
     }
 
 
@@ -143,6 +156,18 @@ class UiModule {
         this.closeWidget(widget)
         if (this.isWidgetOpen(widget)) {
             this.openWidget(widget)
+        }
+    }
+
+
+    /**
+     * Restore the widget state from localstorage.
+     */
+    restoreWidgetState() {
+        let widgetState = this.app.store.get('widgets')
+        for (const moduleName of Object.keys(widgetState.isOpen)) {
+            if (widgetState.isOpen[moduleName]) this.openWidget(moduleName)
+            else this.closeWidget(moduleName)
         }
     }
 
@@ -172,9 +197,10 @@ class UiModule {
 
 
     /**
-     * Show/hide the panel's content.
+     * Show the popup content.
      */
-    showPanel() {
+    showPopup() {
+        this.restoreWidgetState()
         $('.container').removeClass('hide')
     }
 

@@ -1,5 +1,3 @@
-'use strict'
-
 // Wait x miliseconds before resolving the subscribe event,
 // to prevent the server from being hammered.
 const SUBSCRIBE_DELAY = 200
@@ -15,7 +13,7 @@ class Sip {
      * @param {ClickToDialApp} app - The application object.
      */
     constructor(app) {
-        this.app = app
+        this.app = app;
         // Set the verbosity of the Sip library. Useful when you need to
         // debug SIP messages. Supported values are: info, warn, error and fatal.
         SIPml.setDebugLevel('error')

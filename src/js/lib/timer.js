@@ -1,6 +1,3 @@
-'use strict'
-
-
 let registeredTimers = {}
 
 /**
@@ -10,9 +7,9 @@ let registeredTimers = {}
  * @returns {Number} The calculated jitter in ms.
  */
 function jitter(interval, percentage) {
-    let min = 0 - Math.ceil(interval * (percentage / 100));
-    let max = Math.floor(interval * (percentage / 100));
-    return Math.floor(Math.random() * (max - min)) + min;
+    let min = 0 - Math.ceil(interval * (percentage / 100))
+    let max = Math.floor(interval * (percentage / 100))
+    return Math.floor(Math.random() * (max - min)) + min
 }
 
 

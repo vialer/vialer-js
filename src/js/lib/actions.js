@@ -1,4 +1,3 @@
-'use strict'
 /**
  * Generic Actions class to distinguish between tabs, background
  * and contentscript.

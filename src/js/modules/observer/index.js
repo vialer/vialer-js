@@ -1,5 +1,3 @@
-'use strict'
-
 // Identify our elements with these class names.
 const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'

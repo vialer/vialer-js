@@ -1,5 +1,3 @@
-'use strict'
-
 const Actions = require('../../lib/actions')
 
 
@@ -50,7 +48,7 @@ class UserActions extends Actions {
             $('#user-name').text(user.email)
 
             this.app.modules.ui.hideLoginForm()
-            this.app.modules.ui.showPanel()
+            this.app.modules.ui.showPopup()
         })
 
         this.app.on('user:logout.success', (data) => {

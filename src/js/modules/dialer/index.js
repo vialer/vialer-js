@@ -1,5 +1,3 @@
-'use strict'
-
 const DialerActions = require('./actions')
 
 
@@ -248,7 +246,7 @@ class DialerModule {
             'failed_b': this.app.i18n.translate('clicktodialStatusFailedB', bNumber),
         }
 
-        let message = this.app.i18n.translate('clicktodialCallingText');
+        let message = this.app.i18n.translate('clicktodialCallingText')
         if (messages.hasOwnProperty(status)) {
             message = messages[status]
         }
@@ -380,7 +378,7 @@ class DialerModule {
         number = '' + number
 
         // Remove white space characters.
-        return number.replace(/ /g, '');
+        return number.replace(/ /g, '')
     }
 }
 

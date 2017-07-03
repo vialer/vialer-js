@@ -1,5 +1,3 @@
-'use strict'
-
 /**
  * This is the click-to-dial app that runs all scripts
  * combined, replacing all ipc messaging with local
@@ -9,7 +7,7 @@
 
 const ClickToDialApp = require('./lib/app')
 
-window.ResizeSensor = require('css-element-queries').ResizeSensor
+const resizeSensor = require('css-element-queries').ResizeSensor
 
 let isElectron
 
@@ -39,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             width: document.body.clientWidth,
         })
 
-        ResizeSensor(document.body, (e) => {
+        resizeSensor(document.body, (e) => {
             electron.ipcRenderer.send('resize-window', {
                 height: document.body.clientHeight,
                 width: document.body.clientWidth,

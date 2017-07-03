@@ -1,5 +1,3 @@
-'use strict'
-
 const ContactsActions = require('./actions')
 
 
@@ -45,8 +43,6 @@ class ContactsModule {
                     widgetState.contacts.unauthorized = false
                     widgetState.contacts.status = 'connecting'
                     this.app.store.set('widgets', widgetState)
-
-                    this.app.emit('contacts:connecting')
 
                     if (contacts.length) {
                         this.app.emit('contacts:reset')

@@ -1,5 +1,3 @@
-'use strict'
-
 const Actions = require('../../lib/actions')
 
 const phoneIconClassName = 'voipgrid-phone-icon'

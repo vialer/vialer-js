@@ -1,5 +1,3 @@
-'use strict'
-
 const Actions = require('../../lib/actions')
 
 
@@ -81,7 +79,7 @@ class QueuesActions extends Actions {
 
                 // Check if this queue is currently selected.
                 if (selectedQueue && selectedQueue === queue.id) {
-                    listItem.addClass('selected');
+                    listItem.addClass('selected')
                 }
 
                 listItem.data('queue-id', queue.id)

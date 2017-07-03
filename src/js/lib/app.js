@@ -1,5 +1,3 @@
-'use strict'
-
 const Analytics = require('./analytics')
 const Api = require('./api')
 

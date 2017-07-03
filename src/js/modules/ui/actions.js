@@ -1,5 +1,3 @@
-'use strict'
-
 const Actions = require('../../lib/actions')
 
 
@@ -14,8 +12,10 @@ class UiActions extends Actions {
             this.app.browser.tabs.create({url: 'http://wiki.voipgrid.nl/index.php/Chrome_plugin'})
         })
 
+        /**
+         * Set the widget's open state to false.
+         */
         this.app.on('ui:widget.close', (data) => {
-            // Keep track of closed widgets.
             this.app.logger.info(`${this}setting ${data.name} widget state to closed`)
             let widgetState = this.app.store.get('widgets')
             widgetState.isOpen[data.name] = false
@@ -24,11 +24,6 @@ class UiActions extends Actions {
         })
 
         this.app.on('ui:widget.open', (data) => {
-            // Keep track of opened widgets.
-            this.app.logger.info(`${this}setting ${data.name} widget state to opened`)
-            let widgetState = this.app.store.get('widgets')
-            widgetState.isOpen[data.name] = true
-            this.app.store.set('widgets', widgetState)
             this.app.timer.update('queue.size')
         })
 
@@ -37,7 +32,7 @@ class UiActions extends Actions {
         })
 
         this.app.on('ui:ui.refresh', (data) => {
-            this.app.logger.info(`${this}mainpanel.refresh`)
+            this.app.logger.info(`${this}refresh ui`)
             this.app.emit('ui:mainpanel.loading')
             this.module.refreshWidgets(true)
             this.app.emit('ui:mainpanel.ready')
@@ -177,7 +172,7 @@ class UiActions extends Actions {
             let user = this.app.store.get('user')
             $('#user-name').text(user.email)
             this.module.hideLoginForm()
-            this.module.showPanel()
+            this.module.showPopup()
         } else {
             this.app.logger.debug(`${this}no saved state`)
         }
@@ -200,7 +195,7 @@ class UiActions extends Actions {
             case 9:
                 let inputs = $('.login-form :input').filter((index, input) => {
                     return e.currentTarget.tabIndex < input.tabIndex
-                });
+                })
 
                 if (inputs.length === 0) {
                     $('#username').focus()

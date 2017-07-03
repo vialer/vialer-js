@@ -1,5 +1,3 @@
-'use strict'
-
 const AvailabilityActions = require('./actions')
 
 

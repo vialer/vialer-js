@@ -1,5 +1,3 @@
-'use strict'
-
 const EventEmitter = require('events').EventEmitter
 const I18n = require('./i18n')
 const Logger = require('./logger')

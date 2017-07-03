@@ -1,5 +1,3 @@
-'use strict'
-
 module.exports = {
     /**
      * Make an object from location.search.
