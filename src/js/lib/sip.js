@@ -266,6 +266,10 @@ class Sip {
         }
 
         if (complement) {
+            if (!this._sip) {
+                this.app.logger.debug(`${this}not updating from sip server; no sipstack available`)
+                return
+            }
             this.app.logger.debug(`${this}updating sip subscription for ${accountIds.length} account id's`)
 
             // Unsubscribe lost contacts that are in cache, but not in
