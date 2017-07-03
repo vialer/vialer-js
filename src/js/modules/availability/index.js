@@ -101,7 +101,7 @@ class AvailabilityModule {
         // Check if unauthorized.
         const widgetState = this.app.store.get('widgets')
         if (widgetState.availability.unauthorized) {
-            this.app.emit('ui:widget.unauthorized', {name: name})
+            this.app.emit('ui:widget.unauthorized', {name: 'availability'})
             return
         }
 
