@@ -118,7 +118,7 @@ input {
     // don't wrap but put dots at the end if it doesn't fit.
     white-space: nowrap;
     overflow: hidden;
-    width: calc(100% - 150px);
+    width: calc(100% - 155px);
     display: inline-block;
     text-overflow: ellipsis;
 }
