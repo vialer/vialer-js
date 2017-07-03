@@ -52,7 +52,7 @@ input {
 
 .login-form {
     label {
-        font-weight: bold;
+        font-weight: 600;
         display: block;
         margin-bottom: 4px;
     }
@@ -125,7 +125,7 @@ input {
 
 .logout {
     font-size: 11px;
-    font-weight: bold;
+    font-weight: 600;
     float: left;
 
     &:hover {
@@ -220,7 +220,7 @@ input {
 
         label {
             font-size: 14px;
-            font-weight: bold;
+            font-weight: 600;
         }
     }
 
