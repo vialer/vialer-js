@@ -162,7 +162,7 @@ class UiActions extends Actions {
             $('html').addClass('popout')
             $(() => {
                 // Open the contacts widget by default.
-                this.app.modules.ui.actions.openWidget('contacts')
+                this.module.openWidget('contacts')
             })
         }
         // keep track whether this popup is open or closed
