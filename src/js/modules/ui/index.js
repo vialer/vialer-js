@@ -165,9 +165,11 @@ class UiModule {
      */
     restoreWidgetState() {
         let widgetState = this.app.store.get('widgets')
-        for (const moduleName of Object.keys(widgetState.isOpen)) {
-            if (widgetState.isOpen[moduleName]) this.openWidget(moduleName)
-            else this.closeWidget(moduleName)
+        if (widgetState && widgetState.isOpen) {
+            for (const moduleName of Object.keys(widgetState.isOpen)) {
+                if (widgetState.isOpen[moduleName]) this.openWidget(moduleName)
+                else this.closeWidget(moduleName)
+            }
         }
     }
 

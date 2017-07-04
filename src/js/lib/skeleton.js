@@ -24,7 +24,7 @@ class Skeleton extends EventEmitter {
         this.name = options.name
         this.store = new Store(this)
         this.i18n = new I18n(this, options.i18n)
-        this.logger = new Logger()
+        this.logger = new Logger(this)
 
         this._init()
         // Init these modules.

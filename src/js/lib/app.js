@@ -21,7 +21,6 @@ class App extends Skeleton {
         window.cache = {}
 
         this.store = new Store(this)
-        this.timer = new Timer(this)
 
         // Store settings to localstorage.
         for (let key in this.settings) {
@@ -65,6 +64,7 @@ class App extends Skeleton {
             platformUrl: this.getPlatformUrl(),
             c2d: 'true',
         }
+        this.timer = new Timer(this)
         if (this.env.extension) {
             // Only the background script in an extension has a sip stack.
             if (this.env.extension.background) {

@@ -19,7 +19,7 @@ class ObserverModule {
         this.handleMutationsTimeout = null
         this.parkedNodes = []
 
-        this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/print.css')}" media="print">`)
+        this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/webext_print.css')}" media="print">`)
 
         /**
          * Stop listening to DOM mutations. Triggered when

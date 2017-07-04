@@ -302,9 +302,10 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
 
     gulp.watch([
         path.join(__dirname, 'src', '_locales', '**', '*.json'),
-        path.join(__dirname, 'src', 'html', '**', '*.html'),
         path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
     ], ['assets'])
+
+    gulp.watch(path.join(__dirname, 'src', 'html', '**', '*.html'), ['html'])
 
     if (BUILD_TARGET === 'electron') {
         gulp.watch([

@@ -1,37 +1,39 @@
-$fa-font-path: "../fonts";
+$font-path: "../fonts";
+
+$fa-font-path: $font-path;
 @import "font-awesome/scss/font-awesome";
 
 @font-face {
     font-family: "Open Sans";
     font-weight: normal;
     font-style: normal;
-    src: url("/fonts/OpenSans-Regular.woff2") format("woff2");
+    src: url("#{$font-path}/OpenSans-Regular.woff2") format("woff2");
 }
 
 @font-face {
     font-family: "Open Sans";
     font-weight: bold;
     font-style: normal;
-    src: url("/fonts/OpenSans-Bold.woff2") format("woff2");
+    src: url("#{$font-path}/OpenSans-Bold.woff2") format("woff2");
 }
 
 @font-face {
     font-family: "Open Sans";
     font-weight: normal;
     font-style: italic;
-    src: url("/fonts/OpenSans-Italic.woff2") format("woff2");
+    src: url("#{$font-path}/OpenSans-Italic.woff2") format("woff2");
 }
 
 @font-face {
     font-family: "Open Sans";
     font-weight: 600;
     font-style: normal;
-    src: url("/fonts/OpenSans-Semibold.woff2") format("woff2");
+    src: url("#{$font-path}/OpenSans-Semibold.woff2") format("woff2");
 }
 
 @font-face {
     font-family: "Open Sans";
     font-weight: 600;
     font-style: italic;
-    src: url("/fonts/OpenSans-SemiboldItalic.woff2") format("woff2");
+    src: url("#{$font-path}/OpenSans-SemiboldItalic.woff2") format("woff2");
 }

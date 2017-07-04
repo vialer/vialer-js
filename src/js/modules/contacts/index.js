@@ -94,7 +94,8 @@ class ContactsModule {
     _restore() {
         // Check if unauthorized.
         let widgetState = this.app.store.get('widgets')
-        if (widgetState.contacts.unauthorized) {
+        if (!widgetState) this.app.emit('contacts:empty')
+        else if (widgetState.contacts.unauthorized) {
             this.app.logger.debug(`${this}unauthorized to restore`)
             this.app.emit('ui:widget.unauthorized', {name: 'contacts'})
         } else {

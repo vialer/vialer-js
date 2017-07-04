@@ -35,7 +35,7 @@ class Api {
             return response
         }, (err) => {
             // Catch Network Errors.
-            if(err.message == 'Network Error') {
+            if (err.message === 'Network Error') {
                 return Promise.resolve({'status': 'Network Error'})
             }
             // Reject all status codes from 500.
@@ -58,16 +58,8 @@ class Api {
         if (this.app.store.get('user')) {
             // Don't show more than once per login session.
             if (!this.app.store.get('notifications').hasOwnProperty('unauthorized') || !this.app.store.get('notifications').unauthorized) {
-                if (window.webkitNotifications) {
-                    webkitNotifications.createNotification('', '', this.app.i18n.translate('unauthorizedNotificationText')).show()
-                } else {
-                    this.app.browser.notifications.create('unauthorized', {
-                        type: 'basic',
-                        iconUrl: '',
-                        title: this.app.i18n.translate('unauthorizedNotificationText'),
-                        message: '',
-                    }, () => {})
-                }
+                this.app.logger.notification(this.app.i18n.translate('unauthorizedNotificationText'))
+
                 let notificationsData = this.app.store.get('notifications')
                 notificationsData.unauthorized = true
                 this.app.store.set('notifications', notificationsData)

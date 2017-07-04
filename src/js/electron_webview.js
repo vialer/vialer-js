@@ -52,6 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         i18n: require('../_locales/en/messages.json'),
         modules: _modules,
-        name: 'web',
+        name: 'webview',
     })
 })

@@ -57,42 +57,6 @@ class DialerModule {
 
 
     /**
-     * Display a notification regarding what happened to a call. This is
-     * only used when calling silently, without the status dialog(through the
-     * colleagues list).
-     */
-    callStatusNotification(notificationId, text) {
-        let openNotificationTimeout
-        if (!text) {
-            notificationId = 'failed-call'
-            text = this.app.i18n.translate('callStatusNotificationText')
-        }
-
-        let notificationCallback = () => {
-            // Without clearing you can't trigger notifications with the same notificationId (quickly).
-            openNotificationTimeout = setTimeout(() => {
-                this.app.browser.notifications.clear(notificationId, (wasCleared) => {})
-                clearTimeout(openNotificationTimeout)
-                openNotificationTimeout = undefined
-            }, 3000)
-        }
-        if (openNotificationTimeout) {
-            clearTimeout(openNotificationTimeout)
-            openNotificationTimeout = undefined
-            text = `${text} (update)`
-            this.app.browser.notifications.update(notificationId, {title: text}, notificationCallback)
-        } else {
-            this.app.browser.notifications.create(notificationId, {
-                type: 'basic',
-                iconUrl: this.app.browser.runtime.getURL('img/clicktodial-big.png'),
-                title: text,
-                message: '',
-            }, notificationCallback)
-        }
-    }
-
-
-    /**
      * Setup the call between the number from the user's
      * clicktodialaccount and the `b number`; the number the user
      * wants to call..
@@ -111,7 +75,7 @@ class DialerModule {
 
         this.app.api.client.post('api/clicktodial/', {b_number: bNumber}).then((res) => {
             if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-                this.callStatusNotification()
+                this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
                 return
             }
 
@@ -120,7 +84,7 @@ class DialerModule {
                 let callid
                 if (res.data) callid = res.data.callid
                 if (!callid) {
-                    this.callStatusNotification()
+                    this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
                     return
                 }
 
@@ -134,16 +98,14 @@ class DialerModule {
                         this.app.api.client.get(`api/clicktodial/${callid}/`).then((_res) => {
                             if (this.app.api.OK_STATUS.includes(_res.status)) {
                                 const callStatus = _res.data.status
-                                this.app.logger.info(`${this}clicktodial status: ${callStatus}`)
+                                this.app.logger.debug(`${this}clicktodial status: ${callStatus}`)
                                 // Stop after receiving these statuses.
                                 const statuses = ['connected', 'blacklisted', 'disconnected', 'failed_a', 'failed_b']
+                                // Show status in a notification in case it fails/disconnects.
+                                this.app.logger.notification(this.getStatusMessage(callStatus, bNumber))
                                 if (statuses.includes(callStatus)) {
                                     this.app.timer.stopTimer(`dialer:status.update-${callid}`)
                                     this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
-                                    // Show status in a notification in case it fails/disconnects.
-                                    if (callStatus !== 'connected') {
-                                        this.callStatusNotification(callStatus, this.getStatusMessage(status, bNumber))
-                                    }
                                 }
                             } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
                                 // Clear interval, stop timer.

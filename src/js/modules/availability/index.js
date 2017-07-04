@@ -100,7 +100,7 @@ class AvailabilityModule {
     _restore() {
         // Check if unauthorized.
         const widgetState = this.app.store.get('widgets')
-        if (widgetState.availability.unauthorized) {
+        if (widgetState && widgetState.availability.unauthorized) {
             this.app.emit('ui:widget.unauthorized', {name: 'availability'})
             return
         }
@@ -120,7 +120,7 @@ class AvailabilityModule {
         }
 
         // Restore icon.
-        if (widgetState.availability.icon) {
+        if (widgetState && widgetState.availability.icon) {
             if (!widgetState.queues.selected) {
                 this.app.logger.info(`${this}set availability icon`)
                 if (this.app.env.extension) {
@@ -128,7 +128,6 @@ class AvailabilityModule {
                 }
             }
         }
-
 
         // Restore availability.
         this.app.emit('availability:refresh')
