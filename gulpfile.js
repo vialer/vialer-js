@@ -1,5 +1,3 @@
-'use strict'
-
 const {_extend, promisify} = require('util')
 const fs = require('fs')
 const path = require('path')
@@ -42,9 +40,22 @@ const zip = require('gulp-zip')
 const BUILD_DIR = process.env.BUILD_DIR || path.join(__dirname, 'build')
 const BUILD_TARGET = argv.target ? argv.target : 'chrome'
 const BUILD_TARGETS = ['chrome', 'firefox', 'electron']
+
+const PACKAGE = require('./package')
+
+const DISTRIBUTION_NAME = `${PACKAGE.name.toLowerCase()}-${BUILD_TARGET}-${PACKAGE.version}.zip`
+const GULPACTION = argv._[0]
+
+let PRODUCTION
+if (['deploy'].includes(GULPACTION)) {
+    // Possibility to force the production flag before running scripts.
+    PRODUCTION = true
+} else {
+    PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
+}
+
 const NODE_ENV = process.env.NODE_ENV || 'development'
 const NODE_PATH = process.env.NODE_PATH || path.join(__dirname, 'node_modules')
-const PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
 const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
 
@@ -53,7 +64,6 @@ const writeFileAsync = promisify(fs.writeFile)
 let bundlers = {bg: null, popup: null, tab: null, callstatus: null}
 let isWatching
 let sizeOptions = {showTotal: true, showFiles: true}
-
 
 // Verify that the build target is valid.
 if (!BUILD_TARGETS.includes(BUILD_TARGET)) {
@@ -145,6 +155,49 @@ gulp.task('build-clean', `Clean build directory ${path.join(BUILD_DIR, BUILD_TAR
 })
 
 
+/**
+ * A firefox extension version number can only be signed and uploaded once.
+ * The second time will fail.
+ */
+gulp.task('deploy', ['build', 'zip'], function(done) {
+    const api = require('./deploy.json')
+    if (BUILD_TARGET === 'firefox') {
+        let execCommand = `web-ext sign --source-dir ./build/firefox --api-key ${api.firefox.apiKey} --api-secret ${api.firefox.apiSecret} --artifacts-dir ./build/firefox`
+        let child = childExec(execCommand, undefined, (err, stdout, stderr) => {
+            if (stderr) gutil.log(stderr)
+            if (stdout) gutil.log(stdout)
+            done()
+        })
+
+        child.stdout.on('data', function(data) {
+            process.stdout.write(data.toString() + '\r')
+        })
+    } else if (BUILD_TARGET === 'chrome') {
+        const myZipFile = fs.createReadStream(`./build/${DISTRIBUTION_NAME}`)
+        const webStore = require('chrome-webstore-upload')({
+            extensionId: api.chrome.extensionId,
+            clientId: api.chrome.clientId,
+            clientSecret: api.chrome.clientSecret,
+            refreshToken: api.chrome.refreshToken,
+        })
+
+        webStore.fetchToken().then(token => {
+            webStore.uploadExisting(myZipFile, token).then(res => {
+                if (res.uploadState === 'SUCCESS') {
+                    gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
+                    // Can be `default` as well to publish for everyone.
+                    const target = 'trustedTesters'
+                    webStore.publish(target, token).then(_res => {
+                        if (_res.status.includes('OK')) gutil.log(`Succesfully published extension version ${PACKAGE.version} for ${target} to chrome store.`)
+                        else gutil.log(`An error occured duing publishing: ${_res}`)
+                    })
+                } else gutil.log(`An error occured duing uploading: ${res}`)
+            })
+        })
+    }
+})
+
+
 gulp.task('docs', 'Generate documentation.', (done) => {
     let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs`
     childExec(execCommand, undefined, (err, stdout, stderr) => {
@@ -230,6 +283,8 @@ gulp.task('manifest-webext-chrome', 'Generate a web-extension manifest for Chrom
     const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
     let manifest = require('./src/manifest.json')
     manifest.options_ui.chrome_style = true
+    // Reuse the version from the package.json description.
+    manifest.version = PACKAGE.version
     writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
 })
 
@@ -243,6 +298,8 @@ gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Fire
             id: 'click-to-dial@web-extensions',
         },
     }
+    // Reuse the version from the package.json description.
+    manifest.version = PACKAGE.version
     writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
 })
 
@@ -329,12 +386,10 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
 
 
 gulp.task('zip', 'Generate a zip file from the build dir. Useful for extension distribution.', ['build'], function() {
-    const _package = require('./package')
-    const distributionName = `${_package.name.toLowerCase()}-${BUILD_TARGET}-${_package.version}.zip`
     // Build distributable extension.
     return gulp.src([
         `./build/${BUILD_TARGET}/**`,
     ], {base: `./build/${BUILD_TARGET}`})
-    .pipe(zip(distributionName))
+    .pipe(zip(DISTRIBUTION_NAME))
     .pipe(gulp.dest('./build'))
 })

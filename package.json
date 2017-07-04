@@ -1,6 +1,6 @@
 {
   "name": "click-to-dial",
-  "version": "2.0.0",
+  "version": "2.0.10",
   "description": "click-to-dial web extension for Firefox, Chrome & Electron desktop app.",
   "engines": {
     "node": ">=8.0.0"
@@ -28,6 +28,7 @@
   "homepage": "https://github.com/voipgrid/click-to-dial#readme",
   "devDependencies": {
     "browserify": "^14.1.0",
+    "chrome-webstore-upload": "^0.2.1",
     "connect": "^3.6.0",
     "connect-mount": "^1.0.0",
     "del": "^2.2.2",
@@ -47,7 +48,7 @@
     "gulp-sourcemaps": "^2.5.0",
     "gulp-uglify": "^3.0.0",
     "gulp-zip": "^4.0.0",
-    "jsdoc": "git+https://github.com/jvanveen/jsdoc.git#master",
+    "jsdoc": "git+https://github.com/jsdoc3/jsdoc.git#master",
     "jsdoc-rtd": "^1.0.10",
     "mkdirp": "^0.5.1",
     "run-sequence": "^1.2.2",

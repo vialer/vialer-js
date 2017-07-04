@@ -1,0 +1,12 @@
+{
+    "firefox": {
+        "apiKey": "",
+        "apiSecret": ""
+    },
+    "chrome": {
+        "extensionId": "",
+        "clientId": "",
+        "clientSecret": "",
+        "refreshToken": ""
+    }
+}

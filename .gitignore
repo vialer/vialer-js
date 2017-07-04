@@ -3,3 +3,5 @@ build
 docs/build
 .tags
 ./*.zip
+deploy.json
+package-lock.json
