@@ -53,7 +53,7 @@ class UiActions extends Actions {
                 if (res.data) token = res.data.token
                 // add token if possible
                 path = `user/autologin/?token=${token}&username=${this.app.store.get('username')}&next=/${redirectPath}`
-                this.app.browser.tabs.create({url: `${this.app.api.getPlatformUrl()}${path}`})
+                this.app.browser.tabs.create({url: `${this.app.getPlatformUrl()}${path}`})
             })
         })
 
@@ -178,7 +178,7 @@ class UiActions extends Actions {
         }
 
 
-        $(window).on('beforeunload', function(e) {
+        $(window).on('unload', () => {
             this.app.store.set('isMainPanelOpen', false)
         })
 
