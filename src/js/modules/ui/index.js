@@ -39,7 +39,7 @@ class UiModule {
         let widget = this.getWidget(widgetOrWidgetName)
         // Cannot rely on just data.('opened') because this is not transparent to CSS.
         $(widget).data('opened', false).attr('data-opened', false)
-        $(widget).find('.widget-content, .unauthorized-warning').hide(10)
+        $(widget).find('.widget-content, .unauthorized-warning').hide()
     }
 
 
@@ -109,9 +109,9 @@ class UiModule {
 
         this.app.emit('ui:widget.open', {name: widgetName})
         if (widget.hasClass('unauthorized')) {
-            $(widget).find('.unauthorized-warning').show(10)
+            $(widget).find('.unauthorized-warning').show()
         } else {
-            $(widget).find('.widget-content').show(10)
+            $(widget).find('.widget-content').show()
         }
     }
 
@@ -202,8 +202,13 @@ class UiModule {
      * Show the popup content.
      */
     showPopup() {
-        this.restoreWidgetState()
         $('.container').removeClass('hide')
+        this.restoreWidgetState()
+
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=307912
+        setTimeout(() => {
+            $('body').width(401)
+        }, 150);
     }
 
 
