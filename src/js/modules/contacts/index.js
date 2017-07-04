@@ -19,13 +19,14 @@ class ContactsModule {
      * Module load function inits some stuff. The update property is true when
      * refreshing the plugin.
      */
-    _load(update) {
+    _load(update, reopen) {
         if (this.app.env.extension && !this.app.env.extension.background) return
 
         this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         .then((res) => {
-            this.app.emit('ui:widget.reset', {name: 'contacts'})
-
+            if(!reopen) {
+                this.app.emit('ui:widget.reset', {name: 'contacts'})
+            }
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 let contacts = res.data.objects
                 this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
