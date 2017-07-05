@@ -165,6 +165,11 @@ class Skeleton extends EventEmitter {
             }
         }
 
+        environment.os = {}
+        environment.os.linux = navigator.platform.match(/(Linux)/i) ? true : false
+        environment.os.osx = navigator.platform.match(/(Mac)/i) ? true : false
+        environment.os.windows = navigator.platform.match(/(Windows)/i) ? true : false
+
         return environment
     }
 

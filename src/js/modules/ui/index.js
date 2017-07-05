@@ -209,12 +209,16 @@ class UiModule {
     showPopup() {
         $('.container').removeClass('hide')
         this.restoreWidgetState()
-
-        // https://bugs.chromium.org/p/chromium/issues/detail?id=307912
-        setTimeout(() => {
-            const width = $('body').width()
-            $('body').width(width + 1)
-        }, 150)
+        // This is an OSX-related racing bug, caused by the popup animation
+        // that prevents the popup height to be calculated properly.
+        // See https://bugs.chromium.org/p/chromium/issues/detail?id=307912
+        // for more information.
+        if (this.app.env.os.osx) {
+            setTimeout(() => {
+                const width = $('body').width()
+                $('body').width(width + 1)
+            }, 150)
+        }
     }
 
 
