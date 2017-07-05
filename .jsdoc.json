@@ -29,7 +29,7 @@
         "private": true,
         "recurse": true,
         "template": "node_modules/jsdoc-rtd",
-        "tutorials": "./docs/tutorials"
+        "tutorials": "./docs/manuals"
     },
     "package": "./package.json"
 }

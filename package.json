@@ -1,15 +1,16 @@
 {
   "name": "click-to-dial",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "click-to-dial web extension for Firefox, Chrome & Electron desktop app.",
   "engines": {
     "node": ">=8.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "electron": "gulp build --target electron;electron --js-flags='--harmony-async-await' build/electron/electron_main.js",
-    "chromium": "gulp build --target chrome;chromium --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
-    "firefox": "gulp build --target firefox;web-ext run --source-dir build/firefox"
+    "test_chromium": "gulp build --target chrome;chromium --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
+    "test_electron": "gulp build --target electron;electron --js-flags='--harmony-async-await' build/electron/electron_main.js",
+    "test_firefox": "gulp build --target firefox;web-ext run --source-dir build/firefox",
+    "test_webview": "gulp build --target electron;chromium --user-data-dir=/tmp/click-to-dial --disable-web-security --new-window http://localhost:8999/electron/electron_webview.html"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,16 @@
     "voipgrid"
   ],
   "author": "Devhouse Spindle",
+  "contributors": [
+    {
+      "name": "CONTRIBUTORS",
+      "url": "https://github.com/VoIPGRID/click-to-dial/graphs/contributors"
+    }
+  ],
+  "files": [
+    "LICENSE",
+    "build/electron/**"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/voipgrid/click-to-dial/issues"
@@ -51,6 +62,7 @@
     "jsdoc": "git+https://github.com/jsdoc3/jsdoc.git#master",
     "jsdoc-rtd": "^1.0.10",
     "mkdirp": "^0.5.1",
+    "rc": "^1.2.1",
     "run-sequence": "^1.2.2",
     "serve-index": "^1.9.0",
     "serve-static": "^1.12.1",
