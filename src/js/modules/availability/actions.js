@@ -1,8 +1,11 @@
+/**
+ * @module Availability
+ */
 const Actions = require('../../lib/actions')
 
 
 /**
- * All UI related actions for Availability.
+ * Actions for the Availability module.
  */
 class AvailabilityActions extends Actions {
 

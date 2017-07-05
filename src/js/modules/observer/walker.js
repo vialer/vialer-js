@@ -1,3 +1,6 @@
+/**
+ * @module Observer
+ */
 // Identify our elements with these class names.
 const phoneElementClassName = 'voipgrid-phone-number'
 

@@ -1,8 +1,11 @@
+/**
+ * @module Ui
+ */
 const Actions = require('../../lib/actions')
 
 
 /**
- * All UI related actions for the Widgets.
+ * Actions for the Ui module.
  */
 class UiActions extends Actions {
 

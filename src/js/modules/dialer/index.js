@@ -1,9 +1,12 @@
+/**
+ * @module Dialer
+ */
 const DialerActions = require('./actions')
 
 
 /**
- * The Dialer takes care of actually dialing a phonenumber and updating
- * the status about a call.
+ * The Dialer module. It takes care of actually dialing a phonenumber and
+ * updating the status about a call.
  */
 class DialerModule {
 

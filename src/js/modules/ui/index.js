@@ -1,8 +1,11 @@
+/**
+ * @module Ui
+ */
 const UiActions = require('./actions')
 
 
 /**
- * This module holds most of the logic used to interact
+ * The Ui module. It holds most of the logic used to interact
  * with the Click-to-dial UI. It is mainly concerned with generic
  * actions that change the DOM.
  */

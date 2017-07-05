@@ -1,3 +1,6 @@
+/**
+ * @module User
+ */
 const UserActions = require('./actions')
 
 

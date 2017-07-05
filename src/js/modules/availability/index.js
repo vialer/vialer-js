@@ -1,8 +1,11 @@
+/**
+ * @module Availability
+ */
 const AvailabilityActions = require('./actions')
 
 
 /**
- * A meaningful description.
+ * The Availability module.
  */
 class AvailabilityModule {
 

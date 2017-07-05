@@ -1,8 +1,11 @@
+/**
+ * @module Queues
+ */
 const QueuesActions = require('./actions')
 
 
 /**
- * The Queue widget.
+ * The Queues module.
  */
 class QueuesModule {
 

@@ -1,8 +1,11 @@
+/**
+ * @module User
+ */
 const Actions = require('../../lib/actions')
 
 
 /**
- * All User related actions.
+ * Actions for the User module.
  */
 class UserActions extends Actions {
 

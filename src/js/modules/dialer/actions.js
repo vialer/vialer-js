@@ -1,8 +1,14 @@
+/**
+ * @module Dialer
+ */
 const Actions = require('../../lib/actions')
 
 const phoneIconClassName = 'voipgrid-phone-icon'
 
 
+/**
+ * Actions for the Dialer module.
+ */
 class DialerActions extends Actions {
 
     _background() {

@@ -1,8 +1,11 @@
+/**
+ * @module Contacts
+ */
 const ContactsActions = require('./actions')
 
 
 /**
- * The Contacts widget.
+ * The Contacts module.
  */
 class ContactsModule {
     /**
@@ -24,7 +27,7 @@ class ContactsModule {
 
         this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         .then((res) => {
-            if(!reopen) {
+            if (!reopen) {
                 this.app.emit('ui:widget.reset', {name: 'contacts'})
             }
             if (this.app.api.OK_STATUS.includes(res.status)) {

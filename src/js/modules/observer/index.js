@@ -1,3 +1,6 @@
+/**
+ * @module Observer
+ */
 // Identify our elements with these class names.
 const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
@@ -6,7 +9,7 @@ const Walker = require('./walker')
 
 
 /**
- * Injected in all pages and all frames.
+ * The Observer module. Injected in all tabs and all its frames.
  */
 class ObserverModule {
 

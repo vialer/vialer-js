@@ -1,8 +1,11 @@
+/**
+ * @module Contacts
+ */
 const Actions = require('../../lib/actions')
 
 
 /**
- * All UI related actions for Contacts.
+ * Actions for the Contacts module.
  */
 class ContactsActions extends Actions {
     /**

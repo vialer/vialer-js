@@ -1,11 +1,17 @@
+/**
+ * @module Queues
+ */
 const Actions = require('../../lib/actions')
 
 
 /**
- * All UI related actions for the Queues.
+ * Actions for the Queue module.
  */
 class QueuesActions extends Actions {
 
+    /**
+     * Background script related events.
+     */
     _background() {
         // Keep track of selected queue.
         this.app.on('queues:queue.select', (data) => {
@@ -39,6 +45,10 @@ class QueuesActions extends Actions {
         })
     }
 
+
+    /**
+     * Popup script related events.
+     */
     _popup() {
         if (!('queue' in this.app.cache)) {
             this.app.cache.queue = {
