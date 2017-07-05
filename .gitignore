@@ -3,5 +3,5 @@ build
 docs/build
 .tags
 ./*.zip
-deploy.json
+.click-to-dialrc
 package-lock.json
