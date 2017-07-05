@@ -12,7 +12,7 @@
     "templates" : {
         "title": "Click-to-dial",
         "logo": {
-            "url": "../../chrome/img/clicktodial-big.png",
+            "url": "clicktodial-big.png",
             "width": "72px",
             "height": "72px"
         },
@@ -22,6 +22,11 @@
         "tabNames": {
             "api": "Code",
             "tutorials": "Manuals"
+        },
+        "staticFiles": {
+            "include": [
+                "./src/img/clicktodial-big.png"
+            ]
         }
     },
     "opts": {
@@ -30,6 +35,5 @@
         "recurse": true,
         "template": "node_modules/jsdoc-rtd",
         "tutorials": "./docs/manuals"
-    },
-    "package": "./package.json"
+    }
 }

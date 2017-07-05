@@ -196,7 +196,7 @@ gulp.task('deploy', ['build', 'zip'], (done) => {
 
 
 gulp.task('docs', 'Generate documentation.', (done) => {
-    let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs`
+    let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs --package ./package.json`
     childExec(execCommand, undefined, (err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
         if (stdout) gutil.log(stdout)
@@ -206,8 +206,8 @@ gulp.task('docs', 'Generate documentation.', (done) => {
 })
 
 
-gulp.task('docs-deploy', 'Push the docs build directory to github pages.', () => {
-    return gulp.src('./docs/build/**/*').pipe(ghPages())
+gulp.task('docs-deploy', 'Push the docs build directory to github pages.', ['docs'], () => {
+    return gulp.src(`${BUILD_DIR}/docs/**/*`).pipe(ghPages())
 })
 
 
