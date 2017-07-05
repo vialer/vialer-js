@@ -5,5 +5,5 @@ Please use the Firefox addon store or the Chrome store for regular browser
 plugin installation.
 
 The desktop version doesn't have a distribution channel
-yet, except for npm. Check out the [installation](tutorial-install.html) manual
+yet, except for npm. Check out the [documentation](https://voipgrid.github.io/click-to-dial/)
 for detailed information on how to install Click-to-dial from source.
