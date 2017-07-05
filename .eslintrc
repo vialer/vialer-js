@@ -19,7 +19,8 @@
         "tsip_event_code_e": true,
         "tsip_transport_state_e": true,
         "webkitNotifications": true,
-        "electron": true
+        "electron": true,
+        "$": true,
     },
     "plugins": [
 

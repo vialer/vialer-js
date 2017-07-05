@@ -139,7 +139,7 @@ class UiModule {
 
         for (let widget in this.app.modules) {
             // Don't close the widget when the popout is active.
-            if(!reopen) {
+            if (!reopen) {
                 this.app.emit('ui:widget.close', {name: widget})
                 this.app.emit('ui:widget.busy', {name: widget})
             }
@@ -209,8 +209,9 @@ class UiModule {
 
         // https://bugs.chromium.org/p/chromium/issues/detail?id=307912
         setTimeout(() => {
-            $('body').width(401)
-        }, 150);
+            const width = $('body').width()
+            $('body').width(width + 1)
+        }, 150)
     }
 
 
