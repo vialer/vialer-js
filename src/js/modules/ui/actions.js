@@ -34,7 +34,8 @@ class UiActions extends Actions {
         this.app.on('ui:ui.refresh', (data) => {
             this.app.logger.info(`${this}refresh ui`)
             this.app.emit('ui:mainpanel.loading')
-            this.module.refreshWidgets(true)
+            // Reopen the contacts widget when data.popout = true.
+            this.module.refreshWidgets(true, data.popout)
             this.app.emit('ui:mainpanel.ready')
         })
 
@@ -144,7 +145,7 @@ class UiActions extends Actions {
             this.app.emit('help')
         })
         $('#refresh').click((e) => {
-            this.app.emit('ui:ui.refresh')
+            this.app.emit('ui:ui.refresh', {popout: this.app.env.extension.popout})
         })
         $('#settings').click((e) => {
             this.app.emit('ui:settings')

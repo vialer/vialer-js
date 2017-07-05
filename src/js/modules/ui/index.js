@@ -119,7 +119,7 @@ class UiModule {
     /**
      * Initialize all widgets. Called from the refresh button in the popup.
      */
-    refreshWidgets(reloadModules) {
+    refreshWidgets(reloadModules, reopen) {
         // Reset widget data when none can be found.
         if (this.app.store.get('widgets') === null) {
             let widgetState = {isOpen: {}}
@@ -138,11 +138,13 @@ class UiModule {
         }
 
         for (let widget in this.app.modules) {
-            this.app.emit('ui:widget.close', {name: widget})
-            this.app.emit('ui:widget.busy', {name: widget})
+            // Don't close the widget when the popout is active.
+            if(!reopen) {
+                this.app.emit('ui:widget.close', {name: widget})
+                this.app.emit('ui:widget.busy', {name: widget})
+            }
         }
-
-        this.app.reloadModules(reloadModules)
+        this.app.reloadModules(reloadModules, reopen)
     }
 
 

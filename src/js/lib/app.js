@@ -104,12 +104,12 @@ class App extends Skeleton {
     /**
      * Reload all modules that have this method implemented.
      */
-    reloadModules(update) {
+    reloadModules(update, reopen) {
         for (let module in this.modules) {
             // Use 'load' instead of 'restore' to refresh the data on browser restart.
             if (this.modules[module]._load) {
                 this.logger.debug(`${this}(re)loading module ${module}`)
-                this.modules[module]._load(update)
+                this.modules[module]._load(update, reopen)
             }
         }
         this.logger.debug(`${this}${this._listeners} listeners registered`)
