@@ -71,7 +71,7 @@ class Skeleton extends EventEmitter {
             // Allows parent scripts to use the same EventEmitter syntax.
             if (this.env.extension.tab) {
                 window.addEventListener('message', (event) => {
-                    if (this.verbose) this.logger.debug(`${this}emit '${event}' event from child`)
+                    if (this.verbose) this.logger.debug(`${this}emit '${event.data.event}' event from child`)
                     this.emit(event.data.event, event.data.data, true)
                 })
             }
@@ -82,17 +82,7 @@ class Skeleton extends EventEmitter {
      * This method may be overriden to initialize logic before loading
      * modules, e.g. like initializing a sip stack.
      */
-    _init() {
-
-    }
-
-
-    /**
-     * Use `app.devMode`to do more things when in dev mode.
-     */
-    get devMode() {
-        return !('update_url' in this.browser.runtime.getManifest())
-    }
+    _init() {}
 
 
     /**
@@ -165,10 +155,11 @@ class Skeleton extends EventEmitter {
             }
         }
 
-        environment.os = {}
-        environment.os.linux = navigator.platform.match(/(Linux)/i) ? true : false
-        environment.os.osx = navigator.platform.match(/(Mac)/i) ? true : false
-        environment.os.windows = navigator.platform.match(/(Windows)/i) ? true : false
+        environment.os = {
+            linux: navigator.platform.match(/(Linux)/i) ? true : false,
+            osx: navigator.platform.match(/(Mac)/i) ? true : false,
+            windows: navigator.platform.match(/(Windows)/i) ? true : false,
+        }
 
         return environment
     }
