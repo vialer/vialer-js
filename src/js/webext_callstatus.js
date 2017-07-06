@@ -29,7 +29,7 @@ class CallStatusApp extends Skeleton {
         })
 
         $('.callstatus .close').on('click', this.hideCallstatus.bind(this))
-        $(window).on('beforeunload', this.hideCallstatus.bind(this))
+        $(window).on('unload', this.hideCallstatus.bind(this))
 
         // Indication to the tab parent script that it's active.
         this.emit('dialer:callstatus.onshow', {

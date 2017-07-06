@@ -118,8 +118,8 @@ class Timer {
                     this.stopTimer(timerId)
                     registeredTimers[timerId].timer.timeout = setTimeout(timerFunction, timeout)
                 }
-                this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
             }
+            this.app.logger.debug(`${this}set timer ${timerId} with timeout ${timeout}`)
         }
     }
 

@@ -223,12 +223,12 @@ class DialerModule {
     /**
      * Hide panel when clicking outside the iframe.
      */
-    hideFrameOnClick(event) {
+    hideFrameOnClick(callid) {
         $(this.frame).remove()
         delete this.frame
         this.app.emit('dialer:callstatus.onhide', {
             // Extra info to identify call.
-            callid: this.callid,
+            callid: callid,
         })
     }
 
@@ -290,6 +290,8 @@ class DialerModule {
             $(this.frame).show()
         })
         $('html').append(this.frame)
+
+        $('html').on('click', this.hideFrameOnClick.bind(this, callid))
     }
 
 
