@@ -84,17 +84,17 @@ input {
         background: #334;
     }
 
-    .loading {
+    &.loading {
         background: #3c3c50;
     }
 
-    .failed {
+    &.failed {
         background: #f2dede;
         color: #a94442;
         border: 1px solid #ebccd1;
     }
 
-    .info {
+    &.info {
         background: #d9edf7;
         color: #31708f;
         border: 1px solid #bce8f1;
