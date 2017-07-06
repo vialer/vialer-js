@@ -23,6 +23,7 @@ global.app = new TabsApp({
             callstatus: false,
         },
     },
+    i18n: {},
     modules: _modules,
     name: 'tab',
 })

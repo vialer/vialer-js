@@ -3,6 +3,7 @@ const I18n = require('./i18n')
 const Logger = require('./logger')
 const Store = require('./store')
 
+
 /**
  * This is the minimal class that all parts of the click-to-dial
  * application inherit from(tab, contentscript, background, popup/out).
@@ -131,14 +132,6 @@ class Skeleton extends EventEmitter {
      */
     getEnvironment(environment) {
         // If browser exists, use browser, otherwise take the Chrome API.
-        if (window.browser) {
-            this.browser = window.browser
-        } else if (window.chrome) {
-            this.browser = window.chrome
-        } else {
-            this.browser = null
-        }
-
         if (environment.extension) {
             let searchParams = this.utils.parseSearch(location.search)
             if (searchParams.popout) {
@@ -149,11 +142,14 @@ class Skeleton extends EventEmitter {
             if (global.chrome) {
                 environment.extension.isChrome = true
                 environment.extension.isFirefox = false
+                this.browser = chrome
             } else {
                 environment.extension.isChrome = false
                 environment.extension.isFirefox = true
+                this.browser = browser
             }
         }
+
 
         environment.os = {
             linux: navigator.platform.match(/(Linux)/i) ? true : false,

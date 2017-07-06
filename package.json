@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test_chromium": "gulp build --target chrome;chromium --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
     "test_electron": "gulp build --target electron;electron --js-flags='--harmony-async-await' build/electron/electron_main.js",
-    "test_firefox": "gulp build --target firefox;web-ext run --source-dir build/firefox",
+    "test_firefox": "gulp build --target firefox;web-ext run --verbose --source-dir build/firefox",
     "test_webview": "gulp build --target electron;chromium --user-data-dir=/tmp/click-to-dial --disable-web-security --new-window http://localhost:8999/electron/electron_webview.html"
   },
   "repository": {

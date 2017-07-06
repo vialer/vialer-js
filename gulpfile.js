@@ -290,6 +290,7 @@ gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Fire
     const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
     let manifest = require('./src/manifest.json')
     manifest.options_ui.browser_style = true
+    manifest.browser_action.browser_style = true
     manifest.applications = {
         gecko: {
             id: 'click-to-dial@web-extensions',

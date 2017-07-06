@@ -9,6 +9,7 @@ checkout the project and install it's dependencies from npm:
 
     git clone git@github.com:VoIPGRID/click-to-dial.git
     cd click-to-dial
+    npm i -g gulp web-ext
     npm i
 
 
