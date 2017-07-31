@@ -188,7 +188,13 @@ class UiActions extends Actions {
 
 
         // Focus the first input field.
-        $('.login-form :input:visible:first').focus()
+        $(window).on('load', () => {
+            // setTimeout fix for FireFox.
+            setTimeout(() => {
+                $('.login-form :input:visible:first').focus()
+            }, 1)
+        })
+
 
         /**
          * Capture keys in login form.
