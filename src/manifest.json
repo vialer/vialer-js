@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Click-to-dial",
-    "description": "Click-to-dial web extension.",
+    "description": "__MSG_extDescription__",
     "homepage_url": "https://github.com/voipgrid/click-to-dial",
     "icons": {
         "16": "img/call-green-16.png",
