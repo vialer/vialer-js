@@ -215,8 +215,12 @@ class UiModule {
         // for more information.
         if (this.app.env.os.osx) {
             setTimeout(() => {
-                const width = $('body').width()
-                $('body').width(width + 1)
+                // Don't set the width when the html has a popout class
+                // because the popout is responsible and has a fluid width.
+                if (!$('html').hasClass('popout')) {
+                    const width = $('body').width()
+                    $('body').width(width + 1)
+                }
             }, 150)
         }
     }

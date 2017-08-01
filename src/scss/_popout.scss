@@ -85,7 +85,7 @@
 
                 overflow-x: auto;
                 border-top: 0;
-                max-height: none;
+                max-height: calc(100vh - 62px);
                 width: calc(100vw - 26px);
 
                 @media (max-width: 620px) {
