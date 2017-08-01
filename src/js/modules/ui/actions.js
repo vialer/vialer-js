@@ -71,6 +71,11 @@ class UiActions extends Actions {
         })
     }
 
+    _closeMainPanel() {
+        this.app.emit('ui:mainpanel.close')
+        window.close()
+    }
+
 
     _popup() {
         this.app.on('ui:widget.close', (data) => {
@@ -130,8 +135,7 @@ class UiActions extends Actions {
         })
 
         $('#close').click((e) => {
-            this.app.emit('ui:mainpanel.close')
-            window.close()
+            this._closeMainPanel()
         })
 
         /**
@@ -143,15 +147,18 @@ class UiActions extends Actions {
 
         $('#popout').click((e) => {
             this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('webext_popup.html?popout=true')})
+            this._closeMainPanel()
         })
         $('#help').click((e) => {
             this.app.emit('help')
+            this._closeMainPanel()
         })
         $('#refresh').click((e) => {
             this.app.emit('ui:ui.refresh', {popout: this.app.env.extension.popout})
         })
         $('#settings').click((e) => {
             this.app.emit('ui:settings')
+            this._closeMainPanel()
         })
 
 
