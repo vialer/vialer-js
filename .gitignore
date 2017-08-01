@@ -4,4 +4,3 @@ docs/build
 .tags
 ./*.zip
 .click-to-dialrc
-package-lock.json
