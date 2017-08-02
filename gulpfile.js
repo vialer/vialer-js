@@ -44,12 +44,13 @@ const writeFileAsync = promisify(fs.writeFile)
 const BUILD_DIR = process.env.BUILD_DIR || path.join(__dirname, 'build')
 const BUILD_TARGET = argv.target ? argv.target : 'chrome'
 const BUILD_TARGETS = ['chrome', 'firefox', 'electron']
-const DISTRIBUTION_NAME = `${PACKAGE.name.toLowerCase()}-${BUILD_TARGET}-${PACKAGE.version}.zip`
+const DISTRIBUTION_NAME = `${PACKAGE.name.toLowerCase()}-${PACKAGE.version}.zip`
 const GULPACTION = argv._[0]
 const NODE_ENV = process.env.NODE_ENV || 'development'
 const NODE_PATH = path.join(__dirname, 'node_modules') || process.env.NODE_PATH
 const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
+
 // Loads the json API settings from ~/.click-to-dialrc.
 let DEPLOY_SETTINGS = {}
 rc('click-to-dial', DEPLOY_SETTINGS)
@@ -61,10 +62,13 @@ if (!BUILD_TARGETS.includes(BUILD_TARGET)) {
     process.exit()
 }
 gutil.log(`Build target: ${BUILD_TARGET}`)
+
 let PRODUCTION
-// Possibility to force the production flag before running any scripts.
+// Possibility to force the production flag when running certain tasks from
+// the commandline. Use this with care.
 if (['deploy'].includes(GULPACTION)) PRODUCTION = true
 else PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
+
 // Notify developer about some essential build presets.
 if (PRODUCTION) gutil.log('(!) Gulp optimized for production')
 
@@ -145,43 +149,11 @@ gulp.task('build', 'Clean existing build and regenerate a new one.', (done) => {
 })
 
 
-gulp.task('build-clean', `Clean build directory ${path.join(BUILD_DIR, BUILD_TARGET)}`, (done) => {
-    del([path.join(BUILD_DIR, BUILD_TARGET, '**')], {force: true}).then(() => {
-        mkdirp(path.join(BUILD_DIR, BUILD_TARGET), done)
-    })
-})
-
-
-gulp.task('deploy', ['build', 'zip'], (done) => {
-    if (BUILD_TARGET === 'chrome') {
-        const api = DEPLOY_SETTINGS.chrome
-        const zipFile = fs.createReadStream(`./build/${DISTRIBUTION_NAME}`)
-        const webStore = require('chrome-webstore-upload')({
-            extensionId: api.extensionId,
-            clientId: api.clientId,
-            clientSecret: api.clientSecret,
-            refreshToken: api.refreshToken,
-        })
-
-        webStore.fetchToken().then(token => {
-            webStore.uploadExisting(zipFile, token).then(res => {
-                if (res.uploadState === 'SUCCESS') {
-                    gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
-                    // Can be `default` as well to publish for everyone.
-                    webStore.publish(DEPLOY_SETTINGS.audience, token).then(_res => {
-                        if (_res.status.includes('OK')) {
-                            gutil.log(`Succesfully published extension version ${PACKAGE.version} for ${DEPLOY_SETTINGS.audience}.`)
-                        } else gutil.log(`An error occured during publishing: ${_res}`)
-                    })
-                } else gutil.log(`An error occured during uploading: ${res}`)
-            })
-        })
-    } else if (BUILD_TARGET === 'firefox') {
-         // A firefox extension version number can only be signed and
-         // uploaded once using web-ext. The second time will fail with an
-         // unobvious reason.
-        const api = DEPLOY_SETTINGS.firefox
-        let execCommand = `web-ext sign --source-dir ./build/firefox --api-key ${api.apiKey} --api-secret ${api.apiSecret} --artifacts-dir ./build/firefox`
+gulp.task('build-dist', 'Make a build and generate a web-extension zip file.', ['build'], (done) => {
+    // Use the web-ext build method here, so the result will match
+    // the deployable version as closely as possible.
+    if (BUILD_TARGET === 'firefox') {
+        let execCommand = `web-ext build --overwrite-dest --source-dir ./build/${BUILD_TARGET} --artifacts-dir ./dist/${BUILD_TARGET}/`
         let child = childExec(execCommand, undefined, (err, stdout, stderr) => {
             if (stderr) gutil.log(stderr)
             if (stdout) gutil.log(stdout)
@@ -190,6 +162,70 @@ gulp.task('deploy', ['build', 'zip'], (done) => {
 
         child.stdout.on('data', (data) => {
             process.stdout.write(`${data.toString()}\r`)
+        })
+    } else {
+        gulp.src([
+            `./build/${BUILD_TARGET}/**`,
+        ], {base: `./build/${BUILD_TARGET}`})
+        .pipe(zip(DISTRIBUTION_NAME))
+        .pipe(gulp.dest(`./dist/${BUILD_TARGET}/`))
+        .on('end', done)
+    }
+})
+
+
+gulp.task('build-clean', `Clean build directory ${path.join(BUILD_DIR, BUILD_TARGET)}`, (done) => {
+    del([path.join(BUILD_DIR, BUILD_TARGET, '**')], {force: true}).then(() => {
+        mkdirp(path.join(BUILD_DIR, BUILD_TARGET), done)
+    })
+})
+
+
+gulp.task('deploy', (done) => {
+    if (BUILD_TARGET === 'chrome') {
+        runSequence('build-dist', async function() {
+            const api = DEPLOY_SETTINGS.chrome
+            const zipFile = fs.createReadStream(`./dist/${BUILD_TARGET}/${DISTRIBUTION_NAME}`)
+            const webStore = require('chrome-webstore-upload')({
+                extensionId: api.extensionId,
+                clientId: api.clientId,
+                clientSecret: api.clientSecret,
+                refreshToken: api.refreshToken,
+            })
+
+            const token = await webStore.fetchToken()
+            const res = await webStore.uploadExisting(zipFile, token)
+
+            if (res.uploadState !== 'SUCCESS') gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+            else {
+                gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
+                // The default value is `trustedTesters`. Make it `default` to
+                // publish to a broader audience.
+                const _res = webStore.publish(DEPLOY_SETTINGS.audience, token)
+                if (_res.status.includes('OK')) {
+                    gutil.log(`Succesfully published extension version ${PACKAGE.version} for ${DEPLOY_SETTINGS.audience}.`)
+                    done()
+                } else {
+                    gutil.log(`An error occured during publishing: ${JSON.stringify(_res, null, 4)}`)
+                }
+            }
+        })
+    } else if (BUILD_TARGET === 'firefox') {
+        runSequence('build', function() {
+             // A firefox extension version number can only be signed and
+             // uploaded once using web-ext. The second time will fail with an
+             // unobvious reason.
+            const api = DEPLOY_SETTINGS.firefox
+            let _cmd = `web-ext sign --source-dir ./build/${BUILD_TARGET} --api-key ${api.apiKey} --api-secret ${api.apiSecret} --artifacts-dir ./build/${BUILD_TARGET}`
+            let child = childExec(_cmd, undefined, (err, stdout, stderr) => {
+                if (stderr) gutil.log(stderr)
+                if (stdout) gutil.log(stdout)
+                done()
+            })
+
+            child.stdout.on('data', (data) => {
+                process.stdout.write(`${data.toString()}\r`)
+            })
         })
     }
 })
@@ -379,14 +415,4 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         path.join(__dirname, 'src', 'scss', 'webext.scss'),
         path.join(__dirname, 'src', 'scss', '_*.scss'),
     ], ['scss-webext'])
-})
-
-
-gulp.task('zip', 'Generate a zip file from the build dir. Useful for extension distribution.', ['build'], function() {
-    // Build distributable extension.
-    return gulp.src([
-        `./build/${BUILD_TARGET}/**`,
-    ], {base: `./build/${BUILD_TARGET}`})
-    .pipe(zip(DISTRIBUTION_NAME))
-    .pipe(gulp.dest('./build'))
 })
