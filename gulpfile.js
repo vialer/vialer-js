@@ -47,7 +47,7 @@ const BUILD_TARGETS = ['chrome', 'firefox', 'electron']
 const DISTRIBUTION_NAME = `${PACKAGE.name.toLowerCase()}-${BUILD_TARGET}-${PACKAGE.version}.zip`
 const GULPACTION = argv._[0]
 const NODE_ENV = process.env.NODE_ENV || 'development'
-const NODE_PATH = process.env.NODE_PATH || path.join(__dirname, 'node_modules')
+const NODE_PATH = path.join(__dirname, 'node_modules') || process.env.NODE_PATH
 const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
 // Loads the json API settings from ~/.click-to-dialrc.
