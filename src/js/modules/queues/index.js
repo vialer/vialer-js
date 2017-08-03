@@ -195,6 +195,8 @@ class QueuesModule {
                     timeout = 5000
                 }
             }
+
+            this.app.logger.info(`${this}set queue timer timeout to ${timeout}`)
         }
 
         return timeout
