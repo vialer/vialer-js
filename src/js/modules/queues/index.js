@@ -195,6 +195,10 @@ class QueuesModule {
                     timeout = 5000
                 }
             }
+
+            if (!timeout) {
+                this.app.logger.info(`${this}set queue timer timeout to ${timeout}`)
+            }
         }
 
         return timeout
