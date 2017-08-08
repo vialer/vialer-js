@@ -37,8 +37,7 @@ class UiActions extends Actions {
         this.app.on('ui:ui.refresh', (data) => {
             this.app.logger.info(`${this}refresh ui`)
             this.app.emit('ui:mainpanel.loading')
-            // Reopen the contacts widget when data.popout = true.
-            this.module.refreshWidgets(true, data.popout)
+            this.module.refreshWidgets(true)
             this.app.emit('ui:mainpanel.ready')
         })
 
@@ -79,7 +78,10 @@ class UiActions extends Actions {
 
     _popup() {
         this.app.on('ui:widget.close', (data) => {
-            this.module.closeWidget(data.name)
+            // Popout has only the contacts widget open. It can't be closed.
+            if (!this.app.env.extension || (this.app.env.extension && !this.app.env.extension.popout)) {
+                this.module.closeWidget(data.name)
+            }
         })
 
         this.app.on('ui:widget.busy', (data) => {
@@ -118,21 +120,24 @@ class UiActions extends Actions {
 
         /**
          * Open/close the widget's content when clicking its header
-         * (except when it's busy).
+         * (except when it's busy). Popout has only the contacts widget open.
+         * It can't be closed.
          */
-        $('html').on('click', '.widget:not(.busy) .widget-header', (e) => {
-            let widget = $(e.currentTarget).closest('[data-opened]')
-            if (this.module.isWidgetOpen(widget)) {
-                if (!$(e.target).is(':input')) {
-                    this.app.emit('ui:widget.close', {
-                        name: $(widget).data('widget'),
-                    })
-                    this.module.closeWidget(widget)
+        if (!this.app.env.extension || (this.app.env.extension && !this.app.env.extension.popout)) {
+            $('html').on('click', '.widget:not(.busy) .widget-header', (e) => {
+                let widget = $(e.currentTarget).closest('[data-opened]')
+                if (this.module.isWidgetOpen(widget)) {
+                    if (!$(e.target).is(':input')) {
+                        this.app.emit('ui:widget.close', {
+                            name: $(widget).data('widget'),
+                        })
+                        this.module.closeWidget(widget)
+                    }
+                } else {
+                    this.module.openWidget(widget)
                 }
-            } else {
-                this.module.openWidget(widget)
-            }
-        })
+            })
+        }
 
         $('#close').click((e) => {
             this._closeMainPanel()

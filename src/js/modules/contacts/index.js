@@ -22,14 +22,13 @@ class ContactsModule {
      * Module load function inits some stuff. The update property is true when
      * refreshing the plugin.
      */
-    _load(update, reopen) {
+    _load(update) {
         if (this.app.env.extension && !this.app.env.extension.background) return
 
         this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         .then((res) => {
-            if (!reopen) {
-                this.app.emit('ui:widget.reset', {name: 'contacts'})
-            }
+            this.app.emit('ui:widget.reset', {name: 'contacts'})
+
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 let contacts = res.data.objects
                 this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
@@ -54,7 +53,8 @@ class ContactsModule {
                             contacts: contacts,
                             callback: () => {
                                 if (update) {
-                                    this.updateSubscriptions(true)
+                                    let accountIds = widgetState.contacts.list.map((c) => c.account_id)
+                                    this.app.sip.updatePresence(accountIds, true)
                                 } else {
                                     this.app.sip.initStack()
                                 }
@@ -111,7 +111,8 @@ class ContactsModule {
                 this.app.emit('contacts:fill', {
                     contacts: contacts,
                     callback: () => {
-                        this.updateSubscriptions(false)
+                        let accountIds = widgetState.contacts.list.map((c) => c.account_id)
+                        this.app.sip.updatePresence(accountIds, false)
                     },
                 })
             } else {
@@ -123,13 +124,6 @@ class ContactsModule {
 
     toString() {
         return `${this.app}[contacts] `
-    }
-
-
-    updateSubscriptions(reload) {
-        let widgetState = this.app.store.get('widgets')
-        let accountIds = widgetState.contacts.list.map((c) => c.account_id)
-        this.app.sip.updatePresence(accountIds, reload)
     }
 }
 

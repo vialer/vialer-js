@@ -93,7 +93,6 @@ class Sip {
      * @param {Event} e - Catch-all event when SipML UA tries to connect to the websocket proxy.
      */
     sipStatusEvent(e) {
-        let retry
         let retryTimeoutDefault = {interval: 2500, limit: 9000000}
 
         this.status = e.type
@@ -253,19 +252,10 @@ class Sip {
      * @param {Array} accountIds - The accountIds to update presence for.
      * @param {Boolean} complement - Complement missing presence states.
      */
-    async updatePresence(accountIds, complement) {
-        const accountIdsWithState = accountIds.filter((accountId) => accountId in this.states)
-        const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
-
-        // Update already known and connected account presences first.
-        for (let accountId of accountIdsWithState) {
-            this.app.emit('sip:presence.update', {
-                'account_id': accountId,
-                'state': this.states[accountId].state,
-            })
-        }
-
-        if (complement) {
+    async updatePresence(accountIds, reload) {
+        // Message UI that it should show a loading icon.
+        this.app.emit('sip:starting', {})
+        if (!reload) {
             if (!this._sip) {
                 this.app.logger.debug(`${this}not updating from sip server; no sipstack available`)
                 return
@@ -274,11 +264,12 @@ class Sip {
 
             // Unsubscribe lost contacts that are in cache, but not in
             // the accountIds refresh array.
-            const lostAccountIds = Object.keys(this.states).filter((k, v) => accountIds.includes(k))
-            for (let accountId of lostAccountIds) {
+            const cachedAccountIds = Object.keys(this.states).filter((k, v) => accountIds.includes(k))
+            for (let accountId of cachedAccountIds) {
                 this.unsubscribePresence(accountId)
             }
 
+            const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
             // Don't do this in parallel, to keep the load on the websocket
             // server low. Also subscribePresence has a fixed timeout before
             // it resolves the connected state, to further slow down the
@@ -286,9 +277,23 @@ class Sip {
             for (const accountId of accountIdsWithoutState) {
                 await this.subscribePresence(accountId)
             }
-
-            this.app.emit('sip:presences.updated')
+        } else {
+            this.states = {}
+            for (const accountId of accountIds) {
+                await this.subscribePresence(accountId)
+            }
         }
+
+        // Update presence item state in the UI.
+        for (let accountId of accountIds) {
+            this.app.emit('sip:presence.update', {
+                'account_id': accountId,
+                'state': this.states[accountId].state,
+            })
+        }
+
+        // Clear loading indicator in the ui.
+        this.app.emit('sip:presences.updated')
     }
 }
 
