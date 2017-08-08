@@ -96,8 +96,7 @@ class ContactsActions extends Actions {
             $('.widget.contacts .empty-list').addClass('hide')
 
             // Reset search.
-            searchQuery = ''
-            $('.search-form :input').val(searchQuery)
+            $('.search-form :input').val('')
             $('.widget.contacts .contact').removeClass('hide')
         })
 

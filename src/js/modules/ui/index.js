@@ -122,7 +122,7 @@ class UiModule {
     /**
      * Initialize all widgets. Called from the refresh button in the popup.
      */
-    refreshWidgets(reloadModules, reopen) {
+    refreshWidgets(reloadModules) {
         // Reset widget data when none can be found.
         if (this.app.store.get('widgets') === null) {
             let widgetState = {isOpen: {}}
@@ -142,12 +142,10 @@ class UiModule {
 
         for (let widget in this.app.modules) {
             // Don't close the widget when the popout is active.
-            if (!reopen) {
-                this.app.emit('ui:widget.close', {name: widget})
-                this.app.emit('ui:widget.busy', {name: widget})
-            }
+            this.app.emit('ui:widget.close', {name: widget})
+            this.app.emit('ui:widget.busy', {name: widget})
         }
-        this.app.reloadModules(reloadModules, reopen)
+        this.app.reloadModules(reloadModules)
     }
 
 
@@ -158,7 +156,10 @@ class UiModule {
         this.app.logger.debug(`${this}reset widget`)
         let widget = this.getWidget(widgetOrWidgetName)
         $(widget).removeClass('busy').removeClass('unauthorized')
-        this.closeWidget(widget)
+        // Only close a widget when it's not a popout.
+        if (!this.app.env.extension || (this.app.env.extension && !this.app.env.extension.popout)) {
+            this.closeWidget(widget)
+        }
         if (this.isWidgetOpen(widget)) {
             this.openWidget(widget)
         }

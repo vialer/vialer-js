@@ -54,11 +54,15 @@
         box-sizing: border-box;
         position: relative;
 
-        border-left: 1px solid transparent;
-        border-right: 1px solid transparent;
+        border: 0 1px 0 1px solid transparent;
         // flex: 1 0 40px;
         display: flex;
         flex-direction: column;
+
+        // The space for collapsing the widget should be gone.
+        .search-form {
+            right: 10px;
+        }
 
         .widget-header {
             flex: 0 0 40px;
@@ -68,6 +72,11 @@
             margin-right: -1px;
             border-left: 1px solid #d5d5d5;
             border-right: 1px solid #d5d5d5;
+
+            // The widget is not collapsable. Hide the collapse icon.
+            .widget-title {
+                background: none;
+            }
         }
 
         .widget-content {
