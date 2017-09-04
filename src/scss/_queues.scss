@@ -43,6 +43,10 @@
             color: #78788c;
             font-weight: normal;
         }
+
+        &:nth-child(odd) {
+            background: #f9f9f9;
+        }
     }
 
     .empty-list .queue .text {
