@@ -7,6 +7,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "test_chrome": "gulp build --target chrome;chrome --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
     "test_chromium": "gulp build --target chrome;chromium --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
     "test_electron": "gulp build --target electron;electron --js-flags='--harmony-async-await' build/electron/electron_main.js",
     "test_firefox": "gulp build --target firefox;web-ext run --verbose --source-dir build/firefox",
