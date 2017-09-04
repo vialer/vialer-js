@@ -59,6 +59,7 @@ DEPLOY_SETTINGS.audience = argv.audience ? argv.audience : 'trustedTesters'
 // Verify that the build target is valid.
 if (!BUILD_TARGETS.includes(BUILD_TARGET)) {
     gutil.log(`Invalid build target: ${BUILD_TARGET}`)
+    // eslint-disable-next-line no-process-exit
     process.exit()
 }
 gutil.log(`Build target: ${BUILD_TARGET}`)
@@ -72,14 +73,24 @@ else PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 
 // Notify developer about some essential build presets.
 if (PRODUCTION) gutil.log('(!) Gulp optimized for production')
 
-let bundlers = {bg: null, popup: null, tab: null, callstatus: null}
+let bundlers = {
+    bg: null,
+    callstatus: null,
+    popup: null,
+    tab: null,
+}
 let isWatching
-let sizeOptions = {showTotal: true, showFiles: true}
+let sizeOptions = {
+    showFiles: true,
+    showTotal: true,
+}
 
 
 /**
- * Generic browserify task used for multiple entrypoints.
- */
+* Generic browserify task used for multiple entrypoints.
+* @param {String} name - Name of the javascript entrypoint.
+* @returns {Function} - Browerserify bundle function to use.
+*/
 const jsEntry = (name) => {
     return (done) => {
         if (!bundlers[name]) {
@@ -92,60 +103,78 @@ const jsEntry = (name) => {
             if (isWatching) bundlers[name].plugin(watchify)
         }
         bundlers[name].bundle()
-        .on('error', notify.onError('Error: <%= error.message %>'))
-        .on('end', () => {
-            done()
-        })
-        .pipe(source(`${name}.js`))
-        .pipe(buffer())
-        .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
-        .pipe(envify({NODE_ENV: NODE_ENV}))
-        .pipe(ifElse(PRODUCTION, () => minifier()))
+            .on('error', notify.onError('Error: <%= error.message %>'))
+            .on('end', () => {
+                done()
+            })
+            .pipe(source(`${name}.js`))
+            .pipe(buffer())
+            .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
+            .pipe(envify({NODE_ENV: NODE_ENV}))
+            .pipe(ifElse(PRODUCTION, () => minifier()))
 
-        .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
-        .pipe(gulp.dest(`./build/${BUILD_TARGET}/js`))
-        .pipe(size(_extend({title: `${name}.js`}, sizeOptions)))
+            .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))
+            .pipe(gulp.dest(`./build/${BUILD_TARGET}/js`))
+            .pipe(size(_extend({title: `${name}.js`}, sizeOptions)))
     }
 }
 
+
 /**
- * Generic scss task used for multiple entrypoints.
- */
+* Generic scss task used for multiple entrypoints.
+* @param {String} name - Name of the scss entrypoint.
+* @returns {Function} - Sass function to use.
+*/
 const scssEntry = (name) => {
     return () => {
         return gulp.src(`./src/scss/${name}.scss`)
-        .pipe(sass({
-            includePaths: NODE_PATH,
-            sourceMap: !PRODUCTION,
-            sourceMapContents: !PRODUCTION,
-            sourceMapEmbed: !PRODUCTION,
-        }))
-        .on('error', notify.onError('Error: <%= error.message %>'))
-        .pipe(concat(`${name}.css`))
-        .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
-        .pipe(gulp.dest(`./build/${BUILD_TARGET}/css`))
-        .pipe(size(_extend({title: `scss-${name}`}, sizeOptions)))
-        .pipe(ifElse(isWatching, livereload))
+            .pipe(sass({
+                includePaths: NODE_PATH,
+                sourceMap: !PRODUCTION,
+                sourceMapContents: !PRODUCTION,
+                sourceMapEmbed: !PRODUCTION,
+            }))
+            .on('error', notify.onError('Error: <%= error.message %>'))
+            .pipe(concat(`${name}.css`))
+            .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
+            .pipe(gulp.dest(`./build/${BUILD_TARGET}/css`))
+            .pipe(size(_extend({title: `scss-${name}`}, sizeOptions)))
+            .pipe(ifElse(isWatching, livereload))
     }
 }
 
 
 gulp.task('assets', 'Copy click-to-dial assets to the build directory.', ['fonts'], () => {
     return gulp.src('./src/img/{*.png,*.jpg}', {base: './src'})
-    .pipe(ifElse(PRODUCTION, imagemin))
-    .pipe(addsrc('./LICENSE'))
-    .pipe(addsrc('./README.md'))
-    .pipe(addsrc('./src/_locales/**', {base: './src/'}))
-    .pipe(addsrc('./src/js/lib/thirdparty/**/*.js', {base: './src/'}))
-    .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
-    .pipe(size(_extend({title: 'assets'}, sizeOptions)))
-    .pipe(ifElse(isWatching, livereload))
+        .pipe(ifElse(PRODUCTION, imagemin))
+        .pipe(addsrc('./LICENSE'))
+        .pipe(addsrc('./README.md'))
+        .pipe(addsrc('./src/_locales/**', {base: './src/'}))
+        .pipe(addsrc('./src/js/lib/thirdparty/**/*.js', {base: './src/'}))
+        .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
+        .pipe(size(_extend({title: 'assets'}, sizeOptions)))
+        .pipe(ifElse(isWatching, livereload))
 })
 
 
 gulp.task('build', 'Clean existing build and regenerate a new one.', (done) => {
-    if (BUILD_TARGET !== 'electron') runSequence('build-clean', ['assets', 'html', 'js-vendor', 'js-webext', 'scss'], done)
-    else runSequence('build-clean', ['assets', 'html', 'js-electron-main', 'js-electron-webview', 'js-vendor', 'scss'], done)
+    if (BUILD_TARGET !== 'electron') {
+        runSequence('build-clean', [
+            'assets',
+            'html',
+            'js-vendor',
+            'js-webext',
+            'scss',
+        ], done)
+    } else {
+        runSequence('build-clean', [
+            'assets',
+            'html',
+            'js-electron-main',
+            'js-electron-webview',
+            'js-vendor',
+            'scss'], done)
+    }
 })
 
 
@@ -153,6 +182,7 @@ gulp.task('build-dist', 'Make a build and generate a web-extension zip file.', [
     // Use the web-ext build method here, so the result will match
     // the deployable version as closely as possible.
     if (BUILD_TARGET === 'firefox') {
+        // eslint-disable-next-line max-len
         let execCommand = `web-ext build --overwrite-dest --source-dir ./build/${BUILD_TARGET} --artifacts-dir ./dist/${BUILD_TARGET}/`
         let child = childExec(execCommand, undefined, (err, stdout, stderr) => {
             if (stderr) gutil.log(stderr)
@@ -167,9 +197,9 @@ gulp.task('build-dist', 'Make a build and generate a web-extension zip file.', [
         gulp.src([
             `./build/${BUILD_TARGET}/**`,
         ], {base: `./build/${BUILD_TARGET}`})
-        .pipe(zip(DISTRIBUTION_NAME))
-        .pipe(gulp.dest(`./dist/${BUILD_TARGET}/`))
-        .on('end', done)
+            .pipe(zip(DISTRIBUTION_NAME))
+            .pipe(gulp.dest(`./dist/${BUILD_TARGET}/`))
+            .on('end', done)
     }
 })
 
@@ -187,22 +217,24 @@ gulp.task('deploy', (done) => {
             const api = DEPLOY_SETTINGS.chrome
             const zipFile = fs.createReadStream(`./dist/${BUILD_TARGET}/${DISTRIBUTION_NAME}`)
             const webStore = require('chrome-webstore-upload')({
-                extensionId: api.extensionId,
                 clientId: api.clientId,
                 clientSecret: api.clientSecret,
+                extensionId: api.extensionId,
                 refreshToken: api.refreshToken,
             })
 
             const token = await webStore.fetchToken()
             const res = await webStore.uploadExisting(zipFile, token)
 
-            if (res.uploadState !== 'SUCCESS') gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
-            else {
+            if (res.uploadState !== 'SUCCESS') {
+                gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+            } else {
                 gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
                 // The default value is `trustedTesters`. Make it `default` to
                 // publish to a broader audience.
                 const _res = webStore.publish(DEPLOY_SETTINGS.audience, token)
                 if (_res.status.includes('OK')) {
+                    // eslint-disable-next-line max-len
                     gutil.log(`Succesfully published extension version ${PACKAGE.version} for ${DEPLOY_SETTINGS.audience}.`)
                     done()
                 } else {
@@ -212,10 +244,11 @@ gulp.task('deploy', (done) => {
         })
     } else if (BUILD_TARGET === 'firefox') {
         runSequence('build', function() {
-             // A firefox extension version number can only be signed and
-             // uploaded once using web-ext. The second time will fail with an
-             // unobvious reason.
+            // A firefox extension version number can only be signed and
+            // uploaded once using web-ext. The second time will fail with an
+            // unobvious reason.
             const api = DEPLOY_SETTINGS.firefox
+            // eslint-disable-next-line max-len
             let _cmd = `web-ext sign --source-dir ./build/${BUILD_TARGET} --api-key ${api.apiKey} --api-secret ${api.apiSecret} --artifacts-dir ./build/${BUILD_TARGET}`
             let child = childExec(_cmd, undefined, (err, stdout, stderr) => {
                 if (stderr) gutil.log(stderr)
@@ -232,6 +265,7 @@ gulp.task('deploy', (done) => {
 
 
 gulp.task('docs', 'Generate documentation.', (done) => {
+    // eslint-disable-next-line max-len
     let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs --package ./package.json`
     childExec(execCommand, undefined, (err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
@@ -251,14 +285,14 @@ gulp.task('fonts', 'Copy fonts to the build directory.', () => {
     const fontAwesomePath = path.join(NODE_PATH, 'font-awesome', 'fonts')
     const opensansPath = path.join(NODE_PATH, 'npm-font-open-sans', 'fonts')
     return gulp.src(path.join(fontAwesomePath, 'fontawesome-webfont.woff2'))
-    .pipe(addsrc(path.join(opensansPath, 'Bold', 'OpenSans-Bold.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'Italic', 'OpenSans-Italic.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'Semibold', 'OpenSans-Semibold.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'SemiboldItalic', 'OpenSans-SemiboldItalic.woff2')))
-    .pipe(addsrc(path.join(opensansPath, 'Regular', 'OpenSans-Regular.woff2')))
-    .pipe(flatten())
-    .pipe(gulp.dest(`./build/${BUILD_TARGET}/fonts`))
-    .pipe(size(_extend({title: 'fonts'}, sizeOptions)))
+        .pipe(addsrc(path.join(opensansPath, 'Bold', 'OpenSans-Bold.woff2')))
+        .pipe(addsrc(path.join(opensansPath, 'Italic', 'OpenSans-Italic.woff2')))
+        .pipe(addsrc(path.join(opensansPath, 'Semibold', 'OpenSans-Semibold.woff2')))
+        .pipe(addsrc(path.join(opensansPath, 'SemiboldItalic', 'OpenSans-SemiboldItalic.woff2')))
+        .pipe(addsrc(path.join(opensansPath, 'Regular', 'OpenSans-Regular.woff2')))
+        .pipe(flatten())
+        .pipe(gulp.dest(`./build/${BUILD_TARGET}/fonts`))
+        .pipe(size(_extend({title: 'fonts'}, sizeOptions)))
 })
 
 
@@ -266,9 +300,9 @@ gulp.task('html', 'Add html to the build directory.', () => {
     let target = 'electron'
     if (BUILD_TARGET !== 'electron') target = 'webext'
     return gulp.src(path.join('src', 'html', `${target}*.html`))
-    .pipe(ifElse(!PRODUCTION, () => addsrc(path.join('src', 'html', 'test.html'))))
-    .pipe(flatten())
-    .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
+        .pipe(ifElse(!PRODUCTION, () => addsrc(path.join('src', 'html', 'test.html'))))
+        .pipe(flatten())
+        .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
 })
 
 
@@ -282,9 +316,9 @@ gulp.task('js-electron', [
 })
 gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-electron-webview'], () => {
     return gulp.src('./src/js/electron_main.js', {base: './src/js/'})
-    .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
-    .pipe(size(_extend({title: 'electron-main'}, sizeOptions)))
-    .pipe(ifElse(isWatching, livereload))
+        .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
+        .pipe(size(_extend({title: 'electron-main'}, sizeOptions)))
+        .pipe(ifElse(isWatching, livereload))
 })
 gulp.task('js-electron-webview', 'Generate electron webview js.', jsEntry('electron_webview'))
 
@@ -306,7 +340,8 @@ gulp.task('js-webext', 'Generate webextension js.', [
 })
 gulp.task('js-webext-bg', 'Generate the extension background entry js.', jsEntry('webext_bg'))
 gulp.task('js-webext-callstatus', 'Generate the callstatus entry js.', jsEntry('webext_callstatus'))
-gulp.task('js-webext-observer', 'Generate webextension observer js which runs in all tab frames.', jsEntry('webext_observer'))
+// eslint-disable-next-line max-len
+gulp.task('js-webext-observer', 'Generate webextension observer js that runs in all tab frames.', jsEntry('webext_observer'))
 gulp.task('js-webext-options', 'Generate webextension options js.', jsEntry('webext_options'))
 gulp.task('js-webext-popup', 'Generate webextension popup/popout js.', jsEntry('webext_popup'))
 gulp.task('js-webext-tab', 'Generate webextension tab js.', jsEntry('webext_tab'))
@@ -355,7 +390,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     isWatching = true
     livereload.listen({silent: false})
     app.use(serveStatic(path.join(__dirname, 'build')))
-    app.use('/', serveIndex(path.join(__dirname, 'build'), {'icons': false}))
+    app.use('/', serveIndex(path.join(__dirname, 'build'), {icons: false}))
     app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
     http.createServer(app).listen(8999)
     gulp.watch([

@@ -281,7 +281,23 @@ input {
     font-size: 19px;
 
     &.fa-vertical-align {
-        margin-top: -3px;
+        margin-top: -2px;
         vertical-align: middle;
     }
+}
+
+.status-indicator {
+    display: none;
+}
+
+
+@keyframes fa-blink {
+    0% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.fa-blink {
+    transition-timing-function: ease;
+    animation: fa-blink 1s linear infinite;
 }

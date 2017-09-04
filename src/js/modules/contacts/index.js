@@ -59,7 +59,9 @@ class ContactsModule {
                                     let accountIds = widgetState.contacts.list.map((c) => c.account_id)
                                     this.app.sip.updatePresence(accountIds, true)
                                 } else {
-                                    this.app.sip.initStack()
+                                    // Start the stack once we got all contacts
+                                    // from the api.
+                                    this.app.sip.connect()
                                 }
                             },
                             contacts: contacts,

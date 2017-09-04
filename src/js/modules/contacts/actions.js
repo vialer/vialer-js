@@ -106,30 +106,43 @@ class ContactsActions extends Actions {
             $('.widget.contacts .contact').removeClass('hide')
         })
 
-        this.app.on('sip:failed_to_start', (data) => {
-            $('.contacts .connection-icon').hide().filter('.no-connection').css('display', 'inline-block')
-        })
-
         this.app.on('sip:presence.update', (data) => {
             let account_id = data.account_id
             let state = data.state
             $(`#sip${account_id} .status-icon`).removeClass('available unavailable busy ringing shake').addClass(state)
         })
 
+        this.app.on('sip:presences.start_update', (data) => {
+            $('.contacts .status-indicator').hide().filter('.updating-presence-status').css('display', 'inline-block')
+        })
+
         /**
          * Hide the sip presence update indicator.
          */
         this.app.on('sip:presences.updated', (data) => {
-            $('.contacts .connection-icon').hide()
+            $('.contacts .status-indicator').hide()
         })
 
-        this.app.on('sip:starting', () => {
-            $('.contacts .connection-icon').hide().filter('.connecting').css('display', 'inline-block')
+        this.app.on('sip:before_start', () => {
+            $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
+        })
+
+        this.app.on('sip:starting', (e) => {
+            $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
+            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
+        })
+
+        this.app.on('sip:failed_to_start', (data) => {
+            $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
+        })
+
+        this.app.on('sip:started', () => {
+            $('.contacts .status-indicator').hide()
             $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
         })
 
         this.app.on('sip:stopped', (e) => {
-            $('.contacts .connection-icon').hide().filter('.connecting').css('display', 'inline-block')
+            $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
             $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
         })
 

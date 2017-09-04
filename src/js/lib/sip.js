@@ -22,6 +22,22 @@ class Sip {
         this.reconnect = true
         this.states = {}
         this.subscriptions = {}
+        // Emit to the frontend that the sip client is not yet
+        // ready to start.
+        this.app.emit('sip:before_start', {})
+    }
+
+
+    /**
+     * Connect SipML5 to the websocket SIP backend.
+     */
+    connect() {
+        this.app.logger.debug(`${this}connecting to sip backend`)
+        if (this._sip) {
+            this._sip.start()
+        } else {
+            this.initStack()
+        }
     }
 
 
@@ -56,10 +72,12 @@ class Sip {
     initStack() {
         this.app.logger.debug(`${this}init SIP stack`)
         this.stopped = false
+        // The sip stack was already initialized. Just reconnect.
         if (this._sip) {
-            this._sip.start()
+            this.app.logger.warn(`${this}SIP stack is already active`)
             return
         }
+
         SIPml.init((e) => {
             this.app.logger.debug(`${this}starting SIP stack`)
             let userAgent = `Click-to-dial v${this.app.version()}`
@@ -106,7 +124,7 @@ class Sip {
             this.app.emit('sip:failed_to_start', {}, 'both')
             if (this.reconnect) {
                 if (!this.retry) this.retry = Object.assign({}, retryTimeoutDefault)
-                setTimeout(this.initStack.bind(this), this.retry.interval)
+                setTimeout(this.connect.bind(this), this.retry.interval)
                 this.retry = this.app.timer.increaseTimeout(this.retry)
             }
             break
@@ -196,6 +214,8 @@ class Sip {
     * @returns {Promise} - Resolved when the subscription is ready.
     */
     subscribePresence(accountId) {
+        if (this.status === 'stopped') return false
+
         return new Promise((resolve, reject) => {
             // Keep reference to prevent subscribing multiple times.
             this.subscriptions[accountId] = this._sip.newSession('subscribe', {
@@ -256,8 +276,7 @@ class Sip {
     * @param {Boolean} reload - Reload presence from SIP server when true.
     */
     async updatePresence(accountIds, reload) {
-        // Message UI that it should show a loading icon.
-        this.app.emit('sip:starting', {})
+        this.app.emit('sip:presences.start_update')
         if (!reload) {
             if (!this._sip) {
                 this.app.logger.debug(`${this}not updating from sip server; no sipstack available`)
