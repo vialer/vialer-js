@@ -270,6 +270,8 @@ class DialerModule {
             'top': '0',
             'width': '320px',
             'z-index': '2147483647',
+            'border': 'none',
+            'background': '#fff',
         }
 
         this.frame = $('<iframe>', {

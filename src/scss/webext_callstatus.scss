@@ -5,18 +5,18 @@
 .callstatus {
     width: 100%;
     height: 81px;
-    background: #fff;
     font-family: "Open Sans", "Helvetica Neue", Arial, sans-serif;
     font-size: 12px;
-    box-shadow: rgba(0, 0, 0, 0.25) 0 0 0 2038px, rgba(0, 0, 0, 0.25) 0 10px 20px;
     // Center popup.
     margin-left: 0;
     margin-top: 0;
     position: fixed;
+    border-radius: 5px;
 
     .heading {
         color: #3c3c50;
-        background: linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+        // background: linear-gradient(top, #fafafa 0%, #e9e9e9 100%);
+        background: linear-gradient(to bottom, #fafafa 0%,#e9e9e9 100%);
         border-bottom: 1px solid #d5d5d5;
         line-height: 40px;
         height: 40px;
@@ -24,6 +24,8 @@
         padding: 0 6px;
         letter-spacing: 0.2px;
         font-size: 14px;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
 
         // Force fixed height to include border-width.
         -webkit-box-sizing: border-box;
