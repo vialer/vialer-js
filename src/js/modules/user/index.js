@@ -1,12 +1,12 @@
 /**
- * @module User
- */
+* @module User
+*/
 const UserActions = require('./actions')
 
 
 /**
- * The User module.
- */
+* The User module.
+*/
 class UserModule {
 
     constructor(app) {
@@ -16,10 +16,12 @@ class UserModule {
 
 
     /**
-     * Make an api call with the current basic authentication to retrieve
-     * profile information with. Save the credentials in storage when the call
-     * is succesful, otherwise remove the credentials from the store.
-     */
+    * Make an api call with the current basic authentication to retrieve
+    * profile information with. Save the credentials in storage when the call
+    * is succesful, otherwise remove the credentials from the store.
+    * @param {String} username - Username to login with.
+    * @param {String} password - Password to login with.
+    */
     login(username, password) {
         this.app.api.setupClient(username, password)
         this.app.api.client.get('api/permission/systemuser/profile/').then((res) => {

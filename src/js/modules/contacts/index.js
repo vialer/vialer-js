@@ -5,12 +5,12 @@ const ContactsActions = require('./actions')
 
 
 /**
- * The Contacts module.
- */
+* The Contacts module.
+*/
 class ContactsModule {
     /**
-     * @param {ClickToDialApp} app - The application object.
-     */
+    * @param {ClickToDialApp} app - The application object.
+    */
     constructor(app) {
         this.app = app
         this.app.modules.contacts = this
@@ -18,15 +18,19 @@ class ContactsModule {
     }
 
 
+    toString() {
+        return `${this.app}[contacts] `
+    }
+
+
     /**
-     * Module load function inits some stuff. The update property is true when
-     * refreshing the plugin.
-     */
+    * Functionality to load for this module.
+    * @param {Boolean} update - True when refreshing the plugin.
+    */
     _load(update) {
         if (this.app.env.extension && !this.app.env.extension.background) return
 
-        this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
-        .then((res) => {
+        this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description').then((res) => {
             this.app.emit('ui:widget.reset', {name: 'contacts'})
 
             if (this.app.api.OK_STATUS.includes(res.status)) {
@@ -50,7 +54,6 @@ class ContactsModule {
                     if (contacts.length) {
                         this.app.emit('contacts:reset')
                         this.app.emit('contacts:fill', {
-                            contacts: contacts,
                             callback: () => {
                                 if (update) {
                                     let accountIds = widgetState.contacts.list.map((c) => c.account_id)
@@ -59,6 +62,7 @@ class ContactsModule {
                                     this.app.sip.initStack()
                                 }
                             },
+                            contacts: contacts,
                         })
                     } else {
                         this.app.emit('contacts:empty')
@@ -74,8 +78,8 @@ class ContactsModule {
                     widgetState.contacts.unauthorized = true
                     this.app.store.set('widgets', widgetState)
 
-                    // Display an icon explaining the user lacks permissions to use
-                    // this feature of the plugin.
+                    // Display an icon explaining the user lacks permissions
+                    // to use this feature of the plugin.
                     this.app.emit('ui:widget.unauthorized', {name: 'contacts'})
                     this.app.sip.disconnect()
                 }
@@ -89,7 +93,6 @@ class ContactsModule {
         this.app.logger.info(`${this}reset`)
         this.app.emit('contacts:reset')
         this.app.emit('contacts:empty')
-
         // Stop reconnection attempts.
         this.app.sip.disconnect()
     }
@@ -109,21 +112,16 @@ class ContactsModule {
             if (contacts && contacts.length) {
                 this.app.emit('contacts:reset')
                 this.app.emit('contacts:fill', {
-                    contacts: contacts,
                     callback: () => {
                         let accountIds = widgetState.contacts.list.map((c) => c.account_id)
                         this.app.sip.updatePresence(accountIds, false)
                     },
+                    contacts: contacts,
                 })
             } else {
                 this.app.emit('contacts:empty')
             }
         }
-    }
-
-
-    toString() {
-        return `${this.app}[contacts] `
     }
 }
 

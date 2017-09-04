@@ -4,18 +4,19 @@ const SUBSCRIBE_DELAY = 200
 
 
 /**
- * The SIP class takes care of all SIP communication in the background.
- * Currently this is used to check the presence of contacts.
- */
+* The SIP class takes care of all SIP communication in the background.
+* Currently this is used to check the presence of contacts.
+*/
 class Sip {
 
     /**
-     * @param {ClickToDialApp} app - The application object.
-     */
+    * @param {ClickToDialApp} app - The application object.
+    */
     constructor(app) {
-        this.app = app;
+        this.app = app
         // Set the verbosity of the Sip library. Useful when you need to
-        // debug SIP messages. Supported values are: info, warn, error and fatal.
+        // debug SIP messages. Supported values are: info, warn, error and
+        // fatal.
         SIPml.setDebugLevel('error')
 
         this.reconnect = true
@@ -25,8 +26,8 @@ class Sip {
 
 
     /**
-     * Graceful stop, do not reconnect automatically.
-     */
+    * Graceful stop, do not reconnect automatically.
+    */
     disconnect() {
         this.reconnect = false
         this.states = {}
@@ -50,8 +51,8 @@ class Sip {
 
 
     /**
-     * Init and start a new stack.
-     */
+    * Init and start a new stack.
+    */
     initStack() {
         this.app.logger.debug(`${this}init SIP stack`)
         this.stopped = false
@@ -65,36 +66,36 @@ class Sip {
             let user = this.app.store.get('user')
 
             this._sip = new SIPml.Stack({
-                realm: this.app.settings.realm, // domain name
-                impi: user.email, // authorization name (IMS Private Identity)
-                impu: `sip:${user.email}@${this.app.settings.realm}`, // valid SIP Uri (IMS Public Identity)
-                password: user.token,
                 display_name: '',
-                websocket_proxy_url: `wss://${this.app.settings.realm}`,
                 enable_rtcweb_breaker: false,
                 events_listener: {
                     events: '*',
-                    listener: this.sipStatusEvent.bind(this)
+                    listener: this.sipStatusEvent.bind(this),
                 },
+                impi: user.email, // authorization name (IMS Private Identity)
+                impu: `sip:${user.email}@${this.app.settings.realm}`, // valid SIP Uri (IMS Public Identity)
+                password: user.token,
+                realm: this.app.settings.realm, // domain name
                 sip_headers: [
                     { name: 'User-Agent', value: userAgent},
                     { name: 'Organization', value: 'VoIPGRID'},
                 ],
+                websocket_proxy_url: `wss://${this.app.settings.realm}`,
             })
             this._sip.start()
-        } , (event) => {
+        }, (event) => {
             this.app.logger.error(`${this}failed to initialize the engine: ${event.message}`)
         })
     }
 
 
     /**
-     * The SIP stack fires a new event, which is handled by this function.
-     * @param {Event} e - Catch-all event when SipML UA tries to connect to the websocket proxy.
-     */
+    * The SIP stack fires a new event, which is handled by this function.
+    * @param {Event} e - Catch-all event when SipML UA tries to connect to
+    * the websocket proxy.
+    */
     sipStatusEvent(e) {
         let retryTimeoutDefault = {interval: 2500, limit: 9000000}
-
         this.status = e.type
 
         switch (e.o_event.i_code) {
@@ -128,11 +129,11 @@ class Sip {
 
 
     /**
-     * Called multiple times for each presence subscription is registered.
-     * @param {Event} e - Catch-all event when a subscribe event is triggered.
-     * @param {Number} accountId - The accountId of the subscriber.
-     * @param {Function} resolve - The Promise resolver function.
-     */
+    * Called multiple times for each presence subscription is registered.
+    * @param {Event} e - Catch-all event when a subscribe event is triggered.
+    * @param {Number} accountId - The accountId of the subscriber.
+    * @param {Function} resolve - The Promise resolver function.
+    */
     subscribeEvent(e, accountId, resolve) {
         if (e.type === 'connected') {
             setTimeout(() => {
@@ -175,10 +176,11 @@ class Sip {
 
                 // Broadcast presence for account.
                 this.app.emit('sip:presence.update', {
-                    'account_id': accountId,
-                    'state': state,
+                    account_id: accountId,
+                    state: state,
                 })
-                // Remember subscribed accounts and its state at the time of an update.
+                // Remember subscribed accounts and its state at the time
+                // of an update.
                 this.states[accountId] = {
                     entityUri: entityUri,
                     state: state,
@@ -189,30 +191,31 @@ class Sip {
 
 
     /**
-     * Does the actual subscription to the SIP server.
-     * @param {Number} accountId - accountId of the VoIP-account to subscribe to.
-     */
+    * Does the actual subscription to the SIP server.
+    * @param {Number} accountId - Account Id of VoIP-account to subscribe to.
+    * @returns {Promise} - Resolved when the subscription is ready.
+    */
     subscribePresence(accountId) {
         return new Promise((resolve, reject) => {
             // Keep reference to prevent subscribing multiple times.
             this.subscriptions[accountId] = this._sip.newSession('subscribe', {
-                expires: 3600,
                 events_listener: {
                     events: '*',
                     listener: (e) => {
                         this.subscribeEvent(e, accountId, resolve)
                     },
                 },
+                expires: 3600,
+                sip_caps: [
+                    {name: '+g.oma.sip-im', value: null},
+                    {name: '+audio', value: null },
+                    {name: 'language', value: '\"en\"'},
+                ],
                 sip_headers: [
                     // Only notify for 'dialog' events.
                     {name: 'Event', value: 'dialog'},
                     // Subscribe to dialog-info.
                     {name: 'Accept', value: 'application/dialog-info+xml'},
-                ],
-                sip_caps: [
-                    {name: '+g.oma.sip-im', value: null},
-                    {name: '+audio', value: null },
-                    {name: 'language', value: '\"en\"'},
                 ],
             })
 
@@ -229,10 +232,10 @@ class Sip {
 
 
     /**
-     * Stop listening for subscriber events from the SIP server and remove
-     * the cached subscriber state.
-     * @param {Number} accountId - The accountId to deregister.
-     */
+    * Stop listening for subscriber events from the SIP server and remove
+    * the cached subscriber state.
+    * @param {Number} accountId - The accountId to deregister.
+    */
     unsubscribePresence(accountId) {
         this.app.logger.debug(`${this} unsubscribe`)
         if (this.subscriptions.hasOwnProperty(accountId)) {
@@ -246,12 +249,12 @@ class Sip {
 
 
     /**
-     * Retrieves presence information for given account ids.
-     * The presence information is cached. When `update` is used, it
-     * will retrieve missing presence information from the sip server.
-     * @param {Array} accountIds - The accountIds to update presence for.
-     * @param {Boolean} complement - Complement missing presence states.
-     */
+    * Retrieve presence information for given account ids.
+    * The presence information is cached. When `update` is used, it
+    * will retrieve missing presence information from the sip server.
+    * @param {Array} accountIds - The accountIds to update presence for.
+    * @param {Boolean} reload - Reload presence from SIP server when true.
+    */
     async updatePresence(accountIds, reload) {
         // Message UI that it should show a loading icon.
         this.app.emit('sip:starting', {})
@@ -287,8 +290,8 @@ class Sip {
         // Update presence item state in the UI.
         for (let accountId of accountIds) {
             this.app.emit('sip:presence.update', {
-                'account_id': accountId,
-                'state': this.states[accountId].state,
+                account_id: accountId,
+                state: this.states[accountId].state,
             })
         }
 

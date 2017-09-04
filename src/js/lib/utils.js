@@ -1,14 +1,14 @@
 module.exports = {
     /**
-     * Make an object from location.search.
-     * @param {String} query -Querystring, generally `location.search`.
-     * @returns {Object} - Key/value of the parsed search string.
-     * @example
-     * location.search
-     * // ?page=1
-     * parseSearch(location.search)
-     * // {page: "1"}
-     */
+    * Make an object from location.search.
+    * @param {String} query -Querystring, generally `location.search`.
+    * @returns {Object} - Key/value of the parsed search string.
+    * @example
+    * location.search
+    * // ?page=1
+    * parseSearch(location.search)
+    * // {page: "1"}
+    */
     parseSearch(query) {
         let e, k, v
         let re = /([^&=]+)=?([^&]*)/g
@@ -41,17 +41,17 @@ module.exports = {
 
 
     /**
-     * Convert a simple key/value object to a querystring.
-     * @param {Object} params - Key/value object to convert.
-     * @returns {String} - The querystring.
-     * @example
-     * stringifySearch({page: "1"})
-     * // page=1
-     */
+    * Convert a simple key/value object to a querystring.
+    * @param {Object} params - Key/value object to convert.
+    * @returns {String} - The querystring.
+    * @example
+    * stringifySearch({page: "1"})
+    * // page=1
+    */
     stringifySearch(params) {
         return Object
-        .keys(params)
-        .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-        .join('&')
+            .keys(params)
+            .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+            .join('&')
     },
 }

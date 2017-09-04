@@ -7,7 +7,13 @@ class Logger {
 
     constructor(app) {
         this.app = app
-        this.levels = {error: 0, warn: 1, info: 2, verbose: 3, debug: 4}
+        this.levels = {
+            debug: 4,
+            error: 0,
+            info: 2,
+            verbose: 3,
+            warn: 1,
+        }
     }
 
 
@@ -43,9 +49,9 @@ class Logger {
 
     notification(message, title = 'Click-to-dial') {
         const options = {
-            type: 'basic',
-            title: title,
             message: message,
+            title: title,
+            type: 'basic',
         }
         if (this.app.env.extension) {
             options.iconUrl = this.app.browser.runtime.getURL('img/clicktodial-big.png')
@@ -53,12 +59,12 @@ class Logger {
         } else {
             options.iconUrl = 'img/clicktodial.png'
             if (Notification.permission === 'granted') {
-                new Notification(message, options)
+                new Notification(message, options) // eslint-disable-line no-new
             } else if (Notification.permission !== 'denied') {
                 // Create a notification after the user accepted the permission.
                 Notification.requestPermission(function(permission) {
                     if (permission === 'granted') {
-                        new Notification(message, options)
+                        new Notification(message, options) // eslint-disable-line no-new
                     }
                 })
             }

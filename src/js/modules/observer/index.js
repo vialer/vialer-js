@@ -1,6 +1,6 @@
 /**
- * @module Observer
- */
+* @module Observer
+*/
 // Identify our elements with these class names.
 const phoneElementClassName = 'voipgrid-phone-number'
 const phoneIconClassName = 'voipgrid-phone-icon'
@@ -22,12 +22,13 @@ class ObserverModule {
         this.handleMutationsTimeout = null
         this.parkedNodes = []
 
-        this.printStyle = $(`<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/webext_print.css')}" media="print">`)
+        this.printStyle = $(
+            `<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/webext_print.css')}" media="print">`)
 
         /**
-         * Stop listening to DOM mutations. Triggered when
-         * the user logs out.
-         */
+        * Stop listening to DOM mutations. Triggered when
+        * the user logs out.
+        */
         this.app.on('observer:stop', (data) => {
             this.stopObserver()
             // Remove icons.
@@ -43,8 +44,9 @@ class ObserverModule {
 
 
         /**
-         *Signal this script has been loaded and ready to look for phone numbers.
-         */
+        * Signal this script has been loaded and ready to look for
+        * phone numbers.
+        */
         this.app.emit('dialer:observer.ready', {
             callback: (response) => {
                 // Fill the contact list.
@@ -53,7 +55,8 @@ class ObserverModule {
                     if (!observe) return
 
                     if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
-                        // This hidden iframe might become visible, wait for this to happen.
+                        // This hidden iframe might become visible, wait for
+                        // this to happen.
                         $(window).on('resize', () => {
                             this.processPage()
                             // No reason to wait for more resize events.
@@ -67,9 +70,9 @@ class ObserverModule {
         })
 
         /**
-         * Handle a click on a click-to-dial icon next to a phonenumber on a
-         * page. Use the number in the attribute `data-number`.
-         */
+        * Handle a click on a click-to-dial icon next to a phonenumber on a
+        * page. Use the number in the attribute `data-number`.
+        */
         $('body').on('click', `.${phoneIconClassName}`, (e) => {
             if (!$(e.currentTarget).attr('disabled') &&
                 $(e.currentTarget).attr('data-number') &&
@@ -95,9 +98,9 @@ class ObserverModule {
         })
 
         /**
-         * Handle the event when a link is clicked that contains
-         * <a href="tel:"></a>.
-         */
+        * Handle the event when a link is clicked that contains
+        * <a href="tel:"></a>.
+        */
         $('body').on('click', '[href^="tel:"]', (e) => {
             $(e.currentTarget).blur()
             // Don't do anything with this click in the actual page.
@@ -113,9 +116,9 @@ class ObserverModule {
 
 
     /**
-     * Returns a new `<ctd></ctd>` node, that will wrap the phonenumber
-     * and the click-to-dial icon.
-     */
+    * Returns a new `<ctd></ctd>` node, that will wrap the phonenumber
+    * and the click-to-dial icon.
+    */
     get ctdNode() {
         let ctd = document.createElement('ctd')
         ctd.setAttribute('style', 'font-style: inherit; font-family: inherit;')
@@ -125,8 +128,8 @@ class ObserverModule {
 
 
     /**
-     * Element that shows the icon and triggers a call.
-     */
+    * Element that shows the icon and triggers a call.
+    */
     get iconElement() {
         let a = document.createElement('a')
         a.setAttribute('style', this.iconStyle)
@@ -138,22 +141,22 @@ class ObserverModule {
 
     get iconStyle() {
         let iconStyle = {
+            '-moz-border-radius': '9px !important',
+            '-moz-box-shadow': '0 1px 1px rgba(0, 0, 0, 0.2) !important',
             'background-color': 'transparent !important',
             'background-image': `url("${this.app.browser.runtime.getURL('img/clicktodial.png')}")`,
-            'background-repeat': 'no-repeat',
-            'bottom': '-3px !important',
             'background-position': 'center center',
-            '-moz-border-radius': '9px !important',
+            'background-repeat': 'no-repeat',
             'border-radius': '9px !important',
-            '-moz-box-shadow': '0 1px 1px rgba(0, 0, 0, 0.2) !important',
+            bottom: '-3px !important',
             'box-shadow': '0 1px 1px rgba(0, 0, 0, 0.2) !important',
-            'display': 'inline-block',
-            'height': '18px !important',
-            'margin': '0 4px !important',
+            display: 'inline-block',
+            height: '18px !important',
             'line-height': '18px !important',
-            'padding': '0 !important',
-            'position': 'relative !important',
-            'width': '18px !important',
+            margin: '0 4px !important',
+            padding: '0 !important',
+            position: 'relative !important',
+            width: '18px !important',
         }
         let style = ''
         for (let property in iconStyle) {
@@ -164,9 +167,11 @@ class ObserverModule {
 
 
     /**
-     * Create an HTML element containing an anchor with a phone icon with
-     * the phone number in a data attribute.
-     */
+    * Create an HTML element containing an anchor with a phone icon with
+    * the phone number in a data attribute.
+    * @param {String} number - Number to use for the icon.
+    * @returns {Node} - Newly created p element.
+    */
     createNumberIconElement(number) {
         let icon = this.iconElement.cloneNode(false)
         // Add properties unique for "number".
@@ -179,9 +184,6 @@ class ObserverModule {
     }
 
 
-    /**
-     *
-     */
     doInsert(root) {
         let pause = !!root
         if (pause) this.stopObserver()
@@ -189,7 +191,7 @@ class ObserverModule {
 
         // Walk the DOM looking for elements to parse, but block reasonably
         // sized pages to prevent locking the page.
-        let childrenLength = $(root).find('*').length  // no lookup costs
+        let childrenLength = $(root).find('*').length // no lookup costs
         if (childrenLength < 2001) {
             this.app.logger.debug(`${this}scanning ${childrenLength} elements`)
 
@@ -201,7 +203,8 @@ class ObserverModule {
                     // - deal with html-entities (&nbsp;, &lt;, etc.) since
                     // they mess up the start/end from matches when reading
                     // from node.data, and
-                    // - enable inserting the icon html (doesn't work with a text node)
+                    // - enable inserting the icon html
+                    // (doesn't work with a text node)
                     let replacementNode = this.ctdNode.cloneNode(false)
                     replacementNode.textContent = currentNode.data
                     replacementNode.innerHTML = this.escapeHTML(currentNode.data)
@@ -240,8 +243,8 @@ class ObserverModule {
 
 
     /**
-     * Injects icons in the page and start observing the page for changes.
-     */
+    * Injects icons in the page and start observing the page for changes.
+    */
     processPage() {
         this.app.logger.debug(`${this}start observing`)
         // Inject our print stylesheet.
@@ -256,10 +259,17 @@ class ObserverModule {
 
 
     /**
-     * Escape HTML chars when assigning text to innerHTML.
-     */
+    * Escape HTML chars when assigning text to innerHTML.
+    * @param {String} str - The string to escape html from.
+    * @returns {String} - The HTML escaped string.
+    */
     escapeHTML(str) {
-        const replacements = {'&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' }
+        const replacements = {
+            '"': '&quot;',
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+        }
         return str.replace(/[&"<>]/g, (m) => replacements[m])
     }
 
@@ -273,10 +283,10 @@ class ObserverModule {
         let _parkedNodes = this.parkedNodes.slice()
         this.parkedNodes = []
         // Handle mutations if it probably isn't too much to handle
-        // (current limit is totally random)
+        // (current limit is totally random).
         if (_parkedNodes.length < 151) {
             this.app.logger.debug(`${this}processing ${_parkedNodes.length} parked nodes.`)
-            let batchSize = 40  // random size
+            let batchSize = 40 // random size
             for (let i = 0; i < Math.ceil(_parkedNodes.length / batchSize); i++) {
                 ((index) => {
                     setTimeout(() => {
@@ -286,7 +296,8 @@ class ObserverModule {
                             if (stillInDocument) {
                                 let before = new Date().getTime()
                                 this.doInsert(node)
-                                this.app.logger.debug(`${this}doInsert (handleMutations) took`, new Date().getTime() - before)
+                                this.app.logger.debug(
+                                    `${this}doInsert (handleMutations) took`, new Date().getTime() - before)
                             } else {
                                 this.app.logger.debug(`${this}doInsert (handleMutations) took 0 - removed node`)
                             }

@@ -1,6 +1,6 @@
 /**
- * A meaningful description.
- */
+* A simple localstorage store.
+*/
 class Store {
 
     constructor(app) {

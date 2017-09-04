@@ -1,17 +1,23 @@
 /**
- * @module Contacts
- */
+* @module Contacts
+*/
 const Actions = require('../../lib/actions')
 
 
 /**
- * Actions for the Contacts module.
- */
+* Actions for the Contacts module.
+*/
 class ContactsActions extends Actions {
+
+    toString() {
+        return `${this.module}[actions] `
+    }
+
+
     /**
-     * Register local events; e.g. events that are triggered
-     * from the background and handled by the background.
-     */
+    * Register local events; e.g. events that are triggered
+    * from the background and handled by the background.
+    */
     _background() {
         this.app.on('sip:failed_to_start', (e) => {
             let widgetState = this.app.store.get('widgets')
@@ -138,7 +144,9 @@ class ContactsActions extends Actions {
         $('.contacts').on('click', '.status-icon, .name, .extension', (e) => {
             let extension = $(e.currentTarget).closest('.contact').find('.extension').text()
             if (extension && extension.length) {
-                this.app.emit('panel.dial', {'b_number': extension})
+                this.app.emit('panel.dial', {
+                    b_number: extension,
+                })
             }
         })
 
@@ -174,11 +182,6 @@ class ContactsActions extends Actions {
                 e.preventDefault()
             }
         })
-    }
-
-
-    toString() {
-        return `${this.module}[actions] `
     }
 }
 

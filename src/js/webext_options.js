@@ -30,16 +30,16 @@ class OptionsApp extends Skeleton {
 
 document.addEventListener('DOMContentLoaded', () => {
     global.app = new OptionsApp({
-        name: 'options',
         environment: {
             extension: {
                 background: false,
-                popup: false,
-                tab: false,
                 callstatus: false,
                 options: true,
+                popup: false,
+                tab: false,
             },
         },
         modules: [],
+        name: 'options',
     })
 })

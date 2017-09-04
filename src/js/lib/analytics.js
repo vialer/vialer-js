@@ -2,13 +2,13 @@
 
 
 /**
- * Google analytics helper class.
- */
+* Google analytics helper class.
+*/
 class Analytics {
     /**
-     * @param {ClickToDialApp} app - The application object.
-     * @param {String} analyticsId - Google Analytics id.
-     */
+    * @param {ClickToDialApp} app - The application object.
+    * @param {String} analyticsId - Google Analytics id.
+    */
     constructor(app, analyticsId) {
         this.app = app
 
@@ -28,9 +28,9 @@ class Analytics {
 
 
     /**
-     * A function that will POST a Click-to-Dial Event to Google Analytics.
-     * @param {String} origin - Label that will be given to the event.
-     */
+    * A function that will POST a Click-to-Dial Event to Google Analytics.
+    * @param {String} origin - Label that will be given to the event.
+    */
     trackClickToDial(origin) {
         this.app.logger.debug(`${this}send call event`)
         ga('send', 'event', 'Calls', 'Initiate ConnectAB', origin)

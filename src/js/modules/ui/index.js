@@ -1,18 +1,18 @@
 /**
- * @module Ui
- */
+* @module Ui
+*/
 const UiActions = require('./actions')
 
 
 /**
- * The Ui module. It holds most of the logic used to interact
- * with the Click-to-dial UI. It is mainly concerned with generic
- * actions that change the DOM.
- */
+* The Ui module. It holds most of the logic used to interact
+* with the Click-to-dial UI. It is mainly concerned with generic
+* actions that change the DOM.
+*/
 class UiModule {
     /**
-     * @param {ClickToDialApp} app - The application object.
-     */
+    * @param {ClickToDialApp} app - The application object.
+    */
     constructor(app) {
         this.app = app
         this.actions = new UiActions(app, this)
@@ -20,9 +20,10 @@ class UiModule {
 
 
     /**
-     * Display a loading indicator on the widget, used when
-     * retrieving data for widget.
-     */
+    * Display a loading indicator on the widget, used when
+    * retrieving data for widget.
+    * @param {String} widgetOrWidgetName - Reference to widget to set to busy.
+    */
     busyWidget(widgetOrWidgetName) {
         this.app.logger.debug(`${this}busy widget`)
         let widget = this.getWidget(widgetOrWidgetName)
@@ -36,20 +37,24 @@ class UiModule {
 
 
     /**
-     * Popup action; used to close a widget by setting some DOM properties.
-     */
+    * Popup action; used to close a widget by setting some DOM properties.
+    * @param {String} widgetOrWidgetName - Reference to widget to close.
+    */
     closeWidget(widgetOrWidgetName) {
         let widget = this.getWidget(widgetOrWidgetName)
-        // Cannot rely on just data.('opened') because this is not transparent to CSS.
+        // Cannot rely on just data.('opened') because this is
+        // not transparent to CSS.
         $(widget).data('opened', false).attr('data-opened', false)
         $(widget).find('.widget-content, .unauthorized-warning').hide()
     }
 
 
     /**
-     * Get the element for a widget by return the same (already a jquery)
-     * object or finding it by class name.
-     */
+    * Get the element for a widget by return the same (already a jquery)
+    * object or finding it by class name.
+    * @param {String} widgetOrWidgetName - Reference to widget to find.
+    * @returns {Jquery} - Selector to the widget container.
+    */
     getWidget(widgetOrWidgetName) {
         if (widgetOrWidgetName instanceof $) {
             return widgetOrWidgetName
@@ -64,8 +69,10 @@ class UiModule {
 
 
     /**
-     * Return a boolean indicating whether widget is open.
-     */
+    * Return a boolean indicating whether widget is open.
+    * @param {String} widgetOrWidgetName - Reference to widget to check.
+    * @returns {Boolean} - Whether the widget is currently open or not.
+    */
     isWidgetOpen(widgetOrWidgetName) {
         let widget = this.getWidget(widgetOrWidgetName)
         return $(widget).data('opened') === true
@@ -73,22 +80,23 @@ class UiModule {
 
 
     /**
-     * Attempt to login.
-     */
+    * Attempt to login.
+    */
     login() {
         // Login when form is not empty.
         if ($('#username').val().trim().length && $('#password').val().length) {
             this.app.emit('user:login.attempt', {
-                username: $('#username').val().trim(),
                 password: $('#password').val(),
+                username: $('#username').val().trim(),
             })
         }
     }
 
 
     /**
-     * Open/close a widget's content and resize.
-     */
+    * Open/close a widget's content and resize.
+    * @param {String} widgetOrWidgetName - Reference to widget to open.
+    */
     openWidget(widgetOrWidgetName) {
         this.app.logger.debug(`${this}open widget`)
         let widget = this.getWidget(widgetOrWidgetName)
@@ -120,8 +128,9 @@ class UiModule {
 
 
     /**
-     * Initialize all widgets. Called from the refresh button in the popup.
-     */
+    * Initialize all widgets. Called from the refresh button in the popup.
+    * @param {Boolean} reloadModules - Whether to reload all modules or not.
+    */
     refreshWidgets(reloadModules) {
         // Reset widget data when none can be found.
         if (this.app.store.get('widgets') === null) {
@@ -150,8 +159,9 @@ class UiModule {
 
 
     /**
-     * Reset the busy indicator and close a widget.
-     */
+    * Reset the busy indicator and close a widget.
+    * @param {String} widgetOrWidgetName - Reference to widget to reset.
+    */
     resetWidget(widgetOrWidgetName) {
         this.app.logger.debug(`${this}reset widget`)
         let widget = this.getWidget(widgetOrWidgetName)
@@ -205,8 +215,8 @@ class UiModule {
 
 
     /**
-     * Show the popup content.
-     */
+    * Show the popup content.
+    */
     showPopup() {
         $('.container').removeClass('hide')
         this.restoreWidgetState()
@@ -233,10 +243,12 @@ class UiModule {
 
 
     /**
-     * Show the unauthorized warning for a widget.
-     */
-    unauthorizeWidget(widgetName) {
-        const widget = this.getWidget(widgetName)
+    * Show the unauthorized warning for a widget.
+    * @param {String} widgetOrWidgetName - Reference to widget to set to
+    * unauthorized.
+    */
+    unauthorizeWidget(widgetOrWidgetName) {
+        const widget = this.getWidget(widgetOrWidgetName)
         this.resetWidget(widget)
         widget.addClass('unauthorized')
     }

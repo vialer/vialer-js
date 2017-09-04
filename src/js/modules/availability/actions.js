@@ -1,17 +1,22 @@
 /**
- * @module Availability
- */
+* @module Availability
+*/
 const Actions = require('../../lib/actions')
 
 
 /**
- * Actions for the Availability module.
- */
+* Actions for the Availability module.
+*/
 class AvailabilityActions extends Actions {
 
+    toString() {
+        return `${this.module}[actions] `
+    }
+
+
     /**
-     * Background related tasks for the availability module.
-     */
+    * Background related tasks for the availability module.
+    */
     _background() {
         /**
          * Update availability by calling the API, then emit
@@ -26,8 +31,8 @@ class AvailabilityActions extends Actions {
 
 
     /**
-     * Popup related tasks for the availability module.
-     */
+    * Popup related tasks for the availability module.
+    */
     _popup() {
         // Refresh the availability select.
         this.app.on('availability:refresh', (data) => {
@@ -81,7 +86,8 @@ class AvailabilityActions extends Actions {
          * userdestination.
          */
         $('.availability-toggle input[name="availability"]').change((e) => {
-                // These values are used for val() == 'no' which clears the current destination.
+            // These values are used for val() == 'no' which clears the
+            // current destination.
             let selectedType = null
             let selectedId = null
 
@@ -102,10 +108,6 @@ class AvailabilityActions extends Actions {
         })
     }
 
-
-    toString() {
-        return `${this.module}[actions] `
-    }
 }
 
 

@@ -1,9 +1,11 @@
 {
     "parser": "espree",
     "parserOptions": {
+        "ecmaFeatures": {
+            "modules": true
+        },
         "ecmaVersion": 8,
-        "sourceType": "module",
-        "ecmaFeatures": {}
+        "sourceType": "module"
     },
     "env": {
         "amd": false,
@@ -21,9 +23,10 @@
         "webkitNotifications": true,
         "electron": true,
         "$": true,
+        "SIPml": true
     },
     "plugins": [
-
+        "sort-class-members"
     ],
     "rules": {
         "no-alert": 0,
@@ -90,7 +93,7 @@
         "no-path-concat": 0,
         "no-plusplus": 0,
         "no-process-env": 0,
-        "no-process-exit": 0,
+        "no-process-exit": 2,
         "no-proto": 2,
         "no-redeclare": 2,
         "no-regex-spaces": 2,
@@ -151,11 +154,12 @@
         "generator-star-spacing": 0,
         "guard-for-in": 0,
         "handle-callback-err": 0,
+        "indent": [2, 4, {"flatTernaryExpressions": true, "ObjectExpression": 1}],
         "init-declarations": 0,
         "key-spacing": [2, { "beforeColon": false, "afterColon": true }],
         "lines-around-comment": 0,
         "max-depth": [0, 4],
-        "max-len": [0, 80, 4],
+        "max-len": [1, {"code": 120, "tabWidth": 4, "comments": 80}],
         "max-nested-callbacks": [0, 2],
         "max-params": [0, 3],
         "max-statements": [0, 10],
@@ -168,12 +172,26 @@
         "operator-assignment": [0, "always"],
         "operator-linebreak": 0,
         "padded-blocks": 0,
-        "quote-props": 0,
+        "quote-props": [2, "as-needed"],
         "quotes": [1, "single"],
         "radix": 0,
         "require-yield": 0,
-        "semi": [2, "never"],
+        "semi": 0,
         "semi-spacing": [2, {"before": false, "after": true}],
+        "sort-class-members/sort-class-members": [2, {
+        "order": [
+                "[static-properties]",
+                "[static-methods]",
+                "[properties]",
+                "[conventional-private-properties]",
+                "constructor",
+                "[methods]",
+                "[conventional-private-methods]",
+                "[everything-else]"
+            ],
+            "accessorPairPositioning": "getThenSet",
+        }],
+        "sort-keys": [2, "asc", {"natural": true, "caseSensitive": false}],
         "sort-vars": [2, {"ignoreCase": true}],
         "space-before-function-paren": [2, "never"],
         "space-in-brackets": [0, "never"],
@@ -185,7 +203,12 @@
         "spaced-line-comment": [0, "always"],
         "strict": [2, "global"],
         "use-isnan": 2,
-        "valid-jsdoc": 0,
+        "valid-jsdoc": [2, {
+            "prefer": {
+                "return": "returns"
+            },
+             "requireReturn": false
+        }],
         "valid-typeof": 2,
         "vars-on-top": 0,
         "wrap-iife": 0,

@@ -21,8 +21,9 @@ default build target, so you don't necessarily have to specify the target:
 
 Navigate to `chrome://extension`, make sure developer mode is enabled, and load
 the `./build/chrome` directory as an unpacked extension in Chrome. As an alternative
-you can automatically load the extension in a new Chromium browser profile with:
+you can automatically load the extension in a new Chromium/Chrome browser profile with:
 
+    npm run test_chrome
     npm run test_chromium
 
 In Firefox, you have to use a tool called `web-ext` that runs the extension in

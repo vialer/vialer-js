@@ -1,11 +1,11 @@
 let registeredTimers = {}
 
 /**
- * Calculate a jitter from interval.
- * @param {Number} interval - The interval in ms to calculate jitter for.
- * @param {Number} percentage - The jitter range in percentage.
- * @returns {Number} The calculated jitter in ms.
- */
+* Calculate a jitter from interval.
+* @param {Number} interval - The interval in ms to calculate jitter for.
+* @param {Number} percentage - The jitter range in percentage.
+* @returns {Number} The calculated jitter in ms.
+*/
 function jitter(interval, percentage) {
     let min = 0 - Math.ceil(interval * (percentage / 100))
     let max = Math.floor(interval * (percentage / 100))
@@ -14,9 +14,9 @@ function jitter(interval, percentage) {
 
 
 /**
- * This timer keeps track of all used timers inside this plugin and can
- * clear, start or change the timeout of these timers at any time.
- */
+* This timer keeps track of all used timers inside this plugin and can
+* clear, start or change the timeout of these timers at any time.
+*/
 class Timer {
 
     constructor(app) {
@@ -49,10 +49,10 @@ class Timer {
         this.app.logger.debug(`${this}register timer ${timerId}`)
         registeredTimers[timerId] = {
             function: timerFunction,
-            interval: null,  // interval in miliseconds
-            timeout: null,  // timeout in miliseconds
+            interval: null, // interval in miliseconds
             reset: false,
             // References to timer objects to be able to clear it later.
+            timeout: null, // timeout in miliseconds
             timer: {
                 interval: null,
                 timeout: null,
@@ -90,8 +90,10 @@ class Timer {
         if (this.getRegisteredTimer(timerId)) {
             let timerFunction = registeredTimers[timerId].function
             if (registeredTimers[timerId].interval) {
-                registeredTimers[timerId].timer.interval = setInterval(timerFunction, registeredTimers[timerId].interval)
-                this.app.logger.debug(`${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
+                registeredTimers[timerId].timer.interval = setInterval(
+                    timerFunction, registeredTimers[timerId].interval)
+                this.app.logger.debug(
+                    `${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
             }
 
             let timeout = registeredTimers[timerId].timeout
@@ -151,10 +153,10 @@ class Timer {
 
 
     /**
-     * This doubles the retry interval in each run and adds jitter.
-     * @param {object} retry - The reference retry object.
-     * @returns {object} The updated retry object.
-     */
+    * This doubles the retry interval in each run and adds jitter.
+    * @param {object} retry - The reference retry object.
+    * @returns {object} The updated retry object.
+    */
     increaseTimeout(retry) {
         // Make sure that interval doesn't go past the limit.
         if (retry.interval * 2 < retry.limit) {

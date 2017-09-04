@@ -5,11 +5,11 @@ const Store = require('./store')
 
 
 /**
- * This is the minimal class that all parts of the click-to-dial
- * application inherit from(tab, contentscript, background, popup/out).
- * It sets some basic properties that can be reused, like a logger, store,
- * an IPC eventemitter and some environmental properties.
- */
+* This is the minimal class that all parts of the click-to-dial
+* application inherit from(tab, contentscript, background, popup/out).
+* It sets some basic properties that can be reused, like a logger, store,
+* an IPC eventemitter and some environmental properties.
+*/
 class Skeleton extends EventEmitter {
 
     constructor(options) {
@@ -43,20 +43,21 @@ class Skeleton extends EventEmitter {
         }
 
         if (this.env.extension) {
-            // Make the EventEmitter .on method compatible with web extension ipc.
-            // An Ipc event is coming in. Map it to the EventEmitter.
+            // Make the EventEmitter .on method compatible with
+            // web extension ipc. An Ipc event is coming in. Map it to
+            // the EventEmitter.
             this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (request.data) {
-                    // Add extra contextual information about sender to the payload.
+                    // Add extra contextual information about sender to payload.
                     request.data.sender = sender
                     // It may have a callback, but functions can't pass through
                     // the request.data, so map sendResponse.
                     request.data.callback = sendResponse
                 }
-                // The frame option can be used to specifically target a callstatus
-                // or observer script. Otherwise the event is ignored, because
-                // otherwise all events emitted on the tab will also be processed by
-                // the callstatus and observer scripts.
+                // The frame option can be used to specifically target a
+                // callstatus or observer script. Otherwise the event is
+                // ignored, because otherwise all events emitted on the tab will
+                // also be processed by the callstatus and observer scripts.
                 if (this.env.extension.callstatus || this.env.extension.observer) {
                     if (this.env.extension.callstatus && request.data.frame && request.data.frame === 'callstatus') {
                         this.emit(request.event, request.data, true)
@@ -79,25 +80,27 @@ class Skeleton extends EventEmitter {
         }
     }
 
-    /**
-     * This method may be overriden to initialize logic before loading
-     * modules, e.g. like initializing a sip stack.
-     */
-    _init() {}
-
 
     /**
-     * Modified emit method which makes it compatible with web extension ipc.
-     * Without tabId or parent, the event is emitted on the runtime, which
-     * includes listeners for the popout and the background script. The tabId
-     * or the parent are specific when an event needs to be emitted on
-     * either a tab content script or from a loaded tab content script to
-     * it's parent.
-     */
+    * Modified emit method which makes it compatible with web extension ipc.
+    * Without tabId or parent, the event is emitted on the runtime, which
+    * includes listeners for the popout and the background script. The tabId
+    * or the parent are specific when an event needs to be emitted on
+    * either a tab content script or from a loaded tab content script to
+    * it's parent.
+    * @param {Event} event - Eventname to emit with.
+    * @param {Object} data - Payload for the emission.
+    * @param {Boolean|String} noIpc - Flag to skip ipc emission or to do `both`.
+    * @param {Boolean|String} [tabId=false] - Emit to specific tab over ipc.
+    * @param {Boolean|String} [parent=false] - Emit to script's parent over ipc.
+    */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
         if (this.env.extension && (!noIpc || noIpc === 'both')) {
             let payloadArgs = []
-            let payloadData = {event: event, data: data}
+            let payloadData = {
+                data: data,
+                event: event,
+            }
             payloadArgs.push(payloadData)
 
             if (tabId) {
@@ -106,7 +109,10 @@ class Skeleton extends EventEmitter {
                 return
             } else if (parent) {
                 this.logger.debug(`${this}emit ipc event '${event}' to parent`)
-                parent.postMessage({event: event, data: data}, '*')
+                parent.postMessage({
+                    data: data,
+                    event: event,
+                }, '*')
                 return
             }
 
@@ -126,10 +132,12 @@ class Skeleton extends EventEmitter {
 
 
     /**
-     * Sets environmental properties, used to distinguish between
-     * webextension, regular webapp or Electron app.
-     * @param {Object} environment - The environment properties passed to the Constructor.
-     */
+    * Sets environmental properties, used to distinguish between
+    * webextension, regular webapp or Electron app.
+    * @param {Object} environment - Environment properties passed
+    * to the app's Constructor.
+    * @returns {Object} - Environment flags used to make this app universal.
+    */
     getEnvironment(environment) {
         // If browser exists, use browser, otherwise take the Chrome API.
         if (environment.extension) {
@@ -170,6 +178,13 @@ class Skeleton extends EventEmitter {
     toString() {
         return `[${this.name}] `
     }
+
+
+    /**
+    * This method may be overriden to initialize logic before loading
+    * modules, e.g. like initializing a sip stack.
+    */
+    _init() {}
 }
 
 module.exports = Skeleton

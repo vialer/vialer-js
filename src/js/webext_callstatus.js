@@ -2,10 +2,10 @@ const Skeleton = require('./lib/skeleton')
 
 
 class CallStatusApp extends Skeleton {
-
     /**
-     * When the app initializes, it's already assumed to be active and open.
-     */
+    * When the app initializes, it's already assumed to be active and open.
+    * @param {Object} options - Initial options to start the app with.
+    */
     constructor(options) {
         super(options)
         this.verbose = true
@@ -62,9 +62,9 @@ global.app = new CallStatusApp({
     environment: {
         extension: {
             background: false,
+            callstatus: true,
             popup: false,
             tab: false,
-            callstatus: true,
         },
     },
     modules: [],

@@ -1,13 +1,18 @@
 /**
- * @module User
- */
+* @module User
+*/
 const Actions = require('../../lib/actions')
 
 
 /**
- * Actions for the User module.
- */
+* Actions for the User module.
+*/
 class UserActions extends Actions {
+
+    toString() {
+        return `${this.module}[actions] `
+    }
+
 
     _background() {
         this.app.on('user:login.attempt', (data) => {
@@ -26,8 +31,8 @@ class UserActions extends Actions {
 
     _popup() {
         /**
-         * Show an error on login fail.
-         */
+        * Show an error on login fail.
+        */
         this.app.on('user:login.failed', (data) => {
             let button = $('.login-button')
             $(button)
@@ -38,8 +43,8 @@ class UserActions extends Actions {
         })
 
         /**
-         * Display an indicator when logging in.
-         */
+        * Display an indicator when logging in.
+        */
         this.app.on('user:login.in_progress', (data) => {
             let button = $('.login-button')
             $(button).html($(button).data('loading-text')).prop('disabled', true).addClass('loading')
@@ -73,11 +78,6 @@ class UserActions extends Actions {
                 .addClass('info')
                 .addClass('temporary-text')
         })
-    }
-
-
-    toString() {
-        return `${this.module}[actions] `
     }
 }
 

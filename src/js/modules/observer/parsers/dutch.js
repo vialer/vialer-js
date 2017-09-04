@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 let debug = false
 
 // Do not match numbers which are probably part of an IBAN.

@@ -1,7 +1,7 @@
 const Skeleton = require('./lib/skeleton')
 
 const _modules = [
-    {name: 'observer', Module: require('./modules/observer')},
+    {Module: require('./modules/observer'), name: 'observer'},
 ]
 
 
@@ -17,10 +17,10 @@ global.app = new ObserverApp({
     environment: {
         extension: {
             background: false,
-            popup: false,
-            tab: false,
             callstatus: false,
             observer: true,
+            popup: false,
+            tab: false,
         },
     },
     modules: _modules,

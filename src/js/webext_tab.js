@@ -2,7 +2,7 @@ const Skeleton = require('./lib/skeleton')
 
 
 const _modules = [
-    {name: 'dialer', Module: require('./modules/dialer')},
+    {Module: require('./modules/dialer'), name: 'dialer'},
 ]
 
 
@@ -18,9 +18,9 @@ global.app = new TabsApp({
     environment: {
         extension: {
             background: false,
+            callstatus: false,
             popup: false,
             tab: true,
-            callstatus: false,
         },
     },
     i18n: {},

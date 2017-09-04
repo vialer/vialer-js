@@ -1,21 +1,26 @@
 /**
- * @module Dialer
- */
+* @module Dialer
+*/
 const Actions = require('../../lib/actions')
 
 const phoneIconClassName = 'voipgrid-phone-icon'
 
 
 /**
- * Actions for the Dialer module.
- */
+* Actions for the Dialer module.
+*/
 class DialerActions extends Actions {
+
+    toString() {
+        return `${this.module}[actions] `
+    }
+
 
     _background() {
         /**
-         * Emit to each tab's running observer scripts that we want to
-         * observe the DOM and add icons to phonenumbers.
-         */
+        * Emit to each tab's running observer scripts that we want to
+        * observe the DOM and add icons to phonenumbers.
+        */
         this.app.on('user:login.success', (data) => {
             if (this.app.store.get('c2d')) {
                 // Only notify tabs in the context of an extension.
@@ -29,18 +34,18 @@ class DialerActions extends Actions {
         })
 
         /**
-         * Stop callstatus timer for callid when the callstatus dialog closes.
-         */
+        * Stop callstatus timer for callid when the callstatus dialog closes.
+        */
         this.app.on('dialer:callstatus.onhide', (data) => {
             this.app.timer.stopTimer(`dialer:status.update-${data.callid}`)
             this.app.timer.unregisterTimer(`dialer:status.update-${data.callid}`)
         })
 
         /**
-         * Start callstatus timer function for callid when the callstatus
-         * dialog opens. The timer function updates the call status
-         * periodically.
-         */
+        * Start callstatus timer function for callid when the callstatus
+        * dialog opens. The timer function updates the call status
+        * periodically.
+        */
         this.app.on('dialer:callstatus.onshow', (data) => {
             this.app.timer.startTimer(`dialer:status.update-${data.callid}`)
         })
@@ -62,12 +67,12 @@ class DialerActions extends Actions {
             // Add the context menu to dial the selected number when
             // right mouse-clicking.
             this.contextMenuItem = this.app.browser.contextMenus.create({
-                title: this.app.i18n.translate('contextMenuLabel'),
                 contexts: ['selection'],
                 onclick: (info, tab) => {
                     this.app.modules.dialer.dial(info.selectionText, tab)
                     this.app.analytics.trackClickToDial('Webpage')
                 },
+                title: this.app.i18n.translate('contextMenuLabel'),
             })
         }
     }
@@ -95,11 +100,6 @@ class DialerActions extends Actions {
         this.app.on('dialer:callstatus.onshow', (data) => {
             this.module.callid = data.callid
         })
-    }
-
-
-    toString() {
-        return `${this.module}[actions] `
     }
 }
 

@@ -1,17 +1,22 @@
 /**
- * @module Queues
- */
+* @module Queues
+*/
 const Actions = require('../../lib/actions')
 
 
 /**
- * Actions for the Queue module.
- */
+* Actions for the Queue module.
+*/
 class QueuesActions extends Actions {
 
+    toString() {
+        return `${this.module}[actions] `
+    }
+
+
     /**
-     * Background script related events.
-     */
+    * Background script related events.
+    */
     _background() {
         // Keep track of selected queue.
         this.app.on('queues:queue.select', (data) => {
@@ -52,8 +57,8 @@ class QueuesActions extends Actions {
     _popup() {
         if (!('queue' in this.app.cache)) {
             this.app.cache.queue = {
-                'list': [],
-                'selected': null,
+                list: [],
+                selected: null,
             }
         }
 
@@ -136,12 +141,6 @@ class QueuesActions extends Actions {
             this.app.emit('queues:queue.select', {id: queueId})
         })
     }
-
-
-    toString() {
-        return `${this.module}[actions] `
-    }
-
 }
 
 module.exports = QueuesActions

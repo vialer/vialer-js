@@ -1,13 +1,18 @@
 /**
- * @module Ui
- */
+* @module Ui
+*/
 const Actions = require('../../lib/actions')
 
 
 /**
- * Actions for the Ui module.
- */
+* Actions for the Ui module.
+*/
 class UiActions extends Actions {
+
+    toString() {
+        return `${this.module}[actions] `
+    }
+
 
     _background() {
         this.app.on('help', (data) => {
@@ -16,8 +21,8 @@ class UiActions extends Actions {
         })
 
         /**
-         * Set the widget's open state to false.
-         */
+        * Set the widget's open state to false.
+        */
         this.app.on('ui:widget.close', (data) => {
             this.app.logger.info(`${this}setting ${data.name} widget state to closed`)
             let widgetState = this.app.store.get('widgets')
@@ -41,18 +46,16 @@ class UiActions extends Actions {
             this.app.emit('ui:mainpanel.ready')
         })
 
-        /**
-         * Open settings url with or without a token for auto login.
-         * Either opens:
-         *  - platformUrl + user/autologin/?token=*token*&username=*username*&next=/ + path (with token)
-         *  - platformUrl + path (without token)
-         */
+        //Open settings url with or without a token for auto login.
+        // Either opens:
+        // eslint-disable-next-line max-len
+        // - platformUrl + user/autologin/?token=*token*&username=*username*&next=/ + path (with token)
+        // - platformUrl + path (without token)
         this.app.on('ui:settings', (data) => {
             this.app.logger.info(`${this}mainpanel.settings`)
-            this.app.api.client.get('api/autologin/token/')
-            .then((res) => {
+            this.app.api.client.get('api/autologin/token/').then((res) => {
                 let path, token
-                const redirectPath = `client/${this.app.store.get('user').client_id}/user/${this.app.store.get('user').id}/change/#tc0=user-tab-2`
+                const redirectPath = `client/${this.app.store.get('user').client_id}/user/${this.app.store.get('user').id}/change/#tc0=user-tab-2` // eslint-disable-line max-len
                 if (res.data) token = res.data.token
                 // add token if possible
                 path = `user/autologin/?token=${token}&username=${this.app.store.get('username')}&next=/${redirectPath}`
@@ -209,8 +212,8 @@ class UiActions extends Actions {
 
 
         /**
-         * Capture keys in login form.
-         */
+        * Capture keys in login form.
+        */
         $('.login-form :input').keydown((e) => {
             switch (e.which) {
             // Cycle through proper fields with tab.
@@ -240,8 +243,8 @@ class UiActions extends Actions {
         })
 
         /**
-         * Login with the button.
-         */
+        * Login with the button.
+        */
         $('.login-button').click((e) => {
             if ($('.login-button').hasClass('temporary-text')) {
                 this.module.resetLoginButton()
@@ -249,11 +252,6 @@ class UiActions extends Actions {
                 this.module.login()
             }
         })
-    }
-
-
-    toString() {
-        return `${this.module}[actions] `
     }
 }
 

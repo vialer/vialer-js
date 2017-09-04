@@ -1,29 +1,28 @@
 /**
- * Run the click-to-dial app as a contentscript. The click-to-dial
- * app can be run as one, or having it's UI part and background running
- * part separated.
- */
-
+* Run the click-to-dial app as a contentscript. The click-to-dial
+* app can be run as one, or having it's UI part and background running
+* part separated.
+*/
 const ClickToDialApp = require('./lib/app')
 
 const _modules = [
-    {name: 'availability', Module: require('./modules/availability')},
-    {name: 'contacts', Module: require('./modules/contacts')},
-    {name: 'dialer', Module: require('./modules/dialer')},
-    {name: 'ui', Module: require('./modules/ui')},
-    {name: 'user', Module: require('./modules/user')},
-    {name: 'queues', Module: require('./modules/queues')},
+    {Module: require('./modules/availability'), name: 'availability'},
+    {Module: require('./modules/contacts'), name: 'contacts'},
+    {Module: require('./modules/dialer'), name: 'dialer'},
+    {Module: require('./modules/ui'), name: 'ui'},
+    {Module: require('./modules/user'), name: 'user'},
+    {Module: require('./modules/queues'), name: 'queues'},
 ]
 
 global.app = new ClickToDialApp({
-    modules: _modules,
-    name: 'bg',
     environment: {
         extension: {
             background: true,
+            callstatus: false,
             popup: false,
             tab: false,
-            callstatus: false,
         },
     },
+    modules: _modules,
+    name: 'bg',
 })

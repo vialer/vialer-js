@@ -1,16 +1,18 @@
 /**
- * @module Observer
- */
+* @module Observer
+*/
 // Identify our elements with these class names.
 const phoneElementClassName = 'voipgrid-phone-number'
 
 
 /**
- * Using an object to check if tagName is disallowed is faster when using
- * `tagName in {}` than using `Array.indexOf(tagname)`.
- */
+* Using an object to check if tagName is disallowed is faster when using
+* `tagName in {}` than using `Array.indexOf(tagname)`.
+* @returns {Object} - List of disallowed html tags.
+*/
 let getBlockedTagNames = function() {
     // tag list based on:
+    // eslint-disable-next-line max-len
     // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/HTML5_element_list
     const tags = [
         'TITLE', 'BASE', 'LINK', 'META', 'STYLE', 'SCRIPT', 'TEMPLATE', 'PRE', 'FIGURE',
@@ -27,8 +29,9 @@ let getBlockedTagNames = function() {
 }
 
 /**
- * Role list based on: http://www.w3.org/TR/wai-aria/roles#landmark_roles
- */
+* Role list based on: http://www.w3.org/TR/wai-aria/roles#landmark_roles
+* @returns {Object} - List of disallowed html tags.
+*/
 let getBlockedRoles = function() {
     const roles = [
         'button', 'checkbox', 'command', 'input', 'radio', 'range',
@@ -42,8 +45,8 @@ let getBlockedRoles = function() {
 
 
 /**
- * Walks the DOM.
- */
+* Walk the DOM.
+*/
 class Walker {
 
     constructor(app) {
@@ -54,9 +57,11 @@ class Walker {
 
 
     /**
-     * Skip elements which *probably* wouldn't (or shouldn't)
-     * contain a phone number.
-     */
+    * Skip elements which *probably* wouldn't (or shouldn't)
+    * contain a phone number.
+    * @param {Node} element - The DOM element to check.
+    * @returns {Boolean} - Whether the element is blocked or not.
+    */
     isBlockedElement(element) {
         if (element.tagName in this.blockedTagNames) {
             return true
@@ -72,7 +77,8 @@ class Walker {
             let closest_role_element = $(element).closest('[role]')
             if (!!$(element).closest('[contenteditable="true"]').length ||
                     !!$(element).closest('[aria-labelledby]').length ||
-                    (!!closest_role_element.length && $(closest_role_element[0]).attr('role').toLowerCase() in this.blockedRoles)) {
+                    (!!closest_role_element.length &&
+                     $(closest_role_element[0]).attr('role').toLowerCase() in this.blockedRoles)) {
                 return true
             }
         }
@@ -82,8 +88,10 @@ class Walker {
 
 
     /**
-     * Test if `node` should even be processed.
-     */
+    * Test if `node` should even be processed.
+    * @param {Node} node - Node to check for skipping.
+    * @returns {Boolean} - Whether the node can be skipped or not.
+    */
     skipNode(node) {
         // Only parse element and text nodes.
         if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.TEXT_NODE) {
@@ -120,11 +128,15 @@ class Walker {
         return false
     }
 
+
     /**
-     * Walk the DOM and apply fn for every node.
-     */
+    * Walk the DOM and apply fn for every node.
+    * @param {Node} root - The root node to iterate on.
+    * @param {Function} fn - Function to call on each node.
+    */
     walkTheDOM(root, fn) {
-        // Skip element nodes, we'll get to those using a text node's parentNode attr.
+        // Skip element nodes, we'll get to those using a text
+        // node's parentNode attr.
         let whatToShow = NodeFilter.SHOW_TEXT
 
         // Apply filtering on what nodes to process.
