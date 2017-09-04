@@ -11,6 +11,14 @@
     flex-direction: column;
     height: 100%;
 
+
+    .shortcuts {
+        // Hide the popout button when we're in the popout.
+        .popout-button {
+            display: none;
+        }
+    }
+
     // Hide the availability and queues widget.
     .widget.queues,
     .widget.availability {
