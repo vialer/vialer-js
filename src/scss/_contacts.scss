@@ -80,6 +80,10 @@
         .name {
             cursor: pointer;
         }
+
+        &:nth-child(odd) {
+            background: #f9f9f9;
+        }
     }
 
     .empty-list li,
