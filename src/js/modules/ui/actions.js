@@ -70,9 +70,18 @@ class UiActions extends Actions {
         })
     }
 
-    _closeMainPanel() {
+    /**
+    * Called when an external action occurs, like opening a new tab,
+    * which requires to shift the focus of the user to the new
+    * content. Don't close the existing window when it is called
+    * from the popout.
+    */
+    _checkCloseMainPanel() {
         this.app.emit('ui:mainpanel.close')
-        window.close()
+        // Only close the existing window.
+        if (this.app.env.extension && !this.app.env.extension.popout) {
+            window.close()
+        }
     }
 
 
@@ -140,7 +149,7 @@ class UiActions extends Actions {
         }
 
         $('#close').click((e) => {
-            this._closeMainPanel()
+            this._checkCloseMainPanel()
         })
 
         /**
@@ -152,18 +161,18 @@ class UiActions extends Actions {
 
         $('#popout').click((e) => {
             this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('webext_popup.html?popout=true')})
-            this._closeMainPanel()
+            this._checkCloseMainPanel()
         })
         $('#help').click((e) => {
             this.app.emit('help')
-            this._closeMainPanel()
+            this._checkCloseMainPanel()
         })
         $('#refresh').click((e) => {
             this.app.emit('ui:ui.refresh', {popout: this.app.env.extension.popout})
         })
         $('#settings').click((e) => {
             this.app.emit('ui:settings')
-            this._closeMainPanel()
+            this._checkCloseMainPanel()
         })
 
 
