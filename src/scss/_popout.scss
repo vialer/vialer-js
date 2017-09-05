@@ -55,15 +55,13 @@
     }
 
     .widget.contacts {
-        border-left: 1px solid #d5d5d5;
-        border-right: 1px solid #d5d5d5;
+        border-left: 1px solid transparent;
+        border-right: 1px solid transparent;
 
         width: 100%;
         box-sizing: border-box;
         position: relative;
 
-        border: 0 1px 0 1px solid transparent;
-        // flex: 1 0 40px;
         display: flex;
         flex-direction: column;
 
@@ -102,7 +100,7 @@
 
                 overflow-x: auto;
                 border-top: 0;
-                max-height: calc(100vh - 62px);
+                max-height: none;
                 width: calc(100vw - 26px);
 
                 @media (max-width: 620px) {
