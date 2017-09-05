@@ -22,9 +22,6 @@ class Sip {
         this.reconnect = true
         this.states = {}
         this.subscriptions = {}
-        // Emit to the frontend that the sip client is not yet
-        // ready to start.
-        this.app.emit('sip:before_start', {})
     }
 
 
@@ -32,6 +29,9 @@ class Sip {
      * Connect SipML5 to the websocket SIP backend.
      */
     connect() {
+        // Emit to the frontend that the sip client is not yet
+        // ready to start.
+        this.app.emit('sip:before_start', {})
         this.app.logger.debug(`${this}connecting to sip backend`)
         if (this._sip) {
             this._sip.start()
@@ -276,7 +276,6 @@ class Sip {
     * @param {Boolean} reload - Reload presence from SIP server when true.
     */
     async updatePresence(accountIds, reload) {
-        this.app.emit('sip:presences.start_update')
         if (!reload) {
             if (!this._sip) {
                 this.app.logger.debug(`${this}not updating from sip server; no sipstack available`)
@@ -296,11 +295,13 @@ class Sip {
             // server low. Also subscribePresence has a fixed timeout before
             // it resolves the connected state, to further slow down the
             // presence requests.
+            this.app.emit('sip:presences.start_update')
             for (const accountId of accountIdsWithoutState) {
                 await this.subscribePresence(accountId)
             }
         } else {
             this.states = {}
+            this.app.emit('sip:presences.start_update')
             for (const accountId of accountIds) {
                 await this.subscribePresence(accountId)
             }
@@ -308,10 +309,12 @@ class Sip {
 
         // Update presence item state in the UI.
         for (let accountId of accountIds) {
-            this.app.emit('sip:presence.update', {
-                account_id: accountId,
-                state: this.states[accountId].state,
-            })
+            if (this.states[accountId]) {
+                this.app.emit('sip:presence.update', {
+                    account_id: accountId,
+                    state: this.states[accountId].state,
+                })
+            }
         }
 
         // Clear loading indicator in the ui.

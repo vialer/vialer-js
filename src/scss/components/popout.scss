@@ -1,0 +1,211 @@
+// The popout is a special version of the popup that is shown
+// in a separate tab when pressing the popout button in the
+// popup.
+.popout,
+.popout body {
+    height: 100%;
+}
+
+.popout body {
+    width: auto;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+
+    .shortcuts {
+        // Hide the popout button when we're in the popout.
+        .close-button,
+        .popout-button {
+            display: none;
+        }
+    }
+
+    // Hide the availability and queues widget.
+    .widget.queues,
+    .widget.availability {
+        display: none;
+    }
+
+    .account-info {
+        @media (min-width: $tablet) {
+            position: absolute;
+            right: 0;
+        }
+
+        @media (max-width: $tablet) {
+            position: relative;
+            right: auto;
+            left: 473px;
+            min-width: 144px;
+        }
+    }
+
+    .no-scroll {
+        overflow-y: auto;
+    }
+
+    .container {
+        &:not(.hide) {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    .widget.contacts {
+        border-left: 1px solid transparent;
+        border-right: 1px solid transparent;
+
+        width: 100%;
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+
+        // The space for collapsing the widget is filled with the search input.
+        .search-form {
+            float: right;
+            margin-right: $vg-spacing-gap;
+        }
+
+        .widget-header {
+            flex: 0 0 45px;
+            display: flex;
+            flex-direction: column;
+            margin-left: -1px;
+            margin-right: -1px;
+            border-left: 1px solid $vg-grey-lighter;
+            border-right: 1px solid $vg-grey-lighter;
+
+            // The widget cannot be collapsed in popout mode.
+            &:hover {
+                cursor: default;
+            }
+
+            //  Hide the collapse icon; the widget is not collapsable.
+            .widget-title {
+                &::after {
+                    content: none;
+                }
+            }
+        }
+
+        .widget-content {
+            display: flex;
+            flex-direction: column;
+
+            margin-top: -1px;
+            margin-left: -1px;
+            width: 100%;
+
+            .list {
+                display: flex;
+                flex-flow: column wrap;
+                align-content: flex-start;
+
+                overflow-x: auto;
+                border-top: 0;
+                max-height: none;
+                width: calc(100vw);
+
+                @-moz-document url-prefix() {
+                    max-height: calc(100vh - #{$vg-widget-header-size});
+
+                    @media (max-width: $tablet) {
+                        max-height: calc(100vh - #{$vg-widget-header-size} - #{$vg-widget-header-size-small});
+                    }
+                }
+
+                @media (max-width: $tablet) {
+                    display: block;
+                    width: auto;
+                    margin-right: -2px;
+                }
+
+                & .contact {
+                    border-bottom: 0;
+                    border: 1px solid $vg-grey-lighter;
+                    margin-bottom: -1px;
+                    margin-right: -1px;
+
+                    &.last {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@media (min-width: $tablet) {
+    // The main container.
+    body > .login-section, .container {
+        min-width: 361px;
+        max-width: 400px;
+    }
+
+    .widget.contacts {
+        width: 400px;
+
+        .contact {
+            width: 400px;
+        }
+    }
+
+    // Shift the account info a bit down, so it's positioned at the
+    // middle of the contact widget's height.
+    .popout body .account-info {
+        top: 6px;
+    }
+}
+
+// Hide some things for very small surface areas.
+@media (max-width: 369px) {
+    .widget-icon-container,
+    .widget-title-text,
+    .status-indicators {
+        display: none;
+    }
+
+    .widget.contacts .widget-title {
+        .search-form {
+            margin-left: $vg-spacing-gap;
+            width: calc(100% - #{$vg-spacing-gap * 2});
+
+            .search-query {
+                width: 100%;
+            }
+        }
+    }
+
+    .container .account-info {
+        .user-name {
+            // Keep it in the current dom flow, so the
+            // container doesn't collapse.
+            visibility: hidden;
+        }
+
+        .pull-right {
+            position: absolute;
+            right: $vg-spacing-gap;
+            top: 0;
+        }
+    }
+}
+
+@media (max-width: $tablet) {
+    .widget.contacts {
+        overflow-x: hidden;
+    }
+    .popout body .widget.contacts .widget-content .list .contact {
+        border-right: 0;
+        margin-right: 0;
+    }
+
+    .popout body .account-info {
+        left: 0;
+        top: 0;
+    }
+}

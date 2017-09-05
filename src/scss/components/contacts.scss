@@ -1,0 +1,156 @@
+.widget.contacts {
+
+    // The widget is marked as unauthorized.
+    &.unauthorized {
+        .search-form {
+            display: none;
+        }
+    }
+
+    .search-form {
+        float: right;
+        height: $vg-widget-header-size;
+        vertical-align: middle;
+        line-height: $vg-widget-header-size;
+        margin-right: $vg-spacing-gap * 3;
+        // In Firefox, the input needs a small padding to be in the middle.
+
+        // But, in Chrome this padding should not be there.
+        @media screen and (-webkit-min-device-pixel-ratio: 0) {
+            padding-top: 0;
+        }
+
+        // The search icon inside the input element.
+        .search-button {
+            position: absolute;
+            margin-left: 8px;
+            padding-top: 7px;
+            height: $vg-widget-header-size;
+            line-height: 30px;
+            opacity: 0.3;
+            vertical-align: middle;
+        }
+
+        // The input element to search with.
+        .search-query {
+            display: inline;
+            // Make room for the search icon.
+            padding-left: 32px;
+            background: $vg-grey-lightest;
+            border: 1px solid $vg-grey-lighter;
+            height: $vg-widget-header-size - $vg-spacing-2;
+            width: 195px;
+        }
+    }
+
+    .list {
+        margin: 0;
+        padding: 0;
+        // Show a scrollbar after +/- 5 contacts.
+        max-height: 210px;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+
+    // A single contact item in the contacts list.
+    .contact {
+        border-bottom: 1px solid $vg-grey-lighter;
+        margin: 0;
+        line-height: normal;
+        cursor: default;
+        list-style: none;
+        height: $vg-widget-header-size;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+        justify-content: flex-start;
+
+        &.last {
+            margin-bottom: 0;
+        }
+
+
+        &.hide {
+            display: none;
+        }
+
+        .status-icon {
+            width: $vg-widget-header-size;
+            line-height: $vg-widget-header-size;
+            color: $vg-grey-light;
+            cursor: pointer;
+            padding-left: $vg-spacing-2;
+
+            i {
+                padding-top: 14px;
+                padding-left: 3px;
+            }
+        }
+
+        .info {
+            flex: 1;
+            padding: 8px 0;
+            padding-right: $vg-spacing-4;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+
+            .name {
+                max-width: 200px;
+                display: inline;
+                font-weight: 500;
+                cursor: pointer;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .extension {
+                display: inline;
+            }
+        }
+
+        .extension {
+            display: inline-block;
+            color: #9b9c9e;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        // Default row list can be done with css.
+        &:nth-child(odd) {
+            background: $vg-table-row-color-odd;
+        }
+
+        // A filtered row list's styling is enforced using css classes, because
+        // `nth-child` doesn't skip nodes with display: none.
+        &.odd {
+            background: $vg-table-row-color-odd !important;
+        }
+
+        &.even {
+            background: #fff  !important;
+        }
+
+    }
+
+    // No results, either because the user has no colleagues or
+    // the search filter returned empty.
+    .empty-list li,
+    .not-found-contacts li {
+        height: 45px;
+        line-height: 45px;
+
+        .info {
+            padding: 0;
+        }
+    }
+
+    .not-found-contacts {
+        .contact {
+            border: 1px solid $vg-grey-lighter;
+            height: $vg-widget-header-size;
+        }
+    }
+}

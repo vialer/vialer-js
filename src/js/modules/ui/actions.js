@@ -183,10 +183,6 @@ class UiActions extends Actions {
         // widget is open by default.
         if (this.app.env.extension && this.app.env.extension.popout) {
             $('html').addClass('popout')
-            $(() => {
-                // Open the contacts widget by default.
-                this.module.openWidget('contacts')
-            })
         }
         // keep track whether this popup is open or closed
         this.app.store.set('isMainPanelOpen', true)

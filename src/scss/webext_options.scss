@@ -7,7 +7,7 @@ body {
     padding: 5px;
 
     label {
-        font-weight: 600;
+        font-weight: 500;
         vertical-align: center;
     }
 
@@ -37,14 +37,16 @@ body {
 
     button {
         height: 25px;
-        font-weight: 600;
+        font-weight: 500;
 
         &:hover {
             cursor: pointer;
         }
     }
 
-    #status {
+    // The status indicator that says whether the settings are
+    // succesfully saved or not, when saving the options.
+    div {
         float: right;
         display: block;
         opacity: 1;

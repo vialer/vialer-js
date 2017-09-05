@@ -4,7 +4,7 @@
     "description": "__MSG_extDescription__",
     "homepage_url": "https://github.com/voipgrid/click-to-dial",
     "icons": {
-        "16": "img/call-green-16.png",
+        "16": "img/call-green.png",
         "48": "img/clicktodial-big.png"
     },
     "browser_action": {
