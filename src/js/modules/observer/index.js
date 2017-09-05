@@ -34,7 +34,7 @@ class ObserverModule {
             // Remove icons.
             this.restorePhonenumbers()
             // Remove our stylesheet.
-            $(this.observer.printStyle).remove()
+            $(this.printStyle).remove()
         })
 
         this.app.on('observer:start', (data) => {
