@@ -96,12 +96,10 @@ class Skeleton extends EventEmitter {
     */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
         if (this.env.extension && (!noIpc || noIpc === 'both')) {
-            let payloadArgs = []
             let payloadData = {
                 data: data,
                 event: event,
             }
-            payloadArgs.push(payloadData)
 
             if (tabId) {
                 this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
@@ -117,10 +115,13 @@ class Skeleton extends EventEmitter {
             }
 
             if (data && data.callback) {
-                payloadArgs.push(data.callback)
+                const callback = data.callback
+                // Make sure that functions are not part of the payload data.
+                delete data.callback
+                this.browser.runtime.sendMessage(payloadData, callback)
             }
             this.logger.debug(`${this}emit ipc event '${event}'`)
-            this.browser.runtime.sendMessage(...payloadArgs)
+            this.browser.runtime.sendMessage(payloadData)
         }
         // The web version will always use a local emitter, no matter what
         // the value is of `noIpc`. An extension may do both.
