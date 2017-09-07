@@ -1,0 +1,197 @@
+@import "widget";
+
+.no-scroll {
+    overflow-y: hidden;
+}
+
+input {
+    outline: none;
+
+    &[type="text"],
+    &[type="password"] {
+        border: 1px solid $vg-grey-lighter;
+        border-radius: 2px;
+        height: 32px;
+        padding: 0 12px;
+    }
+}
+
+// Keep select height consistent between Firefox and Chrome.
+select {
+    height: 30px;
+}
+
+// The login container.
+.login-section {
+    padding: 10px;
+    padding-bottom: 0;
+    line-height: 100%;
+}
+
+// The most upper box containing account info and
+// icon-links to several locations.
+.container .account-info {
+    height: $vg-widget-header-size-small;
+    padding: 0 $vg-spacing-gap;
+
+    .user-name {
+        line-height: $vg-widget-header-size-small;
+    }
+
+    .pull-right {
+        height: $vg-widget-header-size-small;
+        line-height: $vg-widget-header-size-small;
+
+        // The icon links container at the right top of the popup.
+        .shortcuts {
+            float: right;
+            font-size: 1.2rem;
+            display: inline-block;
+            height: $vg-widget-header-size-small;
+            line-height: $vg-widget-header-size-small;
+            vertical-align: middle;
+
+            i {
+                margin-left: $vg-spacing-1;
+            }
+        }
+     }
+}
+
+.login-form {
+    label {
+        font-weight: 500;
+        display: block;
+        margin-bottom: 4px;
+    }
+
+    button,
+    input {
+        width: 100%;
+        margin-bottom: 7px;
+    }
+
+}
+
+
+.login-button {
+    background: $vg-primary-color;
+    color: #fff;
+    border: 0;
+    height: 40px;
+    display: block;
+    margin-top: 5px;
+    border-radius: 4px;
+
+    &:active {
+        padding: 0;
+    }
+
+    &:hover {
+        background: #334;
+    }
+
+    &.loading {
+        background: $vg-primary-color;
+    }
+
+    &.failed {
+        background: $vg-info-color-failed-light;
+        color: $vg-info-color-failed-dark;
+        border: 1px solid $vg-info-color-failed-lighter;
+    }
+
+    &.info {
+        background: $vg-info-color-info-light;
+        color: $vg-info-color-info-dark;
+        border: 1px solid $vg-info-color-info-lighter;
+    }
+}
+
+.flip-horizontal {
+    transform: scaleX(-1);
+}
+
+// Different cursor for clickable stuff.
+.shortcuts i,
+.logout,
+.widget .widget-header {
+    cursor: pointer;
+}
+
+
+// Account-info: username, logout, help button etc.
+.account-info .user-name {
+    // don't wrap but put dots at the end if it doesn't fit.
+    white-space: nowrap;
+    overflow: hidden;
+    width: 190px;
+    display: inline-block;
+    text-overflow: ellipsis;
+}
+
+.logout {
+    font-weight: 500;
+    float: left;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+
+.container.static .widget[data-opened] .widget-title {
+    background-image: none;
+}
+
+
+.unauthorized-warning {
+    padding: 14px 10px 14px;
+}
+
+.status-icon.busy .fa,
+.status-icon.ringing .fa {
+    color: $vg-info-color-failed-dark;
+}
+
+.status-icon.ringing .fa {
+    transition-timing-function: ease;
+    animation: ringing 0.5s linear infinite;
+}
+
+.status-icon.available .fa {
+    color: $vg-info-color-success-dark;
+}
+
+// Prevent firefox from showing the cursor: text for normal elements like divs etc.
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+// Hide elements.
+.hide {
+    display: none;
+}
+
+.status-indicator {
+    display: none;
+}
+
+@keyframes ringing {
+    0% {color: $vg-info-color-success-dark;}
+    50% {color: $vg-info-color-failed-dark;}
+    100% {color: $vg-info-color-success-dark;}
+}
+
+@keyframes fa-blink {
+    0% {opacity: 0;}
+    50% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+.fa-blink {
+    transition-timing-function: ease;
+    animation: fa-blink 1s linear infinite;
+}

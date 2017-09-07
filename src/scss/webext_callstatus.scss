@@ -1,53 +1,47 @@
-@import "normalize";
-@import "fonts";
+@import "base/mixins";
+@import "base/variables";
+@import "base/containers";
+@import "base/fonts";
+@import "components/widget";
 
-// Styling specifically for the click-to-dial callstatus popup.
-.callstatus {
+
+.widget.callstatus {
+    @include vg-modal-widget;
+
     width: 100%;
-    height: 81px;
-    font-family: "Open Sans", "Helvetica Neue", Arial, sans-serif;
-    font-size: 12px;
-    // Center popup.
+    height: 120px;
+    position: fixed;
+    border-radius: $vg-border-radius;
     margin-left: 0;
     margin-top: 0;
-    position: fixed;
-    border-radius: 5px;
 
-    .heading {
-        color: #3c3c50;
-        background: linear-gradient(to bottom, #fafafa 0%,#e9e9e9 100%);
-        border-bottom: 1px solid #d5d5d5;
-        line-height: 40px;
-        height: 40px;
-        margin: 0;
-        padding: 0 6px;
-        letter-spacing: 0.2px;
-        font-size: 14px;
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
+    .widget-header {
+        span {
+            float: left;
+        }
+    }
 
-        // Force fixed height to include border-width.
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
+
+    .widget-title {
+        .close {
+            position: absolute;
+            right: $vg-spacing-gap;
+            top: $vg-spacing-gap;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 
     .status {
+        font-size: 0.9rem;
         margin: 0;
-        padding: 12px;
-    }
+        padding: $vg-spacing-gap;
 
-    .status-label {
-        color: #99c225;
-        font-weight: 600;
-        font-size: 12px;
+        .status-label {
+            color: $vg-primary-color;
+            font-weight: 500;
+        }
     }
-
-    .close {
-        cursor: pointer;
-        font-size: 13px;
-        line-height: 40px;
-        margin-right: 4px;
-    }
-
 }

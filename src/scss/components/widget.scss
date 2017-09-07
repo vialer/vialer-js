@@ -1,0 +1,138 @@
+.widget {
+
+    // Resize fa icons.
+    .fa {
+        font-size: 1.3rem;
+
+        &.fa-vertical-align {
+            vertical-align: middle;
+        }
+    }
+
+    // Contains the left widget icon and a status icon, like a busy icon.
+    .widget-icon-container {
+        float: left;
+        width: $vg-widget-header-size;
+        // Used for instance with the queue indicators.
+        text-align: center;
+    }
+
+    .widget-title {
+        font-weight: 400;
+
+        height: $vg-widget-header-size;
+        margin: 0;
+        padding: 0;
+
+        // All spans fill in the total height of the widget.
+        span {
+            height: $vg-widget-header-size;
+            line-height: $vg-widget-header-size;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .status-indicators,
+        .widget-title-text {
+            float: left;
+        }
+
+        .status-indicators {
+            width: $vg-widget-header-size;
+            padding-left: $vg-spacing-2;
+            height: $vg-widget-header-size;
+            position: relative;
+
+            .status-indicator {
+                display: none;
+            }
+        }
+
+        // Move the collapse icon to the right without disturbing the
+        // float of other elements, like the contacts search input.
+        &::after {
+            position: absolute;
+            font-size: 1.5rem;
+            right: $vg-spacing-gap;
+            font-family: "FontAwesome";
+            opacity: 0.7;
+            padding-top: 11px;
+        }
+    }
+
+    // Show different icons depending on whether the widget is open.
+    &[data-opened="true"] .widget-title {
+        &::after {
+            content: $icon-double-angle-up;
+        }
+    }
+
+    &[data-opened="false"] .widget-title {
+        &::after {
+            content: $icon-double-angle-down;
+        }
+    }
+
+    .widget-header {
+        @include vg-gradient;
+        border-top: 1px solid $vg-grey-lightest;
+        border-bottom: 1px solid $vg-grey-lightest;
+    }
+
+    .widget-icon {
+        display: inline-block;
+    }
+
+    &.busy .widget-icon {
+        display: none;
+    }
+
+    &.unauthorized .widget-icon {
+        display: none;
+    }
+
+    .busy-icon {
+        display: none;
+    }
+
+    &.busy .busy-icon {
+        display: inline-block;
+    }
+
+    // Hide the content area of the widget when the
+    // unauthorized class is added to the widget
+    // main container.
+    &.unauthorized .widget-content {
+        display: none;
+    }
+
+    .unauthorized-warning {
+        display: none;
+    }
+}
+
+
+.widget-content {
+    .form {
+        padding: 2px 13px 14px;
+
+        label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+    }
+
+    .form-inline .radio {
+        display: inline-block;
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+    }
+
+    .empty-list li {
+        cursor: auto;
+        overflow: hidden;
+    }
+}

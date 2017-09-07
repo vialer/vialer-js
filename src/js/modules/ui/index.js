@@ -98,7 +98,7 @@ class UiModule {
     * @param {String} widgetOrWidgetName - Reference to widget to open.
     */
     openWidget(widgetOrWidgetName) {
-        this.app.logger.debug(`${this}open widget`)
+        this.app.logger.debug(`${this}open widget ${widgetOrWidgetName}`)
         let widget = this.getWidget(widgetOrWidgetName)
         const data = widget.data()
         const widgetName = data.widget
@@ -166,13 +166,6 @@ class UiModule {
         this.app.logger.debug(`${this}reset widget`)
         let widget = this.getWidget(widgetOrWidgetName)
         $(widget).removeClass('busy').removeClass('unauthorized')
-        // Only close a widget when it's not a popout.
-        if (!this.app.env.extension || (this.app.env.extension && !this.app.env.extension.popout)) {
-            this.closeWidget(widget)
-        }
-        if (this.isWidgetOpen(widget)) {
-            this.openWidget(widget)
-        }
     }
 
 

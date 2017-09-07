@@ -27,6 +27,8 @@ const minifier = composer(require('uglify-es'), console)
 const mount = require('connect-mount')
 
 const notify = require('gulp-notify')
+const rename = require('gulp-rename')
+const replace = require('gulp-replace')
 const rc = require('rc')
 const runSequence = require('run-sequence')
 const sass = require('gulp-sass')
@@ -283,13 +285,12 @@ gulp.task('docs-deploy', 'Push the docs build directory to github pages.', ['doc
 
 gulp.task('fonts', 'Copy fonts to the build directory.', () => {
     const fontAwesomePath = path.join(NODE_PATH, 'font-awesome', 'fonts')
-    const opensansPath = path.join(NODE_PATH, 'npm-font-open-sans', 'fonts')
+    const robotoBasePath = path.join(NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
+
     return gulp.src(path.join(fontAwesomePath, 'fontawesome-webfont.woff2'))
-        .pipe(addsrc(path.join(opensansPath, 'Bold', 'OpenSans-Bold.woff2')))
-        .pipe(addsrc(path.join(opensansPath, 'Italic', 'OpenSans-Italic.woff2')))
-        .pipe(addsrc(path.join(opensansPath, 'Semibold', 'OpenSans-Semibold.woff2')))
-        .pipe(addsrc(path.join(opensansPath, 'SemiboldItalic', 'OpenSans-SemiboldItalic.woff2')))
-        .pipe(addsrc(path.join(opensansPath, 'Regular', 'OpenSans-Regular.woff2')))
+        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Light.woff2'), {base: robotoBasePath}))
+        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Regular.woff2'), {base: robotoBasePath}))
+        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Medium.woff2'), {base: robotoBasePath}))
         .pipe(flatten())
         .pipe(gulp.dest(`./build/${BUILD_TARGET}/fonts`))
         .pipe(size(_extend({title: 'fonts'}, sizeOptions)))
@@ -297,12 +298,29 @@ gulp.task('fonts', 'Copy fonts to the build directory.', () => {
 
 
 gulp.task('html', 'Add html to the build directory.', () => {
-    let target = 'electron'
-    if (BUILD_TARGET !== 'electron') target = 'webext'
-    return gulp.src(path.join('src', 'html', `${target}*.html`))
-        .pipe(ifElse(!PRODUCTION, () => addsrc(path.join('src', 'html', 'test.html'))))
+    let jsbottom, jshead, target
+
+    if (BUILD_TARGET === 'electron') {
+        target = 'electron'
+        jshead = '<script src="js/lib/thirdparty/SIPml-api.js"></script>'
+        jsbottom = '<script src="js/electron_webview.js"></script>'
+
+    } else {
+        target = 'webext'
+        jshead = ''
+        jsbottom = '<script src="js/webext_popup.js"></script>'
+    }
+
+    // The webext_popup.html file is shared with the electron build target.
+    // Appropriate scripts are inserted based on the build target.
+    return gulp.src(path.join('src', 'html', 'webext_popup.html'))
+        .pipe(replace('<!--JSBOTTOM-->', jsbottom))
+        .pipe(replace('<!--JSHEAD-->', jshead))
         .pipe(flatten())
+        .pipe(ifElse((target === 'electron'), () => rename('electron_webview.html')))
+        .pipe(ifElse((target === 'webext'), () => addsrc(path.join('src', 'html', 'webext_{options,callstatus}.html'))))
         .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
+        .pipe(ifElse(isWatching, livereload))
 })
 
 
@@ -400,7 +418,9 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         `!${path.join(__dirname, 'src', 'js', 'electron_main.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'electron_webview.js')}`,
     ], () => {
-        if (BUILD_TARGET !== 'electron') gulp.start('js-webext')
+        if (BUILD_TARGET === 'electron') gulp.start('js-electron')
+        else gulp.start('js-webext')
+
         if (WITHDOCS) gulp.start('docs')
     })
 
@@ -448,6 +468,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
 
     gulp.watch([
         path.join(__dirname, 'src', 'scss', 'webext.scss'),
-        path.join(__dirname, 'src', 'scss', '_*.scss'),
+        path.join(__dirname, 'src', 'scss', 'base', '*.scss'),
+        path.join(__dirname, 'src', 'scss', 'components', '*.scss'),
     ], ['scss-webext'])
 })

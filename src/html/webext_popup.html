@@ -6,7 +6,9 @@
         <meta charset="utf-8" />
         <link href="css/webext.css" rel="stylesheet" />
         <script src="js/vendor.js"></script>
+        <!--JSHEAD-->
     </head>
+
     <body class="no-select">
         <div class="login-section">
             <form class="login-form">
@@ -19,25 +21,31 @@
         </div>
         <div class="container hide">
             <div class="account-info">
+                <span id="user-name" class="user-name"></span>
                 <div class="pull-right">
                     <span id="logout" data-link="logout" class="logout" data-i18n-content="logoutLinkText"></span>
                     <span class="shortcuts">
-                        <i id="close" class="close-button fa pull-right fa-times-circle" data-i18n-title="closePanelTitle"></i>
-                        <i id="settings" class="settings-button fa pull-right fa-cog" data-link="settings" data-i18n-title="openSettingsTitle"></i>
-                        <i id="refresh" class="refresh-button fa pull-right fa-refresh" data-i18n-title="refreshPanelTitle"></i>
-                        <i id="help" class="help-button fa pull-right fa-question-circle" data-link="help" data-i18n-title="openHelpTitle"></i>
-                        <i id="popout" class="popout-button fa pull-right flip-horizontal fa-external-link" data-i18n-title="popoutTitle"></i>
+                        <i id="popout" class="popout-button fa flip-horizontal fa-external-link" data-i18n-title="popoutTitle"></i>
+                        <i id="help" class="help-button fa fa-question-circle" data-link="help" data-i18n-title="openHelpTitle"></i>
+                        <i id="refresh" class="refresh-button fa fa-refresh" data-i18n-title="refreshPanelTitle"></i>
+                        <i id="settings" class="settings-button fa fa-cog" data-link="settings" data-i18n-title="openSettingsTitle"></i>
+                        <i id="close" class="close-button fa fa-times-circle" data-i18n-title="closePanelTitle"></i>
                     </span>
                 </div>
-                <span id="user-name" class="user-name"></span>
             </div>
+
             <div class="widget availability" data-opened="false" data-widget="availability">
                 <div class="widget-header no-select">
                     <h3 class="widget-title">
-                        <i class="fa fa-fw fa-phone-square fa-vertical-align widget-icon"></i>
-                        <i class="fa fa-fw fa-spinner fa-spin fa-vertical-align busy-icon"></i>
-                        <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align unauthorized-icon"></i>
-                        <span data-i18n-content="availabilityWidgetTitle"></span>
+                        <span class="widget-icon-container">
+                            <i class="fa fa-phone-square fa-vertical-align widget-icon"></i>
+                            <i class="fa fa-refresh fa-spin fa-vertical-align busy-icon"></i>
+                        </span>
+
+                        <span class="widget-title-text" data-i18n-content="availabilityWidgetTitle"></span>
+                        <span class="status-indicators">
+                            <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align status-indicator unauthorized-icon"></i>
+                        </span>
                     </h3>
                 </div>
                 <div class="widget-content hide">
@@ -62,16 +70,21 @@
                 </div>
                 <div class="unauthorized-warning hide" data-i18n-content="availabilityUnauthorizedWarning"></div>
             </div>
+
             <div class="widget contacts" data-opened="false" data-widget="contacts">
                 <div class="widget-header no-select">
                     <h3 class="widget-title">
-                        <i class="fa fa-fw fa-group fa-vertical-align widget-icon"></i>
-                        <i class="fa fa-fw fa-spinner fa-spin fa-vertical-align busy-icon"></i>
-                        <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align status-indicator unauthorized-icon"></i>
-                        <i class="fa fa-fw fa-triangle fa-spin fa-circle-o-notch fa-vertical-align status-indicator updating-presence-status" data-i18n-title="contactsConnectingTitle"></i>
-                        <i class="fa fa-fw fa-triangle fa-chain-broken fa-blink fa-vertical-align status-indicator disconnected-status" data-i18n-title="contactsNoConnectionTitle"></i>
-                        <span data-i18n-content="contactsWidgetTitle"></span>
+                        <span class="widget-icon-container">
+                            <i class="fa fa-users fa-vertical-align widget-icon"></i>
+                            <i class="fa fa-refresh fa-spin fa-vertical-align busy-icon"></i>
+                        </span>
+                        <span class="widget-title-text" data-i18n-content="contactsWidgetTitle"></span>
 
+                        <span class="status-indicators">
+                            <i class="fa fa-triangle fa-exclamation-triangle fa-vertical-align status-indicator unauthorized-icon"></i>
+                            <i class="fa fa-cloud-download fa-blink fa-vertical-align status-indicator updating-presence-status" data-i18n-title="contactsConnectingTitle"></i>
+                            <i class="fa fa-triangle fa-chain-broken fa-blink fa-vertical-align status-indicator disconnected-status" data-i18n-title="contactsNoConnectionTitle"></i>
+                        </span>
                         <form class="form form-inline search-form">
                             <i class="fa fa-search pull-left search-button"></i>
                             <input id="search-query" type="search" name="search" class="form-control search-query" disabled="disabled" />
@@ -81,7 +94,7 @@
                 <div class="widget-content hide">
                     <ul class="template hide">
                         <li class="contact">
-                            <div class="status-icon pull-left">
+                            <div class="status-icon">
                                 <i class="fa fa-phone-square"></i>
                             </div>
                             <div class="info">
@@ -120,19 +133,27 @@
                 </div>
                 <div class="unauthorized-warning hide" data-i18n-content="contactsUnauthorizedWarning"></div>
             </div>
+
             <div class="widget queues" data-opened="false" data-widget="queues">
                 <div class="widget-header no-select">
                     <h3 class="widget-title">
-                        <i class="fa fa-fw fa-clock-o fa-vertical-align widget-icon"></i>
-                        <i class="fa fa-fw fa-spinner fa-spin fa-vertical-align busy-icon"></i>
-                        <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align unauthorized-icon"></i>
-                        <span data-i18n-content="queuesWidgetTitle"></span>
+                        <span class="widget-icon-container">
+                            <i class="fa fa-clock-o fa-vertical-align widget-icon"></i>
+                            <i class="fa fa-refresh fa-spin fa-vertical-align busy-icon"></i>
+                        </span>
+                        <span class="widget-title-text" data-i18n-content="queuesWidgetTitle"></span>
+
+                        <span class="status-indicators">
+                            <i class="fa fa-fw fa-triangle fa-exclamation-triangle fa-vertical-align status-indicator unauthorized-icon"></i>
+                        </span>
                     </h3>
                 </div>
                 <div class="widget-content hide">
                     <ul class="template hide">
                         <li class="queue">
-                            <span class="indicator">?</span>
+                            <span class="widget-icon-container">
+                                <span class="indicator">?</span>
+                            </span>
                             <span class="text"></span>
                             <span class="code"></span>
                         </li>
@@ -148,7 +169,9 @@
                 </div>
                 <div class="unauthorized-warning hide" data-i18n-content="queuesUnauthorizedWarning"></div>
             </div>
+
         </div>
     </body>
-    <script src="js/webext_popup.js"></script>
+
+    <!--JSBOTTOM-->
 </html>

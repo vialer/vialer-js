@@ -1,0 +1,25 @@
+.widget.availability {
+    .widget-content {
+        // Container for availability radio buttons.
+        .availability-toggle {
+            padding: 10px 0;
+
+            > label {
+                margin-right: 10px;
+            }
+
+            .radio {
+                margin-left: 10px;
+
+                .form-control {
+                    margin-right: 5px;
+                }
+            }
+        }
+
+        // Availability choices select.
+        .availability-destination select {
+            width: 100%;
+        }
+    }
+}

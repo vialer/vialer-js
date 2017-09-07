@@ -1,0 +1,40 @@
+// Dimensions.
+$vg-spacing-1: 5px;
+$vg-spacing-2: 10px;
+$vg-spacing-3: 15px;
+$vg-spacing-4: 20px;
+$vg-spacing-5: 25px;
+
+// Visual gap that lines out with the widget icon that is
+// a 1.3rem centered font in a 45px box.
+$vg-spacing-gap: 13px;
+
+$vg-widget-header-size: 45px;
+$vg-widget-header-size-small: 30px;
+$vg-border-radius: $vg-spacing-1;
+
+$mobile: 369px;
+$tablet: 769px;
+$desktop: 960px;
+$widescreen: 1152px;
+$fullhd: 1344px;
+
+
+// Colors.
+$vg-grey-lightest: #f9f9f9;
+$vg-grey-lighter: #e5e5e5;
+$vg-grey-light: #999;
+
+$vg-primary-color: #3c3c50;
+
+$vg-info-color-failed-dark: #b17979;
+$vg-info-color-failed-light: #f2dede;
+$vg-info-color-failed-lighter: #ebccd1;
+
+$vg-info-color-info-dark: #31708f;
+$vg-info-color-info-light: #d9edf7;
+$vg-info-color-info-lighter: #bce8f1;
+
+$vg-info-color-success-dark: #76b176;
+
+$vg-table-row-color-odd: #f9f9f9;

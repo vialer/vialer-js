@@ -1,0 +1,35 @@
+$font-path: "../fonts";
+
+$fa-font-path: $font-path;
+@import "font-awesome/scss/font-awesome";
+
+// Font-awesome icons.
+$icon-double-angle-up: "\f102";
+$icon-double-angle-down: "\f103";
+$icon-check: "\f00c";
+
+
+.title + hr {
+    margin: 1.3rem 0;
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 300;
+    src: local("Roboto Light"), local("Roboto-Light"), url("#{$font-path}/Roboto-Light.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 400;
+    src: local("Roboto"), local("Roboto-Regular"), url("#{$font-path}/Roboto-Regular.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Roboto";
+    font-style: normal;
+    font-weight: 500;
+    src: local("Roboto Medium"), local("Roboto-Medium"), url("#{$font-path}/Roboto-Medium.woff2") format("woff2");
+}

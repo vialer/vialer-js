@@ -254,7 +254,7 @@ class DialerModule {
             'border-radius': '5px',
             bottom: '0',
             'box-shadow': 'rgba(0,0,0,0.25) 0 0 0 2038px, rgba(0,0,0,0.25) 0 10px 20px',
-            height: '79px',
+            height: '120px',
             left: '0',
             margin: 'auto',
             'min-height': '0',

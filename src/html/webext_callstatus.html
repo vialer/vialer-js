@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="nl">
     <head>
         <meta charset="utf-8" />
@@ -5,17 +6,27 @@
         <script src="js/vendor.js"></script>
     </head>
     <body>
-        <div class="callstatus">
-            <p class="heading">
-                <i class="fa fa-fw fa-phone-square fa-vertical-align"></i>
-                <span data-i18n-content="clicktodialTitle"></span>
-                <span id="number">?</span>
-                <i id="close" class="close fa fa-fw fa-times-circle pull-right"></i>
-            </p>
-            <p class="status">
-                <span class="status-label" data-i18n-content="clicktodialStatusLabel"></span>
-                <span id="status" class="status-text"></span>
-            </p>
+        <div class="widget callstatus">
+            <div class="widget-header">
+                <h3 class="widget-title">
+                    <span class="widget-icon-container">
+                        <i class="fa fa-phone-square fa-vertical-align widget-icon"></i>
+                        <i class="fa fa-refresh fa-spin fa-vertical-align busy-icon"></i>
+                    </span>
+
+                    <span class="widget-title-text" data-i18n-content="clicktodialTitle">Gesprek naar</span>
+                    <span>&nbsp;</span>
+                    <span id="number">...</span>
+
+                    <i id="close" class="close fa fa-vertical-align fa-times-circle"></i>
+                </h3>
+            </div>
+            <div class="widget-content">
+                <p class="status">
+                    <span class="status-label" data-i18n-content="clicktodialStatusLabel"></span>
+                    <span id="status" class="status-text"></span>...
+                </p>
+            </div>
         </div>
     </body>
     <script src="js/webext_callstatus.js"></script>

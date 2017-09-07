@@ -50,7 +50,10 @@ class ContactsActions extends Actions {
 
 
     _popup() {
-        let searchQuery = ''
+        // The SIP websocket connection is not started at this point.
+        // Show the disconnected icon.
+        $('.contacts .disconnected-status').css('display', 'inline-block')
+
         // Force size for .contact,
         // useful in case of a popout and the list of contacts
         // is larger in size (height) than the viewport.
@@ -70,6 +73,7 @@ class ContactsActions extends Actions {
         this.app.on('contacts:fill', (data) => {
             let contacts = data.contacts
             $('.widget.contacts .empty-list').addClass('hide')
+            $('.widget.contacts .not-found-contacts').addClass('hide')
             $('.contacts .search-query').removeAttr('disabled')
 
             // Clear list.
@@ -83,7 +87,6 @@ class ContactsActions extends Actions {
                 listItem.attr('id', 'sip' + contact.account_id)
                 listItem.find('.name').text(contact.description)
                 listItem.find('.extension').text(contact.internal_number)
-
                 listItem.appendTo(list)
             })
 
@@ -94,6 +97,12 @@ class ContactsActions extends Actions {
             data.callback({})
             // Hide element.
             $('embed').hide()
+
+            // Open the contacts widget after it's filled,
+            // so it's open by default in the popout.
+            if (this.app.env.extension && this.app.env.extension.popout) {
+                this.app.modules.ui.openWidget('contacts')
+            }
         })
 
         this.app.on('contacts:reset', (data) => {
@@ -106,52 +115,59 @@ class ContactsActions extends Actions {
             $('.widget.contacts .contact').removeClass('hide')
         })
 
-        this.app.on('sip:presence.update', (data) => {
-            let account_id = data.account_id
-            let state = data.state
-            $(`#sip${account_id} .status-icon`).removeClass('available unavailable busy ringing shake').addClass(state)
-        })
-
-        this.app.on('sip:presences.start_update', (data) => {
-            $('.contacts .status-indicator').hide().filter('.updating-presence-status').css('display', 'inline-block')
-        })
-
-        /**
-         * Hide the sip presence update indicator.
-         */
-        this.app.on('sip:presences.updated', (data) => {
-            $('.contacts .status-indicator').hide()
-        })
 
         this.app.on('sip:before_start', () => {
-            $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
+            $('.contacts .disconnected-status').css('display', 'inline-block')
         })
 
         this.app.on('sip:starting', (e) => {
-            $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
-            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
+            $('.contacts .disconnected-status').css('display', 'inline-block')
         })
 
         this.app.on('sip:failed_to_start', (data) => {
+            $('.contacts .disconnected-status').css('display', 'inline-block')
             $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
         })
 
         this.app.on('sip:started', () => {
-            $('.contacts .status-indicator').hide()
-            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
+            $('.contacts .disconnected-status').hide()
         })
 
         this.app.on('sip:stopped', (e) => {
-            $('.contacts .status-indicator').hide().filter('.disconnected-status').css('display', 'inline-block')
+            // Hide all other status indicators as well.
+            $('.contacts .status-indicator').hide()
+            $('.contacts .disconnected-status').css('display', 'inline-block')
+            // Remove all the statuses from the contacts.
             $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
         })
 
-        // Blink every phone icon with class "ringing".
-        let blink = () => {
-            let ringingNow = $('.status-icon.ringing')
-            $(ringingNow).toggleClass('available').toggleClass('busy')
-        }
-        setInterval(blink, 400)
+        /**
+         * Show a blinking presence loading icon while updating.
+         */
+        this.app.on('sip:presences.start_update', (data) => {
+            $('.contacts .disconnected-status').hide()
+            $('.contacts .updating-presence-status').css('display', 'inline-block')
+            // Remove all statuses from the contacts.
+            $('.contacts .status-icon').removeClass('available unavailable busy ringing shake')
+        })
+
+        /**
+        * Update the status of each account in the contact list when it's
+        * available.
+        */
+        this.app.on('sip:presence.update', (data) => {
+            $(`#sip${data.account_id} .status-icon`)
+                .removeClass('available unavailable busy ringing shake')
+                .addClass(data.state)
+        })
+
+        /**
+        * Hide the sip presence update indicator when the update
+        * process is done.
+        */
+        this.app.on('sip:presences.updated', (data) => {
+            $('.contacts .updating-presence-status').hide()
+        })
 
         // Call a contact when clicking on one.
         $('.contacts').on('click', '.status-icon, .name, .extension', (e) => {
@@ -164,29 +180,39 @@ class ContactsActions extends Actions {
         })
 
         // Search through contacts while typing.
+        const list = $('.contacts .list')
         $('.search-form :input').keyup((e) => {
-            const list = $('.contacts .list')
-            searchQuery = $(e.currentTarget).val().trim().toLowerCase()
+            let searchQuery = $(e.currentTarget).val().trim().toLowerCase()
             $(list).find('.contact.last').removeClass('last')
             // Filter list.
-            $.each($('.contacts .list .contact'), (index, contact) => {
-                // Hide contact if not a match.
-                if ($(contact).find('.name').text().toLowerCase().indexOf(searchQuery) === -1 &&
-                        $(contact).find('.extension').text().toLowerCase().indexOf(searchQuery) === -1) {
-                    $(contact).addClass('hide')
-                } else {
-                    $(contact).removeClass('hide')
-                }
-            })
-
+            let rowOdd = 0
+            if (searchQuery === '') {
+                $('.contacts .list .contact').removeClass('odd even hide')
+            } else {
+                $.each($('.contacts .list .contact'), (index, contact) => {
+                    // Hide contact if not a match.
+                    const nameText = $(contact).find('.name').text().toLowerCase()
+                    const extensionText = $(contact).find('.extension').text().toLowerCase()
+                    // No search result. Hide the item.
+                    if (nameText.indexOf(searchQuery) === -1 && extensionText.indexOf(searchQuery) === -1) {
+                        $(contact).removeClass('odd').removeClass('even')
+                        $(contact).addClass('hide')
+                    } else {
+                        $(contact).removeClass('hide')
+                        if (rowOdd % 2 === 0) {
+                            $(contact).removeClass('even').addClass('odd')
+                        } else {
+                            $(contact).removeClass('odd').addClass('even')
+                        }
+                        rowOdd += 1
+                    }
+                })
+            }
+            $('.contacts .list .contact:visible:last').addClass('last')
             // Show a message if no contacts matched.
             if ($('.contacts .list .contact:visible').length) {
-                $('.widget.contacts .list').css('overflow-x', 'auto')
                 $('.widget.contacts .not-found-contacts').addClass('hide')
-                // hack in popout to display bottom border
-                $('.contacts .list .contact:visible:last').addClass('last')
             } else {
-                $('.widget.contacts .list').css('overflow-x', 'hidden')
                 $('.widget.contacts .not-found-contacts').removeClass('hide')
             }
         }).keydown((e) => {
