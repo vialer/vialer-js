@@ -4,13 +4,17 @@ $vg-spacing-2: 10px;
 $vg-spacing-3: 15px;
 $vg-spacing-4: 20px;
 $vg-spacing-5: 25px;
+$vg-spacing-6: 30px;
+$vg-spacing-12: 60px;
 
 // Visual gap that lines out with the widget icon that is
 // a 1.3rem centered font in a 45px box.
 $vg-spacing-gap: 13px;
 
+
 $vg-widget-header-size: 45px;
 $vg-widget-header-size-small: 30px;
+$vg-widget-header-size-combined: $vg-widget-header-size + $vg-widget-header-size-small;
 $vg-border-radius: $vg-spacing-1;
 
 $mobile: 369px;

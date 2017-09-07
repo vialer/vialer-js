@@ -54,8 +54,8 @@
     }
 
     .widget.contacts {
-        border-left: 1px solid transparent;
-        border-right: 1px solid transparent;
+        border-left: 1px solid $vg-grey-lightest;
+        border-right: 1px solid $vg-grey-lightest;
 
         width: 100%;
         position: relative;
@@ -113,13 +113,13 @@
                     max-height: calc(100vh - #{$vg-widget-header-size});
 
                     @media (max-width: $tablet) {
+                        // Account for an extra border pixel.
                         max-height: calc(100vh - #{$vg-widget-header-size} - #{$vg-widget-header-size-small});
                     }
                 }
 
                 @media (max-width: $tablet) {
                     display: block;
-                    width: auto;
                     margin-right: -2px;
                 }
 
@@ -163,30 +163,41 @@
 
 // Hide some things for very small surface areas.
 @media (max-width: 369px) {
-    .widget-icon-container,
-    .widget-title-text,
-    .status-indicators {
+    .widget-title-text {
         display: none;
+    }
+
+    // Take it out of the flow, so the search input has
+    // room to expand.
+    .status-indicators,
+    .widget-icon-container {
+        position: absolute;
+    }
+
+    .status-indicators {
+        position: absolute !important;
+        margin-left: $vg-widget-header-size-small;
+        display: block;
+        float: none !important;
     }
 
     .widget.contacts .widget-title {
         .search-form {
             margin-left: $vg-spacing-gap;
-            width: calc(100% - #{$vg-spacing-gap * 2});
+            width: calc(100% - 36px);
+
+            .search-button {
+                margin-left: 68px;
+            }
 
             .search-query {
-                width: 100%;
+                width: calc(100% - #{$vg-spacing-12});
+                margin-left: $vg-spacing-12;
             }
         }
     }
 
     .container .account-info {
-        .user-name {
-            // Keep it in the current dom flow, so the
-            // container doesn't collapse.
-            visibility: hidden;
-        }
-
         .pull-right {
             position: absolute;
             right: $vg-spacing-gap;
@@ -196,9 +207,7 @@
 }
 
 @media (max-width: $tablet) {
-    .widget.contacts {
-        overflow-x: hidden;
-    }
+
     .popout body .widget.contacts .widget-content .list .contact {
         border-right: 0;
         margin-right: 0;

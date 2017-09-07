@@ -78,13 +78,17 @@
 
         .status-icon {
             width: $vg-widget-header-size;
-            line-height: $vg-widget-header-size;
+            // Without the 1px less height, the contact box
+            // will overflow in mobile mode when limiting the
+            // boxes using search on Firefox.
+            height: $vg-widget-header-size - 1px;
+            line-height: $vg-widget-header-size -1px -$vg-spacing-2;
             color: $vg-grey-light;
             cursor: pointer;
             padding-left: $vg-spacing-2;
 
             i {
-                padding-top: 14px;
+                padding-top: 12px;
                 padding-left: 3px;
             }
         }
@@ -92,6 +96,10 @@
         .info {
             flex: 1;
             padding: 8px 0;
+            // Without the 1px less height, the contact box
+            // will overflow in mobile mode when limiting the
+            // boxes using search on Firefox.
+            height: $vg-widget-header-size - 1px;
             padding-right: $vg-spacing-4;
             text-overflow: ellipsis;
             white-space: nowrap;
