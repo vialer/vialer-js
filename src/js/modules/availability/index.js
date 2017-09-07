@@ -201,7 +201,7 @@ class AvailabilityModule {
     _reset() {
         this.app.emit('availability:reset')
         this.app.logger.info(`${this}set icon to grey`)
-        if (this.app.env.extension) this.app.browser.browserAction.setIcon({path: 'img/call-gray.png'})
+        if (this.app.env.extension) this.app.browser.browserAction.setIcon({path: 'img/call-grey.png'})
     }
 
 

@@ -12,7 +12,7 @@
     "templates" : {
         "title": "Click-to-dial",
         "logo": {
-            "url": "clicktodial-big.png",
+            "url": "logo.png",
             "width": "72px",
             "height": "72px"
         },
@@ -25,7 +25,7 @@
         },
         "staticFiles": {
             "include": [
-                "./src/img/clicktodial-big.png"
+                "./src/img/logo.png"
             ]
         }
     },

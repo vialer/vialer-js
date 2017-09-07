@@ -54,7 +54,7 @@ class Logger {
             type: 'basic',
         }
         if (this.app.env.extension) {
-            options.iconUrl = this.app.browser.runtime.getURL('img/clicktodial-big.png')
+            options.iconUrl = this.app.browser.runtime.getURL('img/logo.png')
             this.app.browser.notifications.create(message, options)
         } else {
             options.iconUrl = 'img/clicktodial.png'
