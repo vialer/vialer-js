@@ -27,8 +27,9 @@
             padding-top: 7px;
             height: $vg-widget-header-size;
             line-height: 30px;
-            opacity: 0.3;
+            opacity: .3;
             vertical-align: middle;
+            font-size: 1rem;
         }
 
         // The input element to search with.
@@ -40,6 +41,7 @@
             border: 1px solid $vg-grey-lighter;
             height: $vg-widget-header-size - $vg-spacing-2;
             width: 195px;
+            font-size: .9rem;
         }
     }
 
@@ -70,7 +72,6 @@
         &.last {
             margin-bottom: 0;
         }
-
 
         &.hide {
             display: none;
@@ -109,22 +110,40 @@
                 max-width: 200px;
                 display: inline;
                 font-weight: 500;
-                cursor: pointer;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
 
             .extension {
-                display: inline;
+                display: inline-block;
+                color: #9b9c9e;
+                font-weight: normal;
             }
         }
 
-        .extension {
-            display: inline-block;
-            color: #9b9c9e;
-            font-weight: normal;
-            cursor: pointer;
+        &:hover {
+            .info .name,
+            .info .extension,
+            .status-icon {
+                &:hover {
+                    cursor: pointer;
+                }
+            }
         }
+
+        &[disabled] {
+            opacity: .6;
+
+            .info .name,
+            .info .extension,
+            .status-icon {
+                &:hover {
+                    cursor: default;
+                }
+            }
+        }
+
+
 
         // Default row list can be done with css.
         &:nth-child(odd) {

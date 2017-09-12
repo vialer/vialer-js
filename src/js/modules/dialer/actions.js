@@ -33,27 +33,40 @@ class DialerActions extends Actions {
             }
         })
 
+
         /**
-        * Stop callstatus timer for callid when the callstatus dialog closes.
+        * The callstatus dialog is closed. We don't longer poll
+        * the callstatus of the current call.
         */
-        this.app.on('dialer:callstatus.onhide', (data) => {
-            this.app.timer.stopTimer(`dialer:status.update-${data.callid}`)
-            this.app.timer.unregisterTimer(`dialer:status.update-${data.callid}`)
+        this.app.on('dialer:status.onhide', (data) => {
+            if (this.app.timer.getRegisteredTimer(`dialer:status.update-${data.callid}`)) {
+                this.app.timer.stopTimer(`dialer:status.update-${data.callid}`)
+                this.app.timer.unregisterTimer(`dialer:status.update-${data.callid}`)
+            }
         })
+
 
         /**
         * Start callstatus timer function for callid when the callstatus
         * dialog opens. The timer function updates the call status
-        * periodically.
+        * periodically. Check the `dial` method in `dialer/index.js` method
+        * for the used timer function.
         */
-        this.app.on('dialer:callstatus.onshow', (data) => {
+        this.app.on('dialer:status.start', (data) => {
             this.app.timer.startTimer(`dialer:status.update-${data.callid}`)
         })
 
-        // An event from a tab page, requesting to dial a number.
+
+        /**
+        * Used to make the actual call. A callstatus popup will be used if
+        * the sender is a tab; otherwise fall back to html5 notifications.
+        * Silent mode can be forced by passing the `forceSilent` Boolean
+        * with the event.
+        */
         this.app.on('dialer:dial', (data) => {
-            this.module.dial(data.b_number, data.sender.tab)
-            this.app.analytics.trackClickToDial('Webpage')
+            if (data.forceSilent || !this.app.env.extension) this.module.dial(data.b_number, null)
+            else this.module.dial(data.b_number, data.sender.tab)
+            if (data.analytics) this.app.analytics.trackClickToDial(data.analytics)
         })
 
 
@@ -82,23 +95,23 @@ class DialerActions extends Actions {
         /**
          * Trigger showing the callstatus dialog.
          */
-        this.app.on('dialer:callstatus.show', (data) => {
-            this.module.showCallstatus(data.callid)
+        this.app.on('dialer:status.show', (data) => {
+            this.module.showCallstatus(data.bNumber, data.status)
         })
 
-        // Hides the callstatus popup.
-        this.app.on('dialer:callstatus.hide', (data) => {
-            // Re-enable the c2d icons again.
+        // The callstatus iframe informs the tab that
+        // it has to be closed.
+        this.app.on('dialer:status.hide', (data) => {
+            // Re-enable the click-to-dial icons in the tab again.
             $(`.${phoneIconClassName}`).each((i, el) => {
                 $(el).attr('disabled', false)
             })
 
             $(this.module.frame).remove()
             delete this.module.frame
-        })
-
-        this.app.on('dialer:callstatus.onshow', (data) => {
-            this.module.callid = data.callid
+            // Notify the background to stop any timer that
+            // may still be running.
+            this.app.emit('dialer:status.onhide', data)
         })
     }
 }

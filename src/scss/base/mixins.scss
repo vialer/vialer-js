@@ -3,9 +3,7 @@
 }
 
 @mixin vg-modal-widget {
-    position: fixed;
     border-radius: $vg-border-radius;
-    width: 100%;
     margin-left: 0;
     margin-top: 0;
 

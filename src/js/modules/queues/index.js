@@ -1,17 +1,17 @@
 /**
- * @module Queues
- */
+* @module Queues
+*/
 const QueuesActions = require('./actions')
 
 
 /**
- * The Queues module.
- */
+* The Queues module.
+*/
 class QueuesModule {
 
     /**
-     * @param {ClickToDialApp} app - The application object.
-     */
+    * @param {ClickToDialApp} app - The application object.
+    */
     constructor(app) {
         this.app = app
         this.app.modules.queues = this
@@ -141,6 +141,7 @@ class QueuesModule {
                     })
 
                     this.app.emit('queues:reset')
+                    // Pass the queues to the popup.
                     this.app.emit('queues:fill', {
                         queues: queues,
                         selectedQueue: this.app.store.get('widgets').queues.selected,
@@ -183,7 +184,6 @@ class QueuesModule {
 
     _restore() {
         this.app.logger.info(`${this}reloading widget queues`)
-
         // Check if unauthorized.
         let widgetState = this.app.store.get('widgets')
         if (widgetState.queues.unauthorized) {
