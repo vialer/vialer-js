@@ -1,6 +1,10 @@
 {
-    "extDescription": {
+    "extTitle": {
         "message": "Click-to-dial",
+        "description": "Plugin titel."
+    },
+    "extDescription": {
+        "message": "WebExtension voor klik&bel, statusupdate en wachtrij monitoring",
         "description": "Plugin omschrijving."
     },
     "clicktodialTitle": {
