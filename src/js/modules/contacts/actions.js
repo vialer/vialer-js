@@ -54,6 +54,10 @@ class ContactsActions extends Actions {
         // Show the disconnected icon.
         $('.contacts .disconnected-status').css('display', 'inline-block')
 
+        this.app.on('dialer:status.stop', (data) => {
+            $('.contacts').find('.contact').attr('disabled', false)
+        })
+
         // Force size for .contact,
         // useful in case of a popout and the list of contacts
         // is larger in size (height) than the viewport.
@@ -171,10 +175,27 @@ class ContactsActions extends Actions {
 
         // Call a contact when clicking on one.
         $('.contacts').on('click', '.status-icon, .name, .extension', (e) => {
-            let extension = $(e.currentTarget).closest('.contact').find('.extension').text()
+            const $contact = $(e.currentTarget).closest('.contact')
+
+            if ($contact.attr('disabled')) {
+                e.preventDefault()
+                return
+            } else {
+                // Disable all contacts during initiating a call.
+                $('.contacts').find('.contact').attr('disabled', true)
+            }
+
+            let extension = $contact.find('.extension').text()
             if (extension && extension.length) {
-                this.app.emit('panel.dial', {
+                let forceSilent = false
+                // When sending this event from the popout, the sender
+                // will be a tab. Use the `forceSilent` flag to forcefully
+                // disable callstatus notifications.
+                if (this.app.env.extension && this.app.env.extension.popout) forceSilent = true
+                this.app.emit('dialer:dial', {
+                    analytics: 'Colleagues',
                     b_number: extension,
+                    forceSilent: forceSilent,
                 })
             }
         })

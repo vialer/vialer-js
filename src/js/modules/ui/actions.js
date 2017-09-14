@@ -66,11 +66,6 @@ class UiActions extends Actions {
         this.app.on('ui:mainpanel.close', (data) => {
             this.app.logger.info(`${this}mainpanel.close`)
         })
-
-        this.app.on('panel.dial', (data) => {
-            this.app.modules.dialer.dial(data.b_number, null, true)
-            this.app.analytics.trackClickToDial('Colleagues')
-        })
     }
 
     /**

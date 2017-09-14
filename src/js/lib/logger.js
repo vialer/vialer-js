@@ -14,6 +14,7 @@ class Logger {
             verbose: 3,
             warn: 1,
         }
+        this._notification = null
     }
 
 
@@ -47,7 +48,7 @@ class Logger {
     }
 
 
-    notification(message, title = 'Click-to-dial') {
+    notification(message, title = 'Click-to-dial', stack = false) {
         const options = {
             message: message,
             title: title,
@@ -55,16 +56,20 @@ class Logger {
         }
         if (this.app.env.extension) {
             options.iconUrl = this.app.browser.runtime.getURL('img/logo.png')
-            this.app.browser.notifications.create(message, options)
+            if (!stack) chrome.notifications.clear('c2d')
+            this.app.browser.notifications.create('c2d', options)
         } else {
             options.iconUrl = 'img/clicktodial.png'
             if (Notification.permission === 'granted') {
-                new Notification(message, options) // eslint-disable-line no-new
+                if (!stack && this._notification) this._notification.close()
+                this._notification = new Notification(message, options) // eslint-disable-line no-new
             } else if (Notification.permission !== 'denied') {
-                // Create a notification after the user accepted the permission.
+                // Create a notification after the user
+                // accepted the permission.
                 Notification.requestPermission(function(permission) {
                     if (permission === 'granted') {
-                        new Notification(message, options) // eslint-disable-line no-new
+                        if (!stack && this._notification) this._notification.close()
+                        this._notification = new Notification(message, options) // eslint-disable-line no-new
                     }
                 })
             }

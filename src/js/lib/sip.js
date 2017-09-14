@@ -281,7 +281,6 @@ class Sip {
                 this.app.logger.debug(`${this}not updating from sip server; no sipstack available`)
                 return
             }
-            this.app.logger.debug(`${this}updating sip subscription for ${accountIds.length} account id's`)
 
             // Unsubscribe lost contacts that are in cache, but not in
             // the accountIds refresh array.
@@ -291,6 +290,7 @@ class Sip {
             }
 
             const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
+            this.app.logger.debug(`${this}updating sip subscription for ${accountIdsWithoutState.length} account id's`)
             // Don't do this in parallel, to keep the load on the websocket
             // server low. Also subscribePresence has a fixed timeout before
             // it resolves the connected state, to further slow down the

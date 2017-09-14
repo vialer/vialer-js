@@ -19,7 +19,6 @@ class App extends Skeleton {
 
         // Some caching mechanism.
         window.cache = {}
-
         this.store = new Store(this)
 
         // Store settings to localstorage.
@@ -29,15 +28,6 @@ class App extends Skeleton {
                     this.store.set(key, this.settings[key])
                 }
             }
-        }
-
-        // Checkout the contents of localstorage.
-        if (this.verbose) {
-            let localStorageDump = `${this}localstorage contains...\n`
-            for (let i = 0; i < localStorage.length; i++) {
-                localStorageDump += `${localStorage.key(i)}=${localStorage.getItem(localStorage.key(i))}\n`
-            }
-            this.logger.debug(localStorageDump)
         }
 
         // Keep track of some notifications.

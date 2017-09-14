@@ -23,9 +23,20 @@ class Skeleton extends EventEmitter {
         this.modules = {}
 
         this.name = options.name
+        this.logger = new Logger(this)
         this.store = new Store(this)
         this.i18n = new I18n(this, options.i18n)
-        this.logger = new Logger(this)
+
+        if (this.env.extension) {
+            this.ipcListener()
+            // Allows parent scripts to use the same EventEmitter syntax.
+            if (this.env.extension.tab) {
+                window.addEventListener('message', (event) => {
+                    if (this.verbose) this.logger.debug(`${this}emit '${event.data.event}' event from child`)
+                    this.emit(event.data.event, event.data.data, true)
+                })
+            }
+        }
 
         this._init()
         // Init these modules.
@@ -40,43 +51,6 @@ class Skeleton extends EventEmitter {
             this.logger.setLevel('warn')
         } else {
             this.logger.setLevel('debug')
-        }
-
-        if (this.env.extension) {
-            // Make the EventEmitter .on method compatible with
-            // web extension ipc. An Ipc event is coming in. Map it to
-            // the EventEmitter.
-            this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-                if (request.data) {
-                    // Add extra contextual information about sender to payload.
-                    request.data.sender = sender
-                    // It may have a callback, but functions can't pass through
-                    // the request.data, so map sendResponse.
-                    request.data.callback = sendResponse
-                }
-                // The frame option can be used to specifically target a
-                // callstatus or observer script. Otherwise the event is
-                // ignored, because otherwise all events emitted on the tab will
-                // also be processed by the callstatus and observer scripts.
-                if (this.env.extension.callstatus || this.env.extension.observer) {
-                    if (this.env.extension.callstatus && request.data.frame && request.data.frame === 'callstatus') {
-                        this.emit(request.event, request.data, true)
-                    } else if (this.env.extension.observer && request.data.frame && request.data.frame === 'observer') {
-                        this.emit(request.event, request.data, true)
-                    }
-                } else {
-                    this.emit(request.event, request.data, true)
-                }
-
-            })
-
-            // Allows parent scripts to use the same EventEmitter syntax.
-            if (this.env.extension.tab) {
-                window.addEventListener('message', (event) => {
-                    if (this.verbose) this.logger.debug(`${this}emit '${event.data.event}' event from child`)
-                    this.emit(event.data.event, event.data.data, true)
-                })
-            }
         }
     }
 
@@ -102,15 +76,12 @@ class Skeleton extends EventEmitter {
             }
 
             if (tabId) {
-                this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
+                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
                 this.browser.tabs.sendMessage(tabId, payloadData)
                 return
             } else if (parent) {
-                this.logger.debug(`${this}emit ipc event '${event}' to parent`)
-                parent.postMessage({
-                    data: data,
-                    event: event,
-                }, '*')
+                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to parent`)
+                parent.postMessage({data: data, event: event}, '*')
                 return
             }
 
@@ -120,13 +91,13 @@ class Skeleton extends EventEmitter {
                 delete data.callback
                 this.browser.runtime.sendMessage(payloadData, callback)
             }
-            this.logger.debug(`${this}emit ipc event '${event}'`)
+            if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
             this.browser.runtime.sendMessage(payloadData)
         }
         // The web version will always use a local emitter, no matter what
         // the value is of `noIpc`. An extension may do both.
         if (!this.env.extension || noIpc) {
-            this.logger.debug(`${this}emit local event '${event}'`)
+            if (this.verbose) this.logger.debug(`${this}emit local event '${event}'`)
             super.emit(event, data)
         }
     }
@@ -170,10 +141,49 @@ class Skeleton extends EventEmitter {
     }
 
 
+    /**
+    * Make the EventEmitter `.on` method compatible with web extension IPC,
+    * by mapping an IPC event to the EventEmitter.
+    */
+    ipcListener() {
+        this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.data) {
+                // Add extra contextual information about sender to payload.
+                request.data.sender = sender
+                // It may have a callback, but functions can't pass through
+                // the request.data, so map sendResponse.
+                request.data.callback = sendResponse
+            }
+            // The frame option can be used to specifically target a
+            // callstatus or observer script. Otherwise the event is
+            // ignored, because otherwise all events emitted on the tab will
+            // also be processed by the callstatus and observer scripts.
+            if (this.env.extension.callstatus || this.env.extension.observer) {
+                if (this.env.extension.callstatus && request.data.frame && request.data.frame === 'callstatus') {
+                    this.emit(request.event, request.data, true)
+                } else if (this.env.extension.observer && request.data.frame && request.data.frame === 'observer') {
+                    this.emit(request.event, request.data, true)
+                }
+            } else {
+                this.emit(request.event, request.data, true)
+            }
+        })
+    }
+
+
+    /**
+    * Override the default EventEmitter's `on` method, in
+    * order to keep track of listeners.
+    * @param {String} event - Event name to cache.
+    * @param {Function} callback - The function to call on this event.
+    */
     on(event, callback) {
         this._listeners += 1
         super.on(event, callback)
     }
+
+
+
 
 
     toString() {

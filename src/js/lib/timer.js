@@ -29,7 +29,6 @@ class Timer {
             return registeredTimers[timerId]
         }
 
-        this.app.logger.warn(`${this}no such timer ${timerId}`)
         return null
     }
 

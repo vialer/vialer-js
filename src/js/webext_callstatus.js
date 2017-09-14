@@ -3,24 +3,38 @@ const Skeleton = require('./lib/skeleton')
 
 class CallStatusApp extends Skeleton {
     /**
-    * When the app initializes, it's already assumed to be active and open.
+    * We want to show the callstatus as soon as possible. Therefor
+    * the bNumber and the initial status are already passed with
+    * the opening url's query parameters.
     * @param {Object} options - Initial options to start the app with.
     */
     constructor(options) {
         super(options)
-        this.verbose = true
+        this.verbose = false
         this.logger.info(`${this}starting application`)
         // Get the callid from the opened url.
-        this.callid = window.location.href.match(/callid\=([^&]+)/)[1]
+        this.bNumber = window.location.href.match(/bNumber\=([^&]+)/)[1]
+        this.callid = null
+        this.timerStarted = false
 
-        this.on('callstatus:set_bnumber', (data) => {
-            if (data.callid === this.callid) {
-                this.logger.info(`${this}callstatus:set_bnumber triggered`)
-                this.setText(document.getElementById('number'), data.b_number)
+        let initialStatus = decodeURI(window.location.href.match(/status\=([^&]+)/)[1])
+
+        this.setText(document.getElementById('number'), this.bNumber)
+        this.setText(document.getElementById('status'), initialStatus)
+
+        this.on('dialer:status.update', (data) => {
+            // The callid is assigned on the first status update.
+            if (!this.callid) this.callid = data.callid
+            if (!this.timerStarted) {
+                // Notify the background to start the callstatus timer.
+                this.emit('dialer:status.start', {
+                    // Extra info to identify call.
+                    bNumber: this.bNumber,
+                    callid: this.callid,
+                })
+                this.timerStarted = true
             }
-        })
 
-        this.on('callstatus:status.update', (data) => {
             if (data.callid === this.callid) {
                 if (data.status) {
                     this.setText(document.getElementById('status'), data.status)
@@ -30,18 +44,14 @@ class CallStatusApp extends Skeleton {
 
         $('.callstatus .close').on('click', this.hideCallstatus.bind(this))
         $(window).on('unload', this.hideCallstatus.bind(this))
-
-        // Indication to the tab parent script that it's active.
-        this.emit('dialer:callstatus.onshow', {
-            // Extra info to identify call.
-            callid: this.callid,
-        })
     }
 
 
     hideCallstatus(e) {
         this.logger.info(`${this}closing callstatus dialog`)
-        this.emit('dialer:callstatus.hide', {
+        // Notify the parent tab that the callstatus
+        // wants to be closed.
+        this.emit('dialer:status.hide', {
             callid: this.callid,
         }, false, false, parent)
     }

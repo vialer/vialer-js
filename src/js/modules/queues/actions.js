@@ -52,8 +52,8 @@ class QueuesActions extends Actions {
 
 
     /**
-     * Popup script related events.
-     */
+    * Popup script related events.
+    */
     _popup() {
         if (!('queue' in this.app.cache)) {
             this.app.cache.queue = {
@@ -66,7 +66,7 @@ class QueuesActions extends Actions {
             $('.queues .empty-list').removeClass('hide')
         })
 
-        // Fill the queue list.
+        // Fill the queue list with data from the background.
         this.app.on('queues:fill', (data) => {
             let queues = data.queues
             let selectedQueue = data.selectedQueue
@@ -104,8 +104,7 @@ class QueuesActions extends Actions {
         })
 
         this.app.on('queues:reset', (data) => {
-            let list = $('.queues .list')
-            list.empty()
+            $('.queues .list').empty()
             $('.queues .empty-list').addClass('hide')
         })
 
@@ -122,8 +121,8 @@ class QueuesActions extends Actions {
         })
 
         /**
-         * Select a queue.
-         */
+        * Select a queue.
+        */
         $('.queues .list').on('click', '.queue', (e) => {
             let target = e.currentTarget
             let queueId = null

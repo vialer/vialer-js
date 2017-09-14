@@ -70,16 +70,21 @@ class ObserverModule {
         })
 
         /**
-        * Handle a click on a click-to-dial icon next to a phonenumber on a
-        * page. Use the number in the attribute `data-number`.
+        * Handle a click on a click-to-dial icon next to a phonenumber within
+        * a tab. Use the number in the attribute `data-number`.
         */
         $('body').on('click', `.${phoneIconClassName}`, (e) => {
-            if (!$(e.currentTarget).attr('disabled') &&
-                $(e.currentTarget).attr('data-number') &&
-                $(e.currentTarget).parents(`.${phoneElementClassName}`).length
-            ) {
-                // Disable all c2d icons until the callstatus
-                // popup is closed again.
+            // Don't process the click when the icon has
+            // a disabled property set.
+            if ($(e.currentTarget).attr('disabled')) {
+                e.preventDefault()
+                return
+            }
+
+            if ($(e.currentTarget).attr('data-number') &&
+                $(e.currentTarget).parents(`.${phoneElementClassName}`).length) {
+                // Disable all c2d icons until the tab is notified
+                // by the callstatus that it wants to close again.
                 $(`.${phoneIconClassName}`).each((i, el) => {
                     $(el).attr('disabled', true)
                 })
@@ -92,6 +97,7 @@ class ObserverModule {
 
                 const b_number = $(e.currentTarget).attr('data-number')
                 this.app.emit('dialer:dial', {
+                    analytics: 'Webpage',
                     b_number: b_number,
                 })
             }
@@ -110,7 +116,10 @@ class ObserverModule {
 
             // Dial the b_number.
             const bNumber = $(e.currentTarget).attr('href').substring(4)
-            this.app.emit('dialer:dial', {b_number: bNumber})
+            this.app.emit('dialer:dial', {
+                analytics: 'Webpage',
+                b_number: bNumber,
+            })
         })
     }
 

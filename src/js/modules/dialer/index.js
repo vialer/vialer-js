@@ -12,6 +12,7 @@ class DialerModule {
 
     constructor(app, background = true) {
         this.app = app
+
         // Hardcoded blacklist of sites because there is not yet a solution
         // that works for chrome and firefox using exclude site-urls.
         //
@@ -43,146 +44,97 @@ class DialerModule {
 
 
     /**
-    * Setup the call between the number from the user's
-    * clicktodialaccount and the `b number`; the number the user
-    * wants to call..
+    * Calling this method with a provided tab will display the callstatus
+    * on top of that tab in an iframe. The poller is stopped whenever the
+    * callstatus dialog is closed or the returned status is final.
+    * Without a provided tab(like when called from the colleagues widget)
+    * there won't be a visible popup, but a html5 notification that is
+    * triggered when the status changes.
     * @param {Number} bNumber - The number the user wants to call.
-    * @param {Tab} tab - The tab from which the call was initialized.
-    * @param {Boolean} silent - Used when a call is done without having
-    * a status dialog.
+    * @param {Tab} [tab] - The tab from which the call was initialized,
+    *                      or null to use notifcations.
     */
-    dial(bNumber, tab, silent) {
+    async dial(bNumber, tab) {
         // Just make sure b_number is numbers only.
         bNumber = this.sanitizeNumber(bNumber).replace(/[^\d+]/g, '')
-        if (silent) {
-            this.app.logger.info(`${this}calling ${bNumber} silently`)
+        let callid, callstatus
+
+        // Start showing the callstatus dialog early on.
+        // The actual callstatus feedback will be started after the
+        // initial API requests.
+        if (tab) {
+            this.app.emit('dialer:status.show', {
+                bNumber: bNumber,
+                status: this.app.i18n.translate('clicktodialCallingText'),
+            }, false, tab.id)
         } else {
-            this.app.logger.info(`${this}calling ${bNumber}`)
+            this.app.logger.notification(this.app.i18n.translate('clicktodialCallingText'))
         }
 
-        this.app.api.client.post('api/clicktodial/', {b_number: bNumber}).then((res) => {
-            if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-                this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
+        // Get the callid from the API.
+        const res = await this.app.api.client.post('api/clicktodial/', {b_number: bNumber})
+        // Stop when an invalid http response is returned.
+        if (this.app.api.NOTOK_STATUS.includes(res.status)) {
+            this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
+            return
+        }
+
+        // Stop when no callid is returned.
+        if (!res.data || !res.data.callid) {
+            this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
+            return
+        }
+
+        callid = res.data.callid
+
+        const callStatusPoller = async() => {
+            // Get the actual callstatus from the API.
+            const _res = await this.app.api.client.get(`api/clicktodial/${callid}/`)
+            if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
+                // Something went wrong. Stop the timer.
+                this.app.timer.stopTimer(`dialer:status.update-${callid}`)
+                this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
                 return
             }
 
-            if (this.app.api.OK_STATUS.includes(res.status)) {
-                // This callid is used to find the call status,
-                // so without it: stop now.
-                let callid
-                if (res.data) callid = res.data.callid
-                if (!callid) {
-                    this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
-                    return
-                }
+            // Compare with the last callstatus, so we don't
+            // perform unnecessary status updates.
+            if (callstatus !== _res.data.status) {
+                callstatus = _res.data.status
 
-                // A silent call means there won't be a visible popup informing
-                // the user of the call's status. This is used when clicking a
-                // voipaccount in the `Collegues` list.
-                if (silent) {
-                    // A notification will only show in case the call failed to
-                    // connect both sides.
-                    let silentTimerFunction = () => {
-                        this.app.api.client.get(`api/clicktodial/${callid}/`).then((_res) => {
-                            if (this.app.api.OK_STATUS.includes(_res.status)) {
-                                const callStatus = _res.data.status
-                                this.app.logger.debug(`${this}clicktodial status: ${callStatus}`)
-                                // Stop after receiving these statuses.
-                                const statuses = ['connected', 'blacklisted', 'disconnected', 'failed_a', 'failed_b']
-                                // Show status in a notification in case it
-                                // fails/disconnects.
-                                this.app.logger.notification(this.getStatusMessage(callStatus, bNumber))
-                                if (statuses.includes(callStatus)) {
-                                    this.app.timer.stopTimer(`dialer:status.update-${callid}`)
-                                    this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
-                                }
-                            } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
-                                // Clear interval, stop timer.
-                                this.app.timer.stopTimer(`dialer:status.update-${callid}`)
-                                this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
-                            }
-                        })
-                    }
-
-                    this.app.timer.registerTimer(`dialer:status.update-${callid}`, silentTimerFunction)
-                    this.app.timer.setInterval(`dialer:status.update-${callid}`, 1500)
-                    // Instant start, no need to wait for panels in
-                    // the browser to be visible.
-                    this.app.timer.startTimer(`dialer:status.update-${callid}`)
-                } else {
-                    /**
-                     * A non-silent call will display the call's status
-                     * in a popup in the active tab. Whenever the call
-                     * couldn't connect both sides, a notification
-                     * will show.
-                     */
-                    const currentTab = tab.id
-
-                    // Keep updating the call status to the panel.
-                    const timerFunction = () => {
-                        if (this.app.timer.getRegisteredTimer(`dialer:status.update-${callid}`)) {
-                            this.app.api.client.get(`api/clicktodial/${callid}/`).then((_res) => {
-                                if (this.app.api.OK_STATUS.includes(_res.status)) {
-                                    const callStatus = _res.data.status
-                                    this.app.logger.info(`${this}clicktodial status:  ${callStatus}`)
-
-                                    // Stop after receiving these statuses.
-                                    let statuses = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
-                                    if (statuses.includes(callStatus)) {
-                                        this.app.timer.stopTimer(`dialer:status.update-${callid}`)
-                                        this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
-                                    }
-                                    // Update panel with latest status.
-                                    this.app.emit('callstatus:status.update', {
-                                        callid: callid,
-                                        frame: 'callstatus',
-                                        status: this.getStatusMessage(callStatus, bNumber),
-                                        // Extra info to identify call.
-                                    }, false, currentTab)
-                                } else if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
-                                    // Clear interval, stop timer.
-                                    this.app.timer.stopTimer(`dialer:status.update-${callid}`)
-                                    this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
-                                }
-                            })
-                        }
-                    }
-
-                    this.app.timer.registerTimer(`dialer:status.update-${callid}`, timerFunction)
-                    this.app.timer.setInterval(`dialer:status.update-${callid}`, 1500)
-
-                    // Tab listener.
-                    this.app.on('dialer:callstatus.onshow', (data) => {
-                        // Copy the number to the panel.
-                        this.app.logger.debug(`${this}copy the number to the callstatus popup`)
-                        this.app.emit('callstatus:set_bnumber', {
-                            b_number: bNumber,
-                            // Extra info to identify call.
-                            callid: callid,
-                            frame: 'callstatus',
-                        }, false, currentTab)
-
-                        // Copy the initial status.
-                        this.app.logger.debug(`${this}copy the initial status to the callstatus popup`)
-                        this.app.emit('callstatus:status.update', {
-                            callid: callid,
-                            frame: 'callstatus',
-                            status: this.getStatusMessage(res.data.status, bNumber),
-                            // Extra info to identify call.
-                        }, false, currentTab)
-                    })
-
-
-                    // Extra info to identify call.
-                    this.app.logger.debug(`${this}extra info to identify call.`)
-                    // Trigger the callstatus dialog to open.
-                    this.app.emit('dialer:callstatus.show', {
-                        b_number: bNumber,
+                if (tab) {
+                    // Update panel on each call with latest status.
+                    this.app.emit('dialer:status.update', {
                         callid: callid,
-                    }, false, currentTab)
+                        frame: 'callstatus',
+                        status: this.getStatusMessage(callstatus, bNumber),
+                    }, false, tab.id)
+                } else {
+                    // First hide a previous notification, so it won't stack.
+                    this.app.logger.notification(this.getStatusMessage(callstatus, bNumber))
                 }
             }
-        })
+
+            // Stop the status timer when the call is in a final state..
+            const resetStatus = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
+            if (resetStatus.includes(callstatus)) {
+                this.app.emit('dialer:status.stop', {})
+                this.app.timer.stopTimer(`dialer:status.update-${callid}`)
+                this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
+            }
+        }
+
+        this.app.timer.registerTimer(`dialer:status.update-${callid}`, callStatusPoller)
+        this.app.timer.setInterval(`dialer:status.update-${callid}`, 1500)
+
+        if (tab) {
+            // Pass the callid to the callstatus iframe. Timer will
+            // be triggered by the callstatus script.
+            this.app.emit('dialer:status.update', {callid: callid, frame: 'callstatus'}, false, tab.id)
+        } else {
+            // In notification mode, we start the timer immediatly.
+            this.app.timer.startTimer(`dialer:status.update-${callid}`)
+        }
     }
 
 
@@ -208,20 +160,6 @@ class DialerModule {
 
 
     /**
-    * Hide panel when clicking outside the iframe.
-    * @param {String} callid - Call id for the frame to remove.
-    */
-    hideFrameOnClick(callid) {
-        $(this.frame).remove()
-        delete this.frame
-        this.app.emit('dialer:callstatus.onhide', {
-            // Extra info to identify call.
-            callid: callid,
-        })
-    }
-
-
-    /**
     * Process number to return a callable phone number.
     * @param {String} number - Number to clean.
     * @returns {String} - The cleaned number.
@@ -242,32 +180,24 @@ class DialerModule {
 
 
     /**
-    * A tab triggers this function to show a status dialog. The callid is
-    * passed to the iframe page using a search string.
-    * @param {String} callid - The call id is passed to callstatus popup.
+    * A tab triggers this function to show a status dialog.
+    * @param {String} bNumber - Pass it asap to the callstatus page.
+    * @param {String} status - Pass the initial status to the callstatus page.
     */
-    showCallstatus(callid) {
+    showCallstatus(bNumber, status) {
         // Inline style for the injected callstatus iframe.
         let iframeStyle = {
-            background: '#fff',
-            border: 'none',
-            'border-radius': '5px',
-            bottom: '0',
-            'box-shadow': 'rgba(0,0,0,0.25) 0 0 0 2038px, rgba(0,0,0,0.25) 0 10px 20px',
-            height: '120px',
+            height: '100vh',
             left: '0',
-            margin: 'auto',
-            'min-height': '0',
             position: 'fixed',
-            right: '0',
             top: '0',
-            width: '320px',
+            width: '100vw',
             'z-index': '2147483647',
         }
 
         this.frame = $('<iframe>', {
             scrolling: false,
-            src: this.app.browser.runtime.getURL(`webext_callstatus.html?callid=${callid}`),
+            src: this.app.browser.runtime.getURL(`webext_callstatus.html?bNumber=${bNumber}&status=${status}`),
             style: (function() {
                 // Can't set !important with
                 // .css("property", "value !important"),
@@ -284,8 +214,6 @@ class DialerModule {
             $(this.frame).show()
         })
         $('html').append(this.frame)
-
-        $('html').on('click', this.hideFrameOnClick.bind(this, callid))
     }
 
 
