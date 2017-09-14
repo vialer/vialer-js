@@ -5,7 +5,9 @@
 }
 
 input {
-    outline: none;
+    &:focus {
+        outline: 1px solid $vg-grey-light;
+    }
 
     &[type="text"],
     &[type="password"] {
@@ -16,9 +18,15 @@ input {
     }
 }
 
-// Keep select height consistent between Firefox and Chrome.
 select {
-    height: 30px;
+    outline: none;
+    height: 2rem;
+    background: $vg-grey-lightest;
+    border: 1px solid $vg-grey-lighter;
+
+    &:focus {
+        border: 1px solid $vg-grey-light;
+    }
 }
 
 // The login container.
