@@ -12,7 +12,7 @@ class DialerModule {
 
     constructor(app, background = true) {
         this.app = app
-
+        this._contextMenuItem = null
         // Hardcoded blacklist of sites because there is not yet a solution
         // that works for chrome and firefox using exclude site-urls.
         //
@@ -40,6 +40,22 @@ class DialerModule {
         ]
 
         this.actions = new DialerActions(app, this)
+    }
+
+
+    /**
+     * Add a right-click contextmenu item to all browser tabs.
+     */
+    addContextMenuItem() {
+        this.app.logger.info(`${this}adding contextmenu`)
+        this._contextMenuItem = this.app.browser.contextMenus.create({
+            contexts: ['selection'],
+            onclick: (info, _tab) => {
+                this.app.modules.dialer.dial(info.selectionText, _tab)
+                this.app.analytics.trackClickToDial('Webpage')
+            },
+            title: this.app.i18n.translate('contextMenuLabel'),
+        })
     }
 
 
@@ -159,6 +175,12 @@ class DialerModule {
     }
 
 
+    removeContextMenuItem() {
+        this._contextMenuItem = null
+        this.app.browser.contextMenus.removeAll()
+    }
+
+
     /**
     * Process number to return a callable phone number.
     * @param {String} number - Number to clean.
@@ -218,41 +240,46 @@ class DialerModule {
 
 
     /**
-    * Determine if the DOM observer and c2d icons should be switched on
-    * or off. Method is bound to the `dialer:observer.ready` event listener.
+    * Called when the tab observer is initialized, by calling
+    * `dialer:observer.ready` on the background. Determines whether the
+    * DOM observer and c2d icons should be switched on or off.
     * The callback is done to the observer script.
-    * @param {Object} data - The event data.
+    * @param {Object} tab - The tab that is requesting observer status.
+    * @returns {Boolean} - Whether the observer should be listening.
     */
-    determineObserve(data) {
-        if (!data.sender.tab) return
+    switchObserver(tab) {
         if (!this.app.store.get('user')) {
-            this.app.logger.info(`${this}not observing because user is not logged in: ${data.sender.tab.url}`)
-            data.callback({observe: false})
-            return
+            this.app.logger.info(`${this}not observing because user is not logged in`)
+            this.removeContextMenuItem()
+            return false
         }
 
+        // Add the context menu to dial the selected number when
+        // right mouse-clicking. The contextmenu is available, even when
+        // c2d icons are disabled. Also, this can't be switched per tab,
+        // so don't take blacklisted tabs in account.
+        if (!this._contextMenuItem) this.addContextMenuItem()
+
         if (!this.app.store.get('c2d')) {
-            this.app.logger.info(`${this}not observing because icons are disabled: ${data.sender.tab.url}`)
-            data.callback({observe: false})
-            return
+            this.app.logger.info(`${this}not observing because icons are disabled`)
+            return false
         }
 
         // Test if one of the blacklisted sites matches.
         let blacklisted = false
         for (let i = 0; i < this.blacklist.length; i++) {
-            if (new RegExp(this.blacklist[i]).test(data.sender.tab.url)) {
+            if (new RegExp(this.blacklist[i]).test(tab.url)) {
                 blacklisted = true
                 break
             }
         }
 
         if (blacklisted) {
-            this.app.logger.info(`${this}not observing because this site is blacklisted: ${data.sender.tab.url}`)
-            data.callback({observe: false})
-        } else {
-            this.app.logger.info(`${this}observing ${data.sender.tab.url}`)
-            data.callback({observe: true})
+            this.app.logger.info(`${this}not observing because this site is blacklisted: ${tab.url}`)
+            return false
         }
+
+        return true
     }
 
 
@@ -269,21 +296,18 @@ class DialerModule {
     trimNumber(number) {
         // Force possible int to string.
         number = '' + number
-
         // Remove white space characters.
         return number.replace(/ /g, '')
     }
 
 
     _reset() {
-        if (this.contextMenuItem) {
-            this.app.browser.contextMenus.removeAll()
-        }
-
+        if (!this.app.env.extension) return
+        // Called when logging the plugin out. Remove the contextmenu item.
+        if (this._contextMenuItem) this.removeContextMenuItem()
         // Emit to each tab's running observer scripts that we don't want to
         // observe anymore.
         if (this.app.store.get('c2d')) {
-            if (!this.app.env.extension) return
             this.app.browser.tabs.query({}, (tabs) => {
                 tabs.forEach((tab) => {
                     // Emit all observers on the tab to stop.

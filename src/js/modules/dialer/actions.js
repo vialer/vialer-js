@@ -22,15 +22,16 @@ class DialerActions extends Actions {
         * observe the DOM and add icons to phonenumbers.
         */
         this.app.on('user:login.success', (data) => {
-            if (this.app.store.get('c2d')) {
-                // Only notify tabs in the context of an extension.
-                if (!this.app.env.extension) return
-                this.app.browser.tabs.query({}, (tabs) => {
-                    tabs.forEach((tab) => {
+            // Only notify tabs in the context of an extension.
+            if (!this.app.env.extension) return
+
+            this.app.browser.tabs.query({}, (tabs) => {
+                tabs.forEach((tab) => {
+                    if (this.module.switchObserver(tab)) {
                         this.app.emit('observer:start', {frame: 'observer'}, false, tab.id)
-                    })
+                    }
                 })
-            }
+            })
         })
 
 
@@ -69,23 +70,11 @@ class DialerActions extends Actions {
             if (data.analytics) this.app.analytics.trackClickToDial(data.analytics)
         })
 
-
-        // The observer script indicates that it's ready to observe.
+        // The observer script in a frame indicates that it's ready to observe.
         // Check if it should add icons.
-        this.app.on('dialer:observer.ready', this.module.determineObserve.bind(this.module))
-
-        // Remove all previously added context menus.
         if (this.app.env.extension) {
-            this.app.browser.contextMenus.removeAll()
-            // Add the context menu to dial the selected number when
-            // right mouse-clicking.
-            this.contextMenuItem = this.app.browser.contextMenus.create({
-                contexts: ['selection'],
-                onclick: (info, tab) => {
-                    this.app.modules.dialer.dial(info.selectionText, tab)
-                    this.app.analytics.trackClickToDial('Webpage')
-                },
-                title: this.app.i18n.translate('contextMenuLabel'),
+            this.app.on('dialer:observer.ready', (data) => {
+                data.callback({observe: this.module.switchObserver(data.sender.tab)})
             })
         }
     }
