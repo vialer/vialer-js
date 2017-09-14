@@ -37,34 +37,32 @@ class ObserverModule {
             $(this.printStyle).remove()
         })
 
+
+        // Manually trigger to observe the current tab.
         this.app.on('observer:start', (data) => {
-            // Stop listening to DOM mutations.
             this.processPage()
         })
 
 
         /**
-        * Signal this script has been loaded and ready to look for
-        * phone numbers.
+        * Signal the background that the observer has been loaded and is
+        * ready to look for phone numbers if the background demands it.
         */
         this.app.emit('dialer:observer.ready', {
-            callback: (response) => {
-                // Fill the contact list.
-                if (response && response.hasOwnProperty('observe')) {
-                    let observe = response.observe
-                    if (!observe) return
+            callback: (data) => {
+                // Don't start observing, unless the observe property is true.
+                if (!data.observe) return
 
-                    if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
-                        // This hidden iframe might become visible, wait for
-                        // this to happen.
-                        $(window).on('resize', () => {
-                            this.processPage()
-                            // No reason to wait for more resize events.
-                            $(window).off('resize')
-                        })
-                    } else {
+                if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
+                    // Wait for this hidden iframe to become visible, before
+                    // starting the observer.
+                    $(window).on('resize', () => {
                         this.processPage()
-                    }
+                        // No reason to wait for more resize events.
+                        $(window).off('resize')
+                    })
+                } else {
+                    this.processPage()
                 }
             },
         })
