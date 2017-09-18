@@ -55,6 +55,11 @@ class QueuesActions extends Actions {
     * Popup script related events.
     */
     _popup() {
+        let _$ = {}
+        _$.widget = $('.widget.queues')
+        _$.list = _$.widget.find('.widget-item-list.list')
+        _$.emptyList = _$.widget.find('.widget-item-list.empty')
+
         if (!('queue' in this.app.cache)) {
             this.app.cache.queue = {
                 list: [],
@@ -63,14 +68,14 @@ class QueuesActions extends Actions {
         }
 
         this.app.on('queues:empty', (data) => {
-            $('.queues .empty-list').removeClass('hide')
+            _$.emptyList.removeClass('hide')
         })
 
         // Fill the queue list with data from the background.
         this.app.on('queues:fill', (data) => {
             let queues = data.queues
             let selectedQueue = data.selectedQueue
-            $('.queues .empty-list').addClass('hide')
+            _$.emptyList.addClass('hide')
             if (this.app.cache.queue.list === queues && this.app.cache.queue.selected === selectedQueue) {
                 // No changes so exit early.
                 this.app.logger.debug(`${this}no new queue data`)
@@ -81,16 +86,15 @@ class QueuesActions extends Actions {
             this.app.cache.queue.selected = selectedQueue
 
             // Clear list.
-            let list = $('.queues .list')
-            list.empty()
+            _$.list.empty()
 
             // Fill list.
-            let template = $('.queues .template .queue')
+            let template = _$.widget.find('template').contents()
             $.each(queues, function(index, queue) {
                 let listItem = template.clone()
-                listItem.find('.indicator').text(queue.queue_size)
-                listItem.find('.text').text(queue.description)
-                listItem.find('.code').text('(' + queue.internal_number + ')')
+                listItem.find('.icon i').text(queue.queue_size)
+                listItem.find('.name').text(queue.description)
+                listItem.find('.description').text( queue.internal_number)
 
                 // Check if this queue is currently selected.
                 if (selectedQueue && selectedQueue === queue.id) {
@@ -99,13 +103,13 @@ class QueuesActions extends Actions {
 
                 listItem.data('queue-id', queue.id)
                 listItem.find('.indicator').attr('id', 'size' + queue.id)
-                listItem.appendTo(list)
+                listItem.appendTo(_$.list)
             })
         })
 
         this.app.on('queues:reset', (data) => {
-            $('.queues .list').empty()
-            $('.queues .empty-list').addClass('hide')
+            _$.list.empty()
+            _$.emptyList.addClass('hide')
         })
 
         // Update the size for a queue.
@@ -123,7 +127,7 @@ class QueuesActions extends Actions {
         /**
         * Select a queue.
         */
-        $('.queues .list').on('click', '.queue', (e) => {
+        _$.list.on('click', '.queue', (e) => {
             let target = e.currentTarget
             let queueId = null
             if ($(target).data('queue-id')) {

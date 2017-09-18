@@ -1,71 +1,30 @@
 .widget.queues {
 
-    .list {
-        // Show a scrollbar after +/- 5 queues.
-        max-height: 210px;
-        width: 100%;
-        overflow: auto;
-    }
+    .widget-content {
+        .widget-item {
+            .icon {
+                width: $vg-widget-header-size;
+                vertical-align: center;
+                text-align: center;
 
-    .queue {
-        border-bottom: 1px solid $vg-grey-lighter;
-        font-weight: 500;
-        margin: 0;
-        height: $vg-widget-header-size;
-        padding: 0;
-        line-height: $vg-widget-header-size;
-        background-position: right center;
-        background-repeat: no-repeat;
-        background-image: none;
-        list-style: none;
-
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        // Force fixed height to include border-width.
-
-        &:hover {
-            cursor: pointer;
-        }
-
-        &.selected {
-
-            &::after {
-                position: absolute;
-                right: 0;
-                color: $vg-info-color-success-dark;
-                font-size: 1.3em;
-                float: right;
-                font-family: "FontAwesome";
-                content: $icon-check;
-                margin-right: $vg-spacing-gap;
+                // The queues icon is a somewhat deviant icons.
+                // It is a background with inside text, instead
+                // of a font.
+                i {
+                    display: inline-block;
+                    width: 1.1rem;
+                    height: 1.1rem;
+                    background: $vg-info-color-failed-dark;
+                    line-height: 1.1rem;
+                    letter-spacing: 0;
+                    // Centers the icon in the middle of the background.
+                    font-size: 0.8rem;
+                    font-style: normal;
+                    font-weight: 500;
+                    border-radius: $vg-spacing-4;
+                    color: #fff;
+                }
             }
         }
-
-        .indicator {
-            display: inline-block;
-            width: 1.3rem;
-            height: 1.3rem;
-            background: $vg-info-color-failed-dark;
-            line-height: 1.3rem;
-            color: #fff;
-            // Centers the icon in the middle of the background.
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-radius: $vg-spacing-4;
-        }
-
-        .code {
-            color: #78788c;
-            font-weight: normal;
-        }
-
-        &:nth-child(odd) {
-            background-color: #f9f9f9;
-        }
-    }
-
-    .empty-list .queue .text {
-        margin-left: 30px;
     }
 }

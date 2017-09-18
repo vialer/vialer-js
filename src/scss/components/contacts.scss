@@ -2,182 +2,56 @@
 
     // The widget is marked as unauthorized.
     &.unauthorized {
-        .search-form {
-            display: none;
-        }
-    }
-
-    .search-form {
-        float: right;
-        height: $vg-widget-header-size;
-        vertical-align: middle;
-        line-height: $vg-widget-header-size;
-        margin-right: $vg-spacing-gap * 3;
-        // In Firefox, the input needs a small padding to be in the middle.
-
-        // But, in Chrome this padding should not be there.
-        @media screen and (-webkit-min-device-pixel-ratio: 0) {
-            padding-top: 0;
-        }
-
-        // The search icon inside the input element.
-        .search-button {
-            position: absolute;
-            margin-left: 8px;
-            padding-top: 7px;
-            height: $vg-widget-header-size;
-            line-height: 30px;
-            opacity: .3;
-            vertical-align: middle;
-            font-size: 1rem;
-        }
-
-        // The input element to search with.
-        .search-query {
-            display: inline;
-            // Make room for the search icon.
-            padding-left: 32px;
-            background: $vg-grey-lightest;
-            border: 1px solid $vg-grey-lighter;
-            height: $vg-widget-header-size - $vg-spacing-2;
-            width: 195px;
-            font-size: .9rem;
-        }
-    }
-
-    .list {
-        margin: 0;
-        padding: 0;
-        // Show a scrollbar after +/- 5 contacts.
-        max-height: 210px;
-        width: 100%;
-        overflow-x: hidden;
-    }
-
-
-    // A single contact item in the contacts list.
-    .contact {
-        border-bottom: 1px solid $vg-grey-lighter;
-        margin: 0;
-        line-height: normal;
-        cursor: default;
-        list-style: none;
-        height: $vg-widget-header-size;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        align-items: stretch;
-        justify-content: flex-start;
-
-        &.last {
-            margin-bottom: 0;
-        }
-
-        &.hide {
-            display: none;
-        }
-
-        .status-icon {
-            width: $vg-widget-header-size;
-            // Without the 1px less height, the contact box
-            // will overflow in mobile mode when limiting the
-            // boxes using search on Firefox.
-            height: $vg-widget-header-size - 1px;
-            line-height: $vg-widget-header-size -1px -$vg-spacing-2;
-            color: $vg-grey-light;
-            cursor: pointer;
-            padding-left: $vg-spacing-2;
-
-            i {
-                padding-top: 12px;
-                padding-left: 3px;
+        .widget-header {
+            .search {
+                display: none;
             }
         }
+    }
 
-        .info {
+    .widget-header {
+        .search {
             flex: 1;
-            padding: 8px 0;
-            // Without the 1px less height, the contact box
-            // will overflow in mobile mode when limiting the
-            // boxes using search on Firefox.
-            height: $vg-widget-header-size - 1px;
-            padding-right: $vg-spacing-4;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            overflow: hidden;
-
-            .name {
-                max-width: 200px;
-                display: inline;
-                font-weight: 500;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .extension {
-                display: inline-block;
-                color: #9b9c9e;
-                font-weight: normal;
-            }
-        }
-
-        &:hover {
-            .info .name,
-            .info .extension,
-            .status-icon {
-                &:hover {
-                    cursor: pointer;
-                }
-            }
-        }
-
-        &[disabled] {
-            opacity: .6;
-
-            .info .name,
-            .info .extension,
-            .status-icon {
-                &:hover {
-                    cursor: default;
-                }
-            }
-        }
-
-
-
-        // Default row list can be done with css.
-        &:nth-child(odd) {
-            background: $vg-table-row-color-odd;
-        }
-
-        // A filtered row list's styling is enforced using css classes, because
-        // `nth-child` doesn't skip nodes with display: none.
-        &.odd {
-            background: $vg-table-row-color-odd !important;
-        }
-
-        &.even {
-            background: #fff  !important;
-        }
-
-    }
-
-    // No results, either because the user has no colleagues or
-    // the search filter returned empty.
-    .empty-list li,
-    .not-found-contacts li {
-        height: 45px;
-        line-height: 45px;
-
-        .info {
-            padding: 0;
-        }
-    }
-
-    .not-found-contacts {
-        .contact {
-            border: 1px solid $vg-grey-lighter;
             height: $vg-widget-header-size;
+            vertical-align: middle;
+            line-height: $vg-widget-header-size;
+            padding-right: $vg-widget-header-size - 3px;
+
+            // The search icon inside the input element.
+            i {
+                position: absolute;
+                margin-left: 8px;
+                padding-top: 7px;
+                height: $vg-widget-header-size;
+                line-height: 30px;
+                opacity: .3;
+                vertical-align: middle;
+                font-size: 1rem;
+            }
+
+            // The input element to search with.
+            input {
+                // Place the cursor to the right of the search icon.
+                padding-left: $vg-widget-header-size-small;
+                font-size: .9rem;
+                width: 100%;
+            }
+        }
+    }
+
+    .widget-content {
+        // A single contact item in the contacts list.
+        .widget-item {
+            &.hide {display: none;}
+            .icon i {color: $vg-grey-light;}
+            .icon.busy i {color: $vg-info-color-failed-dark;}
+            .icon.available i {color: $vg-info-color-success-dark;}
+
+            // Ringing state is a css keyframe animation.
+            .icon.ringing i {
+                transition-timing-function: ease;
+                animation: ringing 1.5s linear infinite;
+            }
         }
     }
 }

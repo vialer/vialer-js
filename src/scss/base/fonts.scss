@@ -33,3 +33,101 @@ $icon-check: "\f00c";
     font-weight: 500;
     src: local("Roboto Medium"), local("Roboto-Medium"), url("#{$font-path}/Roboto-Medium.woff2") format("woff2");
 }
+
+
+@font-face {
+    font-family: "click2dial";
+    src: url("#{$font-path}/click2dial.woff") format("woff");
+    font-weight: normal;
+    font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+    font-family: "click2dial";
+    speak: none;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
+.fa-blink,
+.icon-blink {
+    transition-timing-function: ease;
+    animation: icon-blink 1s linear infinite;
+}
+
+.icon-spin {
+    animation: icon-spin 2s infinite linear;
+    display: inline-block;
+}
+
+@keyframes icon-blink {
+    0% {opacity: 0;}
+    50% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+@-webkit-keyframes icon-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(359deg);
+    }
+}
+
+@keyframes ringing {
+    0% {color: $vg-info-color-failed-dark;}
+    50% {color: $vg-info-color-success-dark;}
+    100% {color: $vg-info-color-failed-dark;}
+}
+
+.icon-availability:before {
+    content: "\e900";
+}
+
+.icon-colleagues:before {
+    content: "\e901";
+}
+
+.icon-queue:before {
+    content: "\e902";
+}
+
+.icon-search:before {
+    content: "\e903";
+}
+
+.icon-phone:before {
+    content: "\e904";
+}
+
+.icon-logout:before {
+    content: "\e905";
+}
+
+.icon-full-screen:before {
+    content: "\e906";
+}
+
+.icon-support:before {
+    content: "\e907";
+}
+
+.icon-refresh:before {
+    content: "\e918";
+}
+
+.icon-settings:before {
+    content: "\e909";
+}
+
+.icon-close:before {
+    content: "\e90a";
+}

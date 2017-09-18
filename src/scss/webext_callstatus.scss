@@ -16,31 +16,24 @@ body {
 
 .widget.callstatus {
     @include vg-modal-widget;
-    background: #fff;
     width: 320px;
-    height: 120px;
-    position: fixed;
-    margin: 0 auto;
-    margin-top: calc(50vh - 120px);
-    left: 50%;
+    height: 110px;
+    margin-top: calc(50vh - 110px);
     margin-left: -160px;
-    border-radius: $vg-border-radius;
-
+    left: 50%;
 
     .widget-header {
         position: relative;
 
         span {
-            float: left;
+            line-height: $vg-widget-header-size;
         }
-    }
 
 
-    .widget-title {
         .close {
             position: absolute;
             right: $vg-spacing-gap;
-            top: $vg-spacing-gap;
+            line-height: $vg-widget-header-size;
 
             &:hover {
                 cursor: pointer;
@@ -49,7 +42,6 @@ body {
     }
 
     .status {
-        font-size: 0.9rem;
         margin: 0;
         padding: $vg-spacing-gap;
 

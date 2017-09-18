@@ -50,6 +50,7 @@ const DISTRIBUTION_NAME = `${PACKAGE.name.toLowerCase()}-${PACKAGE.version}.zip`
 const GULPACTION = argv._[0]
 const NODE_ENV = process.env.NODE_ENV || 'development'
 const NODE_PATH = path.join(__dirname, 'node_modules') || process.env.NODE_PATH
+const SRC_DIR = path.join(__dirname, 'src')
 const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
 
@@ -288,6 +289,7 @@ gulp.task('fonts', 'Copy fonts to the build directory.', () => {
     const robotoBasePath = path.join(NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
 
     return gulp.src(path.join(fontAwesomePath, 'fontawesome-webfont.woff2'))
+        .pipe(addsrc(path.join(SRC_DIR, 'fonts', '*'), {base: path.join(SRC_DIR)}))
         .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Light.woff2'), {base: robotoBasePath}))
         .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Regular.woff2'), {base: robotoBasePath}))
         .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Medium.woff2'), {base: robotoBasePath}))

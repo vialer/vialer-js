@@ -7,7 +7,7 @@
         "message": "WebExtension for Click-to-Dial, status updates and queue monitoring",
         "description": "Extension description."
     },
-    "clicktodialTitle": {
+    "dialTo": {
         "message": "Calling to",
         "description": "Text for the title of the Click-to-Dial popup."
     },
@@ -32,7 +32,7 @@
         "description": "Text to show after logging out successfully."
     },
     "loginFormLoadingText": {
-        "message": "<i class='fa fa-spinner fa-spin'></i> Logging in..",
+        "message": "<i class='icon-refresh icon-spin'></i> <span>Logging in...</span>",
         "description": "Text to show while trying to log in."
     },
     "loginFormLoginButtonText": {
@@ -96,7 +96,7 @@
         "description": "Text to show in case there are no contacts to display."
     },
     "noContactsFoundText": {
-        "message": "No colleagues matched.",
+        "message": "No colleagues found.",
         "description": "Text to show in case there are no contacts found."
     },
     "contactsUnauthorizedWarning": {

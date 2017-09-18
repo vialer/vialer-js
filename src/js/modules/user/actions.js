@@ -55,7 +55,7 @@ class UserActions extends Actions {
             let user = data.user
             $('#user-name').text(user.email)
 
-            this.app.modules.ui.hideLoginForm()
+            $('.login-section').addClass('hide')
             this.app.modules.ui.showPopup()
         })
 

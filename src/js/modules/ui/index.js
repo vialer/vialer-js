@@ -45,7 +45,6 @@ class UiModule {
         // Cannot rely on just data.('opened') because this is
         // not transparent to CSS.
         $(widget).data('opened', false).attr('data-opened', false)
-        $(widget).find('.widget-content, .unauthorized-warning').hide()
     }
 
 
@@ -60,11 +59,6 @@ class UiModule {
             return widgetOrWidgetName
         }
         return $(`.container:not(.static) .widget.${widgetOrWidgetName}`)
-    }
-
-
-    hideLoginForm() {
-        $('.login-section').addClass('hide')
     }
 
 
@@ -119,11 +113,6 @@ class UiModule {
         this.app.store.set('widgets', widgetState)
 
         this.app.emit('ui:widget.open', {name: widgetName})
-        if (widget.hasClass('unauthorized')) {
-            $(widget).find('.unauthorized-warning').show()
-        } else {
-            $(widget).find('.widget-content').show()
-        }
     }
 
 

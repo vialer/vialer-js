@@ -17,7 +17,9 @@ $vg-widget-header-size-small: 30px;
 $vg-widget-header-size-combined: $vg-widget-header-size + $vg-widget-header-size-small;
 $vg-border-radius: $vg-spacing-1;
 
+$mini: 250px;
 $mobile: 369px;
+$widget: 400px;
 $tablet: 769px;
 $desktop: 960px;
 $widescreen: 1152px;
@@ -25,20 +27,20 @@ $fullhd: 1344px;
 
 
 // Colors.
-$vg-grey-lightest: #f9f9f9;
+$vg-grey-lightest: #fbfbfb;
 $vg-grey-lighter: #e5e5e5;
 $vg-grey-light: #999;
 
 $vg-primary-color: #3c3c50;
 
-$vg-info-color-failed-dark: #b17979;
-$vg-info-color-failed-light: #f2dede;
-$vg-info-color-failed-lighter: #ebccd1;
+$vg-info-color-failed-dark: #d9534f;
+$vg-info-color-failed-light: lighten($vg-info-color-failed-dark, 30%);
+$vg-info-color-failed-lighter: lighten($vg-info-color-failed-dark, 40%);
 
 $vg-info-color-info-dark: #31708f;
-$vg-info-color-info-light: #d9edf7;
-$vg-info-color-info-lighter: #bce8f1;
+$vg-info-color-info-light: lighten($vg-info-color-info-dark, 30%);
+$vg-info-color-info-lighter: lighten($vg-info-color-info-dark, 40%);
 
-$vg-info-color-success-dark: #76b176;
-
-$vg-table-row-color-odd: #f9f9f9;
+$vg-info-color-success-dark: #5cb85c;
+$vg-info-color-success-light: lighten($vg-info-color-success-dark, 30%);
+$vg-info-color-success-lighter: lighten($vg-info-color-success-dark, 40%);

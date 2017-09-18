@@ -7,7 +7,7 @@
         "message": "WebExtension voor klik&bel, statusupdate en wachtrij monitoring",
         "description": "Plugin omschrijving."
     },
-    "clicktodialTitle": {
+    "dialTo": {
         "message": "Gesprek naar",
         "description": "Tekst van de titel voor de klik&bel popup."
     },
@@ -32,7 +32,7 @@
         "description": "Weer te geven tekst na het succesvol uitloggen."
     },
     "loginFormLoadingText": {
-        "message": "<i class='fa fa-spinner fa-spin'></i> Inloggen..",
+        "message": "<i class='icon-refresh icon-spin'></i> <span>Inloggen...</span>",
         "description": "Weer te geven tekst tijdens het inloggen."
     },
     "loginFormLoginButtonText": {

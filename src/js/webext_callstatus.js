@@ -11,7 +11,7 @@ class CallStatusApp extends Skeleton {
     constructor(options) {
         super(options)
         this.verbose = false
-        this.logger.info(`${this}starting application`)
+        this.logger.info(`${this}starting callstatus application`)
         // Get the callid from the opened url.
         this.bNumber = window.location.href.match(/bNumber\=([^&]+)/)[1]
         this.callid = null

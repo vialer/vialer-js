@@ -99,13 +99,6 @@ class UiActions extends Actions {
             this.module.openWidget(data.name)
         })
 
-        // Hack in popout to display bottom border.
-        this.app.on('ui:widget.open', (data) => {
-            if (data.name === 'contacts') {
-                $('.contacts .list .contact:visible:last').addClass('last')
-            }
-        })
-
         this.app.on('ui:widget.reset', (data) => {
             this.module.resetWidget(data.name)
         })
@@ -122,7 +115,7 @@ class UiActions extends Actions {
         this.app.on('ui:mainpanel.ready', (data) => {
             setTimeout(() => {
                 $('#refresh').removeClass('fa-spin')
-            }, 200)
+            }, 1000)
         })
 
         /**
@@ -131,7 +124,7 @@ class UiActions extends Actions {
          * It can't be closed.
          */
         if (!this.app.env.extension || (this.app.env.extension && !this.app.env.extension.popout)) {
-            $('html').on('click', '.widget:not(.busy) .widget-header', (e) => {
+            $('html').on('click', '.widget .widget-header', (e) => {
                 let widget = $(e.currentTarget).closest('[data-opened]')
                 if (this.module.isWidgetOpen(widget)) {
                     if (!$(e.target).is(':input')) {
@@ -182,18 +175,15 @@ class UiActions extends Actions {
         // keep track whether this popup is open or closed
         this.app.store.set('isMainPanelOpen', true)
 
-        /**
-         * Popup is reloaded every time, so the only way to 'persist' the data
-         * is by reading data from storage and present them as they were.
-         */
+        // Switch between logged-in and login state.
         if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
             this.app.emit('ui:ui.restore')
             let user = this.app.store.get('user')
             $('#user-name').text(user.email)
-            this.module.hideLoginForm()
+
             this.module.showPopup()
         } else {
-            this.app.logger.debug(`${this}no saved state`)
+            $('.login-section').removeClass('hide')
         }
 
 

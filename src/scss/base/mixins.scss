@@ -1,8 +1,11 @@
 @mixin vg-gradient {
-    background: linear-gradient(to bottom, #fcfcfc 0%, #efefef 100%);
+    background: linear-gradient(to bottom, rgb(252,252,252) 0%, rgb(234,234,234) 100%);
 }
 
 @mixin vg-modal-widget {
+    position: fixed;
+    margin: 0 auto;
+    background: #fff;
     border-radius: $vg-border-radius;
     margin-left: 0;
     margin-top: 0;
@@ -11,4 +14,25 @@
         border-top-left-radius: $vg-border-radius;
         border-top-right-radius: $vg-border-radius;
     }
+}
+
+@mixin vg-widget-icon {
+    display: inline-block;
+    width: $vg-widget-header-size;
+    height: $vg-widget-header-size;
+    line-height: $vg-widget-header-size;
+    vertical-align: middle;
+    font-size: 1rem;
+    text-align: center;
+
+    i {
+        line-height: $vg-widget-header-size;
+    }
+}
+
+// Prevent firefox from showing the cursor: text for normal elements like divs etc.
+@mixin no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
 }

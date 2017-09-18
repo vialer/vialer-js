@@ -45,7 +45,7 @@ rules:
     # Nesting
     force-attribute-nesting: 0
     force-element-nesting: 0
-    force-pseudo-nesting: 1
+    force-pseudo-nesting: 0
 
     # Name Formats
     class-name-format: 1

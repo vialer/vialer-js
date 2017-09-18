@@ -1,220 +1,142 @@
-// The popout is a special version of the popup that is shown
+// The popout is a full-page version of the popup that is shown
 // in a separate tab when pressing the popout button in the
 // popup.
-.popout,
-.popout body {
+
+// The popup suppresses vertical scroll, due to visual tear when
+// opening the popup. The popout needs vertical scroll though.
+.popup.popout {
+    overflow-y: initial;
+}
+
+.popup.popout,
+.popup.popout body {
     height: 100%;
 }
 
-.popout body {
+.popup.popout body {
     width: auto;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+    margin: 0 auto;
 
-    .shortcuts {
-        // Hide the popout button when we're in the popout.
-        .close-button,
-        .popout-button {
-            display: none;
+    .container {
+        .account-info {
+            .shortcuts {
+                // Hide the popout button and the close button.
+                .close-button,
+                .popout-button {
+                    display: none;
+                }
+            }
         }
     }
 
-    // Hide the availability and queues widget.
+    //
+    // // Hide the availability and queues widget.
     .widget.queues,
     .widget.availability {
         display: none;
     }
 
     .account-info {
-        @media (min-width: $tablet) {
-            position: absolute;
-            right: 0;
-        }
+        max-width: 400px;
 
-        @media (max-width: $tablet) {
-            position: relative;
-            right: auto;
-            left: 473px;
-            min-width: 144px;
-        }
-    }
-
-    .no-scroll {
-        overflow-y: auto;
-    }
-
-    .container {
-        &:not(.hide) {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+        @media (max-width: $mini) {
+            .user-name {
+                display: none;
+            }
         }
     }
 
     .widget.contacts {
-        border-left: 1px solid $vg-grey-lightest;
-        border-right: 1px solid $vg-grey-lightest;
-
         width: 100%;
         position: relative;
 
-        display: flex;
-        flex-direction: column;
-
-        // The space for collapsing the widget is filled with the search input.
-        .search-form {
-            float: right;
-            margin-right: $vg-spacing-gap;
-        }
-
         .widget-header {
-            flex: 0 0 45px;
-            display: flex;
-            flex-direction: column;
-            margin-left: -1px;
-            margin-right: -1px;
-            border-left: 1px solid $vg-grey-lighter;
+            max-width: 400px;
             border-right: 1px solid $vg-grey-lighter;
+            border-bottom: 1px solid $vg-grey-lighter;
 
-            // The widget cannot be collapsed in popout mode.
-            &:hover {
-                cursor: default;
+            // Remove the collapse icon.
+            &::after {
+                display: none;
             }
 
-            //  Hide the collapse icon; the widget is not collapsable.
-            .widget-title {
-                &::after {
-                    content: none;
+            @media (max-width: $widget) {
+                border-right: 0;
+                border-bottom: 0;
+            }
+
+            @media (max-width: $mini) {
+                .status-indicators {
+                    display: none;
+                }
+
+                .widget-header-text {
+                    display: none;
+                }
+            }
+
+            .search {
+                padding-right: $vg-spacing-gap;
+                // The search input vertical outlining is 1px off.
+                @-moz-document url-prefix() {
+                    margin-top: 1px;
                 }
             }
         }
 
         .widget-content {
-            display: flex;
-            flex-direction: column;
-
-            margin-top: -1px;
-            margin-left: -1px;
-            width: 100%;
-
-            .list {
-                display: flex;
-                flex-flow: column wrap;
-                align-content: flex-start;
-
-                overflow-x: auto;
+            margin-top: $vg-widget-header-size-small;
+            border-bottom: 1px solid $vg-grey-lightest;
+            border-top: 1px solid $vg-grey-lightest;
+            @media (max-width: $widget) {
+                margin-top: 0;
                 border-top: 0;
-                max-height: none;
-                width: calc(100vw);
+            }
 
-                @-moz-document url-prefix() {
-                    max-height: calc(100vh - #{$vg-widget-header-size});
+            .widget-item-list {
+                max-height: initial;
+                column-gap: 0;
 
-                    @media (max-width: $tablet) {
-                        // Account for an extra border pixel.
-                        max-height: calc(100vh - #{$vg-widget-header-size} - #{$vg-widget-header-size-small});
-                    }
-                }
-
-                @media (max-width: $tablet) {
-                    display: block;
-                    margin-right: -2px;
-                }
-
-                & .contact {
+                .widget-item {
                     border-bottom: 0;
-                    border: 1px solid $vg-grey-lighter;
-                    margin-bottom: -1px;
-                    margin-right: -1px;
+                }
 
-                    &.last {
-                        margin-bottom: 0;
+                @media (min-width: $fullhd) {
+                    column-count: 5;
+                }
+
+                @media (min-width: $widescreen) and (max-width: $fullhd) {
+                    column-count: 4;
+
+                }
+
+                @media (min-width: $desktop) and (max-width: $widescreen) {
+                    column-count: 3;
+                }
+
+                @media (min-width: $mobile) and (max-width: $desktop) {
+                    column-count: 2;
+                }
+
+                @media (max-width: $widget) {
+                    column-count: 1;
+
+                    .widget-header {
+                        border-right: 0 !important;
                     }
+
+                    .widget-item {
+                        border-top: 1px solid $vg-grey-lighter;
+                    }
+
                 }
             }
         }
-    }
-}
 
-
-@media (min-width: $tablet) {
-    // The main container.
-    body > .login-section, .container {
-        min-width: 361px;
-        max-width: 400px;
-    }
-
-    .widget.contacts {
-        width: 400px;
-
-        .contact {
-            width: 400px;
+        .widget-item {
+            -webkit-column-break-inside: avoid;
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
-    }
-
-    // Shift the account info a bit down, so it's positioned at the
-    // middle of the contact widget's height.
-    .popout body .account-info {
-        top: 6px;
-    }
-}
-
-// Hide some things for very small surface areas.
-@media (max-width: 369px) {
-    .widget-title-text {
-        display: none;
-    }
-
-    // Take it out of the flow, so the search input has
-    // room to expand.
-    .status-indicators,
-    .widget-icon-container {
-        position: absolute;
-    }
-
-    .status-indicators {
-        position: absolute !important;
-        margin-left: $vg-widget-header-size-small;
-        display: block;
-        float: none !important;
-    }
-
-    .widget.contacts .widget-title {
-        .search-form {
-            margin-left: $vg-spacing-gap;
-            width: calc(100% - 36px);
-
-            .search-button {
-                margin-left: 68px;
-            }
-
-            .search-query {
-                width: calc(100% - #{$vg-spacing-12});
-                margin-left: $vg-spacing-12;
-            }
-        }
-    }
-
-    .container .account-info {
-        .pull-right {
-            position: absolute;
-            right: $vg-spacing-gap;
-            top: 0;
-        }
-    }
-}
-
-@media (max-width: $tablet) {
-
-    .popout body .widget.contacts .widget-content .list .contact {
-        border-right: 0;
-        margin-right: 0;
-    }
-
-    .popout body .account-info {
-        left: 0;
-        top: 0;
     }
 }
