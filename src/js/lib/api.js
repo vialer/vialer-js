@@ -22,7 +22,10 @@ class Api {
     * @param {String} password - Password to login with.
     */
     setupClient(username, password) {
-        let clientOptions = {baseURL: this.app.store.get('platformUrl')}
+        let clientOptions = {
+            baseURL: this.app.store.get('platformUrl'),
+            timeout: 15000,
+        }
         if (username && password) {
             this.app.logger.info(`${this}Set api client with basic auth for user ${username}`)
             clientOptions.auth = {
@@ -40,8 +43,8 @@ class Api {
             if (err.message === 'Network Error') {
                 return Promise.resolve({status: 'Network Error'})
             }
-            // Reject all status codes from 500.
-            if (err.response.status >= 500) {
+            // Reject all status codes from 500 and timeouts.
+            if (!err.response || err.response.status >= 500) {
                 return Promise.reject(err)
             }
             // All other error codes are part of the normal application flow.
