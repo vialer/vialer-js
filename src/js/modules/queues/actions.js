@@ -76,6 +76,7 @@ class QueuesActions extends Actions {
             let queues = data.queues
             let selectedQueue = data.selectedQueue
             _$.emptyList.addClass('hide')
+
             if (this.app.cache.queue.list === queues && this.app.cache.queue.selected === selectedQueue) {
                 // No changes so exit early.
                 this.app.logger.debug(`${this}no new queue data`)
@@ -85,7 +86,6 @@ class QueuesActions extends Actions {
             this.app.cache.queue.list = queues
             this.app.cache.queue.selected = selectedQueue
 
-            // Clear list.
             _$.list.empty()
 
             // Fill list.
@@ -112,16 +112,11 @@ class QueuesActions extends Actions {
             _$.emptyList.addClass('hide')
         })
 
-        // Update the size for a queue.
-        this.app.on('queues:queue.size', (data) => {
-            let id = data.id
-            let size = data.size
-
-            if (isNaN(size)) {
-                // Queue size is not available.
-                size = '?'
+        // Update the size of all passed queues.
+        this.app.on('queues:update_size', (data) => {
+            for (const queue of data.queues) {
+                $(`#size${queue.id}`).text(queue.size)
             }
-            $(`#size${id}`).text(size)
         })
 
         /**
