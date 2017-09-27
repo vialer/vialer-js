@@ -160,6 +160,7 @@
         // an optional description. This format is used by items for
         // the Colleagues and Queues widgets.
         .widget-item {
+            position: relative;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -194,7 +195,7 @@
                     font-size: 1.2em;
                     font-family: "click-to-dial";
                     content: $icon-check;
-                    margin-right: $vg-spacing-gap * 2;
+                    margin-right: $vg-spacing-gap;
                 }
             }
 
