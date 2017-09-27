@@ -54,6 +54,10 @@ const SRC_DIR = path.join(__dirname, 'src')
 const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
 
+// Switches extra applicationverbosity on/off.
+let VERBOSE = false
+if ((process.env.VERBOSE === 'true') || (process.env.VERBOSE === '1')) VERBOSE = true
+
 // Loads the json API settings from ~/.click-to-dialrc.
 let DEPLOY_SETTINGS = {}
 rc('click-to-dial', DEPLOY_SETTINGS)
@@ -113,7 +117,10 @@ const jsEntry = (name) => {
             .pipe(source(`${name}.js`))
             .pipe(buffer())
             .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
-            .pipe(envify({NODE_ENV: NODE_ENV}))
+            .pipe(envify({
+                NODE_ENV: NODE_ENV,
+                VERBOSE: VERBOSE,
+            }))
             .pipe(ifElse(PRODUCTION, () => minifier()))
 
             .pipe(ifElse(!PRODUCTION, () => sourcemaps.write('./')))

@@ -44,13 +44,23 @@ class Skeleton extends EventEmitter {
             this.modules[module.name] = new module.Module(this)
         }
 
-        // Increases verbosity beyond the logger's debug level.
-        this.verbose = false
         // Sets the verbosity of the logger.
         if (process.env.NODE_ENV === 'production') {
             this.logger.setLevel('warn')
         } else {
+            this.logger.info(`${this}loglevel set to debug`)
             this.logger.setLevel('debug')
+        }
+
+        // Increases verbosity beyond the logger's debug level. Not
+        // always useful during development, so it can be switched
+        // of manually.
+        if (process.env.VERBOSE === true) {
+            this.logger.info(`${this}extra verbosity is enabled`)
+            this.verbose = true
+        } else {
+            this.logger.info(`${this}extra verbosity is disabled`)
+            this.verbose = false
         }
     }
 
@@ -86,13 +96,15 @@ class Skeleton extends EventEmitter {
             }
 
             if (data && data.callback) {
+                if (this.verbose) this.logger.debug(`${this}emit ipc event with callback '${event}'`)
                 const callback = data.callback
                 // Make sure that functions are not part of the payload data.
                 delete data.callback
                 this.browser.runtime.sendMessage(payloadData, callback)
+            } else {
+                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
+                this.browser.runtime.sendMessage(payloadData)
             }
-            if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
-            this.browser.runtime.sendMessage(payloadData)
         }
         // The web version will always use a local emitter, no matter what
         // the value is of `noIpc`. An extension may do both.
@@ -181,9 +193,6 @@ class Skeleton extends EventEmitter {
         this._listeners += 1
         super.on(event, callback)
     }
-
-
-
 
 
     toString() {

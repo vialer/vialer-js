@@ -9,7 +9,6 @@ class ObserverApp extends Skeleton {
 
     constructor(options) {
         super(options)
-        this.verbose = true
     }
 }
 

@@ -10,7 +10,6 @@ class TabsApp extends Skeleton {
 
     constructor(options) {
         super(options)
-        this.verbose = true
     }
 }
 
