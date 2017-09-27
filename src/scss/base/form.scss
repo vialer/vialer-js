@@ -1,0 +1,112 @@
+html body {
+
+    input {
+        background: $vg-grey-lightest;
+
+        &:focus {
+            outline: 1px solid $vg-grey-light;
+        }
+
+        &[type="text"],
+        &[type="password"] {
+            border: 1px solid $vg-grey-lighter;
+            border-radius: 2px;
+            height: 35px;
+            padding: 0 12px;
+        }
+
+        &[disabled] {
+            background: $vg-grey-lighter;
+            cursor: not-allowed;
+        }
+
+        &[type="checkbox"] {
+            display: none;
+
+            // Unchecked icon.
+            & + label {
+                line-height: 1.5rem;
+                vertical-align: center;
+
+                &:before {
+                    font-family: click-to-dial;
+                    display: block;
+                    float: left;
+                    content: $icon-checkbox-unchecked;
+                    font-size: 1.2rem;
+                    width: 1.5rem;
+                    margin-top: 0.05rem;
+                }
+            }
+
+            // Checked icon.
+            &:checked + label:before {
+                content: $icon-checkbox-checked;
+            }
+
+            &:disabled + label {
+                color: #999;
+            }
+        }
+    }
+
+
+    select {
+        height: 35px;
+        background: $vg-grey-lightest;
+        outline: none;
+        border: 1px solid $vg-grey-lighter;
+
+        &:focus {
+            border: 1px solid $vg-grey-light;
+        }
+    }
+
+    button {
+        outline: none;
+        background: $vg-primary-color;
+        box-shadow: none;
+        color: #fff;
+        border: 1px solid $vg-primary-color;
+        font-weight: 500;
+        height: 40px;
+        position: relative;
+        line-height: 40px;
+        display: block;
+        border-radius: 4px;
+        text-align: center;
+
+        i {
+            position: absolute;
+            line-height: 40px;
+            left: $vg-spacing-gap;
+            font-size: 1rem;
+        }
+
+        &:active {
+            padding: 0;
+        }
+
+        &:hover {
+            background: lighten($vg-primary-color, 10%);
+            border: 1px solid lighten($vg-primary-color, 30%);
+            cursor: pointer;
+        }
+
+        &.loading {
+            background: $vg-primary-color;
+        }
+
+        &.failed {
+            border: 1px solid $vg-info-color-failed-light;
+            background: $vg-info-color-failed-lighter;
+            color: $vg-info-color-failed-dark;
+        }
+
+        &.info {
+            border: 1px solid $vg-info-color-info-light;
+            background: $vg-info-color-info-lighter;
+            color: $vg-info-color-info-dark;
+        }
+    }
+}

@@ -49,7 +49,7 @@ class UserModule {
                 // Remove credentials from the store.
                 this.app.store.remove('username')
                 this.app.store.remove('password')
-                this.app.emit('user:login.failed')
+                this.app.emit('user:login.failed', {reason: res.status})
             }
         })
     }
@@ -57,11 +57,12 @@ class UserModule {
 
     logout() {
         this.app.logger.info(`${this}logout`)
-        this.app.store.remove('user')
         this.app.modules.ui.resetWidgetState()
         this.app.resetModules()
-        this.app.store.remove('username')
+        this.app.store.remove('user')
         this.app.store.remove('password')
+
+        this.app.store.remove('widgets')
         this.app.emit('user:logout.success')
         this.app.api.setupClient()
         this.app.timer.stopAllTimers()

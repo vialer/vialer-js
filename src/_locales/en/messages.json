@@ -27,6 +27,10 @@
         "message": "Incorrect username/password",
         "description": "Text to show after a failed login attempt."
     },
+    "loginFormLoginErrorText": {
+        "message": "Error, please check platform settings",
+        "description": "Text to show after a failed login attempt."
+    },
     "loginFormLogoutText": {
         "message": "Logged out",
         "description": "Text to show after logging out successfully."
@@ -206,6 +210,10 @@
     "platformUrlOptionlabel": {
         "message": "URL to the resource where information is read from",
         "description": "Label for the 'options' form of the field 'platformUrl'."
+    },
+    "platformUrlOptionWarninglabel": {
+        "message": "You will be automatically logged out when changing this setting",
+        "description": "Warning for the 'options' form  of the field 'platformUrl'."
     },
     "saveButtonText": {
         "message": "Save",

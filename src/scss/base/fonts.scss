@@ -79,11 +79,6 @@ $font-path: "../fonts";
     100% {color: $vg-info-color-failed-dark;}
 }
 
-// Make sure to keep these in sync with the icons beneath.
-$icon-toggle-up: "\e910";
-$icon-toggle-down: "\e90d";
-$icon-check: "\e901";
-
 // The click-to-dial font icons.
 .icon-availability:before {
     content: "\e900";
@@ -163,4 +158,12 @@ $icon-check: "\e901";
 
 .icon-cloud-download:before {
     content: "\f0ed";
+}
+
+.icon-check-square-o:before {
+    content: $icon-checkbox-checked;
+}
+
+.icon-square-o:before {
+    content: $icon-checkbox-unchecked;
 }

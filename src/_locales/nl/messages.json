@@ -27,6 +27,10 @@
         "message": "Onjuiste gebruiksernaam/wachtwoord",
         "description": "Weer te geven tekst bij een mislukte inlogpoging."
     },
+    "loginFormLoginErrorText": {
+        "message": "Fout, controleer platform instellingen",
+        "description": "Weer te geven tekst bij een mislukte inlogpoging."
+    },
     "loginFormLogoutText": {
         "message": "Uitgelogd",
         "description": "Weer te geven tekst na het succesvol uitloggen."
@@ -206,6 +210,10 @@
     "platformUrlOptionlabel": {
         "message": "URL van het platform dat de informatie aanlevert",
         "description": "Label voor het 'options'-formulier van het veld 'platformUrl'."
+    },
+    "platformUrlOptionWarninglabel": {
+        "message": "U wordt automatisch uitgelogd wanneer u deze instelling aanpast",
+        "description": "Waarschuwing voor het 'options'-formulier van het veld 'platformUrl'."
     },
     "saveButtonText": {
         "message": "Opslaan",

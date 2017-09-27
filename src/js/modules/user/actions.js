@@ -23,7 +23,7 @@ class UserActions extends Actions {
             this.module.login(this.app.store.get('username'), this.app.store.get('password'))
         })
 
-        this.app.on('user:logout.attempt', (data) => {
+        this.app.on('user:logout.attempt', () => {
             this.module.logout()
         })
     }
@@ -35,11 +35,21 @@ class UserActions extends Actions {
         */
         this.app.on('user:login.failed', (data) => {
             let button = $('.login-button')
-            $(button)
-                .html($(button).data('failed-text'))
-                .prop('disabled', false)
-                .addClass('failed')
-                .addClass('temporary-text')
+            // This is an indication that an incorrect platform url is used.
+            if (data.reason === 404) {
+                $(button)
+                    .html($(button).data('error-text'))
+                    .prop('disabled', false)
+                    .addClass('failed')
+                    .addClass('temporary-text')
+            } else {
+                $(button)
+                    .html($(button).data('failed-text'))
+                    .prop('disabled', false)
+                    .addClass('failed')
+                    .addClass('temporary-text')
+            }
+
         })
 
         /**

@@ -11,7 +11,7 @@ class Api {
     constructor(app) {
         this.app = app
         this.OK_STATUS = [200, 201, 202, 204]
-        this.NOTOK_STATUS = [400, 401, 403, 'Network Error']
+        this.NOTOK_STATUS = [400, 401, 403, 404, 'Network Error']
         this.UNAUTHORIZED_STATUS = [401]
         this.setupClient(this.app.store.get('username'), this.app.store.get('password'))
     }
