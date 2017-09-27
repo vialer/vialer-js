@@ -4,7 +4,7 @@
         "description": "Plugin titel."
     },
     "extDescription": {
-        "message": "WebExtension voor klik&bel, statusupdate en wachtrij monitoring",
+        "message": "Klik&bel, statusupdate en wachtrij monitoring",
         "description": "Plugin omschrijving."
     },
     "dialTo": {

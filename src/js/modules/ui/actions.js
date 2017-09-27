@@ -17,7 +17,7 @@ class UiActions extends Actions {
     _background() {
         this.app.on('help', (data) => {
             // Open the plugin wiki page.
-            this.app.browser.tabs.create({url: 'http://wiki.voipgrid.nl/index.php/Chrome_plugin'})
+            this.app.browser.tabs.create({url: 'http://wiki.voipgrid.nl/index.php/Click-to-dial'})
         })
 
         /**

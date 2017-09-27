@@ -4,7 +4,7 @@
         "description": "Plugin title."
     },
     "extDescription": {
-        "message": "WebExtension for Click-to-Dial, status updates and queue monitoring",
+        "message": "Click-to-Dial, status updates and queue monitoring",
         "description": "Extension description."
     },
     "dialTo": {
