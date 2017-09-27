@@ -79,7 +79,6 @@
   "dependencies": {
     "axios": "^0.16.2",
     "css-element-queries": "^0.4.0",
-    "font-awesome": "^4.7.0",
     "gulp-flatten": "^0.3.1",
     "gulp-imagemin": "^3.3.0",
     "jquery": "^3.2.1",

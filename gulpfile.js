@@ -285,14 +285,12 @@ gulp.task('docs-deploy', 'Push the docs build directory to github pages.', ['doc
 
 
 gulp.task('fonts', 'Copy fonts to the build directory.', () => {
-    const fontAwesomePath = path.join(NODE_PATH, 'font-awesome', 'fonts')
     const robotoBasePath = path.join(NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
 
-    return gulp.src(path.join(fontAwesomePath, 'fontawesome-webfont.woff2'))
-        .pipe(addsrc(path.join(SRC_DIR, 'fonts', '*'), {base: path.join(SRC_DIR)}))
-        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Light.woff2'), {base: robotoBasePath}))
-        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Regular.woff2'), {base: robotoBasePath}))
-        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Medium.woff2'), {base: robotoBasePath}))
+    return gulp.src(path.join(SRC_DIR, 'fonts', '*'))
+        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Light.woff2')))
+        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Regular.woff2')))
+        .pipe(addsrc(path.join(robotoBasePath, 'Roboto-Medium.woff2')))
         .pipe(flatten())
         .pipe(gulp.dest(`./build/${BUILD_TARGET}/fonts`))
         .pipe(size(_extend({title: 'fonts'}, sizeOptions)))

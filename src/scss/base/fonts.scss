@@ -1,14 +1,5 @@
 $font-path: "../fonts";
 
-$fa-font-path: $font-path;
-@import "font-awesome/scss/font-awesome";
-
-// Font-awesome icons.
-$icon-double-angle-up: "\f102";
-$icon-double-angle-down: "\f103";
-$icon-check: "\f00c";
-
-
 .title + hr {
     margin: 1.3rem 0;
 }
@@ -36,14 +27,14 @@ $icon-check: "\f00c";
 
 
 @font-face {
-    font-family: "click2dial";
-    src: url("#{$font-path}/click2dial.woff") format("woff");
+    font-family: "click-to-dial";
+    src: url("#{$font-path}/click-to-dial.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
 
 [class^="icon-"], [class*=" icon-"] {
-    font-family: "click2dial";
+    font-family: "click-to-dial";
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -88,46 +79,88 @@ $icon-check: "\f00c";
     100% {color: $vg-info-color-failed-dark;}
 }
 
+// Make sure to keep these in sync with the icons beneath.
+$icon-toggle-up: "\e910";
+$icon-toggle-down: "\e90d";
+$icon-check: "\e901";
+
+// The click-to-dial font icons.
 .icon-availability:before {
     content: "\e900";
 }
 
-.icon-colleagues:before {
-    content: "\e901";
-}
-
-.icon-queue:before {
-    content: "\e902";
-}
-
-.icon-search:before {
-    content: "\e903";
-}
-
-.icon-phone:before {
-    content: "\e904";
-}
-
-.icon-logout:before {
-    content: "\e905";
-}
-
-.icon-full-screen:before {
-    content: "\e906";
-}
-
-.icon-support:before {
-    content: "\e907";
-}
-
-.icon-refresh:before {
-    content: "\e918";
-}
-
-.icon-settings:before {
-    content: "\e909";
+.icon-check:before {
+    content: $icon-check;
 }
 
 .icon-close:before {
+    content: "\e902";
+}
+
+.icon-colleagues:before {
+    content: "\e903";
+}
+
+.icon-cross:before {
+    content: "\e904";
+}
+
+.icon-full-screen:before {
+    content: "\e905";
+}
+
+.icon-logout:before {
+    content: "\e906";
+}
+
+.icon-phone:before {
+    content: "\e907";
+}
+
+.icon-queue:before {
+    content: "\e908";
+}
+
+.icon-refresh:before {
+    content: "\e909";
+}
+
+.icon-search:before {
     content: "\e90a";
+}
+
+.icon-settings:before {
+    content: "\e90b";
+}
+
+.icon-support:before {
+    content: "\e90c";
+}
+
+.icon-toggle-down:before {
+    content: $icon-toggle-down;
+}
+
+.icon-toggle-left:before {
+    content: "\e90e";
+}
+
+.icon-toggle-right:before {
+    content: "\e90f";
+}
+
+.icon-toggle-up:before {
+    content: $icon-toggle-up;
+}
+
+.icon-warning:before {
+    content: "\e911";
+}
+
+.icon-lost-connection:before {
+    content: "\e912";
+}
+
+.icon-cloud-download:before {
+    content: "\f0ed";
 }
