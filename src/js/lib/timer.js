@@ -74,6 +74,11 @@ class Timer {
     }
 
 
+    /**
+    * @param {String} timerId - Find the timer by it's unique identifier.
+    * @param {Number|Function} timeout - A timeout or function that returns a timeout.
+    * @param {Boolean} reset - Whether to rerun the timer function after *timeout* and resolving the timer function.
+    */
     setTimeout(timerId, timeout, reset) {
         this.app.logger.debug(`${this}set timeout for ${timerId}`)
         if (this.getRegisteredTimer(timerId)) {
@@ -86,42 +91,46 @@ class Timer {
 
 
     startTimer(timerId) {
-        if (this.getRegisteredTimer(timerId)) {
-            let timerFunction = registeredTimers[timerId].function
-            if (registeredTimers[timerId].interval) {
-                registeredTimers[timerId].timer.interval = setInterval(
-                    timerFunction, registeredTimers[timerId].interval)
-                this.app.logger.debug(
-                    `${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
-            }
+        if (!this.getRegisteredTimer(timerId)) return
 
-            let timeout = registeredTimers[timerId].timeout
-            if (typeof timeout === 'function') timeout = timeout()
+        let timerFunction = registeredTimers[timerId].function
 
-            if (timeout) {
-                if (registeredTimers[timerId].reset) {
-                    let resetFunction = () => {
-                        timerFunction()
-
-                        // Call again once finished.
-                        let _timeout = registeredTimers[timerId].timeout
-                        if (typeof _timeout === 'function') {
-                            _timeout = _timeout()
-                        }
-                        if (_timeout) {
-                            this.stopTimer(timerId)
-                            registeredTimers[timerId].timer.timeout = setTimeout(resetFunction, _timeout)
-                        }
-                    }
-                    this.stopTimer(timerId)
-                    registeredTimers[timerId].timer.timeout = setTimeout(resetFunction, timeout)
-                } else {
-                    this.stopTimer(timerId)
-                    registeredTimers[timerId].timer.timeout = setTimeout(timerFunction, timeout)
-                }
-            }
-            this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
+        if (registeredTimers[timerId].interval) {
+            registeredTimers[timerId].timer.interval = setInterval(timerFunction, registeredTimers[timerId].interval)
+            this.app.logger.debug(`${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
         }
+
+        let timeout = registeredTimers[timerId].timeout
+        if (typeof timeout === 'function') timeout = timeout()
+
+        if (timeout) {
+            if (registeredTimers[timerId].reset) {
+                let resetFunction = async() => {
+                    // The timer function should return a Promise, so the next
+                    // timer will start with a new timeout AFTER the
+                    // previous one is resolved.
+                    await timerFunction()
+                    // Determine the new dynamic timeout once the
+                    // timer function is finished.
+                    let _timeout = registeredTimers[timerId].timeout
+                    if (typeof _timeout === 'function') _timeout = _timeout()
+
+                    // Only repeat the timer function when the timeout is
+                    // not false-like (not 0).
+                    if (_timeout) {
+                        this.stopTimer(timerId)
+                        registeredTimers[timerId].timer.timeout = setTimeout(resetFunction, _timeout)
+                    }
+                }
+                this.stopTimer(timerId)
+                registeredTimers[timerId].timer.timeout = setTimeout(resetFunction, timeout)
+            } else {
+                this.stopTimer(timerId)
+                registeredTimers[timerId].timer.timeout = setTimeout(timerFunction, timeout)
+            }
+        }
+        this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
+
     }
 
 

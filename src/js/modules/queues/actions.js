@@ -18,10 +18,11 @@ class QueuesActions extends Actions {
     * Background script related events.
     */
     _background() {
-        // Keep track of selected queue.
+        // User indicated that it wants to watch a queue.
         this.app.on('queues:queue.select', (data) => {
-            let widgetState = this.app.store.get('widgets')
             let id = data.id
+            let widgetState = this.app.store.get('widgets')
+
             if (id) {
                 let size = NaN
                 if (this.module.sizes && this.module.sizes.hasOwnProperty(id)) {

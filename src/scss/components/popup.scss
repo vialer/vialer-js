@@ -1,39 +1,8 @@
+@import "../base/form";
 @import "widget";
 
 .popup {
     overflow-y: hidden;
-}
-
-input {
-    background: $vg-grey-lightest;
-
-    &:focus {
-        outline: 1px solid $vg-grey-light;
-    }
-
-    &[type="text"],
-    &[type="password"] {
-        border: 1px solid $vg-grey-lighter;
-        border-radius: 2px;
-        height: 35px;
-        padding: 0 12px;
-    }
-
-    &[disabled] {
-        background: $vg-grey-lighter;
-        cursor: not-allowed;
-    }
-}
-
-select {
-    height: 35px;
-    background: $vg-grey-lightest;
-    outline: none;
-    border: 1px solid $vg-grey-lighter;
-
-    &:focus {
-        border: 1px solid $vg-grey-light;
-    }
 }
 
 // The login container.
@@ -109,46 +78,13 @@ select {
     }
 
     .login-button {
-        background: $vg-primary-color;
-        color: #fff;
-        border: 0;
-        height: 40px;
-        position: relative;
-        line-height: 40px;
-        display: block;
         margin-top: 5px;
-        border-radius: 4px;
 
         i {
             position: absolute;
             line-height: 40px;
             left: $vg-spacing-gap;
             font-size: 1rem;
-        }
-
-        &:active {
-            padding: 0;
-        }
-
-        &:hover {
-            background: lighten($vg-primary-color, 10%);
-            cursor: pointer;
-        }
-
-        &.loading {
-            background: $vg-primary-color;
-        }
-
-        &.failed {
-            border: 1px solid $vg-info-color-failed-light;
-            background: $vg-info-color-failed-lighter;
-            color: $vg-info-color-failed-dark;
-        }
-
-        &.info {
-            border: 1px solid $vg-info-color-info-light;
-            background: $vg-info-color-info-lighter;
-            color: $vg-info-color-info-dark;
         }
     }
 }
@@ -168,9 +104,4 @@ select {
 
 .unauthorized-warning {
     padding: 14px 10px 14px;
-}
-
-// Hide elements.
-.hide {
-    display: none;
 }

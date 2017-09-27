@@ -34,33 +34,35 @@ class QueuesModule {
     }
 
 
-    setQueueSizesTimer() {
-        this.app.timer.registerTimer('queue.size', this.updateQueues.bind(this))
-        this.app.timer.setTimeout('queue.size', this.timerTimeout.bind(this), true)
-        this.app.timer.startTimer('queue.size')
-    }
-
-
     /**
-    * Check for queue sizes on a variable timeout.
-    * @returns {Number} - New timeout for the queue update imer.
+    * Register the queus update timer function and
+    * the dynamic interval check.
     */
-    timerTimeout() {
-        let timeout = 0
-        // Only when authenticated.
-        if (this.app.store.get('user')) {
-            // at least every 20s when a queue is selected
-            if (this.app.store.get('widgets').queues.selected) timeout = 20000
+    setQueueSizesTimer() {
+        // Register the timer function.
+        this.app.timer.registerTimer('queue.size', this.updateQueues.bind(this))
 
-            // Quicker if the panel is visible and the queues widget is open.
-            if (this.app.store.get('isMainPanelOpen')) {
-                if (this.app.store.get('widgets').isOpen.queues) timeout = 5000
+        // Set a dynamic timer interval.
+        this.app.timer.setTimeout('queue.size', () => {
+            let timeout = 0
+
+            // Only when authenticated.
+            if (this.app.store.get('user')) {
+                // at least every 20s when a queue is selected
+                if (this.app.store.get('widgets').queues.selected) timeout = 20000
+
+                // Decrease interval when the panel is visible and the
+                // queues widget is open.
+                if (this.app.store.get('isMainPanelOpen')) {
+                    if (this.app.store.get('widgets').isOpen.queues) timeout = 5000
+                }
+                this.app.logger.info(`${this}set queue timer timeout to ${timeout}`)
             }
 
-            this.app.logger.info(`${this}set queue timer timeout to ${timeout}`)
-        }
+            return timeout
+        }, true)
 
-        return timeout
+        this.app.timer.startTimer('queue.size')
     }
 
 
@@ -73,9 +75,13 @@ class QueuesModule {
     * Retrieve fresh queue statistics from the API.
     */
     async updateQueues() {
+        // A user may have been logged out, while this function may
+        // still be running on the background.
+        if (!this.app.store.get('user')) return
+
         this.app.logger.info(`${this}updating queue info from api`)
 
-        const res = await this.app.api.client.get('api/queuecallgroup')
+        const res = await this.app.api.client.get('api/queuecallgroup/')
 
         if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
             this.app.logger.debug(`${this}unauthorized queues request`)

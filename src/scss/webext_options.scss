@@ -1,62 +1,91 @@
-body {
-    overflow: auto;
-}
+@import "./base/variables";
 
-.field {
-    margin-bottom: 10px;
-    padding: 5px;
+@import "./base/fonts";
+@import "./base/form";
+@import "./base/containers";
 
-    label {
-        font-weight: 500;
-        vertical-align: center;
-    }
 
-    label + input {
-        clear: both;
-        display: block;
-    }
+// Chrome needs some !important force to make the styles align.
+.chrome-options {
+    padding: $vg-spacing-2;
+    padding-bottom: 0;
+    // Make up for the extra space that's needed for the save notifier.
+    padding-top: $vg-spacing-4;
 
     input {
-        &[type="checkbox"] {
-            margin-top: -3px;
-            margin-right: 5px;
+        &[type="text"] {
+            width: 100%;
 
-            &:hover {
-                cursor: pointer;
+            &:focus {
+                border: 1px solid $vg-grey-lighter !important;
+                border-color: 1px solid $vg-grey-lighter !important;
+                outline: 1px solid $vg-grey-light !important;
             }
         }
+    }
 
-        &[type="text"] {
-            width: 300px;
+    button {
+        width: 100%;
+        background-image: none !important;
+        color: #fff !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+
+        &:focus {
+            outline: 0;
+            border: 1px solid $vg-grey-lighter !important;
         }
     }
 }
 
-.actions {
-    margin: 15px 0;
 
-    button {
-        height: 25px;
-        font-weight: 500;
+.options {
+    .field {
+        margin-bottom: $vg-spacing-1;
 
-        &:hover {
-            cursor: pointer;
+        label {
+            font-weight: 500;
+            vertical-align: center;
+            display: inline-block;
+            margin-bottom: $vg-spacing-1;
+        }
+
+        label + input {
+            clear: both;
+            display: block;
+        }
+
+        .warning {
+            padding: 0;
+            margin: 0;
+            font-size: 0.8rem;
+            color: $vg-info-color-failed-dark;
+            line-height: 25px;
+            position: absolute;
         }
     }
 
-    // The status indicator that says whether the settings are
-    // succesfully saved or not, when saving the options.
-    div {
-        float: right;
-        display: block;
-        opacity: 1;
-        transition: opacity 0.5s ease-in-out;
-        line-height: 25px;
+    // Container for the save button.
+    .actions {
+        // Leave room for the platform warning, which is not part of the
+        // document flow.
+        margin-top: 25px;
 
-        &.hide {
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
+        // The status indicator that says whether the settings are
+        // succesfully saved or not, when saving the options.
+        .status {
+            float: right;
+            display: block;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+            line-height: 25px;
+
+            &.hide {
+                opacity: 0;
+                transition: opacity 1.5s ease-in-out;
+            }
+
         }
-
     }
+
 }
