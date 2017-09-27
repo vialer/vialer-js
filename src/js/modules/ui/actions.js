@@ -197,7 +197,7 @@ class UiActions extends Actions {
             // setTimeout fix for FireFox.
             setTimeout(() => {
                 $('.login-form :input:visible:first').focus()
-            }, 1)
+            }, 100)
         })
 
 
