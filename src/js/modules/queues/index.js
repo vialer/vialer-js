@@ -80,8 +80,14 @@ class QueuesModule {
         if (!this.app.store.get('user')) return
 
         this.app.logger.info(`${this}updating queue info from api`)
-
-        const res = await this.app.api.client.get('api/queuecallgroup/')
+        // Suppress a timeout exception to keep the interval check alive
+        // after a timeout.
+        let res
+        try {
+            res = await this.app.api.client.get('api/queuecallgroup/')
+        } catch (e) {
+            return
+        }
 
         if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
             this.app.logger.debug(`${this}unauthorized queues request`)
