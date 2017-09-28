@@ -33,21 +33,21 @@ $icon-check: "\e901";
 $icon-checkbox-checked: "\f046";
 $icon-checkbox-unchecked: "\f096";
 
-// Colors.
-$vg-grey-lightest: #fbfbfb;
-$vg-grey-lighter: #e5e5e5;
-$vg-grey-light: #999;
+// Default colors; can be overriden by brand.json.
+$vg-primary-color: #3c3c50 !default;
 
-$vg-primary-color: #3c3c50;
+$vg-info-color-failed-dark: #d9534f !default;
+$vg-info-color-failed-light: lighten($vg-info-color-failed-dark, 30%) !default;
+$vg-info-color-failed-lighter: lighten($vg-info-color-failed-dark, 40%) !default;
 
-$vg-info-color-failed-dark: #d9534f;
-$vg-info-color-failed-light: lighten($vg-info-color-failed-dark, 30%);
-$vg-info-color-failed-lighter: lighten($vg-info-color-failed-dark, 40%);
+$vg-info-color-info-dark: #31708f !default;
+$vg-info-color-info-light: lighten($vg-info-color-info-dark, 30%) !default;
+$vg-info-color-info-lighter: lighten($vg-info-color-info-dark, 40%) !default;
 
-$vg-info-color-info-dark: #31708f;
-$vg-info-color-info-light: lighten($vg-info-color-info-dark, 30%);
-$vg-info-color-info-lighter: lighten($vg-info-color-info-dark, 40%);
+$vg-info-color-success-dark: #5cb85c !default;
+$vg-info-color-success-light: lighten($vg-info-color-success-dark, 30%) !default;
+$vg-info-color-success-lighter: lighten($vg-info-color-success-dark, 40%) !default;
 
-$vg-info-color-success-dark: #5cb85c;
-$vg-info-color-success-light: lighten($vg-info-color-success-dark, 30%);
-$vg-info-color-success-lighter: lighten($vg-info-color-success-dark, 40%);
+$vg-grey-lightest: #fbfbfb !default;
+$vg-grey-lighter: #e5e5e5 !default;
+$vg-grey-light: #999 !default;

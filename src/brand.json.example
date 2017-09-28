@@ -1,0 +1,19 @@
+{
+    "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
+    "name": "Click-to-dial",
+    "colors": {
+        "vg-primary-color": "#3c3c50",
+        "vg-info-color-failed-dark": " #d9534f",
+        "vg-info-color-failed-light": "lighten($vg-info-color-failed-dark, 30%)",
+        "vg-info-color-failed-lighter": "lighten($vg-info-color-failed-dark, 40%)",
+        "vg-info-color-info-dark": "#31708f",
+        "vg-info-color-info-light": "lighten($vg-info-color-info-dark, 30%)",
+        "vg-info-color-info-lighter": "lighten($vg-info-color-info-dark, 40%)",
+        "vg-info-color-success-dark": "#5cb85c",
+        "vg-info-color-success-light": "lighten($vg-info-color-success-dark, 30%)",
+        "vg-info-color-success-lighter": "lighten($vg-info-color-success-dark, 40%)",
+        "vg-grey-lightest": "#fbfbfb",
+        "vg-grey-lighter": "#e5e5e5",
+        "vg-grey-light": "#999"
+    }
+}

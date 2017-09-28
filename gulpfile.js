@@ -21,6 +21,7 @@ const gutil = require('gulp-util')
 const http = require('http')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
+const insert = require('gulp-insert')
 const imagemin = require('gulp-imagemin')
 const mkdirp = require('mkdirp')
 const minifier = composer(require('uglify-es'), console)
@@ -94,11 +95,38 @@ let sizeOptions = {
 
 
 /**
+* Converts branding data to a valid SCSS variables string.
+* @param {Object} brandProperties: Key/value object that's converted to a SCSS variable string.
+* @returns {String} - Scss-formatted variables string.
+*/
+function formatScssVars(brandProperties) {
+    return Object.keys(brandProperties).map((name) => '$' + name + ': ' + brandProperties[name] + ';').join('\n')
+}
+
+
+/**
+* Read the manifest file and augment it with generic
+* variable options(e.g. branding options)
+* that are not browser-specific.
+* @returns {Object} - The manifest template.
+*/
+const getManifest = () => {
+    let brand = require('./src/brand.json')
+    let manifest = require('./src/manifest.json')
+    manifest.name = brand.name
+    manifest.homepage_url = brand.homepage_url
+    manifest.version = PACKAGE.version
+    return manifest
+}
+
+
+/**
 * Generic browserify task used for multiple entrypoints.
 * @param {String} name - Name of the javascript entrypoint.
 * @returns {Function} - Browerserify bundle function to use.
 */
 const jsEntry = (name) => {
+    let brand = require('./src/brand.json')
     return (done) => {
         if (!bundlers[name]) {
             bundlers[name] = browserify({
@@ -109,6 +137,7 @@ const jsEntry = (name) => {
             })
             if (isWatching) bundlers[name].plugin(watchify)
         }
+        bundlers[name].ignore('process')
         bundlers[name].bundle()
             .on('error', notify.onError('Error: <%= error.message %>'))
             .on('end', () => {
@@ -118,8 +147,10 @@ const jsEntry = (name) => {
             .pipe(buffer())
             .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
             .pipe(envify({
+                HOMEPAGE: brand.homepage_url,
                 NODE_ENV: NODE_ENV,
                 VERBOSE: VERBOSE,
+                VERSION: PACKAGE.version,
             }))
             .pipe(ifElse(PRODUCTION, () => minifier()))
 
@@ -136,8 +167,11 @@ const jsEntry = (name) => {
 * @returns {Function} - Sass function to use.
 */
 const scssEntry = (name) => {
+    let brand = require('./src/brand.json')
+    let brandColors = formatScssVars(brand.colors)
     return () => {
         return gulp.src(`./src/scss/${name}.scss`)
+            .pipe(insert.prepend(brandColors))
             .pipe(sass({
                 includePaths: NODE_PATH,
                 sourceMap: !PRODUCTION,
@@ -373,26 +407,22 @@ gulp.task('js-webext-tab', 'Generate webextension tab js.', jsEntry('webext_tab'
 
 
 gulp.task('manifest-webext-chrome', 'Generate a web-extension manifest for Chrome.', (done) => {
+    let manifest = getManifest()
+    manifest.options_ui.chrome_style = false
     const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
-    let manifest = require('./src/manifest.json')
-    manifest.options_ui.chrome_style = true
-    // Reuse the version from the package.json description.
-    manifest.version = PACKAGE.version
     writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
 })
 
 
 gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Firefox.', (done) => {
-    const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
-    let manifest = require('./src/manifest.json')
+    let manifest = getManifest()
     manifest.options_ui.browser_style = true
     manifest.applications = {
         gecko: {
             id: 'click-to-dial@web-extensions',
         },
     }
-    // Reuse the version from the package.json description.
-    manifest.version = PACKAGE.version
+    const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
     writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
 })
 

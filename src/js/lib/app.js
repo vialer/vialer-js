@@ -110,12 +110,13 @@ class App extends Skeleton {
 
 
     /**
-    * Small helper that gets the version of the app from the npm package.
+    * Small helper that returns the version of the app.
+    * The version is inserted at buildtime from the
+    * package.json file.
     * @returns {String} - The current app's version.
     */
     version() {
-        const _package = require('../../../package.json')
-        return _package.version
+        return process.env.VERSION
     }
 
 

@@ -11,6 +11,8 @@ checkout the project and install it's dependencies from npm:
     cd click-to-dial
     npm i -g gulp web-ext
     npm i
+    # set the default branding
+    cp ./src/brand.json.example ./src/brand.json
 
 
 ## As web-extension
