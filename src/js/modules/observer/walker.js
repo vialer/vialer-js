@@ -2,7 +2,7 @@
 * @module Observer
 */
 // Identify our elements with these class names.
-const phoneElementClassName = 'voipgrid-phone-number'
+const phoneElementClassName = 'click-to-dial-phone-number'
 
 
 /**

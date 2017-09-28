@@ -41,6 +41,7 @@ const sourcemaps = require('gulp-sourcemaps')
 const watchify = require('watchify')
 const zip = require('gulp-zip')
 
+const BRAND = require('./src/brand.json')
 const PACKAGE = require('./package')
 const writeFileAsync = promisify(fs.writeFile)
 
@@ -111,22 +112,21 @@ function formatScssVars(brandProperties) {
 * @returns {Object} - The manifest template.
 */
 const getManifest = () => {
-    let brand = require('./src/brand.json')
     let manifest = require('./src/manifest.json')
-    manifest.name = brand.name
-    manifest.homepage_url = brand.homepage_url
+    manifest.name = BRAND.name
+    manifest.permissions.push(BRAND.permissions)
+    manifest.homepage_url = BRAND.homepage_url
     manifest.version = PACKAGE.version
     return manifest
 }
 
 
 /**
-* Generic browserify task used for multiple entrypoints.
+* Return a browserify function task used for multiple entrypoints.
 * @param {String} name - Name of the javascript entrypoint.
 * @returns {Function} - Browerserify bundle function to use.
 */
 const jsEntry = (name) => {
-    let brand = require('./src/brand.json')
     return (done) => {
         if (!bundlers[name]) {
             bundlers[name] = browserify({
@@ -147,8 +147,10 @@ const jsEntry = (name) => {
             .pipe(buffer())
             .pipe(ifElse(!PRODUCTION, () => sourcemaps.init({loadMaps: true})))
             .pipe(envify({
-                HOMEPAGE: brand.homepage_url,
+                HOMEPAGE: BRAND.homepage_url,
                 NODE_ENV: NODE_ENV,
+                PLATFORM_URL: BRAND.permissions,
+                SIP_ENDPOINT: BRAND.sip_endpoint,
                 VERBOSE: VERBOSE,
                 VERSION: PACKAGE.version,
             }))
@@ -167,8 +169,7 @@ const jsEntry = (name) => {
 * @returns {Function} - Sass function to use.
 */
 const scssEntry = (name) => {
-    let brand = require('./src/brand.json')
-    let brandColors = formatScssVars(brand.colors)
+    const brandColors = formatScssVars(BRAND.colors)
     return () => {
         return gulp.src(`./src/scss/${name}.scss`)
             .pipe(insert.prepend(brandColors))
@@ -183,7 +184,6 @@ const scssEntry = (name) => {
             .pipe(ifElse(PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
             .pipe(gulp.dest(`./build/${BUILD_TARGET}/css`))
             .pipe(size(_extend({title: `scss-${name}`}, sizeOptions)))
-            .pipe(ifElse(isWatching, livereload))
     }
 }
 
@@ -202,56 +202,43 @@ gulp.task('assets', 'Copy click-to-dial assets to the build directory.', ['fonts
 
 
 gulp.task('build', 'Clean existing build and regenerate a new one.', (done) => {
-    if (BUILD_TARGET !== 'electron') {
-        runSequence('build-clean', [
-            'assets',
-            'html',
-            'js-vendor',
-            'js-webext',
-            'scss',
-        ], done)
-    } else {
-        runSequence('build-clean', [
-            'assets',
-            'html',
-            'js-electron-main',
-            'js-electron-webview',
-            'js-vendor',
-            'scss'], done)
-    }
+    let targetTasks
+    if (BUILD_TARGET === 'electron') targetTasks = ['js-electron-main', 'js-electron-webview', 'js-vendor']
+    else targetTasks = ['js-vendor', 'js-webext']
+
+    runSequence(['assets', 'html', 'scss'].concat(targetTasks), done)
 })
 
 
-gulp.task('build-dist', 'Make a build and generate a web-extension zip file.', ['build'], (done) => {
-    // Use the web-ext build method here, so the result will match
-    // the deployable version as closely as possible.
-    if (BUILD_TARGET === 'firefox') {
-        // eslint-disable-next-line max-len
-        let execCommand = `web-ext build --overwrite-dest --source-dir ./build/${BUILD_TARGET} --artifacts-dir ./dist/${BUILD_TARGET}/`
-        let child = childExec(execCommand, undefined, (err, stdout, stderr) => {
-            if (stderr) gutil.log(stderr)
-            if (stdout) gutil.log(stdout)
-            done()
-        })
+gulp.task('build-dist', 'Make a build and generate a web-extension zip file.', (done) => {
+    runSequence('build', async function() {
+        // Use the web-ext build method here, so the result will match
+        // the deployable version as closely as possible.
+        if (BUILD_TARGET === 'firefox') {
+            // eslint-disable-next-line max-len
+            let execCommand = `web-ext build --overwrite-dest --source-dir ./build/${BUILD_TARGET} --artifacts-dir ./dist/${BUILD_TARGET}/`
+            let child = childExec(execCommand, undefined, (err, stdout, stderr) => {
+                if (stderr) gutil.log(stderr)
+                if (stdout) gutil.log(stdout)
+                done()
+            })
 
-        child.stdout.on('data', (data) => {
-            process.stdout.write(`${data.toString()}\r`)
-        })
-    } else {
-        gulp.src([
-            `./build/${BUILD_TARGET}/**`,
-        ], {base: `./build/${BUILD_TARGET}`})
-            .pipe(zip(DISTRIBUTION_NAME))
-            .pipe(gulp.dest(`./dist/${BUILD_TARGET}/`))
-            .on('end', done)
-    }
-})
-
-
-gulp.task('build-clean', `Clean build directory ${path.join(BUILD_DIR, BUILD_TARGET)}`, (done) => {
-    del([path.join(BUILD_DIR, BUILD_TARGET, '**')], {force: true}).then(() => {
-        mkdirp(path.join(BUILD_DIR, BUILD_TARGET), done)
+            child.stdout.on('data', (data) => {
+                process.stdout.write(`${data.toString()}\r`)
+            })
+        } else {
+            gulp.src([`./build/${BUILD_TARGET}/**`], {base: `./build/${BUILD_TARGET}`})
+                .pipe(zip(DISTRIBUTION_NAME))
+                .pipe(gulp.dest(`./dist/${BUILD_TARGET}/`))
+                .on('end', done)
+        }
     })
+})
+
+
+gulp.task('build-clean', `Clean build directory ${path.join(BUILD_DIR, BUILD_TARGET)}`, async() => {
+    await del([path.join(BUILD_DIR, BUILD_TARGET, '**')], {force: true})
+    mkdirp(path.join(BUILD_DIR, BUILD_TARGET))
 })
 
 
@@ -288,7 +275,7 @@ gulp.task('deploy', (done) => {
         })
     } else if (BUILD_TARGET === 'firefox') {
         runSequence('build', function() {
-            // A firefox extension version number can only be signed and
+            // A Firefox extension version number can only be signed and
             // uploaded once using web-ext. The second time will fail with an
             // unobvious reason.
             const api = DEPLOY_SETTINGS.firefox
@@ -309,7 +296,6 @@ gulp.task('deploy', (done) => {
 
 
 gulp.task('docs', 'Generate documentation.', (done) => {
-    // eslint-disable-next-line max-len
     let execCommand = `node ${NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${BUILD_DIR}/docs --package ./package.json`
     childExec(execCommand, undefined, (err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
@@ -365,56 +351,55 @@ gulp.task('html', 'Add html to the build directory.', () => {
 })
 
 
-gulp.task('js-electron', [
-    'js-electron-main',
-    'js-electron-webview',
-    'js-vendor',
-], (done) => {
-    if (isWatching) livereload.changed('web.js')
-    done()
+gulp.task('js-electron', 'Generate electron js.', (done) => {
+    runSequence([
+        'js-electron-main',
+        'js-electron-webview',
+        'js-vendor',
+    ], done)
 })
+
+
 gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-electron-webview'], () => {
     return gulp.src('./src/js/electron_main.js', {base: './src/js/'})
+        .pipe(ifElse(PRODUCTION, () => minifier()))
         .pipe(gulp.dest(`./build/${BUILD_TARGET}`))
         .pipe(size(_extend({title: 'electron-main'}, sizeOptions)))
         .pipe(ifElse(isWatching, livereload))
 })
+
 gulp.task('js-electron-webview', 'Generate electron webview js.', jsEntry('electron_webview'))
-
-
 gulp.task('js-vendor', 'Generate third-party vendor js.', jsEntry('vendor'))
-
-
-gulp.task('js-webext', 'Generate webextension js.', [
-    'js-webext-bg',
-    'js-webext-callstatus',
-    'js-webext-observer',
-    'js-webext-options',
-    'js-webext-popup',
-    'js-webext-tab',
-    `manifest-webext-${BUILD_TARGET}`,
-], (done) => {
-    if (isWatching) livereload.changed('web.js')
-    done()
+gulp.task('js-webext', 'Generate webextension js.', [], (done) => {
+    runSequence([
+        'js-webext-bg',
+        'js-webext-callstatus',
+        'js-webext-observer',
+        'js-webext-options',
+        'js-webext-popup',
+        'js-webext-tab',
+    ], `manifest-webext-${BUILD_TARGET}`, () => {
+        if (isWatching) livereload.changed('web.js')
+        done()
+    })
 })
 gulp.task('js-webext-bg', 'Generate the extension background entry js.', jsEntry('webext_bg'))
 gulp.task('js-webext-callstatus', 'Generate the callstatus entry js.', jsEntry('webext_callstatus'))
-// eslint-disable-next-line max-len
 gulp.task('js-webext-observer', 'Generate webextension observer js that runs in all tab frames.', jsEntry('webext_observer'))
 gulp.task('js-webext-options', 'Generate webextension options js.', jsEntry('webext_options'))
 gulp.task('js-webext-popup', 'Generate webextension popup/popout js.', jsEntry('webext_popup'))
 gulp.task('js-webext-tab', 'Generate webextension tab js.', jsEntry('webext_tab'))
 
 
-gulp.task('manifest-webext-chrome', 'Generate a web-extension manifest for Chrome.', (done) => {
+gulp.task('manifest-webext-chrome', 'Generate a web-extension manifest for Chrome.', async() => {
     let manifest = getManifest()
     manifest.options_ui.chrome_style = false
     const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
-    writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
+    await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))
 })
 
 
-gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Firefox.', (done) => {
+gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Firefox.', async() => {
     let manifest = getManifest()
     manifest.options_ui.browser_style = true
     manifest.applications = {
@@ -423,16 +408,24 @@ gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Fire
         },
     }
     const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
-    writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4)).then(done)
+    await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))
 })
 
 
-gulp.task('scss', 'Compile all css.', [
-    'scss-webext',
-    'scss-webext-callstatus',
-    'scss-webext-options',
-    'scss-webext-print',
-])
+gulp.task('scss', 'Compile all css.', [], (done) => {
+    runSequence([
+        'scss-webext',
+        'scss-webext-callstatus',
+        'scss-webext-options',
+        'scss-webext-print',
+    ], () => {
+        // Targetting webext.css for livereload changed only works in the
+        // webview. In the callstatus html, it will trigger a page reload.
+        if (isWatching) livereload.changed('webext.css')
+        done()
+    })
+})
+
 
 gulp.task('scss-webext', 'Generate popover webextension css.', scssEntry('webext'))
 gulp.task('scss-webext-callstatus', 'Generate webextension callstatus dialog css.', scssEntry('webext_callstatus'))
@@ -448,6 +441,20 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     app.use('/', serveIndex(path.join(__dirname, 'build'), {icons: false}))
     app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
     http.createServer(app).listen(8999)
+
+    // Watch files related to working on the documentation.
+    if (WITHDOCS) {
+        gutil.log('Watching documentation')
+        gulp.watch([
+            path.join(__dirname, '.jsdoc.json'),
+            path.join(__dirname, 'README.md'),
+            path.join(__dirname, 'docs', 'manuals', '**'),
+        ], () => {
+            gulp.start('docs')
+        })
+    }
+
+    // Watch files related to working on the webextension.
     gulp.watch([
         path.join(__dirname, 'src', 'js', '**', '*.js'),
         `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
@@ -461,17 +468,14 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         if (WITHDOCS) gulp.start('docs')
     })
 
-    if (WITHDOCS) {
-        gutil.log('Watching documentation')
-        gulp.watch([
-            path.join(__dirname, '.jsdoc.json'),
-            path.join(__dirname, 'README.md'),
-            path.join(__dirname, 'docs', 'manuals', '**'),
-        ], () => {
-            gulp.start('docs')
-        })
+    gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
+
+    if (BUILD_TARGET !== 'electron') {
+        gulp.watch(path.join(__dirname, 'src', 'manifest.json'), [`manifest-webext-${BUILD_TARGET}`])
     }
 
+
+    // Watch files related to working on linked packages.
     if (WATCHLINKED) {
         gutil.log('Watching linked development packages')
         gulp.watch([
@@ -482,30 +486,13 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         ], ['docs'])
     }
 
+    // Watch files related to working on assets.
     gulp.watch([
         path.join(__dirname, 'src', '_locales', '**', '*.json'),
         path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
     ], ['assets'])
 
+    // Watch files related to working on the html and css.
     gulp.watch(path.join(__dirname, 'src', 'html', '**', '*.html'), ['html'])
-
-    if (BUILD_TARGET === 'electron') {
-        gulp.watch([
-            path.join(__dirname, 'src', 'js', 'electron_main.js'),
-            path.join(__dirname, 'src', 'js', 'electron_webview.js'),
-        ], ['js-electron-main', 'js-electron-webview'])
-    } else {
-        gulp.watch(path.join(__dirname, 'src', 'manifest.json'), [`manifest-webext-${BUILD_TARGET}`])
-        gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_callstatus.scss'), ['scss-webext-callstatus'])
-        gulp.watch(path.join(__dirname, 'src', 'scss', 'webext_options.scss'), ['scss-webext-options'])
-        gulp.watch([path.join(__dirname, 'src', 'scss', 'webext_print.scss')], ['scss-webext-print'])
-    }
-
-    gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
-
-    gulp.watch([
-        path.join(__dirname, 'src', 'scss', 'webext.scss'),
-        path.join(__dirname, 'src', 'scss', 'base', '*.scss'),
-        path.join(__dirname, 'src', 'scss', 'components', '*.scss'),
-    ], ['scss-webext'])
+    gulp.watch(path.join(__dirname, 'src', 'scss', '**', '*.scss'), ['scss'])
 })

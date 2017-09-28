@@ -3,7 +3,7 @@
 */
 const Actions = require('../../lib/actions')
 
-const phoneIconClassName = 'voipgrid-phone-icon'
+const phoneIconClassName = 'click-to-dial-icon'
 
 
 /**

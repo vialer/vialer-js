@@ -52,8 +52,8 @@ class App extends Skeleton {
         let platformUrl = this.store.get('platformUrl')
 
         if (!platformUrl) {
-            // Set a default platform url when it's not set.
-            platformUrl = 'https://partner.voipgrid.nl/'
+            // Set a default platform url from the brand when it's not set.
+            platformUrl = process.env.PLATFORM_URL
             this.store.set('platformUrl', platformUrl)
         }
 
@@ -128,7 +128,7 @@ class App extends Skeleton {
             analyticsId: 'UA-60726618-9',
             c2d: 'true',
             platformUrl: this.getPlatformUrl(),
-            realm: 'websocket.voipgrid.nl',
+            realm: process.env.SIP_ENDPOINT,
         }
         this.timer = new Timer(this)
         if (this.env.extension) {
