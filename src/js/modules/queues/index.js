@@ -48,14 +48,13 @@ class QueuesModule {
 
             // Only when authenticated.
             if (this.app.store.get('user')) {
-                // at least every 20s when a queue is selected
+                // Check every 20s when a queue is selected, no matter
+                // if the popup is opened or closed.
                 if (this.app.store.get('widgets').queues.selected) timeout = 20000
 
-                // Decrease interval when the panel is visible and the
+                // Check more regularly when the popup is open and the
                 // queues widget is open.
-                if (this.app.store.get('isMainPanelOpen')) {
-                    if (this.app.store.get('widgets').isOpen.queues) timeout = 5000
-                }
+                if (this.app.store.get('isMainPanelOpen') && this.app.store.get('widgets').isOpen.queues) timeout = 5000
                 this.app.logger.info(`${this}set queue timer timeout to ${timeout}`)
             }
 
@@ -143,6 +142,8 @@ class QueuesModule {
     _load() {
         if (this.app.env.extension && !this.app.env.extension.background) return
         this.app.emit('ui:widget.reset', {name: 'queues'})
+        // Start with showing an empty queue list.
+        this.app.emit('queues:empty')
         this.updateQueues()
         this.setQueueSizesTimer()
     }
@@ -157,13 +158,17 @@ class QueuesModule {
         this.app.logger.info(`${this}reloading widget queues`)
         // Restore the queue from localstorage.
         let widgetState = this.app.store.get('widgets')
-        if (widgetState.queues.unauthorized) {
+        this.sizes = {}
+
+        if (!Object.keys(widgetState.queues).length) {
+            // No widget state. Empty the list.
+            this.app.emit('queues:empty')
+        } else if (widgetState.queues.unauthorized) {
             this.app.emit('ui:widget.unauthorized', {name: 'queues'})
         } else {
-            // Restore ids and sizes.
+            // Start with a queue state from localstorage.
             this.sizes = widgetState.queues.sizes
 
-            // Restore queues list.
             let queues = widgetState.queues.list
             if (queues && queues.length) {
                 this.app.emit('queues:fill', {
@@ -171,11 +176,12 @@ class QueuesModule {
                     selectedQueue: widgetState.queues.selected,
                 })
             } else {
+                // No queues in localstore. Empty the list.
                 this.app.emit('queues:empty')
             }
-
-            this.setQueueSizesTimer()
         }
+
+        this.setQueueSizesTimer()
     }
 }
 

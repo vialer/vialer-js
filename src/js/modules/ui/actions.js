@@ -172,8 +172,6 @@ class UiActions extends Actions {
         if (this.app.env.extension && this.app.env.extension.popout) {
             $('html').addClass('popout')
         }
-        // keep track whether this popup is open or closed
-        this.app.store.set('isMainPanelOpen', true)
 
         // Switch between logged-in and login state.
         if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
@@ -194,6 +192,8 @@ class UiActions extends Actions {
 
         // Focus the first input field.
         $(window).on('load', () => {
+            // Keep track whether this popup is open or closed.
+            this.app.store.set('isMainPanelOpen', true)
             // setTimeout fix for FireFox.
             setTimeout(() => {
                 $('.login-form :input:visible:first').focus()
