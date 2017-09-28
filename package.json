@@ -1,6 +1,6 @@
 {
   "name": "click-to-dial",
-  "version": "2.0.13",
+  "version": "2.1.0",
   "description": "click-to-dial web extension for Firefox, Chrome & Electron desktop app.",
   "engines": {
     "node": ">=8.0.0"
