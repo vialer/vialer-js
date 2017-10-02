@@ -45,6 +45,8 @@ class UserModule {
                 // Start loading the widgets.
                 this.app.modules.ui.refreshWidgets(false)
                 this.app.logger.info(`${this}login successful`)
+                // Connect to the sip service on succesful login.
+                this.app.sip.connect()
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 // Remove credentials from the store.
                 this.app.store.remove('username')
@@ -66,6 +68,9 @@ class UserModule {
         this.app.emit('user:logout.success')
         this.app.api.setupClient()
         this.app.timer.stopAllTimers()
+
+        // Disconnect without reconnect attempt.
+        this.app.sip.disconnect(false)
     }
 
 

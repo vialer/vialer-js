@@ -25,9 +25,9 @@ class ContactsModule {
 
     /**
     * Functionality to load for this module.
-    * @param {Boolean} update - True when refreshing the plugin.
+    * @param {Boolean} refresh - True when the plugin is forced to refresh.
     */
-    _load(update) {
+    _load(refresh) {
         if (this.app.env.extension && !this.app.env.extension.background) return
 
         this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description').then((res) => {
@@ -37,32 +37,23 @@ class ContactsModule {
                 let contacts = res.data.objects
                 this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
 
-                // Remove accounts that are not currently registered.
+                // Remove accounts that are not currently registered
+                // to a device.
                 for (let i = contacts.length - 1; i >= 0; i--) {
-                    if (!contacts[i].hasOwnProperty('sipreginfo')) {
-                        contacts.splice(i, 1)
-                    }
+                    if (!contacts[i].hasOwnProperty('sipreginfo')) contacts.splice(i, 1)
                 }
 
                 let widgetState = this.app.store.get('widgets')
                 if (widgetState) {
                     widgetState.contacts.list = contacts
                     widgetState.contacts.unauthorized = false
-                    widgetState.contacts.status = 'connecting'
                     this.app.store.set('widgets', widgetState)
 
                     if (contacts.length) {
                         this.app.emit('contacts:reset')
                         this.app.emit('contacts:fill', {
                             callback: () => {
-                                if (update) {
-                                    let accountIds = widgetState.contacts.list.map((c) => c.account_id)
-                                    this.app.sip.updatePresence(accountIds, true)
-                                } else {
-                                    // Start the stack once we got all contacts
-                                    // from the api.
-                                    this.app.sip.connect()
-                                }
+                                this.app.sip.updatePresence(refresh)
                             },
                             contacts: contacts,
                         })
@@ -71,7 +62,6 @@ class ContactsModule {
                     }
                 }
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-                this.app.sip.disconnect()
 
                 if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                     this.app.logger.info(`${this}unauthorized contacts`)
@@ -83,7 +73,6 @@ class ContactsModule {
                     // Display an icon explaining the user lacks permissions
                     // to use this feature of the plugin.
                     this.app.emit('ui:widget.unauthorized', {name: 'contacts'})
-                    this.app.sip.disconnect()
                 }
 
             }
@@ -95,15 +84,17 @@ class ContactsModule {
         this.app.logger.info(`${this}reset`)
         this.app.emit('contacts:reset')
         this.app.emit('contacts:empty')
-        // Stop reconnection attempts.
-        this.app.sip.disconnect()
     }
 
 
+    /**
+    * Called when restoring the popup.
+    */
     _restore() {
-        // Check if unauthorized.
         let widgetState = this.app.store.get('widgets')
         if (!widgetState) this.app.emit('contacts:empty')
+
+        // Check if unauthorized.
         else if (widgetState.contacts.unauthorized) {
             this.app.logger.debug(`${this}unauthorized to restore`)
             this.app.emit('ui:widget.unauthorized', {name: 'contacts'})
@@ -115,8 +106,7 @@ class ContactsModule {
                 this.app.emit('contacts:reset')
                 this.app.emit('contacts:fill', {
                     callback: () => {
-                        let accountIds = widgetState.contacts.list.map((c) => c.account_id)
-                        this.app.sip.updatePresence(accountIds, false)
+                        this.app.sip.updatePresence()
                     },
                     contacts: contacts,
                 })
