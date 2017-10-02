@@ -233,7 +233,8 @@ class DialerModule {
         })
 
         $(this.frame).hide().on('load', (e) => {
-            $(this.frame).show()
+            // Show and focus the callstatus iframe after loading.
+            $(this.frame).show().get(0).contentWindow.focus()
         })
         $('html').append(this.frame)
     }

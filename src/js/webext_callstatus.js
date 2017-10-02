@@ -41,18 +41,33 @@ class CallStatusApp extends Skeleton {
             }
         })
 
-        $('.callstatus .close').on('click', this.hideCallstatus.bind(this))
+        // Close the dialog on escape. Requires the iframe to be focussed.
+        $(document).keyup((e) => {
+            if (e.keyCode === 27) {
+                this.hideCallstatus()
+            }
+        })
+
+        // The most outer bubbled event triggers closing the callstatus.
+        $('body').on('click', this.hideCallstatus.bind(this))
+        // Except when we click inside the callstatus dialog. In this
+        // case we stop the bubbling.
+        $('.callstatus .close, .callstatus').on('click', (e) => {
+            e.stopPropagation()
+            if ($(e.currentTarget).hasClass('close')) {
+                this.hideCallstatus()
+            }
+        })
+
         $(window).on('unload', this.hideCallstatus.bind(this))
     }
 
 
-    hideCallstatus(e) {
+    hideCallstatus() {
         this.logger.info(`${this}closing callstatus dialog`)
         // Notify the parent tab that the callstatus
         // wants to be closed.
-        this.emit('dialer:status.hide', {
-            callid: this.callid,
-        }, false, false, parent)
+        this.emit('dialer:status.hide', {callid: this.callid}, false, false, parent)
     }
 
 
