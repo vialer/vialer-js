@@ -14,41 +14,6 @@ class ContactsActions extends Actions {
     }
 
 
-    /**
-    * Register local events; e.g. events that are triggered
-    * from the background and handled by the background.
-    */
-    _background() {
-        this.app.on('sip:failed_to_start', (e) => {
-            let widgetState = this.app.store.get('widgets')
-            widgetState.contacts.status = 'failed_to_start'
-            this.app.store.set('widgets', widgetState)
-        })
-
-        this.app.on('sip:started', (e) => {
-            let widgetState = this.app.store.get('widgets')
-            widgetState.contacts.status = 'connected'
-            this.app.store.set('widgets', widgetState)
-            const accountIds = widgetState.contacts.list.map((c) => c.account_id)
-            this.app.sip.updatePresence(accountIds, true)
-        })
-
-        this.app.on('sip:starting', (e) => {
-            let widgetState = this.app.store.get('widgets')
-            widgetState.contacts.status = 'connecting'
-            this.app.store.set('widgets', widgetState)
-        })
-
-        this.app.on('sip:stopped', (e) => {
-            let widgetState = this.app.store.get('widgets')
-            if (widgetState) {
-                widgetState.contacts.status = 'disconnected'
-                this.app.store.set('widgets', widgetState)
-            }
-        })
-    }
-
-
     _popup() {
         let _$ = {}
         _$.widget = $('.widget.contacts')
@@ -59,8 +24,10 @@ class ContactsActions extends Actions {
         _$.statusIndicators = _$.widget.find('.status-indicators')
 
         // The SIP websocket connection is not yet started at this point.
-        // Show the disconnected icon to begin with.
-        _$.widget.find('.disconnected-status').removeClass('hide')
+        // Show the disconnected icon until a connected event occurs.
+        if (this.app.store.get('sip').status !== 'started') {
+            _$.widget.find('.disconnected-status').removeClass('hide')
+        }
 
         this.app.on('dialer:status.stop', (data) => {
             _$.widget.find('.widget-item').attr('disabled', false)
@@ -132,7 +99,7 @@ class ContactsActions extends Actions {
 
         this.app.on('sip:stopped', (e) => {
             // Hide all other status indicators as well.
-            _$.statusIndicators.find('i').hide().filter('.disconnected-status').removeClass('hide')
+            _$.statusIndicators.find('i').addClass('hide').filter('.disconnected-status').removeClass('hide')
             // Remove all the statuses from the contacts.
             _$.widget.find('.icon').removeClass('available unavailable busy ringing shake')
         })
@@ -141,10 +108,7 @@ class ContactsActions extends Actions {
          * Show a blinking presence loading icon while updating.
          */
         this.app.on('sip:presences.start_update', (data) => {
-            _$.statusIndicators.find('.disconnected-status').addClass('hide')
-            _$.statusIndicators.find('.updating-presence-status').removeClass('hide')
-            // Remove all statuses from the contacts.
-            _$.widget.find('.icon').removeClass('available unavailable busy ringing shake')
+            _$.statusIndicators.find('i').addClass('hide').filter('.updating-presence-status').removeClass('hide')
         })
 
         /**

@@ -22,6 +22,8 @@ class Sip {
         this.reconnect = true
         this.states = {}
         this.subscriptions = {}
+        // Start the SIP stack ASAP.
+        this.connect()
     }
 
 
@@ -31,21 +33,23 @@ class Sip {
     connect() {
         // Emit to the frontend that the sip client is not yet
         // ready to start.
-        this.app.emit('sip:before_start', {})
-        this.app.logger.debug(`${this}connecting to sip backend`)
-        if (this._sip) {
-            this._sip.start()
+        if (this.status === 'started') {
+            this.app.logger.warn(`${this}already connected to sip backend`)
         } else {
-            this.initStack()
+            this.app.logger.debug(`${this}connecting to sip backend`)
+            this.app.emit('sip:before_start', {})
+            if (!this._sip) this.initStack()
+            else this._sip.start()
         }
     }
 
 
     /**
     * Graceful stop, do not reconnect automatically.
+    * @param {Boolean} reconnect - Whether try to reconnect.
     */
-    disconnect() {
-        this.reconnect = false
+    disconnect(reconnect = true) {
+        this.reconnect = reconnect
         this.states = {}
         this.subscriptions = {}
 
@@ -79,7 +83,7 @@ class Sip {
         }
 
         SIPml.init((e) => {
-            this.app.logger.debug(`${this}starting SIP stack`)
+            this.app.logger.debug(`${this}SIP stack created`)
             let userAgent = `Click-to-dial v${this.app.version()}`
             let user = this.app.store.get('user')
 
@@ -114,31 +118,42 @@ class Sip {
     */
     sipStatusEvent(e) {
         let retryTimeoutDefault = {interval: 2500, limit: 9000000}
+        if (!this.retry) this.retry = Object.assign({}, retryTimeoutDefault)
         this.status = e.type
+
+        this.app.store.set('sip', {status: this.status})
 
         switch (e.o_event.i_code) {
         case tsip_event_code_e.STACK_STARTING:
+            this.app.logger.info(`${this}SIP stack starting`)
             this.app.emit('sip:starting', {}, 'both')
             break
         case tsip_event_code_e.STACK_FAILED_TO_START:
+            this.app.logger.warn(`${this}SIP stack failed to start`)
             this.app.emit('sip:failed_to_start', {}, 'both')
             if (this.reconnect) {
-                if (!this.retry) this.retry = Object.assign({}, retryTimeoutDefault)
                 setTimeout(this.connect.bind(this), this.retry.interval)
                 this.retry = this.app.timer.increaseTimeout(this.retry)
             }
             break
         case tsip_event_code_e.STACK_STARTED:
+            this.app.logger.info(`${this}SIP stack started`)
             // Reset the retry timer.
             this.retry = Object.assign({}, retryTimeoutDefault)
             this.app.emit('sip:started', {}, 'both')
+            // Start updating presence information.
+            this.updatePresence()
             break
         case tsip_event_code_e.STACK_STOPPED:
             // This event is triggered twice somehow. Flag is resetted when
             // connected again.
             if (this.stopped) {
-                // Emitted within the context of the bg script.
                 this.app.emit('sip:stopped', {}, 'both')
+
+                if (this.reconnect) {
+                    setTimeout(this.connect.bind(this), this.retry.interval)
+                    this.retry = this.app.timer.increaseTimeout(this.retry)
+                }
             }
             this.stopped = true
             break
@@ -257,7 +272,7 @@ class Sip {
     * @param {Number} accountId - The accountId to deregister.
     */
     unsubscribePresence(accountId) {
-        this.app.logger.debug(`${this} unsubscribe`)
+        this.app.logger.debug(`${this}unsubscribe presence ${accountId}`)
         if (this.subscriptions.hasOwnProperty(accountId)) {
             if (this._sip && this._sip.o_stack.e_state === tsip_transport_state_e.STARTED) {
                 this.subscriptions[accountId].unsubscribe()
@@ -269,56 +284,62 @@ class Sip {
 
 
     /**
-    * Retrieve presence information for given account ids.
-    * The presence information is cached. When `update` is used, it
-    * will retrieve missing presence information from the sip server.
-    * @param {Array} accountIds - The accountIds to update presence for.
-    * @param {Boolean} reload - Reload presence from SIP server when true.
+    * Update presence information for given account ids. The presence info
+    * is cached and will only subscribe for account ids that are not yet
+    * in the cached states object. This behaviour can be overridden using
+    * the `refresh` option. With `refresh`, all supplied account ids will
+    * have their presence updated from the SIP server.
+    * @param {Boolean} refresh - Force refreshing presence from the sip service.
     */
-    async updatePresence(accountIds, reload) {
-        if (!reload) {
-            if (!this._sip) {
-                this.app.logger.debug(`${this}not updating from sip server; no sipstack available`)
-                return
-            }
+    async updatePresence(refresh) {
+        if (this.status === 'stopped') {
+            this.app.logger.debug(`${this}SIP presence cannot update. No websocket connection.`)
+            return
+        }
 
-            // Unsubscribe lost contacts that are in cache, but not in
-            // the accountIds refresh array.
-            const cachedAccountIds = Object.keys(this.states).filter((k, v) => accountIds.includes(k))
-            for (let accountId of cachedAccountIds) {
-                this.unsubscribePresence(accountId)
-            }
+        // Get the current account ids from localstorage.
+        let widgetState = this.app.store.get('widgets')
+        let accountIds = widgetState.contacts.list.map((c) => c.account_id)
 
-            const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
-            this.app.logger.debug(`${this}updating sip subscription for ${accountIdsWithoutState.length} account id's`)
-            // Don't do this in parallel, to keep the load on the websocket
-            // server low. Also subscribePresence has a fixed timeout before
-            // it resolves the connected state, to further slow down the
-            // presence requests.
+        if (refresh) {
+            // Set all colleagues to unavailable in the UI and
+            // clear the states object.
+            for (let accountId in this.states) {
+                this.app.emit('sip:presence.update', {account_id: accountId, state: 'unavailable'})
+            }
+            this.states = {}
+        } else {
+            // Set the current cached in the UI early on.
+            for (let accountId in this.states) {
+                this.app.emit('sip:presence.update', {account_id: accountId, state: this.states[accountId].state})
+            }
+        }
+
+        // Always unsubscribe lost contacts that are in cache, but not in
+        // the accountIds refresh array.
+        const oldCachedAccountIds = Object.keys(this.states).filter((k, v) => !accountIds.includes(Number(k)))
+
+        this.app.logger.debug(`${this}SIP subscription unsubscribe cleanup for ${oldCachedAccountIds.length} accounts`)
+        for (let accountId of oldCachedAccountIds) {
+            this.unsubscribePresence(Number(accountId))
+        }
+
+        const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
+        this.app.logger.debug(`${this}SIP subscription update for ${accountIdsWithoutState.length} accounts`)
+
+        if (accountIdsWithoutState.length) {
             this.app.emit('sip:presences.start_update')
             for (const accountId of accountIdsWithoutState) {
-                await this.subscribePresence(accountId)
+                // We could do this in parallel, but we don't to keep the load on
+                // the websocket server low. Also subscribePresence has a fixed
+                // timeout before it resolves the connected state, to further slow
+                // down the presence requests.
+                await this.subscribePresence(Number(accountId))
             }
-        } else {
-            this.states = {}
-            this.app.emit('sip:presences.start_update')
-            for (const accountId of accountIds) {
-                await this.subscribePresence(accountId)
-            }
-        }
 
-        // Update presence item state in the UI.
-        for (let accountId of accountIds) {
-            if (this.states[accountId]) {
-                this.app.emit('sip:presence.update', {
-                    account_id: accountId,
-                    state: this.states[accountId].state,
-                })
-            }
+            // Clear loading indicator in the ui.
+            this.app.emit('sip:presences.updated')
         }
-
-        // Clear loading indicator in the ui.
-        this.app.emit('sip:presences.updated')
     }
 }
 
