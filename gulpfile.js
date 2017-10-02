@@ -263,7 +263,7 @@ gulp.task('deploy', (done) => {
                 gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
                 // The default value is `trustedTesters`. Make it `default` to
                 // publish to a broader audience.
-                const _res = webStore.publish(DEPLOY_SETTINGS.audience, token)
+                const _res = await webStore.publish(DEPLOY_SETTINGS.audience, token)
                 if (_res.status.includes('OK')) {
                     // eslint-disable-next-line max-len
                     gutil.log(`Succesfully published extension version ${PACKAGE.version} for ${DEPLOY_SETTINGS.audience}.`)
