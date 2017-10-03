@@ -6,16 +6,20 @@
 
 
 // Chrome needs some !important force to make the styles align.
-.chrome-options {
+.chrome {
+    overflow-y: hidden;
     padding: $vg-spacing-2;
     padding-bottom: 0;
     // Make up for the extra space that's needed for the save notifier.
     padding-top: $vg-spacing-4;
 
+    // Windows won't calculate the width properly with a set width.
+    body {
+        width: auto;
+    }
+
     input {
         &[type="text"] {
-            width: 100%;
-
             &:focus {
                 border: 1px solid $vg-grey-lighter !important;
                 border-color: 1px solid $vg-grey-lighter !important;
@@ -25,7 +29,6 @@
     }
 
     button {
-        width: 100%;
         background-image: none !important;
         color: #fff !important;
         box-shadow: none !important;
@@ -38,17 +41,33 @@
     }
 }
 
+.firefox {
+    body {
+        font-size: 1rem;
+    }
+}
+
 
 .options {
+    button {
+        width: 100%;
+    }
+
+    input {
+        &[type="text"] {
+            width: 100%;
+        }
+    }
+
+
     .field {
-        margin-bottom: $vg-spacing-1;
+        padding-bottom: $vg-spacing-1;
 
         label {
             font-weight: 500;
-            vertical-align: center;
+            vertical-align: middle;
             display: inline-block;
-            margin-bottom: $vg-spacing-1;
-            font-size: 1rem;
+            padding-bottom: $vg-spacing-1;
         }
 
         label + input {
@@ -59,7 +78,6 @@
         .warning {
             padding: 0;
             margin: 0;
-            font-size: 0.8rem;
             color: $vg-info-color-failed-dark;
             line-height: 25px;
             position: absolute;
@@ -69,8 +87,9 @@
     // Container for the save button.
     .actions {
         // Leave room for the platform warning, which is not part of the
-        // document flow.
-        margin-top: 25px;
+        // document flow. Use padding here; not margin, otherwise the height
+        // of the options dialog is not calculated correctly on Windows.
+        padding-top: 20px;
 
         // The status indicator that says whether the settings are
         // succesfully saved or not, when saving the options.
