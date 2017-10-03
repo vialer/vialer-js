@@ -25,7 +25,7 @@ class ContactsActions extends Actions {
 
         // The SIP websocket connection is not yet started at this point.
         // Show the disconnected icon until a connected event occurs.
-        if (this.app.store.get('sip').status !== 'started') {
+        if (this.app.store.get('sip') && this.app.store.get('sip').status !== 'started') {
             _$.widget.find('.disconnected-status').removeClass('hide')
         }
 

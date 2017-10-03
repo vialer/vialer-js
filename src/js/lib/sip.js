@@ -22,8 +22,10 @@ class Sip {
         this.reconnect = true
         this.states = {}
         this.subscriptions = {}
-        // Start the SIP stack ASAP.
-        this.connect()
+        // Start the SIP stack ASAP when logged in.
+        if (app.store.get('user') && app.store.get('username') && app.store.get('password')) {
+            this.connect()
+        }
     }
 
 
