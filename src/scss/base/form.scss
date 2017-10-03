@@ -15,6 +15,12 @@ html body {
             padding: 0 12px;
         }
 
+        &[type="radio"] {
+            &:focus {
+                outline: none;
+            }
+        }
+
         &[disabled] {
             background: $vg-grey-lighter;
             cursor: not-allowed;

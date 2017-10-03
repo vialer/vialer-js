@@ -25,7 +25,11 @@ class ContactsActions extends Actions {
 
         // The SIP websocket connection is not yet started at this point.
         // Show the disconnected icon until a connected event occurs.
+<<<<<<< HEAD
         if (this.app.store.get('sip') && this.app.store.get('sip').status !== 'started') {
+=======
+        if (!this.app.store.get('sip') || this.app.store.get('sip').status !== 'started') {
+>>>>>>> 5354524... Search for extension in contacts. Closes #82
             _$.widget.find('.disconnected-status').removeClass('hide')
         }
 
@@ -167,7 +171,7 @@ class ContactsActions extends Actions {
             $.each($widgetItems, (index, contact) => {
                 // Hide contact if not a match.
                 const nameText = $(contact).find('.name').text().toLowerCase()
-                const extensionText = $(contact).find('.extension').text().toLowerCase()
+                const extensionText = $(contact).find('.description').text().toLowerCase()
                 // No search result. Hide the item.
                 if (nameText.indexOf(searchQuery) === -1 && extensionText.indexOf(searchQuery) === -1) {
                     $(contact).removeClass('odd').removeClass('even')
