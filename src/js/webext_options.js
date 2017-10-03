@@ -7,8 +7,8 @@ class OptionsApp extends Skeleton {
 
         // The settings pages are browser-specific. Distinguish between the
         // two by setting a css class on the html element.
-        if (this.env.extension.isChrome) $('html').addClass('chrome-options')
-        if (this.env.extension.isFirefox) $('html').addClass('firefox-options')
+        if (this.env.extension.isChrome) $('html').addClass('chrome')
+        if (this.env.extension.isFirefox) $('html').addClass('firefox')
 
         // Cache all queried nodes.
         this.$ = {

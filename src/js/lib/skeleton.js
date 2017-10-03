@@ -131,15 +131,12 @@ class Skeleton extends EventEmitter {
             } else {
                 environment.extension.popout = false
             }
-            if (global.chrome) {
-                environment.extension.isChrome = true
-                environment.extension.isFirefox = false
-                this.browser = chrome
-            } else {
-                environment.extension.isChrome = false
-                environment.extension.isFirefox = true
-                this.browser = browser
-            }
+
+            environment.extension.isChrome = navigator.userAgent.toLowerCase().includes('chrome')
+            environment.extension.isFirefox = navigator.userAgent.toLowerCase().includes('firefox')
+
+            if (environment.extension.isChrome) this.browser = chrome
+            else this.browser = browser
         }
 
 
