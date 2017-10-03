@@ -14,6 +14,7 @@ class QueuesModule {
     */
     constructor(app) {
         this.app = app
+        this.hasUI = true
         this.app.modules.queues = this
         this.sizes = {}
 

@@ -15,6 +15,7 @@ class ObserverModule {
 
     constructor(app) {
         this.app = app
+        this.hasUI = false
         this.parsers = require('./parsers')
         this.walker = new Walker(this.app)
         // Search and insert icons after mutations.

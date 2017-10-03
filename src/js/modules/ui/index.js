@@ -15,6 +15,7 @@ class UiModule {
     */
     constructor(app) {
         this.app = app
+        this.hasUI = false
         this.actions = new UiActions(app, this)
     }
 
@@ -25,12 +26,17 @@ class UiModule {
     * @param {String} widgetOrWidgetName - Reference to widget to set to busy.
     */
     busyWidget(widgetOrWidgetName) {
-        this.app.logger.debug(`${this}busy widget`)
         let widget = this.getWidget(widgetOrWidgetName)
-        let isOpen = this.isWidgetOpen(widget)
+        if (!widget) return
+        const data = widget.data()
+        this.app.logger.debug(`${this}set ui state for widget '${data.widget}' to busy`)
         this.resetWidget(widget)
         $(widget).addClass('busy')
-        if (isOpen) {
+
+        // The popout doesn't change the open/closed status of ANY widget.
+        if (this.app.env.extension && this.app.env.extension.popout) return
+
+        if (this.isWidgetOpen(widget)) {
             this.openWidget(widget)
         }
     }
@@ -92,9 +98,9 @@ class UiModule {
     * @param {String} widgetOrWidgetName - Reference to widget to open.
     */
     openWidget(widgetOrWidgetName) {
-        this.app.logger.debug(`${this}open widget ${widgetOrWidgetName}`)
         let widget = this.getWidget(widgetOrWidgetName)
         const data = widget.data()
+        this.app.logger.debug(`${this}open widget ${data.widget}`)
         const widgetName = data.widget
 
         let widgetState = this.app.store.get('widgets')
@@ -117,18 +123,20 @@ class UiModule {
 
 
     /**
-    * Initialize all widgets. Called from the refresh button in the popup.
+    * Refresh all widgets. Called from the refresh button in the popup.
     * @param {Boolean} reloadModules - Whether to reload all modules or not.
     */
     refreshWidgets(reloadModules) {
         // Reset widget data when none can be found.
         if (this.app.store.get('widgets') === null) {
             let widgetState = {isOpen: {}}
-            for (let widget in this.app.modules) {
-                // Initial state for widget.
-                widgetState.isOpen[widget] = false
-                // each widget can share variables here.
-                widgetState[widget] = {}
+            for (let moduleName in this.app.modules) {
+                if (this.app.modules[moduleName].hasUI) {
+                    // Initial state for widget.
+                    widgetState.isOpen[moduleName] = false
+                    // each widget can share variables here.
+                    widgetState[moduleName] = {}
+                }
             }
             this.app.store.set('widgets', widgetState)
         }
@@ -138,22 +146,25 @@ class UiModule {
             this.app.store.set('isMainPanelOpen', false)
         }
 
-        for (let widget in this.app.modules) {
-            // Don't close the widget when the popout is active.
-            this.app.emit('ui:widget.close', {name: widget})
-            this.app.emit('ui:widget.busy', {name: widget})
+        for (let moduleName in this.app.modules) {
+            // Modules with a UI are notified to reflect busy state.
+            if (this.app.modules[moduleName].hasUI) {
+                this.app.emit('ui:widget.close', {name: moduleName})
+                this.app.emit('ui:widget.busy', {name: moduleName})
+            }
         }
         this.app.reloadModules(reloadModules)
     }
 
 
     /**
-    * Reset the busy indicator and close a widget.
+    * Set the busy indicator.
     * @param {String} widgetOrWidgetName - Reference to widget to reset.
     */
     resetWidget(widgetOrWidgetName) {
-        this.app.logger.debug(`${this}reset widget`)
         let widget = this.getWidget(widgetOrWidgetName)
+        const data = widget.data()
+        this.app.logger.debug(`${this}resetting ui state for widget '${data.widget}'`)
         $(widget).removeClass('busy').removeClass('unauthorized')
     }
 
@@ -162,6 +173,9 @@ class UiModule {
      * Restore the widget state from localstorage.
      */
     restoreWidgetState() {
+        // The popout doesn't change the open/closed status of ANY widget.
+        if (this.app.env.extension && this.app.env.extension.popout) return
+
         let widgetState = this.app.store.get('widgets')
         if (widgetState && widgetState.isOpen) {
             for (const moduleName of Object.keys(widgetState.isOpen)) {

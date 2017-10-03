@@ -84,6 +84,12 @@ class UiActions extends Actions {
 
 
     _popup() {
+        // The popout behaves different from the popover. The contacts
+        // widget is open by default.
+        if (this.app.env.extension && this.app.env.extension.popout) {
+            $('html').addClass('popout')
+        }
+
         this.app.on('ui:widget.close', (data) => {
             // Popout has only the contacts widget open. It can't be closed.
             if (!this.app.env.extension || (this.app.env.extension && !this.app.env.extension.popout)) {
@@ -119,9 +125,8 @@ class UiActions extends Actions {
         })
 
         /**
-         * Open/close the widget's content when clicking its header
-         * (except when it's busy). Popout has only the contacts widget open.
-         * It can't be closed.
+         * Toggles the widget's content visibility when clicking its header.
+         * Popout has only the contacts widget open and it can't be closed.
          */
         if (!this.app.env.extension || (this.app.env.extension && !this.app.env.extension.popout)) {
             $('html').on('click', '.widget .widget-header', (e) => {
@@ -159,19 +164,13 @@ class UiActions extends Actions {
             this._checkCloseMainPanel()
         })
         $('#refresh').click((e) => {
-            this.app.emit('ui:ui.refresh', {popout: this.app.env.extension.popout})
+            this.app.emit('ui:ui.refresh')
         })
         $('#settings').click((e) => {
             this.app.emit('ui:settings')
             this._checkCloseMainPanel()
         })
 
-
-        // The popout behaves different from the popover. The contacts
-        // widget is open by default.
-        if (this.app.env.extension && this.app.env.extension.popout) {
-            $('html').addClass('popout')
-        }
 
         // Switch between logged-in and login state.
         if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {

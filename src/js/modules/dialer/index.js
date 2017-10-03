@@ -12,6 +12,7 @@ class DialerModule {
 
     constructor(app, background = true) {
         this.app = app
+        this.hasUI = false
         this._contextMenuItem = null
         // Hardcoded blacklist of sites because there is not yet a solution
         // that works for chrome and firefox using exclude site-urls.
@@ -91,12 +92,14 @@ class DialerModule {
         const res = await this.app.api.client.post('api/clicktodial/', {b_number: bNumber})
         // Stop when an invalid http response is returned.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
+            this.app.emit('dialer:status.stop', {})
             this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
             return
         }
 
         // Stop when no callid is returned.
         if (!res.data || !res.data.callid) {
+            this.app.emit('dialer:status.stop', {})
             this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
             return
         }
@@ -107,6 +110,7 @@ class DialerModule {
             // Get the actual callstatus from the API.
             const _res = await this.app.api.client.get(`api/clicktodial/${callid}/`)
             if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
+                this.app.emit('dialer:status.stop', {})
                 // Something went wrong. Stop the timer.
                 this.app.timer.stopTimer(`dialer:status.update-${callid}`)
                 this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)

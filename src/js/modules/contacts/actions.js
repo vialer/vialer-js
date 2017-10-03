@@ -60,10 +60,12 @@ class ContactsActions extends Actions {
             // Trigger the callback function to receive presence data
             // after the list is fully built.
             data.callback({})
+
             // Open the contacts widget after it's filled,
-            // so it's open by default in the popout.
+            // so it's open by default in the popout. Also after a refresh.
             if (this.app.env.extension && this.app.env.extension.popout) {
-                this.app.modules.ui.openWidget('contacts')
+                const widgetElement = this.app.modules.ui.getWidget('contacts')
+                $(widgetElement).data('opened', true).attr('data-opened', true)
             }
         })
 

@@ -13,6 +13,7 @@ class ContactsModule {
     */
     constructor(app) {
         this.app = app
+        this.hasUI = true
         this.app.modules.contacts = this
         this.actions = new ContactsActions(app)
     }

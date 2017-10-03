@@ -14,6 +14,7 @@ class AvailabilityModule {
     */
     constructor(app) {
         this.app = app
+        this.hasUI = true
         this.app.modules.availability = this
         this.actions = new AvailabilityActions(app, this)
     }
