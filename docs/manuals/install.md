@@ -1,72 +1,69 @@
-# Requirements
+# Build from source
+## Requirements
 * Node.js 8.0.0 or higher
 * Npm 5 or higher
-* Electron executable (for the desktop version)
+* Electron executable for the desktop version (optional)
 
-# Checkout the project
-You want to build Click-to-dial from source? Great! Then you first have to
-checkout the project and install it's dependencies from npm:
+First checkout the project and install its dependencies from npm:
+```bash
+git clone git@github.com:VoIPGRID/click-to-dial.git
+cd click-to-dial
+npm i -g gulp web-ext
+npm i
+# Set the default branding file.
+cp ./src/brand.json.example ./src/brand.json
+```
 
-    git clone git@github.com:VoIPGRID/click-to-dial.git
-    cd click-to-dial
-    npm i -g gulp web-ext
-    npm i
-    # set the default branding
-    cp ./src/brand.json.example ./src/brand.json
 
-
-## As web-extension
-Building click-to-dial as a web-extension is straightforward. Chrome is the
-default build target, so you don't necessarily have to specify the target:
-
-    gulp build --target chrome
+## Chrom(e/ium) WebExtension
+```bash
+# Development build. The target may be omitted for chrom(e/ium).
+gulp build --target chrome
+# Or make a production build:
+NODE_ENV=production gulp build
+```
 
 Navigate to `chrome://extension`, make sure developer mode is enabled, and load
-the `./build/chrome` directory as an unpacked extension in Chrome. As an alternative
-you can automatically load the extension in a new Chromium/Chrome browser profile with:
+the `./build/chrome` directory as an unpacked extension in Chrome. You can also
+load the extension in a new Chromium/Chrome browser profile using an npm script:
+```bash
+npm run test_chrome
+npm run test_chromium
+```
+You can also drag-and-drop a zip file on the extension page, when you made a
+distribution zip in `dist/chrome` using:
 
-    npm run test_chrome
-    npm run test_chromium
+```bash
+gulp build-dist
+```
 
-In Firefox, you have to use a tool called `web-ext` that runs the extension in
-a temporary user session.
+This functionality is verified to work on Linux and OSX. Windows users reported
+some issues using this method.
 
-    npm i -g web-ext
-    gulp build --target firefox
-    web-ext run --source-dir build/firefox
 
-Alternatively, you can run Firefox with the addon loaded in a new profile with:
+## Firefox WebExtension
+```bash
+gulp build --target firefox
+# Or make a production build:
+NODE_ENV=production gulp build --target firefox
+```
+
+Navigate to `about:debugging`. Switch `Enable add-on debugging` on. Select
+`Load Temporary Add-on` and point it to the `manifest.json` in the `build/firefox`
+directory. Alternatively, you can run Firefox with the addon temporarily loaded
+using web-ext in a new profile with:
 
     npm run test_firefox
 
-
-## As webview
-Click-to-dial's functionality, except for the automatic phonenumber recognizion &
-call icon placement in tabs and their frames, can run outside the context of a
-browser plugin; i.e. in a browser webview. This is especially useful for doing quick
-iterations on styling and functionality that's not specific to web extensions.
-You can use the [livereload](https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei) extension to immediately reload changes, instead
-of having to manually reload the plugin each time.
-
-In order to bypass cross-domain browser security, you need to disable CORS in
-Chrom(e/ium):
-
-    gulp build watch --target electron
-    chromium --disable-web-security --user-data-dir
-
-Then visit `http://localhost:8999/electron/electron_webview.html`. Alternatively,
-you can run the webview in Chromium with a temporary profile and disabled CORS using:
-
-    npm run test_webview
+There is no way to install unsigned xpi/zip files like with Chrome. The signed
+and published Firefox xpi can be installed directly though.
 
 
-## As desktop app
-Click-to-dial can run as a desktop app using Electron. It requires electron to be
-installed on your system, and to switch async/await support on through a flag.
-
-    gulp build --target electron
-    electron --js-flags='--harmony-async-await' build/electron/electron_main.js
-
-Or run the same command as an npm script:
-
-    npm run test_electron
+## Electron desktop
+Click-to-dial can run as a desktop app using Electron, although this
+version is still **experimental** and not (yet) officially supported.
+You're free to give it a spin though! It requires Electron to be installed
+on your system. To run the desktop version:
+```bash
+npm run test_electron
+```
