@@ -1,0 +1,419 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Source: lib/timer.js | Click-to-dial</title>
+    <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/main.css">
+
+    
+</head>
+<body>
+<div class="main-container">
+    <input type="checkbox" id="nav-trigger" class="nav-trigger">
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+    <label for="nav-trigger" class="overlay"></label>
+    <nav class="lnb" id="lnb">
+        <div class="nav-search js-search">
+            <div class="logo" style="width: 72px; height: 72px">
+                <img src="logo.png" width="100%" height="100%">
+            </div>
+            <input type="text" placeholder="Search docs">
+            <ul class="searched-list"></ul>
+        </div>
+
+        <div class="nav-main">
+            <h1><a href="index.html" class="link">Click-to-dial</a></h1>
+            <span class="version">
+            
+                v2.1.3
+            
+            </span>
+        </div>
+
+        
+        <ol class="nav-tab">
+            <li id="api-tab">
+                <a href="#api"><h4>Code</h4></a>
+            </li>
+            <li id="manuals-tab">
+                <a href="#manuals"><h4>Manuals</h4></a>
+            </li>
+        </ol>
+        
+
+        <div class="scroll">
+        <div class="nav-api hidden"><h3>Global</h3><ul><li class="nav-item"><a href="global.html#ClickToDialApp">ClickToDialApp</a></li><li class="nav-item"><a href="global.html#jitter">jitter</a></li></ul></div><div class="nav-manuals hidden"><h3>Manuals</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-deployment.html">Deployment</a>
+                <div class="nav-item-sub hidden" id="deployment_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-development.html">Development</a>
+                <div class="nav-item-sub hidden" id="development_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-install.html">Installation</a>
+                <div class="nav-item-sub hidden" id="install_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Modules</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Availability.html">Availability</a>
+                <div class="nav-item-sub hidden" id="module_Availability_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Contacts.html">Contacts</a>
+                <div class="nav-item-sub hidden" id="module_Contacts_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Dialer.html">Dialer</a>
+                <div class="nav-item-sub hidden" id="module_Dialer_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Observer.html">Observer</a>
+                <div class="nav-item-sub hidden" id="module_Observer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer.html#~getBlockedRoles">getBlockedRoles</a></a></li><li class="sub-nav-item"><a href="module-Observer.html#~getBlockedTagNames">getBlockedTagNames</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Queues.html">Queues</a>
+                <div class="nav-item-sub hidden" id="module_Queues_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Ui.html">Ui</a>
+                <div class="nav-item-sub hidden" id="module_Ui_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-User.html">User</a>
+                <div class="nav-item-sub hidden" id="module_User_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Classes</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Actions.html">Actions</a>
+                <div class="nav-item-sub hidden" id="Actions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Analytics.html">Analytics</a>
+                <div class="nav-item-sub hidden" id="Analytics_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Analytics.html#trackClickToDial">trackClickToDial</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Api.html">Api</a>
+                <div class="nav-item-sub hidden" id="Api_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Api.html#setupClient">setupClient</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="CallStatusApp.html">CallStatusApp</a>
+                <div class="nav-item-sub hidden" id="CallStatusApp_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Logger.html">Logger</a>
+                <div class="nav-item-sub hidden" id="Logger_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Availability-AvailabilityActions.html">AvailabilityActions</a>
+                <div class="nav-item-sub hidden" id="module_Availability_AvailabilityActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Availability-AvailabilityActions.html#_background">_background</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityActions.html#_popup">_popup</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Availability-AvailabilityModule.html">AvailabilityModule</a>
+                <div class="nav-item-sub hidden" id="module_Availability_AvailabilityModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#_load">_load</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#_restore">_restore</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#availabilityOptions">availabilityOptions</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#toggleAvailabilitySelect">toggleAvailabilitySelect</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Contacts-ContactsActions.html">ContactsActions</a>
+                <div class="nav-item-sub hidden" id="module_Contacts_ContactsActions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Contacts-ContactsModule.html">ContactsModule</a>
+                <div class="nav-item-sub hidden" id="module_Contacts_ContactsModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Contacts-ContactsModule.html#_load">_load</a></a></li><li class="sub-nav-item"><a href="module-Contacts-ContactsModule.html#_restore">_restore</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Dialer-DialerActions.html">DialerActions</a>
+                <div class="nav-item-sub hidden" id="module_Dialer_DialerActions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Dialer-DialerModule.html">DialerModule</a>
+                <div class="nav-item-sub hidden" id="module_Dialer_DialerModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#addContextMenuItem">addContextMenuItem</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#dial">dial</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#sanitizeNumber">sanitizeNumber</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#showCallstatus">showCallstatus</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#switchObserver">switchObserver</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#trimNumber">trimNumber</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Observer-ObserverModule.html">ObserverModule</a>
+                <div class="nav-item-sub hidden" id="module_Observer_ObserverModule_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#ctdNode">ctdNode</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#iconElement">iconElement</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#restorePhonenumbers">restorePhonenumbers</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#stopObserver">stopObserver</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Observer-Walker.html">Walker</a>
+                <div class="nav-item-sub hidden" id="module_Observer_Walker_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-Walker.html#isBlockedElement">isBlockedElement</a></a></li><li class="sub-nav-item"><a href="module-Observer-Walker.html#skipNode">skipNode</a></a></li><li class="sub-nav-item"><a href="module-Observer-Walker.html#walkTheDOM">walkTheDOM</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Queues-QueuesActions.html">QueuesActions</a>
+                <div class="nav-item-sub hidden" id="module_Queues_QueuesActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Queues-QueuesActions.html#_background">_background</a></a></li><li class="sub-nav-item"><a href="module-Queues-QueuesActions.html#_popup">_popup</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Queues-QueuesModule.html">QueuesModule</a>
+                <div class="nav-item-sub hidden" id="module_Queues_QueuesModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Queues-QueuesModule.html#setQueueSizesTimer">setQueueSizesTimer</a></a></li><li class="sub-nav-item"><a href="module-Queues-QueuesModule.html#updateQueues">updateQueues</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Ui-UiActions.html">UiActions</a>
+                <div class="nav-item-sub hidden" id="module_Ui_UiActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Ui-UiActions.html#_checkCloseMainPanel">_checkCloseMainPanel</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Ui-UiModule.html">UiModule</a>
+                <div class="nav-item-sub hidden" id="module_Ui_UiModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Ui-UiModule.html#busyWidget">busyWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#closeWidget">closeWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#getWidget">getWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#isWidgetOpen">isWidgetOpen</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#login">login</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#openWidget">openWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#refreshWidgets">refreshWidgets</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetLoginButton">resetLoginButton</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetWidget">resetWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetWidgetState">resetWidgetState</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#restoreWidgetState">restoreWidgetState</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#showPopup">showPopup</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#unauthorizeWidget">unauthorizeWidget</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-User-UserActions.html">UserActions</a>
+                <div class="nav-item-sub hidden" id="module_User_UserActions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-User-UserModule.html">UserModule</a>
+                <div class="nav-item-sub hidden" id="module_User_UserModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-User-UserModule.html#login">login</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sip.html">Sip</a>
+                <div class="nav-item-sub hidden" id="Sip_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Sip.html#connect">connect</a></a></li><li class="sub-nav-item"><a href="Sip.html#disconnect">disconnect</a></a></li><li class="sub-nav-item"><a href="Sip.html#initStack">initStack</a></a></li><li class="sub-nav-item"><a href="Sip.html#sipStatusEvent">sipStatusEvent</a></a></li><li class="sub-nav-item"><a href="Sip.html#subscribeEvent">subscribeEvent</a></a></li><li class="sub-nav-item"><a href="Sip.html#subscribePresence">subscribePresence</a></a></li><li class="sub-nav-item"><a href="Sip.html#unsubscribePresence">unsubscribePresence</a></a></li><li class="sub-nav-item"><a href="Sip.html#updatePresence">updatePresence</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#getEnvironment">getEnvironment</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Store.html">Store</a>
+                <div class="nav-item-sub hidden" id="Store_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Timer.html">Timer</a>
+                <div class="nav-item-sub hidden" id="Timer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Timer.html#increaseTimeout">increaseTimeout</a></a></li><li class="sub-nav-item"><a href="Timer.html#setTimeout">setTimeout</a></a></li></ul></div>
+            </li></ul></div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <ul class="breadcrumbs">
+            <li><a href="index.html">Docs</a> »</li>
+            <li>Source: lib/timer.js</li>
+        </ul>
+        <hr>
+        
+
+
+
+    
+<article>
+    <pre class="prettyprint source linenums"><code>let registeredTimers = {}
+
+/**
+* Calculate a jitter from interval.
+* @param {Number} interval - The interval in ms to calculate jitter for.
+* @param {Number} percentage - The jitter range in percentage.
+* @returns {Number} The calculated jitter in ms.
+*/
+function jitter(interval, percentage) {
+    let min = 0 - Math.ceil(interval * (percentage / 100))
+    let max = Math.floor(interval * (percentage / 100))
+    return Math.floor(Math.random() * (max - min)) + min
+}
+
+
+/**
+* This timer keeps track of all used timers inside this plugin and can
+* clear, start or change the timeout of these timers at any time.
+*/
+class Timer {
+
+    constructor(app) {
+        this.app = app
+        this.registeredTimers = registeredTimers
+    }
+
+    getRegisteredTimer(timerId) {
+        if (registeredTimers.hasOwnProperty(timerId)) {
+            return registeredTimers[timerId]
+        }
+
+        return null
+    }
+
+
+    update(timerId) {
+        if (timerId) {
+            this.startTimer(timerId)
+        } else {
+            for (timerId in registeredTimers) {
+                this.startTimer(timerId)
+            }
+        }
+    }
+
+
+    registerTimer(timerId, timerFunction) {
+        this.app.logger.debug(`${this}register timer ${timerId}`)
+        registeredTimers[timerId] = {
+            function: timerFunction,
+            interval: null, // interval in miliseconds
+            reset: false,
+            // References to timer objects to be able to clear it later.
+            timeout: null, // timeout in miliseconds
+            timer: {
+                interval: null,
+                timeout: null,
+            },
+        }
+    }
+
+
+    unregisterTimer(timerId) {
+        if (this.getRegisteredTimer(timerId)) {
+            delete registeredTimers[timerId]
+        }
+    }
+
+
+    setInterval(timerId, interval) {
+        if (this.getRegisteredTimer(timerId)) {
+            registeredTimers[timerId].interval = interval
+        }
+    }
+
+
+    /**
+    * @param {String} timerId - Find the timer by it's unique identifier.
+    * @param {Number|Function} timeout - A timeout or function that returns a timeout.
+    * @param {Boolean} reset - Whether to rerun the timer function after *timeout* and resolving the timer function.
+    */
+    setTimeout(timerId, timeout, reset) {
+        this.app.logger.debug(`${this}set timeout for ${timerId}`)
+        if (this.getRegisteredTimer(timerId)) {
+            registeredTimers[timerId].timeout = timeout
+            // *reset* indicates whether to re-run *timerFunction* after
+            // *timeout* miliseconds it finished
+            registeredTimers[timerId].reset = reset
+        }
+    }
+
+
+    startTimer(timerId) {
+        if (!this.getRegisteredTimer(timerId)) return
+
+        let timerFunction = registeredTimers[timerId].function
+
+        if (registeredTimers[timerId].interval) {
+            registeredTimers[timerId].timer.interval = setInterval(timerFunction, registeredTimers[timerId].interval)
+            this.app.logger.debug(`${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
+        }
+
+        let timeout = registeredTimers[timerId].timeout
+        if (typeof timeout === 'function') timeout = timeout()
+
+        if (timeout) {
+            if (registeredTimers[timerId].reset) {
+                let resetFunction = async() => {
+                    // The timer function should return a Promise, so the next
+                    // timer will start with a new timeout AFTER the
+                    // previous one is resolved.
+                    await timerFunction()
+                    // Determine the new dynamic timeout once the
+                    // timer function is finished.
+                    let _timeout = registeredTimers[timerId].timeout
+                    if (typeof _timeout === 'function') _timeout = _timeout()
+
+                    // Only repeat the timer function when the timeout is
+                    // not false-like (not 0).
+                    if (_timeout) {
+                        this.stopTimer(timerId)
+                        registeredTimers[timerId].timer.timeout = setTimeout(resetFunction, _timeout)
+                    }
+                }
+                this.stopTimer(timerId)
+                registeredTimers[timerId].timer.timeout = setTimeout(resetFunction, timeout)
+            } else {
+                this.stopTimer(timerId)
+                registeredTimers[timerId].timer.timeout = setTimeout(timerFunction, timeout)
+            }
+        }
+        this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
+
+    }
+
+
+    stopTimer(timerId) {
+        if (this.getRegisteredTimer(timerId)) {
+            if (registeredTimers[timerId].timer.interval) {
+                this.app.logger.debug(`${this}clearing interval timer ${timerId}`)
+                clearInterval(registeredTimers[timerId].timer.interval)
+                registeredTimers[timerId].timer.interval = null
+            }
+            if (registeredTimers[timerId].timer.timeout) {
+                this.app.logger.debug(`${this}clearing timeout timer ${timerId}`)
+                clearTimeout(registeredTimers[timerId].timer.timeout)
+                registeredTimers[timerId].timer.timeout = null
+            }
+        } else {
+            this.app.logger.debug(`${this}no such timer: ${timerId}`)
+        }
+    }
+
+
+    stopAllTimers() {
+        for (const timerId of Object.keys(this.registeredTimers)) {
+            this.app.logger.debug(`${this}remove remaining timer '${timerId}'`)
+            this.stopTimer(timerId)
+        }
+    }
+
+
+    /**
+    * This doubles the retry interval in each run and adds jitter.
+    * @param {object} retry - The reference retry object.
+    * @returns {object} The updated retry object.
+    */
+    increaseTimeout(retry) {
+        // Make sure that interval doesn't go past the limit.
+        if (retry.interval * 2 &lt; retry.limit) {
+            retry.interval = retry.interval * 2
+        } else {
+            retry.interval = retry.limit
+        }
+
+        retry.timeout = retry.interval + jitter(retry.interval, 30)
+        this.app.logger.debug(`${this}increase timeout interval to '${retry.interval}'`)
+        return retry
+    }
+
+
+    toString() {
+        return `${this.app}[timer] `
+    }
+}
+
+
+module.exports = Timer
+</code></pre>
+</article>
+
+
+
+
+
+        <hr>
+        <footer>
+            <strong>&copy; Devhouse Spindle</strong><br/>
+            Documented with <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+        </footer>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+
+window.isApi = true
+window.isManual = false
+window.doc = {
+    name: '',
+    longname: '',
+}
+
+if (!doc.name) isApi = false
+
+</script>
+<script src="js/rtd.js"></script>
+</body>
+</html>

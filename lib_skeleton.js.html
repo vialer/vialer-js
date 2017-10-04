@@ -1,0 +1,438 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Source: lib/skeleton.js | Click-to-dial</title>
+    <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/main.css">
+
+    
+</head>
+<body>
+<div class="main-container">
+    <input type="checkbox" id="nav-trigger" class="nav-trigger">
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+    <label for="nav-trigger" class="overlay"></label>
+    <nav class="lnb" id="lnb">
+        <div class="nav-search js-search">
+            <div class="logo" style="width: 72px; height: 72px">
+                <img src="logo.png" width="100%" height="100%">
+            </div>
+            <input type="text" placeholder="Search docs">
+            <ul class="searched-list"></ul>
+        </div>
+
+        <div class="nav-main">
+            <h1><a href="index.html" class="link">Click-to-dial</a></h1>
+            <span class="version">
+            
+                v2.1.3
+            
+            </span>
+        </div>
+
+        
+        <ol class="nav-tab">
+            <li id="api-tab">
+                <a href="#api"><h4>Code</h4></a>
+            </li>
+            <li id="manuals-tab">
+                <a href="#manuals"><h4>Manuals</h4></a>
+            </li>
+        </ol>
+        
+
+        <div class="scroll">
+        <div class="nav-api hidden"><h3>Global</h3><ul><li class="nav-item"><a href="global.html#ClickToDialApp">ClickToDialApp</a></li><li class="nav-item"><a href="global.html#jitter">jitter</a></li></ul></div><div class="nav-manuals hidden"><h3>Manuals</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-deployment.html">Deployment</a>
+                <div class="nav-item-sub hidden" id="deployment_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-development.html">Development</a>
+                <div class="nav-item-sub hidden" id="development_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-install.html">Installation</a>
+                <div class="nav-item-sub hidden" id="install_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Modules</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Availability.html">Availability</a>
+                <div class="nav-item-sub hidden" id="module_Availability_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Contacts.html">Contacts</a>
+                <div class="nav-item-sub hidden" id="module_Contacts_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Dialer.html">Dialer</a>
+                <div class="nav-item-sub hidden" id="module_Dialer_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Observer.html">Observer</a>
+                <div class="nav-item-sub hidden" id="module_Observer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer.html#~getBlockedRoles">getBlockedRoles</a></a></li><li class="sub-nav-item"><a href="module-Observer.html#~getBlockedTagNames">getBlockedTagNames</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Queues.html">Queues</a>
+                <div class="nav-item-sub hidden" id="module_Queues_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Ui.html">Ui</a>
+                <div class="nav-item-sub hidden" id="module_Ui_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-User.html">User</a>
+                <div class="nav-item-sub hidden" id="module_User_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Classes</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Actions.html">Actions</a>
+                <div class="nav-item-sub hidden" id="Actions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Analytics.html">Analytics</a>
+                <div class="nav-item-sub hidden" id="Analytics_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Analytics.html#trackClickToDial">trackClickToDial</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Api.html">Api</a>
+                <div class="nav-item-sub hidden" id="Api_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Api.html#setupClient">setupClient</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="CallStatusApp.html">CallStatusApp</a>
+                <div class="nav-item-sub hidden" id="CallStatusApp_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Logger.html">Logger</a>
+                <div class="nav-item-sub hidden" id="Logger_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Availability-AvailabilityActions.html">AvailabilityActions</a>
+                <div class="nav-item-sub hidden" id="module_Availability_AvailabilityActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Availability-AvailabilityActions.html#_background">_background</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityActions.html#_popup">_popup</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Availability-AvailabilityModule.html">AvailabilityModule</a>
+                <div class="nav-item-sub hidden" id="module_Availability_AvailabilityModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#_load">_load</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#_restore">_restore</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#availabilityOptions">availabilityOptions</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#toggleAvailabilitySelect">toggleAvailabilitySelect</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Contacts-ContactsActions.html">ContactsActions</a>
+                <div class="nav-item-sub hidden" id="module_Contacts_ContactsActions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Contacts-ContactsModule.html">ContactsModule</a>
+                <div class="nav-item-sub hidden" id="module_Contacts_ContactsModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Contacts-ContactsModule.html#_load">_load</a></a></li><li class="sub-nav-item"><a href="module-Contacts-ContactsModule.html#_restore">_restore</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Dialer-DialerActions.html">DialerActions</a>
+                <div class="nav-item-sub hidden" id="module_Dialer_DialerActions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Dialer-DialerModule.html">DialerModule</a>
+                <div class="nav-item-sub hidden" id="module_Dialer_DialerModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#addContextMenuItem">addContextMenuItem</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#dial">dial</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#sanitizeNumber">sanitizeNumber</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#showCallstatus">showCallstatus</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#switchObserver">switchObserver</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#trimNumber">trimNumber</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Observer-ObserverModule.html">ObserverModule</a>
+                <div class="nav-item-sub hidden" id="module_Observer_ObserverModule_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#ctdNode">ctdNode</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#iconElement">iconElement</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#restorePhonenumbers">restorePhonenumbers</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#stopObserver">stopObserver</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Observer-Walker.html">Walker</a>
+                <div class="nav-item-sub hidden" id="module_Observer_Walker_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-Walker.html#isBlockedElement">isBlockedElement</a></a></li><li class="sub-nav-item"><a href="module-Observer-Walker.html#skipNode">skipNode</a></a></li><li class="sub-nav-item"><a href="module-Observer-Walker.html#walkTheDOM">walkTheDOM</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Queues-QueuesActions.html">QueuesActions</a>
+                <div class="nav-item-sub hidden" id="module_Queues_QueuesActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Queues-QueuesActions.html#_background">_background</a></a></li><li class="sub-nav-item"><a href="module-Queues-QueuesActions.html#_popup">_popup</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Queues-QueuesModule.html">QueuesModule</a>
+                <div class="nav-item-sub hidden" id="module_Queues_QueuesModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Queues-QueuesModule.html#setQueueSizesTimer">setQueueSizesTimer</a></a></li><li class="sub-nav-item"><a href="module-Queues-QueuesModule.html#updateQueues">updateQueues</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Ui-UiActions.html">UiActions</a>
+                <div class="nav-item-sub hidden" id="module_Ui_UiActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Ui-UiActions.html#_checkCloseMainPanel">_checkCloseMainPanel</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Ui-UiModule.html">UiModule</a>
+                <div class="nav-item-sub hidden" id="module_Ui_UiModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Ui-UiModule.html#busyWidget">busyWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#closeWidget">closeWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#getWidget">getWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#isWidgetOpen">isWidgetOpen</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#login">login</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#openWidget">openWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#refreshWidgets">refreshWidgets</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetLoginButton">resetLoginButton</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetWidget">resetWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetWidgetState">resetWidgetState</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#restoreWidgetState">restoreWidgetState</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#showPopup">showPopup</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#unauthorizeWidget">unauthorizeWidget</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-User-UserActions.html">UserActions</a>
+                <div class="nav-item-sub hidden" id="module_User_UserActions_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-User-UserModule.html">UserModule</a>
+                <div class="nav-item-sub hidden" id="module_User_UserModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-User-UserModule.html#login">login</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sip.html">Sip</a>
+                <div class="nav-item-sub hidden" id="Sip_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Sip.html#connect">connect</a></a></li><li class="sub-nav-item"><a href="Sip.html#disconnect">disconnect</a></a></li><li class="sub-nav-item"><a href="Sip.html#initStack">initStack</a></a></li><li class="sub-nav-item"><a href="Sip.html#sipStatusEvent">sipStatusEvent</a></a></li><li class="sub-nav-item"><a href="Sip.html#subscribeEvent">subscribeEvent</a></a></li><li class="sub-nav-item"><a href="Sip.html#subscribePresence">subscribePresence</a></a></li><li class="sub-nav-item"><a href="Sip.html#unsubscribePresence">unsubscribePresence</a></a></li><li class="sub-nav-item"><a href="Sip.html#updatePresence">updatePresence</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#getEnvironment">getEnvironment</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Store.html">Store</a>
+                <div class="nav-item-sub hidden" id="Store_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Timer.html">Timer</a>
+                <div class="nav-item-sub hidden" id="Timer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Timer.html#increaseTimeout">increaseTimeout</a></a></li><li class="sub-nav-item"><a href="Timer.html#setTimeout">setTimeout</a></a></li></ul></div>
+            </li></ul></div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <ul class="breadcrumbs">
+            <li><a href="index.html">Docs</a> »</li>
+            <li>Source: lib/skeleton.js</li>
+        </ul>
+        <hr>
+        
+
+
+
+    
+<article>
+    <pre class="prettyprint source linenums"><code>const EventEmitter = require('events').EventEmitter
+const I18n = require('./i18n')
+const Logger = require('./logger')
+const Store = require('./store')
+
+
+/**
+* This is the minimal class that all parts of the click-to-dial
+* application inherit from(tab, contentscript, background, popup/out).
+* It sets some basic properties that can be reused, like a logger, store,
+* an IPC eventemitter and some environmental properties.
+*/
+class Skeleton extends EventEmitter {
+
+    constructor(options) {
+        super()
+        this.cache = {}
+        this._listeners = 0
+
+        this.utils = require('./utils')
+        this.env = this.getEnvironment(options.environment)
+
+        this.modules = {}
+
+        this.name = options.name
+        this.logger = new Logger(this)
+        this.store = new Store(this)
+        this.i18n = new I18n(this, options.i18n)
+
+        if (this.env.extension) {
+            this.ipcListener()
+            // Allows parent scripts to use the same EventEmitter syntax.
+            if (this.env.extension.tab) {
+                window.addEventListener('message', (event) => {
+                    if (this.verbose) this.logger.debug(`${this}emit '${event.data.event}' event from child`)
+                    this.emit(event.data.event, event.data.data, true)
+                })
+            }
+        }
+
+        this._init()
+        // Init these modules.
+        for (let module of options.modules) {
+            this.modules[module.name] = new module.Module(this)
+        }
+
+        // Sets the verbosity of the logger.
+        if (process.env.NODE_ENV === 'production') {
+            this.logger.setLevel('warn')
+        } else {
+            this.logger.info(`${this}loglevel set to debug`)
+            this.logger.setLevel('debug')
+        }
+
+        // Increases verbosity beyond the logger's debug level. Not
+        // always useful during development, so it can be switched
+        // of manually.
+        if (process.env.VERBOSE === true) {
+            this.logger.info(`${this}extra verbosity is enabled`)
+            this.verbose = true
+        } else {
+            this.logger.info(`${this}extra verbosity is disabled`)
+            this.verbose = false
+        }
+    }
+
+
+    /**
+    * Modified emit method which makes it compatible with web extension ipc.
+    * Without tabId or parent, the event is emitted on the runtime, which
+    * includes listeners for the popout and the background script. The tabId
+    * or the parent are specific when an event needs to be emitted on
+    * either a tab content script or from a loaded tab content script to
+    * it's parent.
+    * @param {Event} event - Eventname to emit with.
+    * @param {Object} data - Payload for the emission.
+    * @param {Boolean|String} noIpc - Flag to skip ipc emission or to do `both`.
+    * @param {Boolean|String} [tabId=false] - Emit to specific tab over ipc.
+    * @param {Boolean|String} [parent=false] - Emit to script's parent over ipc.
+    */
+    emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
+        if (this.env.extension &amp;&amp; (!noIpc || noIpc === 'both')) {
+            let payloadData = {
+                data: data,
+                event: event,
+            }
+
+            if (tabId) {
+                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
+                this.browser.tabs.sendMessage(tabId, payloadData)
+                return
+            } else if (parent) {
+                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to parent`)
+                parent.postMessage({data: data, event: event}, '*')
+                return
+            }
+
+            if (data &amp;&amp; data.callback) {
+                if (this.verbose) this.logger.debug(`${this}emit ipc event with callback '${event}'`)
+                const callback = data.callback
+                // Make sure that functions are not part of the payload data.
+                delete data.callback
+                this.browser.runtime.sendMessage(payloadData, callback)
+            } else {
+                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
+                this.browser.runtime.sendMessage(payloadData)
+            }
+        }
+        // The web version will always use a local emitter, no matter what
+        // the value is of `noIpc`. An extension may do both.
+        if (!this.env.extension || noIpc) {
+            if (this.verbose) this.logger.debug(`${this}emit local event '${event}'`)
+            super.emit(event, data)
+        }
+    }
+
+
+    /**
+    * Sets environmental properties, used to distinguish between
+    * webextension, regular webapp or Electron app.
+    * @param {Object} environment - Environment properties passed
+    * to the app's Constructor.
+    * @returns {Object} - Environment flags used to make this app universal.
+    */
+    getEnvironment(environment) {
+        // If browser exists, use browser, otherwise take the Chrome API.
+        if (environment.extension) {
+            let searchParams = this.utils.parseSearch(location.search)
+            if (searchParams.popout) {
+                environment.extension.popout = true
+            } else {
+                environment.extension.popout = false
+            }
+
+            environment.extension.isChrome = navigator.userAgent.toLowerCase().includes('chrome')
+            environment.extension.isFirefox = navigator.userAgent.toLowerCase().includes('firefox')
+
+            if (environment.extension.isChrome) this.browser = chrome
+            else this.browser = browser
+        }
+
+
+        environment.os = {
+            linux: navigator.platform.match(/(Linux)/i) ? true : false,
+            osx: navigator.platform.match(/(Mac)/i) ? true : false,
+            windows: navigator.platform.match(/(Windows)/i) ? true : false,
+        }
+
+        return environment
+    }
+
+
+    /**
+    * Make the EventEmitter `.on` method compatible with web extension IPC,
+    * by mapping an IPC event to the EventEmitter.
+    */
+    ipcListener() {
+        this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+            if (request.data) {
+                // Add extra contextual information about sender to payload.
+                request.data.sender = sender
+                // It may have a callback, but functions can't pass through
+                // the request.data, so map sendResponse.
+                request.data.callback = sendResponse
+            }
+            // The frame option can be used to specifically target a
+            // callstatus or observer script. Otherwise the event is
+            // ignored, because otherwise all events emitted on the tab will
+            // also be processed by the callstatus and observer scripts.
+            if (this.env.extension.callstatus || this.env.extension.observer) {
+                if (this.env.extension.callstatus &amp;&amp; request.data.frame &amp;&amp; request.data.frame === 'callstatus') {
+                    this.emit(request.event, request.data, true)
+                } else if (this.env.extension.observer &amp;&amp; request.data.frame &amp;&amp; request.data.frame === 'observer') {
+                    this.emit(request.event, request.data, true)
+                }
+            } else {
+                this.emit(request.event, request.data, true)
+            }
+        })
+    }
+
+
+    /**
+    * Override the default EventEmitter's `on` method, in
+    * order to keep track of listeners.
+    * @param {String} event - Event name to cache.
+    * @param {Function} callback - The function to call on this event.
+    */
+    on(event, callback) {
+        this._listeners += 1
+        super.on(event, callback)
+    }
+
+
+    toString() {
+        return `[${this.name}] `
+    }
+
+
+    /**
+    * This method may be overriden to initialize logic before loading
+    * modules, e.g. like initializing a sip stack.
+    */
+    _init() {}
+}
+
+module.exports = Skeleton
+</code></pre>
+</article>
+
+
+
+
+
+        <hr>
+        <footer>
+            <strong>&copy; Devhouse Spindle</strong><br/>
+            Documented with <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+        </footer>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+
+window.isApi = true
+window.isManual = false
+window.doc = {
+    name: '',
+    longname: '',
+}
+
+if (!doc.name) isApi = false
+
+</script>
+<script src="js/rtd.js"></script>
+</body>
+</html>
