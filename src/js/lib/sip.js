@@ -123,6 +123,7 @@ class Sip {
         if (!this.retry) this.retry = Object.assign({}, retryTimeoutDefault)
         this.status = e.type
 
+        // Keep the websocket connection status in sync with localstorage.
         this.app.store.set('sip', {status: this.status})
 
         switch (e.o_event.i_code) {
@@ -231,7 +232,7 @@ class Sip {
     * @returns {Promise} - Resolved when the subscription is ready.
     */
     subscribePresence(accountId) {
-        if (this.status === 'stopped') return false
+        if (this.status !== 'started') return false
 
         return new Promise((resolve, reject) => {
             // Keep reference to prevent subscribing multiple times.
@@ -294,8 +295,8 @@ class Sip {
     * @param {Boolean} refresh - Force refreshing presence from the sip service.
     */
     async updatePresence(refresh) {
-        if (this.status === 'stopped') {
-            this.app.logger.debug(`${this}SIP presence cannot update. No websocket connection.`)
+        if (this.status !== 'started') {
+            this.app.logger.warn(`${this}cannot update presence without websocket connection.`)
             return
         }
 
