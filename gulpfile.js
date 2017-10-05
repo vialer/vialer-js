@@ -64,6 +64,7 @@ if ((process.env.VERBOSE === 'true') || (process.env.VERBOSE === '1')) VERBOSE =
 let DEPLOY_SETTINGS = {}
 rc('click-to-dial', DEPLOY_SETTINGS)
 DEPLOY_SETTINGS.audience = argv.audience ? argv.audience : 'trustedTesters'
+
 // Some additional variable processing.
 // Verify that the build target is valid.
 if (!BUILD_TARGETS.includes(BUILD_TARGET)) {
@@ -114,6 +115,7 @@ function formatScssVars(brandProperties) {
 const getManifest = () => {
     let manifest = require('./src/manifest.json')
     manifest.name = BRAND.name
+    manifest.browser_action.default_title = BRAND.name
     manifest.permissions.push(BRAND.permissions)
     manifest.homepage_url = BRAND.homepage_url
     manifest.version = PACKAGE.version
@@ -403,9 +405,7 @@ gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Fire
     let manifest = getManifest()
     manifest.options_ui.browser_style = true
     manifest.applications = {
-        gecko: {
-            id: 'click-to-dial@web-extensions',
-        },
+        gecko: DEPLOY_SETTINGS.gecko,
     }
     const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
     await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))

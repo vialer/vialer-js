@@ -33,19 +33,11 @@ npm login
     # Build integrity check passed...
     ```
 
-3. Use [release-it](https://www.npmjs.com/package/release-it) to make the necessary git tags, version bumps and to
-   publish to npm from the `master` branch.
+3. Use [release-it](https://www.npmjs.com/package/release-it) to make the necessary git tags and version bumps from
+   the `master` branch. We don't publish to npm yet, until the Electron version is installable.
 
    ```bash
-   release-it
-   Release source repo
-   ? Show updated files? Yes
-   M  package.json
-
-   ? Commit (Release 1.0.9)? Yes
-   ? Tag (1.0.9)? Yes
-   ? Push? Yes
-   ? Publish "click-to-dial" to npm? Yes
+   release-it -n
    ```
 
 4. Publish the Chrome version. Specify `default` as audience to publish the

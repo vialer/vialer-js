@@ -1,5 +1,9 @@
 {
     "firefox": {
+        "gecko": {
+            "id": "",
+             "strict_min_version": "55.0"
+        },
         "apiKey": "",
         "apiSecret": ""
     },
