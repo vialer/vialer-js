@@ -33,8 +33,9 @@ npm login
     # Build integrity check passed...
     ```
 
-3. Use [release-it](https://www.npmjs.com/package/release-it) to make the necessary git tags and version bumps from
-   the `master` branch. We don't publish to npm yet, until the Electron version is installable.
+3. Use [release-it](https://www.npmjs.com/package/release-it) to make the necessary
+   git tags and version bumps from the `master` branch. We don't publish to npm yet,
+   until the Electron version is installable.
 
    ```bash
    release-it -n
