@@ -405,7 +405,7 @@ gulp.task('manifest-webext-firefox', 'Generate a web-extension manifest for Fire
     let manifest = getManifest()
     manifest.options_ui.browser_style = true
     manifest.applications = {
-        gecko: DEPLOY_SETTINGS.gecko,
+        gecko: DEPLOY_SETTINGS.firefox.gecko,
     }
     const manifestTarget = path.join(__dirname, 'build', BUILD_TARGET, 'manifest.json')
     await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))
