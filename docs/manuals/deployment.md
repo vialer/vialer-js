@@ -25,6 +25,12 @@ npm login
 
 ## Public release
 1. Make sure you updated `CHANGELOG.md` with all changes since the last version
+2. Bump the version and create git tags.
+
+   ```bash
+   npm version patch
+   ```
+
 2. Check the build integrity of the plugin:
 
     ```bash
@@ -33,13 +39,6 @@ npm login
     # Build integrity check passed...
     ```
 
-3. Use [release-it](https://www.npmjs.com/package/release-it) to make the necessary
-   git tags and version bumps from the `master` branch. We don't publish to npm yet,
-   until the Electron version is installable.
-
-   ```bash
-   release-it -n
-   ```
 
 4. Publish the Chrome version. Specify `default` as audience to publish the
    version to the world. The default audience is `trustedTesters` and will only
@@ -55,13 +54,15 @@ npm login
    extension updates. You can [manually override](https://developer.chrome.com/apps/autoupdate#testing)
    this behaviour, to see if the new version is updated correctly.
 
-5. Publish the Firefox version.
+5. Upload the Firefox version to the store.
 
    ```bash
    gulp deploy --target firefox
    ```
 
-   The plugin will first be automatically validated in the Firefox addon store.
+   No worries when you see a message about a failure to sign the plugin. A new
+   plugins version can't be signed utomatically when it's listed in the addons
+   store.
 
 6. Go to the Mozilla addons [versions page](https://addons.mozilla.org/nl/developers/addon/click-to-dial-v2/versions)
    and open the detail view for the newly uploaded version.
