@@ -1,6 +1,6 @@
 {
   "name": "click-to-dial",
-  "version": "2.1.4",
+  "version": "2.0.0",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
     "node": ">=8.0.0"
