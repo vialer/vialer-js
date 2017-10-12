@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 2.0.7
+* Move logout icon in front of email
+* Change colleagues widget icon
+* Update font with added entity icon
+
 ## Version 2.0.2
 This release is a major refactor of the Click-to-dial plugin. Most of the work
 that was done, had to do with making the plugin WebExtensions-ready when

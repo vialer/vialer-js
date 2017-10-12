@@ -24,11 +24,14 @@ npm login
 ```
 
 ## Public release
-1. Make sure you updated `CHANGELOG.md` with all changes since the last version
+1. Uupdate the `CHANGELOG.md` with all the changes since the last version
 2. Bump the version and create git tags.
 
    ```bash
    npm version patch
+   # Tag the version.
+   git tag v2.x.x
+   git push origin 2.x.x
    ```
 
 2. Check the build integrity of the plugin:
