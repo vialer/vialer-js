@@ -35,10 +35,13 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin-left: $vg-spacing-3;
+        // Don't allow the email address to push the icons down.
+        max-width: 200px;
     }
 
     .logout-button {
-        width: 45px;
+        width: $vg-widget-header-size-small;
         text-align: center;
         vertical-align: middle;
         font-size: 0.8rem;

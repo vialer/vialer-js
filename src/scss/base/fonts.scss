@@ -80,6 +80,10 @@ $font-path: "../fonts";
 }
 
 // The click-to-dial font icons.
+.icon-entity:before {
+    content: "\e913";
+}
+
 .icon-availability:before {
     content: "\e900";
 }
