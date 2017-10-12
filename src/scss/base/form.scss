@@ -65,6 +65,11 @@ html body {
         outline: none;
         border: 1px solid $vg-grey-lighter;
 
+        select:-moz-focusring {
+            color: transparent;
+            text-shadow: 0 0 0 #000;
+        }
+
         &:focus {
             border: 1px solid $vg-grey-light;
         }
