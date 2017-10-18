@@ -44,7 +44,7 @@
         "description": "Tekst van de loginknop."
     },
     "logoutLinkText": {
-        "message": "uitloggen",
+        "message": "Uitloggen",
         "description": "Tekst van de logoutlink."
     },
     "closePanelTitle": {

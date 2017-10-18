@@ -44,7 +44,7 @@
         "description": "Text for the login button."
     },
     "logoutLinkText": {
-        "message": "log out",
+        "message": "Log out",
         "description": "Text for the logout link."
     },
     "closePanelTitle": {
