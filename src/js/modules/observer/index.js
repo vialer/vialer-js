@@ -2,8 +2,8 @@
 * @module Observer
 */
 // Identify our elements with these class names.
-const phoneElementClassName = 'click-to-dial-phone-number'
-const phoneIconClassName = 'click-to-dial-icon'
+const phoneElementClassName = 'vialer-phone-number'
+const phoneIconClassName = 'vialer-icon'
 
 const Walker = require('./walker')
 

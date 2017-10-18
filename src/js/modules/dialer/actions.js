@@ -3,7 +3,7 @@
 */
 const Actions = require('../../lib/actions')
 
-const phoneIconClassName = 'click-to-dial-icon'
+const phoneIconClassName = 'vialer-icon'
 
 
 /**
@@ -91,7 +91,7 @@ class DialerActions extends Actions {
         // The callstatus iframe informs the tab that
         // it has to be closed.
         this.app.on('dialer:status.hide', (data) => {
-            // Re-enable the click-to-dial icons in the tab again.
+            // Re-enable the Vialer icons in the tab again.
             $(`.${phoneIconClassName}`).each((i, el) => {
                 $(el).attr('disabled', false)
             })

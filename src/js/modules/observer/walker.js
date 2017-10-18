@@ -2,7 +2,7 @@
 * @module Observer
 */
 // Identify our elements with these class names.
-const phoneElementClassName = 'click-to-dial-phone-number'
+const phoneElementClassName = 'vialer-phone-number'
 
 
 /**

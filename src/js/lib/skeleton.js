@@ -5,7 +5,7 @@ const Store = require('./store')
 
 
 /**
-* This is the minimal class that all parts of the click-to-dial
+* This is the minimal class that all parts of the Vialer-js
 * application inherit from(tab, contentscript, background, popup/out).
 * It sets some basic properties that can be reused, like a logger, store,
 * an IPC eventemitter and some environmental properties.

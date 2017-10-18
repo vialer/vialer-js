@@ -1,9 +1,3 @@
-/**
- * Run the click-to-dial app as a contentscript. The click-to-dial
- * app can be run as one, or having it's UI part and background running
- * part separated.
- */
-
 const ClickToDialApp = require('./lib/app')
 
 const _modules = [
