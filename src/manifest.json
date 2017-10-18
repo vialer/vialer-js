@@ -2,8 +2,9 @@
     "manifest_version": 2,
     "description": "__MSG_extDescription__",
     "icons": {
-        "16": "img/icon-green-small.png",
-        "48": "img/icon-green.png"
+        "16": "img/logo-16.png",
+        "32": "img/logo-32.png",
+        "64": "img/logo-64.png"
     },
     "browser_action": {
         "default_icon": "img/icon-grey-small.png",
