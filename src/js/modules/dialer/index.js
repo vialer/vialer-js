@@ -74,6 +74,7 @@ class DialerModule {
     async dial(bNumber, tab) {
         // Just make sure b_number is numbers only.
         bNumber = this.sanitizeNumber(bNumber).replace(/[^\d+]/g, '')
+        const failedStatus = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
         let callid, callstatus
 
         // Start showing the callstatus dialog early on.
@@ -109,6 +110,7 @@ class DialerModule {
         const callStatusPoller = async() => {
             // Get the actual callstatus from the API.
             const _res = await this.app.api.client.get(`api/clicktodial/${callid}/`)
+
             if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
                 this.app.emit('dialer:status.stop', {})
                 // Something went wrong. Stop the timer.
@@ -130,14 +132,17 @@ class DialerModule {
                         status: this.getStatusMessage(callstatus, bNumber),
                     }, false, tab.id)
                 } else {
-                    // First hide a previous notification, so it won't stack.
-                    this.app.logger.notification(this.getStatusMessage(callstatus, bNumber))
+                    if (failedStatus.includes(callstatus)) {
+                        this.app.logger.notification(this.getStatusMessage(callstatus, bNumber), 'Vialer', false, 'warning')
+                    } else {
+                        this.app.logger.notification(this.getStatusMessage(callstatus, bNumber))
+                    }
+
                 }
             }
 
-            // Stop the status timer when the call is in a final state..
-            const resetStatus = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
-            if (resetStatus.includes(callstatus)) {
+            // Stop the status timer when the call is in a final state.
+            if (failedStatus.includes(callstatus)) {
                 this.app.emit('dialer:status.stop', {})
                 this.app.timer.stopTimer(`dialer:status.update-${callid}`)
                 this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)

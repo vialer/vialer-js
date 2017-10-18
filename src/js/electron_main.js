@@ -25,7 +25,7 @@ function createWindow() {
         height: 186,
         resizable: false,
         show: false,
-        title: 'Click-to-dial',
+        title: 'Vialer',
         useContentSize: true,
         width: 400,
     })
