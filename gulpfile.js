@@ -41,7 +41,6 @@ const sourcemaps = require('gulp-sourcemaps')
 const watchify = require('watchify')
 const zip = require('gulp-zip')
 
-const BRAND = require('./src/brand.json')
 const PACKAGE = require('./package')
 const writeFileAsync = promisify(fs.writeFile)
 
@@ -56,13 +55,15 @@ const SRC_DIR = path.join(__dirname, 'src')
 const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
 
+let BRAND = require('./src/brand.json')
+
 // Switches extra applicationverbosity on/off.
 let VERBOSE = false
 if ((process.env.VERBOSE === 'true') || (process.env.VERBOSE === '1')) VERBOSE = true
 
-// Loads the json API settings from ~/.click-to-dialrc.
+// Loads the json API settings from ~/.vialer-jsrc.
 let DEPLOY_SETTINGS = {}
-rc('click-to-dial', DEPLOY_SETTINGS)
+rc('vialer-js', DEPLOY_SETTINGS)
 DEPLOY_SETTINGS.audience = argv.audience ? argv.audience : 'trustedTesters'
 
 // Some additional variable processing.
@@ -190,7 +191,7 @@ const scssEntry = (name) => {
 }
 
 
-gulp.task('assets', 'Copy click-to-dial assets to the build directory.', ['fonts'], () => {
+gulp.task('assets', 'Copy assets to the build directory.', ['fonts'], () => {
     return gulp.src('./src/img/{*.png,*.jpg}', {base: './src'})
         .pipe(ifElse(PRODUCTION, imagemin))
         .pipe(addsrc('./LICENSE'))
@@ -204,6 +205,8 @@ gulp.task('assets', 'Copy click-to-dial assets to the build directory.', ['fonts
 
 
 gulp.task('build', 'Clean existing build and regenerate a new one.', (done) => {
+    // Refresh the brand content with each build.
+    BRAND = require('./src/brand.json')
     let targetTasks
     if (BUILD_TARGET === 'electron') targetTasks = ['js-electron-main', 'js-electron-webview', 'js-vendor']
     else targetTasks = ['js-vendor', 'js-webext']
@@ -472,6 +475,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
 
     if (BUILD_TARGET !== 'electron') {
         gulp.watch(path.join(__dirname, 'src', 'manifest.json'), [`manifest-webext-${BUILD_TARGET}`])
+        gulp.watch(path.join(__dirname, 'src', 'brand.json'), ['build'])
     }
 
 

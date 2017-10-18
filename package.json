@@ -1,5 +1,5 @@
 {
-  "name": "click-to-dial",
+  "name": "vialer-js",
   "version": "2.0.8",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
@@ -7,17 +7,18 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test_chrome": "gulp build --target chrome;chrome --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
-    "test_chromium": "gulp build --target chrome;chromium --user-data-dir=/tmp/click-to-dial --load-extension=./build/chrome --no-first-run",
+    "test_chrome": "gulp build --target chrome;chrome --user-data-dir=/tmp/vialer-js --load-extension=./build/chrome --no-first-run",
+    "test_chromium": "gulp build --target chrome;chromium --user-data-dir=/tmp/vialer-js --load-extension=./build/chrome --no-first-run",
     "test_electron": "gulp build --target electron;electron --js-flags='--harmony-async-await' build/electron/electron_main.js",
     "test_firefox": "gulp build --target firefox;web-ext run --verbose --source-dir build/firefox",
-    "test_webview": "gulp build --target electron;chromium --user-data-dir=/tmp/click-to-dial --disable-web-security --new-window http://localhost:8999/electron/electron_webview.html"
+    "test_webview": "gulp build --target electron;chromium --user-data-dir=/tmp/vialer-js --disable-web-security --new-window http://localhost:8999/electron/electron_webview.html"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/voipgrid/click-to-dial.git"
+    "url": "git+https://github.com/voipgrid/vialer-js.git"
   },
   "keywords": [
+    "electron",
     "sip",
     "telephony",
     "click-to-dial"
@@ -26,7 +27,7 @@
   "contributors": [
     {
       "name": "CONTRIBUTORS",
-      "url": "https://github.com/VoIPGRID/click-to-dial/graphs/contributors"
+      "url": "https://github.com/voipgrid/vialer-js/graphs/contributors"
     }
   ],
   "files": [
@@ -35,7 +36,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/voipgrid/click-to-dial/issues"
+    "url": "https://github.com/voipgrid/vialer-js/issues"
   },
   "homepage": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
   "devDependencies": {

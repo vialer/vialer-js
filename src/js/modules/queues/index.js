@@ -23,12 +23,12 @@ class QueuesModule {
 
 
     getIconForSize(size) {
-        let icon = '/img/queue.png'
+        let icon = '/img/icon-queue.png'
         if (!isNaN(size)) {
             if (size < 10) {
-                icon = `/img/queue${size}.png`
+                icon = `/img/icon-queue-${size}.png`
             } else {
-                icon = '/img/queue10.png'
+                icon = '/img/icon-queue-10.png'
             }
         }
         return icon

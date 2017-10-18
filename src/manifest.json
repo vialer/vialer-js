@@ -2,11 +2,11 @@
     "manifest_version": 2,
     "description": "__MSG_extDescription__",
     "icons": {
-        "16": "img/call-green.png",
-        "48": "img/logo.png"
+        "16": "img/icon-green-small.png",
+        "48": "img/icon-green.png"
     },
     "browser_action": {
-        "default_icon": "img/call-grey.png",
+        "default_icon": "img/icon-grey-small.png",
         "default_popup": "webext_popup.html"
     },
     "background": {

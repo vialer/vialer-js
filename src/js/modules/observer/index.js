@@ -152,7 +152,7 @@ class ObserverModule {
             '-moz-border-radius': '9px !important',
             '-moz-box-shadow': '0 1px 1px rgba(0, 0, 0, 0.2) !important',
             'background-color': 'transparent !important',
-            'background-image': `url("${this.app.browser.runtime.getURL('img/clicktodial.png')}")`,
+            'background-image': `url("${this.app.browser.runtime.getURL('img/icon-c2d.png')}")`,
             'background-position': 'center center',
             'background-repeat': 'no-repeat',
             'border-radius': '9px !important',

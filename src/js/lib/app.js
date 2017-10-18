@@ -38,7 +38,7 @@ class App extends Skeleton {
             this.reloadModules(false)
 
             if (this.env.extension && this.env.extension.background) {
-                this.browser.browserAction.setIcon({path: 'img/call-green.png'})
+                this.browser.browserAction.setIcon({path: 'img/icon-green-small.png'})
             }
         }
     }

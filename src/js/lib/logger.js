@@ -55,11 +55,11 @@ class Logger {
             type: 'basic',
         }
         if (this.app.env.extension) {
-            options.iconUrl = this.app.browser.runtime.getURL('img/logo.png')
+            options.iconUrl = this.app.browser.runtime.getURL('img/icon-green-spacing.png')
             if (!stack) chrome.notifications.clear('c2d')
             this.app.browser.notifications.create('c2d', options)
         } else {
-            options.iconUrl = 'img/clicktodial.png'
+            options.iconUrl = 'img/icon-c2d.png'
             if (Notification.permission === 'granted') {
                 if (!stack && this._notification) this._notification.close()
                 this._notification = new Notification(message, options) // eslint-disable-line no-new

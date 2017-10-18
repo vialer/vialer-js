@@ -15,7 +15,7 @@ const {ipcMain} = require('electron')
 let mainWindow
 
 function createWindow() {
-    let tray = new Tray(path.join(__dirname, 'img', 'clicktodial.png'))
+    let tray = new Tray(path.join(__dirname, 'img', 'icon-green.png'))
     tray.setToolTip('This is my application.')
 
 
@@ -37,7 +37,7 @@ function createWindow() {
         }
     })
 
-    mainWindow.setIcon(path.join(__dirname, 'img', 'clicktodial.png'))
+    mainWindow.setIcon(path.join(__dirname, 'img', 'icon-green.png'))
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'electron_webview.html'),

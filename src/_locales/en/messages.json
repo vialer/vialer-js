@@ -1,6 +1,6 @@
 {
     "extTitle": {
-        "message": "Click-to-dial",
+        "message": "Vialer",
         "description": "Plugin title."
     },
     "extDescription": {
@@ -9,11 +9,11 @@
     },
     "dialTo": {
         "message": "Calling to",
-        "description": "Text for the title of the Click-to-Dial popup."
+        "description": "Text for the title of the Vialer-js popup."
     },
     "clicktodialStatusLabel": {
         "message": "Status:",
-        "description": "Label for the call status in the Click-to-Dial popup."
+        "description": "Label for the call status in the Vialer-js popup."
     },
     "loginFormUsernameLabel": {
         "message": "E-mail address",
@@ -128,7 +128,7 @@
         "description": "Text you see instead of the widget in case you're missing permissions."
     },
     "unauthorizedNotificationText": {
-        "message": "In order to use Click-to-Dial, you first need to log in by clicking the toolbar icon and entering your login details.",
+        "message": "In order to use Vialer, you first need to log in by clicking the toolbar icon and entering your login details.",
         "description": "Text for the notification shown when calling the API on the remote server returns status '401 Unauthorized'."
     },
     "callStatusNotificationText": {

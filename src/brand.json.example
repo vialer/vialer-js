@@ -2,7 +2,7 @@
     "permissions": "https://partner.voipgrid.nl/",
     "sip_endpoint": "websocket.voipgrid.nl",
     "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
-    "name": "Click-to-dial",
+    "name": "Vialer",
     "colors": {
         "vg-primary-color": "#3c3c50",
         "vg-info-color-failed-dark": " #d9534f",

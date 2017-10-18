@@ -10,13 +10,13 @@
         "plugins/markdown"
     ],
     "templates" : {
-        "title": "Click-to-dial",
+        "title": "Vialer-js",
         "logo": {
             "url": "logo.png",
             "width": "72px",
             "height": "72px"
         },
-        "name": "Click-to-dial",
+        "name": "Vialer-js",
         "footerText": "&copy; Devhouse Spindle",
         "useCollapsibles": true,
         "tabNames": {

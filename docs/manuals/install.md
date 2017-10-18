@@ -6,8 +6,8 @@
 
 First checkout the project and install its dependencies from npm:
 ```bash
-git clone git@github.com:VoIPGRID/click-to-dial.git
-cd click-to-dial
+git clone git@github.com:VoIPGRID/vialer-js.git
+cd vialer-js
 npm i -g gulp web-ext
 npm i
 # Set the default branding file.
@@ -60,7 +60,7 @@ and published Firefox xpi can be installed directly though.
 
 
 ## Electron desktop
-Click-to-dial can run as a desktop app using Electron, although this
+Vialer-js can run as a desktop app using Electron, although this
 version is still **experimental** and not (yet) officially supported.
 You're free to give it a spin though! It requires Electron to be installed
 on your system. To run the desktop version:

@@ -5,7 +5,7 @@ Deployment to the Firefox and Chrome store is (semi) automated. In order to depl
 to either one, you first need to fill in API credentials in the following file:
 
 ```bash
-cp .click-to-dialrc.example ~/.click-to-dialrc
+cp .vialer-jsrc.example ~/.vialer-jsrc
 ```
 
 For Firefox, fill in the `apiKey` and `apiSecret` from the
@@ -67,7 +67,7 @@ npm login
    plugins version can't be signed utomatically when it's listed in the addons
    store.
 
-6. Go to the Mozilla addons [versions page](https://addons.mozilla.org/nl/developers/addon/click-to-dial-v2/versions)
+6. Go to the Mozilla addons [versions page](https://addons.mozilla.org/nl/developers/addon/vialer-js/versions)
    and open the detail view for the newly uploaded version.
 
    * Set Compatibility to Firefox only, and pin it to Firefox 57 and upwards.
@@ -80,15 +80,15 @@ npm login
     # v8.6.0
     npm -v
     # 5.4.2
-    unzip click-to-dial-*.xpi -d /tmp/click-to-dial-xpi-unzipped
-    unzip sources.zip -d /tmp/click-to-dial-sources-unzipped
-    cd /tmp/click-to-dial-sources-unzipped
+    unzip vialer-js-*.xpi -d /tmp/vialer-js-xpi-unzipped
+    unzip sources.zip -d /tmp/vialer-js-sources-unzipped
+    cd /tmp/vialer-js-sources-unzipped
     npm i
     cp src/brand.json.example src/brand.json
     NODE_ENV=production gulp build --target firefox
     cd -
-    diff -r /tmp/click-to-dial-xpi-unzipped /tmp/click-to-dial-sources-unzipped/build/firefox
-    rm -Rf /tmp/click-to-dial*
+    diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox
+    rm -Rf /tmp/vialer-js*
     ```
 
     For help and questions about the reviewing process, you can contact an AMO-editor
