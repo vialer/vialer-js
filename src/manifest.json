@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "description": "__MSG_extDescription__",
     "icons": {
-        "16": "img/icon-phone.png",
+        "16": "img/icon-phone-16.png",
         "32": "img/logo-32.png",
         "64": "img/logo-64.png",
         "128": "img/logo-128.png"
