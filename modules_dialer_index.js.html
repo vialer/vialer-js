@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Source: modules/dialer/index.js | Click-to-dial</title>
+    <title>Source: modules/dialer/index.js | Vialer-js</title>
     <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="styles/main.css">
 
@@ -19,17 +19,17 @@
     <nav class="lnb" id="lnb">
         <div class="nav-search js-search">
             <div class="logo" style="width: 72px; height: 72px">
-                <img src="logo.png" width="100%" height="100%">
+                <img src="logo-64.png" width="100%" height="100%">
             </div>
             <input type="text" placeholder="Search docs">
             <ul class="searched-list"></ul>
         </div>
 
         <div class="nav-main">
-            <h1><a href="index.html" class="link">Click-to-dial</a></h1>
+            <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.1.3
+                v2.0.11
             
             </span>
         </div>
@@ -274,6 +274,7 @@ class DialerModule {
     async dial(bNumber, tab) {
         // Just make sure b_number is numbers only.
         bNumber = this.sanitizeNumber(bNumber).replace(/[^\d+]/g, '')
+        const failedStatus = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
         let callid, callstatus
 
         // Start showing the callstatus dialog early on.
@@ -309,6 +310,7 @@ class DialerModule {
         const callStatusPoller = async() => {
             // Get the actual callstatus from the API.
             const _res = await this.app.api.client.get(`api/clicktodial/${callid}/`)
+
             if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
                 this.app.emit('dialer:status.stop', {})
                 // Something went wrong. Stop the timer.
@@ -330,14 +332,17 @@ class DialerModule {
                         status: this.getStatusMessage(callstatus, bNumber),
                     }, false, tab.id)
                 } else {
-                    // First hide a previous notification, so it won't stack.
-                    this.app.logger.notification(this.getStatusMessage(callstatus, bNumber))
+                    if (failedStatus.includes(callstatus)) {
+                        this.app.logger.notification(this.getStatusMessage(callstatus, bNumber), 'Vialer', false, 'warning')
+                    } else {
+                        this.app.logger.notification(this.getStatusMessage(callstatus, bNumber))
+                    }
+
                 }
             }
 
-            // Stop the status timer when the call is in a final state..
-            const resetStatus = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
-            if (resetStatus.includes(callstatus)) {
+            // Stop the status timer when the call is in a final state.
+            if (failedStatus.includes(callstatus)) {
                 this.app.emit('dialer:status.stop', {})
                 this.app.timer.stopTimer(`dialer:status.update-${callid}`)
                 this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)

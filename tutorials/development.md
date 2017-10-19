@@ -24,7 +24,7 @@ specific development.
 For Electron, there is currently no way to autoreload.
 
 When working on styling/testing the popup, there is also another option.
-Besides running the Click-to-dial popup in the context of an Electron webview,
+Besides running the Vialer-js popup in the context of an Electron webview,
 it is also possible to run it in a regular browser view when the browser's
 same-origin policy is disabled. This is useful during development, because
 it allows developers to quickly iterate on styling and functionality

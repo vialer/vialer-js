@@ -5,7 +5,7 @@ Deployment to the Firefox and Chrome store is (semi) automated. In order to depl
 to either one, you first need to fill in API credentials in the following file:
 
 ```bash
-cp .click-to-dialrc.example ~/.click-to-dialrc
+cp .vialer-jsrc.example ~/.vialer-jsrc
 ```
 
 For Firefox, fill in the `apiKey` and `apiSecret` from the
@@ -24,7 +24,16 @@ npm login
 ```
 
 ## Public release
-1. Make sure you updated `CHANGELOG.md` with all changes since the last version
+1. Uupdate the `CHANGELOG.md` with all the changes since the last version
+2. Bump the version and create git tags.
+
+   ```bash
+   npm version patch
+   # Tag the version.
+   git tag v2.x.x
+   git push origin 2.x.x
+   ```
+
 2. Check the build integrity of the plugin:
 
     ```bash
@@ -33,20 +42,6 @@ npm login
     # Build integrity check passed...
     ```
 
-3. Use [release-it](https://www.npmjs.com/package/release-it) to make the necessary git tags, version bumps and to
-   publish to npm from the `master` branch.
-
-   ```bash
-   release-it
-   Release source repo
-   ? Show updated files? Yes
-   M  package.json
-
-   ? Commit (Release 1.0.9)? Yes
-   ? Tag (1.0.9)? Yes
-   ? Push? Yes
-   ? Publish "click-to-dial" to npm? Yes
-   ```
 
 4. Publish the Chrome version. Specify `default` as audience to publish the
    version to the world. The default audience is `trustedTesters` and will only
@@ -62,15 +57,17 @@ npm login
    extension updates. You can [manually override](https://developer.chrome.com/apps/autoupdate#testing)
    this behaviour, to see if the new version is updated correctly.
 
-5. Publish the Firefox version.
+5. Upload the Firefox version to the store.
 
    ```bash
    gulp deploy --target firefox
    ```
 
-   The plugin will first be automatically validated in the Firefox addon store.
+   No worries when you see a message about a failure to sign the plugin. A new
+   plugins version can't be signed utomatically when it's listed in the addons
+   store.
 
-6. Go to the Mozilla addons [versions page](https://addons.mozilla.org/nl/developers/addon/click-to-dial-v2/versions)
+6. Go to the Mozilla addons [versions page](https://addons.mozilla.org/nl/developers/addon/vialer-js/versions)
    and open the detail view for the newly uploaded version.
 
    * Set Compatibility to Firefox only, and pin it to Firefox 57 and upwards.
@@ -83,15 +80,15 @@ npm login
     # v8.6.0
     npm -v
     # 5.4.2
-    unzip click-to-dial-*.xpi -d /tmp/click-to-dial-xpi-unzipped
-    unzip sources.zip -d /tmp/click-to-dial-sources-unzipped
-    cd /tmp/click-to-dial-sources-unzipped
+    unzip vialer-js-*.xpi -d /tmp/vialer-js-xpi-unzipped
+    unzip sources.zip -d /tmp/vialer-js-sources-unzipped
+    cd /tmp/vialer-js-sources-unzipped
     npm i
     cp src/brand.json.example src/brand.json
     NODE_ENV=production gulp build --target firefox
     cd -
-    diff -r /tmp/click-to-dial-xpi-unzipped /tmp/click-to-dial-sources-unzipped/build/firefox
-    rm -Rf /tmp/click-to-dial*
+    diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox
+    rm -Rf /tmp/vialer-js*
     ```
 
     For help and questions about the reviewing process, you can contact an AMO-editor

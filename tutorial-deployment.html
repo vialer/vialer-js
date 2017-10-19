@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Tutorial: Deployment | Click-to-dial</title>
+    <title>Tutorial: Deployment | Vialer-js</title>
     <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="styles/main.css">
 
@@ -18,17 +18,17 @@
     <nav class="lnb" id="lnb">
         <div class="nav-search js-search">
             <div class="logo" style="width: 72px; height: 72px">
-                <img src="logo.png" width="100%" height="100%">
+                <img src="logo-64.png" width="100%" height="100%">
             </div>
             <input type="text" placeholder="Search docs">
             <ul class="searched-list"></ul>
         </div>
 
         <div class="nav-main">
-            <h1><a href="index.html" class="link">Click-to-dial</a></h1>
+            <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.1.3
+                v2.0.11
             
             </span>
         </div>
@@ -203,7 +203,7 @@
 <article class="readme">
     <h1>Deployment process</h1><h2>Preparation</h2><p>Deployment to the Firefox and Chrome store is (semi) automated. In order to deploy
 to either one, you first need to fill in API credentials in the following file:</p>
-<pre class="prettyprint source lang-bash"><code>cp .click-to-dialrc.example ~/.click-to-dialrc</code></pre><p>For Firefox, fill in the <code>apiKey</code> and <code>apiSecret</code> from the
+<pre class="prettyprint source lang-bash"><code>cp .vialer-jsrc.example ~/.vialer-jsrc</code></pre><p>For Firefox, fill in the <code>apiKey</code> and <code>apiSecret</code> from the
 <a href="https://addons.mozilla.org/nl/developers/addon/api/key/">API key</a> management page.
 For Chrome, the initial setup requires an <code>extensionId</code>, <code>clientId</code>, <code>clientSecret</code>
 and a <code>refreshToken</code>. See this
@@ -213,22 +213,18 @@ developer, in order to push to one of the stores.</p>
 <p>To be able to push to npm, an authorized developer first have to login to the
 <code>Spindle</code> npm account.</p>
 <pre class="prettyprint source lang-bash"><code>npm login</code></pre><h2>Public release</h2><ol>
-<li>Make sure you updated <code>CHANGELOG.md</code> with all changes since the last version</li>
+<li>Uupdate the <code>CHANGELOG.md</code> with all the changes since the last version</li>
+<li><p>Bump the version and create git tags.</p>
+<pre class="prettyprint source lang-bash"><code>npm version patch
+# Tag the version.
+git tag v2.x.x
+git push origin 2.x.x</code></pre></li>
 <li><p>Check the build integrity of the plugin:</p>
 <pre class="prettyprint source lang-bash"><code> ./test_build.sh
  # Should show this at the end:
  # Build integrity check passed...</code></pre></li>
-<li><p>Use <a href="https://www.npmjs.com/package/release-it">release-it</a> to make the necessary git tags, version bumps and to
-publish to npm from the <code>master</code> branch.</p>
-<pre class="prettyprint source lang-bash"><code>release-it
-Release source repo
-? Show updated files? Yes
-M  package.json
-
-? Commit (Release 1.0.9)? Yes
-? Tag (1.0.9)? Yes
-? Push? Yes
-? Publish &quot;click-to-dial&quot; to npm? Yes</code></pre></li>
+</ol>
+<ol>
 <li><p>Publish the Chrome version. Specify <code>default</code> as audience to publish the
 version to the world. The default audience is <code>trustedTesters</code> and will only
 be visible on a per-user basis.</p>
@@ -238,10 +234,12 @@ updated to all users within several hours, when the browser checks for
 extension updates. You can <a href="https://developer.chrome.com/apps/autoupdate#testing">manually override</a>
 this behaviour, to see if the new version is updated correctly.</p>
 </li>
-<li><p>Publish the Firefox version.</p>
-<pre class="prettyprint source lang-bash"><code>gulp deploy --target firefox</code></pre><p>The plugin will first be automatically validated in the Firefox addon store.</p>
+<li><p>Upload the Firefox version to the store.</p>
+<pre class="prettyprint source lang-bash"><code>gulp deploy --target firefox</code></pre><p>No worries when you see a message about a failure to sign the plugin. A new
+plugins version can't be signed utomatically when it's listed in the addons
+store.</p>
 </li>
-<li><p>Go to the Mozilla addons <a href="https://addons.mozilla.org/nl/developers/addon/click-to-dial-v2/versions">versions page</a>
+<li><p>Go to the Mozilla addons <a href="https://addons.mozilla.org/nl/developers/addon/vialer-js/versions">versions page</a>
 and open the detail view for the newly uploaded version.</p>
 <ul>
 <li>Set Compatibility to Firefox only, and pin it to Firefox 57 and upwards.</li>
@@ -252,15 +250,15 @@ node -v
 # v8.6.0
 npm -v
 # 5.4.2
-unzip click-to-dial-*.xpi -d /tmp/click-to-dial-xpi-unzipped
-unzip sources.zip -d /tmp/click-to-dial-sources-unzipped
-cd /tmp/click-to-dial-sources-unzipped
+unzip vialer-js-*.xpi -d /tmp/vialer-js-xpi-unzipped
+unzip sources.zip -d /tmp/vialer-js-sources-unzipped
+cd /tmp/vialer-js-sources-unzipped
 npm i
 cp src/brand.json.example src/brand.json
 NODE_ENV=production gulp build --target firefox
 cd -
-diff -r /tmp/click-to-dial-xpi-unzipped /tmp/click-to-dial-sources-unzipped/build/firefox
-rm -Rf /tmp/click-to-dial*</code></pre><p>For help and questions about the reviewing process, you can contact an AMO-editor
+diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox
+rm -Rf /tmp/vialer-js*</code></pre><p>For help and questions about the reviewing process, you can contact an AMO-editor
 on <a href="irc://mozilla.org/%23amo">irc</a>.</p>
 </li>
 </ul>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Source: lib/logger.js | Click-to-dial</title>
+    <title>Source: lib/logger.js | Vialer-js</title>
     <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="styles/main.css">
 
@@ -19,17 +19,17 @@
     <nav class="lnb" id="lnb">
         <div class="nav-search js-search">
             <div class="logo" style="width: 72px; height: 72px">
-                <img src="logo.png" width="100%" height="100%">
+                <img src="logo-64.png" width="100%" height="100%">
             </div>
             <input type="text" placeholder="Search docs">
             <ul class="searched-list"></ul>
         </div>
 
         <div class="nav-main">
-            <h1><a href="index.html" class="link">Click-to-dial</a></h1>
+            <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.1.3
+                v2.0.11
             
             </span>
         </div>
@@ -248,18 +248,21 @@ class Logger {
     }
 
 
-    notification(message, title = 'Click-to-dial', stack = false) {
+    notification(message, title = 'Vialer', stack = false, type = 'info') {
         const options = {
             message: message,
             title: title,
             type: 'basic',
         }
         if (this.app.env.extension) {
-            options.iconUrl = this.app.browser.runtime.getURL('img/logo.png')
+            if (type === 'info') options.iconUrl = this.app.browser.runtime.getURL('img/icon-green-spacing.png')
+            else if (type === 'warning') options.iconUrl = this.app.browser.runtime.getURL('img/icon-red-spacing.png')
+            else options.iconUrl = this.app.browser.runtime.getURL('img/icon-grey-spacing.png')
+
             if (!stack) chrome.notifications.clear('c2d')
             this.app.browser.notifications.create('c2d', options)
         } else {
-            options.iconUrl = 'img/clicktodial.png'
+            options.iconUrl = 'img/icon-c2d.png'
             if (Notification.permission === 'granted') {
                 if (!stack &amp;&amp; this._notification) this._notification.close()
                 this._notification = new Notification(message, options) // eslint-disable-line no-new
