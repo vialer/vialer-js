@@ -115,6 +115,8 @@ function formatScssVars(brandProperties) {
 */
 const getManifest = () => {
     let manifest = require('./src/manifest.json')
+    // The 16x16px icon is used for the context menu.
+    // It is different from the logo.
     manifest.name = BRAND.name
     manifest.browser_action.default_title = BRAND.name
     manifest.permissions.push(BRAND.permissions)
