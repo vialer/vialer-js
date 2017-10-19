@@ -78,7 +78,7 @@ gutil.log(`Build target: ${BUILD_TARGET}`)
 let PRODUCTION
 // Possibility to force the production flag when running certain tasks from
 // the commandline. Use this with care.
-if (['deploy'].includes(GULPACTION)) PRODUCTION = true
+if (['deploy', 'build-dist'].includes(GULPACTION)) PRODUCTION = true
 else PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
 
 // Notify developer about some essential build presets.
