@@ -57,7 +57,8 @@
         font-size: 1rem;
         display: inline-block;
         height: $vg-widget-header-size-small;
-        margin-right: $vg-spacing-gap;
+        // Position the last icon in line with the rest.
+        margin-right: $vg-spacing-gap - 2px;
         vertical-align: middle;
 
         i {
