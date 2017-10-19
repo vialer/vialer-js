@@ -10,6 +10,13 @@
         "plugins/markdown"
     ],
     "templates" : {
+        "default": {
+            "staticFiles": {
+              "include": [
+                  "./src/img/logo-64.png"
+              ]
+            }
+        },
         "title": "Vialer-js",
         "logo": {
             "url": "logo-64.png",
@@ -22,11 +29,6 @@
         "tabNames": {
             "api": "Code",
             "tutorials": "Manuals"
-        },
-        "staticFiles": {
-            "include": [
-                "./src/img/logo-64.png"
-            ]
         }
     },
     "opts": {

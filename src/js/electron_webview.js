@@ -4,7 +4,7 @@
 * event emitters. This version also runs in Electron as
 * a desktop app.
 */
-const ClickToDialApp = require('./lib/app')
+const VialerApp = require('./lib/app')
 
 const resizeSensor = require('css-element-queries').ResizeSensor
 
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 
-    global.app = new ClickToDialApp({
+    global.app = new VialerApp({
         environment: {
             electron: isElectron,
             extension: false,

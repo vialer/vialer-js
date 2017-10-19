@@ -1,4 +1,4 @@
-const ClickToDialApp = require('./lib/app')
+const VialerApp = require('./lib/app')
 
 const _modules = [
     {Module: require('./modules/availability'), name: 'availability'},
@@ -9,7 +9,7 @@ const _modules = [
     {Module: require('./modules/queues'), name: 'queues'},
 ]
 
-global.app = new ClickToDialApp({
+global.app = new VialerApp({
     environment: {
         extension: {
             background: true,

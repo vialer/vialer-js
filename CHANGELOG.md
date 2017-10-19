@@ -1,15 +1,7 @@
 # Changelog
 
-## Version 2.0.7
-* Move logout icon in front of email
-* Change colleagues widget icon
-* Update font with added entity icon
-
-## Version 2.0.2
-This release is a major refactor of the Vialer plugin. Most of the work
-that was done, had to do with making the plugin WebExtensions-ready when
-Firefox 57 is released. Visible changes:
-
+## Version 2.0.12
+* The name and branding of the Click-to-dial/VoIPGRID  browser plugin has been changed to Vialer
 * Presence information is synced more reliably to the UI
 * Cleaned up styling, improved styling consistency, new icons and Roboto font
 * Styled settings page
@@ -23,11 +15,16 @@ Firefox 57 is released. Visible changes:
 * Repeated timer functions are now handled async
 * Widget open state is not affected anymore by refreshing the popout
 * Disable call options when a call is in progress
+* Phone icon used in context menu
+* Popout favicon forced to Vialer logo (Firefox doesn't have a logo there)
+* Fix opacity notification icon
+* A red notification icon is used when a call fails
 
-Invisible changes:
+Changes invisible to users:
 * Refactored codebase
 * Rewrote to use chrome namespace; plugin can now be deployed as Firefox and Chrome plugin
 * Improved logging
 * Simplified Eventemitter API to deal with IPC messaging
 * Experimental Electron build
 * Gulp buildsystem, simplified development and deployment
+* The repository has been changed to https://github.com/VoIPGRID/vialer-js

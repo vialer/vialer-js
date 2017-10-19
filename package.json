@@ -68,7 +68,7 @@
     "gulp-uglify": "^3.0.0",
     "gulp-zip": "^4.0.0",
     "jsdoc": "^3.5.4",
-    "jsdoc-rtd": "^1.0.12",
+    "jsdoc-rtd": "^1.0.15",
     "mkdirp": "^0.5.1",
     "rc": "^1.2.1",
     "run-sequence": "^1.2.2",
