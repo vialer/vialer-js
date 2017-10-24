@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 2.0.13
+* [101](https://github.com/VoIPGRID/vialer-js/issues/101): Add db schema check to account for old localstorage data.
+  User will automatically be logged out if the db schema in the application doesn't match with the one in localstorage.
+  Also does a better property check on contacts list, notifications and queues list.
+
 ## Version 2.0.12
 * The name and branding of the Click-to-dial/VoIPGRID  browser plugin has been changed to Vialer
 * Presence information is synced more reliably to the UI
