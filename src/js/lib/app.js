@@ -21,6 +21,15 @@ class App extends Skeleton {
         window.cache = {}
         this.store = new Store(this)
 
+        // Clears localstorage if the schema changed after a plugin update.
+        if (!this.store.validSchema()) {
+            this.app.modules.user.logout()
+            return
+        }
+
+        // Keep track of some notifications.
+        this.store.set('notifications', {})
+
         // Store settings to localstorage.
         for (let key in this.settings) {
             if (this.settings.hasOwnProperty(key)) {
@@ -30,8 +39,7 @@ class App extends Skeleton {
             }
         }
 
-        // Keep track of some notifications.
-        this.store.set('notifications', {})
+
         // Continue last session if credentials are available.
         if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
             this.logger.info(`${this}reusing existing session from existing credentials`)

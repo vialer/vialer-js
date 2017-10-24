@@ -302,6 +302,8 @@ class Sip {
 
         // Get the current account ids from localstorage.
         let widgetState = this.app.store.get('widgets')
+        // The SIP stack already started, but the contacts were not filled yet.
+        if (!widgetState || !widgetState.contacts || !widgetState.contacts.list) return
         let accountIds = widgetState.contacts.list.map((c) => c.account_id)
 
         if (refresh) {

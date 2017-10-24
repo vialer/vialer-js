@@ -161,7 +161,7 @@ class QueuesModule {
         let widgetState = this.app.store.get('widgets')
         this.sizes = {}
 
-        if (!Object.keys(widgetState.queues).length) {
+        if (!widgetState || !widgetState.queues || !Object.keys(widgetState.queues).length) {
             // No widget state. Empty the list.
             this.app.emit('queues:empty')
         } else if (widgetState.queues.unauthorized) {
