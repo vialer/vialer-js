@@ -5,10 +5,7 @@ class Store {
 
     constructor(app) {
         this.app = app
-    }
-
-    reset() {
-        localStorage.clear()
+        this.dbSchema = '1.0'
     }
 
 
@@ -22,12 +19,6 @@ class Store {
     }
 
 
-    set(key, value) {
-        if (this.app.verbose) this.app.logger.debug(`${this}set ${value} for ${key}`)
-        localStorage.setItem(key, JSON.stringify(value))
-    }
-
-
     remove(key) {
         if (this.get(key)) {
             localStorage.removeItem(key)
@@ -35,8 +26,31 @@ class Store {
     }
 
 
+    reset() {
+        localStorage.clear()
+    }
+
+
+    set(key, value) {
+        if (this.app.verbose) this.app.logger.debug(`${this}set ${value} for ${key}`)
+        localStorage.setItem(key, JSON.stringify(value))
+    }
+
+
     toString() {
         return `${this.app}[store] `
+    }
+
+
+    validSchema() {
+        let schema = this.get('db_schema')
+        if (!schema || schema !== this.dbSchema) {
+            this.set('db_schema', this.dbSchema)
+            this.app.logger.warn(`${this}clear data (schema change)`)
+            return false
+        }
+
+        return true
     }
 }
 

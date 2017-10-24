@@ -40,6 +40,7 @@ class UserModule {
                 this.app.emit('user:login.success', {user: user}, 'both')
                 // Reset seen notifications.
                 let notificationsData = this.app.store.get('notifications')
+                if (!notificationsData) notificationsData = {}
                 notificationsData.unauthorized = false
                 this.app.store.set('notifications', notificationsData)
                 // Start loading the widgets.
@@ -61,9 +62,12 @@ class UserModule {
         this.app.logger.info(`${this}logout`)
         this.app.modules.ui.resetWidgetState()
         this.app.resetModules()
+        // Remove credentials for basic auth.
         this.app.store.remove('user')
         this.app.store.remove('password')
-
+        // Remove cached sip status.
+        this.app.store.remove('sip')
+        // Remove the widget cache.
         this.app.store.remove('widgets')
         this.app.emit('user:logout.success')
         this.app.api.setupClient()

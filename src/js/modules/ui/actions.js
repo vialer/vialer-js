@@ -171,6 +171,9 @@ class UiActions extends Actions {
             this._checkCloseMainPanel()
         })
 
+        if (!this.app.store.validSchema()) {
+            this.app.emit('user:logout.attempt')
+        }
 
         // Switch between logged-in and login state.
         if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
