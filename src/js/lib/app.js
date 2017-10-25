@@ -76,13 +76,13 @@ class App extends Skeleton {
 
     /**
     * Get realm websocket URL from brand settings or set default.
-    * @returns {String} - The cleaned up websocket URL.
+    * @returns {String} - The websocket URL.
     */
     getWebsocketUrl() {
         let websocketUrl = this.store.get('realm')
 
         if (!websocketUrl) {
-            // Set a default platform url from the brand when it's not set.
+            // Set a default websocket url from the brand when it's not set.
             websocketUrl = process.env.SIP_ENDPOINT
             this.store.set('realm', websocketUrl)
         }
