@@ -28,7 +28,7 @@
             <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.0.14
+                v2.0.15
             
             </span>
         </div>
@@ -213,16 +213,10 @@ developer, in order to push to one of the stores.</p>
 <p>To be able to push to npm, an authorized developer first have to login to the
 <code>Spindle</code> npm account.</p>
 <pre class="prettyprint source lang-bash"><code>npm login</code></pre><h2>Public release</h2><ol>
-<li><p>Uupdate the <code>CHANGELOG.md</code> with all the changes since the last version</p>
+<li><p>Update the <code>CHANGELOG.md</code> with all the changes since the last version</p>
 </li>
-<li><p>Check the build integrity of the plugin:</p>
-<pre class="prettyprint source lang-bash"><code> ./test_build.sh
- # Should show this at the end:
- # Build integrity check passed...</code></pre></li>
-<li><p>Bump the version and create git tags.</p>
+<li><p>Bump the version:</p>
 <pre class="prettyprint source lang-bash"><code>npm version patch
-# Tag the version.
-git tag v2.x.x
 git push origin 2.x.x
 git push origin master</code></pre></li>
 <li><p>Publish the Chrome version. Specify <code>default</code> as audience to publish the
@@ -242,25 +236,8 @@ store.</p>
 <li><p>Go to the Mozilla addons <a href="https://addons.mozilla.org/nl/developers/addon/vialer-js/versions">versions page</a>
 and open the detail view for the newly uploaded version.</p>
 <ul>
-<li>Set Compatibility to Firefox only, remove Firefox for Android and pin from Firefox 50 up.</li>
-<li>Copy the changes from <code>CHANGELOG.md</code> to the Release notes (for the users).</li>
-<li><p>Add the following template to the Release notes for developers:</p>
-<pre class="prettyprint source lang-bash"><code>To confirm contents xpi and sources.zip:
-node -v
-# v8.6.0
-npm -v
-# 5.4.2
-unzip vialer-js-*.xpi -d /tmp/vialer-js-xpi-unzipped
-unzip sources.zip -d /tmp/vialer-js-sources-unzipped
-cd /tmp/vialer-js-sources-unzipped
-npm i
-cp src/brand.json.example src/brand.json
-NODE_ENV=production gulp build --target firefox
-cd -
-diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox
-rm -Rf /tmp/vialer-js*</code></pre><ul>
-<li>Upload sources.zip</li>
-</ul>
+<li>Set Compatibility to Firefox only.</li>
+<li><p>Copy the changes from <code>CHANGELOG.md</code> to the Release notes (for the users).</p>
 <p>For help and questions about the reviewing process, you can contact an AMO-editor
 on <a href="irc://mozilla.org/%23amo">irc</a>.</p>
 </li>
