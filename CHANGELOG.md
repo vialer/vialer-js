@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 2.0.14
+* Fixed websocket reconnection issue. 
+
 ## Version 2.0.13
 * [101](https://github.com/VoIPGRID/vialer-js/issues/101): Add db schema check to account for old localstorage data.
   User will automatically be logged out if the db schema in the application doesn't match with the one in localstorage.
