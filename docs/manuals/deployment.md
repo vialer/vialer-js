@@ -54,21 +54,12 @@ npm login
    gulp deploy --target firefox
    ```
 
-   No worries when you see a message about a failure to sign the plugin. A new
-   plugins version can't be signed utomatically when it's listed in the addons
-   store.
+5. Update the github pages hosted documentation
 
-5. Go to the Mozilla addons [versions page](https://addons.mozilla.org/nl/developers/addon/vialer-js/versions)
-   and open the detail view for the newly uploaded version.
+  ```bash
+  gulp docs-deploy
+  ```
 
-   * Set Compatibility to Firefox only.
-   * Copy the changes from `CHANGELOG.md` to the Release notes (for the users).
 
-    For help and questions about the reviewing process, you can contact an AMO-editor
-    on [irc](irc://mozilla.org/%23amo).
-
-7. Update the github pages hosted documentation
-
-   ```bash
-   gulp docs-deploy
-   ```
+For help and questions about the reviewing process, you can contact an AMO-editor
+on [irc](irc://mozilla.org/%23amo).
