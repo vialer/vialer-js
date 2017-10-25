@@ -75,6 +75,23 @@ class App extends Skeleton {
 
 
     /**
+    * Get realm websocket URL from brand settings or set default.
+    * @returns {String} - The cleaned up websocket URL.
+    */
+    getWebsocketUrl() {
+        let websocketUrl = this.store.get('realm')
+
+        if (!websocketUrl) {
+            // Set a default platform url from the brand when it's not set.
+            websocketUrl = process.env.SIP_ENDPOINT
+            this.store.set('realm', websocketUrl)
+        }
+
+        return websocketUrl
+    }
+
+
+    /**
     * Reload all modules that have this method implemented.
     * @param {Boolean} update - Module indicator to update instead of (re)load.
     */
@@ -136,7 +153,7 @@ class App extends Skeleton {
             analyticsId: 'UA-60726618-9',
             c2d: 'true',
             platformUrl: this.getPlatformUrl(),
-            realm: process.env.SIP_ENDPOINT,
+            realm: this.getWebsocketUrl(),
         }
         this.timer = new Timer(this)
         if (this.env.extension) {

@@ -148,17 +148,12 @@ class Sip {
             this.updatePresence()
             break
         case tsip_event_code_e.STACK_STOPPED:
-            // This event is triggered twice somehow. Flag is resetted when
-            // connected again.
-            if (this.stopped) {
-                this.app.emit('sip:stopped', {}, 'both')
+            this.app.emit('sip:stopped', {}, 'both')
 
-                if (this.reconnect) {
-                    setTimeout(this.connect.bind(this), this.retry.interval)
-                    this.retry = this.app.timer.increaseTimeout(this.retry)
-                }
+            if (this.reconnect) {
+                setTimeout(this.connect.bind(this), this.retry.interval)
+                this.retry = this.app.timer.increaseTimeout(this.retry)
             }
-            this.stopped = true
             break
         }
     }
