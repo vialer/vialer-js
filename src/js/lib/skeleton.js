@@ -46,7 +46,7 @@ class Skeleton extends EventEmitter {
 
         // Sets the verbosity of the logger.
         if (process.env.NODE_ENV === 'production') {
-            this.logger.setLevel('warn')
+            this.logger.setLevel('error')
         } else {
             this.logger.info(`${this}loglevel set to debug`)
             this.logger.setLevel('debug')

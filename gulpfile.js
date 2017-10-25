@@ -49,13 +49,15 @@ const BUILD_TARGET = argv.target ? argv.target : 'chrome'
 const BUILD_TARGETS = ['chrome', 'firefox', 'electron']
 const DISTRIBUTION_NAME = `${PACKAGE.name.toLowerCase()}-${PACKAGE.version}.zip`
 const GULPACTION = argv._[0]
-const NODE_ENV = process.env.NODE_ENV || 'development'
+
 const NODE_PATH = path.join(__dirname, 'node_modules') || process.env.NODE_PATH
 const SRC_DIR = path.join(__dirname, 'src')
 const WATCHLINKED = argv.linked ? argv.linked : false
 const WITHDOCS = argv.docs ? argv.docs : false
 
 let BRAND = require('./src/brand.json')
+let PRODUCTION
+let NODE_ENV
 
 // Switches extra applicationverbosity on/off.
 let VERBOSE = false
@@ -75,11 +77,17 @@ if (!BUILD_TARGETS.includes(BUILD_TARGET)) {
 }
 gutil.log(`Build target: ${BUILD_TARGET}`)
 
-let PRODUCTION
-// Possibility to force the production flag when running certain tasks from
+
+// Force production mode when running certain tasks from
 // the commandline. Use this with care.
-if (['deploy', 'build-dist'].includes(GULPACTION)) PRODUCTION = true
-else PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
+if (['deploy', 'build-dist'].includes(GULPACTION)) {
+    PRODUCTION = true
+    process.env.NODE_ENV = 'production'
+} else {
+    PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
+}
+
+NODE_ENV = process.env.NODE_ENV || 'development'
 
 // Notify developer about some essential build presets.
 if (PRODUCTION) gutil.log('(!) Gulp optimized for production')
