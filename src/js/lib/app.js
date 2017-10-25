@@ -23,7 +23,7 @@ class App extends Skeleton {
 
         // Clears localstorage if the schema changed after a plugin update.
         if (!this.store.validSchema()) {
-            this.app.modules.user.logout()
+            this.modules.user.logout()
             return
         }
 
