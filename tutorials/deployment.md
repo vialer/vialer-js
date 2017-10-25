@@ -25,14 +25,6 @@ npm login
 
 ## Public release
 1. Uupdate the `CHANGELOG.md` with all the changes since the last version
-2. Bump the version and create git tags.
-
-   ```bash
-   npm version patch
-   # Tag the version.
-   git tag v2.x.x
-   git push origin 2.x.x
-   ```
 
 2. Check the build integrity of the plugin:
 
@@ -42,6 +34,15 @@ npm login
     # Build integrity check passed...
     ```
 
+3. Bump the version and create git tags.
+
+   ```bash
+   npm version patch
+   # Tag the version.
+   git tag v2.x.x
+   git push origin 2.x.x
+   git push origin master
+   ```
 
 4. Publish the Chrome version. Specify `default` as audience to publish the
    version to the world. The default audience is `trustedTesters` and will only
@@ -70,7 +71,7 @@ npm login
 6. Go to the Mozilla addons [versions page](https://addons.mozilla.org/nl/developers/addon/vialer-js/versions)
    and open the detail view for the newly uploaded version.
 
-   * Set Compatibility to Firefox only, and pin it to Firefox 57 and upwards.
+   * Set Compatibility to Firefox only, remove Firefox for Android and pin from Firefox 50 up.
    * Copy the changes from `CHANGELOG.md` to the Release notes (for the users).
    * Add the following template to the Release notes for developers:
 
@@ -90,6 +91,7 @@ npm login
     diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox
     rm -Rf /tmp/vialer-js*
     ```
+    * Upload sources.zip
 
     For help and questions about the reviewing process, you can contact an AMO-editor
     on [irc](irc://mozilla.org/%23amo).

@@ -29,7 +29,7 @@
             <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.0.12
+                v2.0.14
             
             </span>
         </div>
@@ -101,7 +101,7 @@
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="App.html">App</a>
-                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#getWebsocketUrl">getWebsocketUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="CallStatusApp.html">CallStatusApp</a>
@@ -246,7 +246,7 @@ class Skeleton extends EventEmitter {
 
         // Sets the verbosity of the logger.
         if (process.env.NODE_ENV === 'production') {
-            this.logger.setLevel('warn')
+            this.logger.setLevel('error')
         } else {
             this.logger.info(`${this}loglevel set to debug`)
             this.logger.setLevel('debug')

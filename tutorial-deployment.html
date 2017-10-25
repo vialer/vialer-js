@@ -28,7 +28,7 @@
             <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.0.12
+                v2.0.14
             
             </span>
         </div>
@@ -100,7 +100,7 @@
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="App.html">App</a>
-                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#getWebsocketUrl">getWebsocketUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="CallStatusApp.html">CallStatusApp</a>
@@ -213,18 +213,18 @@ developer, in order to push to one of the stores.</p>
 <p>To be able to push to npm, an authorized developer first have to login to the
 <code>Spindle</code> npm account.</p>
 <pre class="prettyprint source lang-bash"><code>npm login</code></pre><h2>Public release</h2><ol>
-<li>Uupdate the <code>CHANGELOG.md</code> with all the changes since the last version</li>
-<li><p>Bump the version and create git tags.</p>
-<pre class="prettyprint source lang-bash"><code>npm version patch
-# Tag the version.
-git tag v2.x.x
-git push origin 2.x.x</code></pre></li>
+<li><p>Uupdate the <code>CHANGELOG.md</code> with all the changes since the last version</p>
+</li>
 <li><p>Check the build integrity of the plugin:</p>
 <pre class="prettyprint source lang-bash"><code> ./test_build.sh
  # Should show this at the end:
  # Build integrity check passed...</code></pre></li>
-</ol>
-<ol>
+<li><p>Bump the version and create git tags.</p>
+<pre class="prettyprint source lang-bash"><code>npm version patch
+# Tag the version.
+git tag v2.x.x
+git push origin 2.x.x
+git push origin master</code></pre></li>
 <li><p>Publish the Chrome version. Specify <code>default</code> as audience to publish the
 version to the world. The default audience is <code>trustedTesters</code> and will only
 be visible on a per-user basis.</p>
@@ -242,7 +242,7 @@ store.</p>
 <li><p>Go to the Mozilla addons <a href="https://addons.mozilla.org/nl/developers/addon/vialer-js/versions">versions page</a>
 and open the detail view for the newly uploaded version.</p>
 <ul>
-<li>Set Compatibility to Firefox only, and pin it to Firefox 57 and upwards.</li>
+<li>Set Compatibility to Firefox only, remove Firefox for Android and pin from Firefox 50 up.</li>
 <li>Copy the changes from <code>CHANGELOG.md</code> to the Release notes (for the users).</li>
 <li><p>Add the following template to the Release notes for developers:</p>
 <pre class="prettyprint source lang-bash"><code>To confirm contents xpi and sources.zip:
@@ -258,7 +258,10 @@ cp src/brand.json.example src/brand.json
 NODE_ENV=production gulp build --target firefox
 cd -
 diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox
-rm -Rf /tmp/vialer-js*</code></pre><p>For help and questions about the reviewing process, you can contact an AMO-editor
+rm -Rf /tmp/vialer-js*</code></pre><ul>
+<li>Upload sources.zip</li>
+</ul>
+<p>For help and questions about the reviewing process, you can contact an AMO-editor
 on <a href="irc://mozilla.org/%23amo">irc</a>.</p>
 </li>
 </ul>

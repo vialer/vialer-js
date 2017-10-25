@@ -29,7 +29,7 @@
             <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.0.12
+                v2.0.14
             
             </span>
         </div>
@@ -101,7 +101,7 @@
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="App.html">App</a>
-                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#getWebsocketUrl">getWebsocketUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="CallStatusApp.html">CallStatusApp</a>
@@ -205,10 +205,7 @@ class Store {
 
     constructor(app) {
         this.app = app
-    }
-
-    reset() {
-        localStorage.clear()
+        this.dbSchema = '1.0'
     }
 
 
@@ -222,12 +219,6 @@ class Store {
     }
 
 
-    set(key, value) {
-        if (this.app.verbose) this.app.logger.debug(`${this}set ${value} for ${key}`)
-        localStorage.setItem(key, JSON.stringify(value))
-    }
-
-
     remove(key) {
         if (this.get(key)) {
             localStorage.removeItem(key)
@@ -235,8 +226,31 @@ class Store {
     }
 
 
+    reset() {
+        localStorage.clear()
+    }
+
+
+    set(key, value) {
+        if (this.app.verbose) this.app.logger.debug(`${this}set ${value} for ${key}`)
+        localStorage.setItem(key, JSON.stringify(value))
+    }
+
+
     toString() {
         return `${this.app}[store] `
+    }
+
+
+    validSchema() {
+        let schema = this.get('db_schema')
+        if (!schema || schema !== this.dbSchema) {
+            this.set('db_schema', this.dbSchema)
+            this.app.logger.warn(`${this}clear data (schema change)`)
+            return false
+        }
+
+        return true
     }
 }
 
