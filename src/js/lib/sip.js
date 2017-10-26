@@ -24,25 +24,53 @@ class Sip {
         this.subscriptions = {}
         // Start the SIP stack ASAP when logged in.
         if (app.store.get('user') && app.store.get('username') && app.store.get('password')) {
-            this.connect()
+            SIPml.init((e) => {
+                this.connect()
+            }, (e) => {
+                this.app.logger.error(`${this}failed to initialize the engine: ${e.message}`)
+            })
         }
     }
 
 
     /**
-     * Connect SipML5 to the websocket SIP backend.
-     */
+    * Init and start a new stack, connecting
+    * SipML5 to the websocket SIP backend.
+    */
     connect() {
         // Emit to the frontend that the sip client is not yet
         // ready to start.
         if (this.status === 'started') {
             this.app.logger.warn(`${this}already connected to sip backend`)
-        } else {
-            this.app.logger.debug(`${this}connecting to sip backend`)
-            this.app.emit('sip:before_start', {})
-            if (!this._sip) this.initStack()
-            else this._sip.start()
+            return
         }
+
+        this.app.logger.debug(`${this}connecting to sip backend`)
+        this.app.emit('sip:before_start', {})
+
+        this._stopped = false
+
+        let userAgent = `Click-to-dial v${this.app.version()}`
+        let user = this.app.store.get('user')
+
+        this._sip = new SIPml.Stack({
+            display_name: '',
+            enable_rtcweb_breaker: false,
+            events_listener: {
+                events: '*',
+                listener: this.sipStatusEvent.bind(this),
+            },
+            impi: user.email, // authorization name (IMS Private Identity)
+            impu: `sip:${user.email}@${this.app.settings.realm}`, // valid SIP Uri (IMS Public Identity)
+            password: user.token,
+            realm: this.app.settings.realm, // domain name
+            sip_headers: [
+                { name: 'User-Agent', value: userAgent},
+                { name: 'Organization', value: 'VoIPGRID'},
+            ],
+            websocket_proxy_url: `wss://${this.app.settings.realm}`,
+        })
+        this._sip.start()
     }
 
 
@@ -61,55 +89,12 @@ class Sip {
                 this.unsubscribePresence(accountId)
             })
         }
-        if (this._sip) {
+        if (this._sip && this._sip.stop(0) === 0) {
             // A succesful disconnect returns 0.
-            if (this._sip.stop(0) === 0) {
-                this.app.logger.debug(`${this}disconnect`)
-            }
+            this.app.logger.debug(`${this}disconnect`)
         } else {
             this.app.logger.debug(`${this}not (yet) connected`)
         }
-    }
-
-
-    /**
-    * Init and start a new stack.
-    */
-    initStack() {
-        this.app.logger.debug(`${this}init SIP stack`)
-        this.stopped = false
-        // The sip stack was already initialized. Just reconnect.
-        if (this._sip) {
-            this.app.logger.warn(`${this}SIP stack is already active`)
-            return
-        }
-
-        SIPml.init((e) => {
-            this.app.logger.debug(`${this}SIP stack created`)
-            let userAgent = `Click-to-dial v${this.app.version()}`
-            let user = this.app.store.get('user')
-
-            this._sip = new SIPml.Stack({
-                display_name: '',
-                enable_rtcweb_breaker: false,
-                events_listener: {
-                    events: '*',
-                    listener: this.sipStatusEvent.bind(this),
-                },
-                impi: user.email, // authorization name (IMS Private Identity)
-                impu: `sip:${user.email}@${this.app.settings.realm}`, // valid SIP Uri (IMS Public Identity)
-                password: user.token,
-                realm: this.app.settings.realm, // domain name
-                sip_headers: [
-                    { name: 'User-Agent', value: userAgent},
-                    { name: 'Organization', value: 'VoIPGRID'},
-                ],
-                websocket_proxy_url: `wss://${this.app.settings.realm}`,
-            })
-            this._sip.start()
-        }, (event) => {
-            this.app.logger.error(`${this}failed to initialize the engine: ${event.message}`)
-        })
     }
 
 
@@ -148,11 +133,15 @@ class Sip {
             this.updatePresence()
             break
         case tsip_event_code_e.STACK_STOPPED:
-            this.app.emit('sip:stopped', {}, 'both')
+            if (!this._stopped) {
+                this.app.emit('sip:stopped', {}, 'both')
 
-            if (this.reconnect) {
-                setTimeout(this.connect.bind(this), this.retry.interval)
-                this.retry = this.app.timer.increaseTimeout(this.retry)
+                if (this.reconnect) {
+                    setTimeout(this.connect.bind(this), this.retry.interval)
+                    this.retry = this.app.timer.increaseTimeout(this.retry)
+                }
+
+                this._stopped = true
             }
             break
         }
