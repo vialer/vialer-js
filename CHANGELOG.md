@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 2.0.16
+* Fix websocket reconnection issue (for real, hopefully!)
+
+## Version 2.0.15
+* Fix invalid call to modules.
+
 ## Version 2.0.14
 * Fixed websocket reconnection issue. 
 
