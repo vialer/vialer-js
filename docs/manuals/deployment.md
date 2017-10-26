@@ -34,9 +34,8 @@ npm login
    git push origin master
    ```
 
-3. Publish the Chrome version. Specify `default` as audience to publish the
-   version to the world. The default audience is `trustedTesters` and will only
-   be visible on a per-user basis.
+3. Publish the Chrome version. Specify `trustedTesters` as audience to publish the
+   version to the testers. Specify `default` to publish to the world.
 
    ```bash
    gulp deploy --target chrome --audience default
