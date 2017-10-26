@@ -9,6 +9,7 @@
     },
     "chrome": {
         "extensionId": "",
+        "extensionId_test": "",
         "clientId": "",
         "clientSecret": "",
         "refreshToken": ""

@@ -262,10 +262,21 @@ gulp.task('deploy', (done) => {
         runSequence('build-dist', async function() {
             const api = DEPLOY_SETTINGS.chrome
             const zipFile = fs.createReadStream(`./dist/${BUILD_TARGET}/${DISTRIBUTION_NAME}`)
+
+            let targetExtension
+
+            // Deploy to production environment.
+            if (DEPLOY_SETTINGS.audience === 'default') {
+                targetExtension = api.extensionId
+            } else {
+                // Deploy to test extension.
+                targetExtension = api.extensionId_test
+            }
+
             const webStore = require('chrome-webstore-upload')({
                 clientId: api.clientId,
                 clientSecret: api.clientSecret,
-                extensionId: api.extensionId,
+                extensionId: targetExtension,
                 refreshToken: api.refreshToken,
             })
 
@@ -274,11 +285,15 @@ gulp.task('deploy', (done) => {
 
             if (res.uploadState !== 'SUCCESS') {
                 gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
-            } else {
-                gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
-                // The default value is `trustedTesters`. Make it `default` to
-                // publish to a broader audience.
-                const _res = await webStore.publish(DEPLOY_SETTINGS.audience, token)
+                return
+            }
+
+            gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
+            // Chrome store has a distinction to publish for `trustedTesters` and
+            // `default`(world). Instead, we use a separate extension which
+            // gives us more control over the release process.
+            try {
+                const _res = await webStore.publish('default', token)
                 if (_res.status.includes('OK')) {
                     // eslint-disable-next-line max-len
                     gutil.log(`Succesfully published extension version ${PACKAGE.version} for ${DEPLOY_SETTINGS.audience}.`)
@@ -286,6 +301,8 @@ gulp.task('deploy', (done) => {
                 } else {
                     gutil.log(`An error occured during publishing: ${JSON.stringify(_res, null, 4)}`)
                 }
+            } catch (err) {
+                gutil.log(err)
             }
         })
     } else if (BUILD_TARGET === 'firefox') {
