@@ -19,17 +19,48 @@ class Sip {
         // fatal.
         SIPml.setDebugLevel('error')
 
+        // This flag indicates whether a reconnection attempt will be
+        // made when the websocket connection is gone.
         this.reconnect = true
+
         this.states = {}
         this.subscriptions = {}
-        // Start the SIP stack ASAP when logged in.
-        if (app.store.get('user') && app.store.get('username') && app.store.get('password')) {
-            SIPml.init((e) => {
-                this.connect()
-            }, (e) => {
-                this.app.logger.error(`${this}failed to initialize the engine: ${e.message}`)
-            })
-        }
+
+        // The default connection timeout to start with.
+        this.retryDefault = {interval: 2500, limit: 9000000}
+        // Used to store retry state.
+        this.retry = Object.assign({}, this.retryDefault)
+
+        // Periodically checks the websocket status.
+        this.app.timer.registerTimer('sip.check_connection', () => {
+            // A connection attempt without user credentials is useless.
+            if (app.hasCredentials()) {
+                // The current status is disconnect and we want to reconnect.
+                if (this.reconnect && this.status === 'stopped') {
+                    this.connect()
+                    // Increase the (jittered) timeout before the next connection
+                    // attempt is made. The timeout is reset when a connection
+                    // was succesfully established (`STACK_STARTED`).
+                    // The reason for this is to offload the websocket server
+                    // when a lot of clients try to (re)connect at once.
+                    this.retry = this.app.timer.increaseTimeout(this.retry)
+                    this.app.timer.setTimeout('sip.check_connection', this.retry.timeout)
+                }
+            }
+            this.app.timer.startTimer('sip.check_connection')
+        })
+
+        // Set the initial connection check timer.
+        this.app.timer.setTimeout('sip.check_connection', this.retryDefault.interval)
+        this.app.timer.startTimer('sip.check_connection')
+
+        SIPml.init((e) => {
+            // Connect the websocket when credentials are set. Otherwise
+            // the connection is made when logging in.
+            if (app.hasCredentials()) this.connect()
+        }, (e) => {
+            this.app.logger.error(`${this}failed to initialize the SIP engine: ${e.message}`)
+        })
     }
 
 
@@ -40,17 +71,14 @@ class Sip {
     connect() {
         // Emit to the frontend that the sip client is not yet
         // ready to start.
-        if (this.status === 'started') {
-            this.app.logger.warn(`${this}already connected to sip backend`)
+        if (['started', 'starting'].includes(this.status)) {
+            this.app.logger.warn(`${this}sip backend already starting or started`)
             return
         }
 
         this.app.logger.debug(`${this}connecting to sip backend`)
         this.app.emit('sip:before_start', {})
 
-        this._stopped = false
-
-        let userAgent = `Click-to-dial v${this.app.version()}`
         let user = this.app.store.get('user')
 
         this._sip = new SIPml.Stack({
@@ -65,7 +93,7 @@ class Sip {
             password: user.token,
             realm: this.app.settings.realm, // domain name
             sip_headers: [
-                { name: 'User-Agent', value: userAgent},
+                { name: 'User-Agent', value: `Click-to-dial v${this.app.version()}`},
                 { name: 'Organization', value: 'VoIPGRID'},
             ],
             websocket_proxy_url: `wss://${this.app.settings.realm}`,
@@ -104,46 +132,42 @@ class Sip {
     * the websocket proxy.
     */
     sipStatusEvent(e) {
-        let retryTimeoutDefault = {interval: 2500, limit: 9000000}
-        if (!this.retry) this.retry = Object.assign({}, retryTimeoutDefault)
         this.status = e.type
-
         // Keep the websocket connection status in sync with localstorage.
         this.app.store.set('sip', {status: this.status})
 
-        switch (e.o_event.i_code) {
-        case tsip_event_code_e.STACK_STARTING:
-            this.app.logger.info(`${this}SIP stack starting`)
-            this.app.emit('sip:starting', {}, 'both')
-            break
-        case tsip_event_code_e.STACK_FAILED_TO_START:
-            this.app.logger.warn(`${this}SIP stack failed to start`)
-            this.app.emit('sip:failed_to_start', {}, 'both')
-            if (this.reconnect) {
-                setTimeout(this.connect.bind(this), this.retry.interval)
-                this.retry = this.app.timer.increaseTimeout(this.retry)
-            }
-            break
-        case tsip_event_code_e.STACK_STARTED:
-            this.app.logger.info(`${this}SIP stack started`)
-            // Reset the retry timer.
-            this.retry = Object.assign({}, retryTimeoutDefault)
-            this.app.emit('sip:started', {}, 'both')
-            // Start updating presence information.
-            this.updatePresence()
-            break
-        case tsip_event_code_e.STACK_STOPPED:
-            if (!this._stopped) {
-                this.app.emit('sip:stopped', {}, 'both')
+        // SipML5 hack to trigger STACK_STOPPED event logic just once.
+        if (e.o_event.i_code !== tsip_event_code_e.STACK_STOPPED) this._stopped = false
 
-                if (this.reconnect) {
-                    setTimeout(this.connect.bind(this), this.retry.interval)
-                    this.retry = this.app.timer.increaseTimeout(this.retry)
+        switch (e.o_event.i_code) {
+            case tsip_event_code_e.STACK_STARTING:
+                this._stopped = false
+                this.app.logger.info(`${this}SIP stack starting`)
+                this.app.emit('sip:starting', {}, 'both')
+                break
+            case tsip_event_code_e.STACK_FAILED_TO_START:
+                this._stopped = false
+                this.app.logger.warn(`${this}SIP stack failed to start`)
+                this.app.emit('sip:failed_to_start', {}, 'both')
+                break
+            case tsip_event_code_e.STACK_STARTED:
+                this._stopped = false
+                this.app.logger.info(`${this}SIP stack started`)
+                // Reset the connection retry timer.
+                this.retry = Object.assign({}, this.retryDefault)
+                this.app.emit('sip:started', {}, 'both')
+                // Start updating presence information.
+                this.updatePresence()
+                break
+            case tsip_event_code_e.STACK_STOPPED:
+                // SipML5 hack to trigger STACK_STOPPED event logic just once.
+                if (!this._stopped) {
+                    this.app.logger.info(`${this}SIP stack stopped`)
+                    this.app.emit('sip:stopped', {}, 'both')
                 }
 
                 this._stopped = true
-            }
-            break
+                break
         }
     }
 
@@ -180,17 +204,17 @@ class Sip {
                 // State node has final say, regardless of stateAttr!
                 if (stateNode) {
                     switch (stateNode.textContent) {
-                    case 'trying':
-                    case 'proceeding':
-                    case 'early':
-                        state = 'ringing'
-                        break
-                    case 'confirmed':
-                        state = 'busy'
-                        break
-                    case 'terminated':
-                        state = 'available'
-                        break
+                        case 'trying':
+                        case 'proceeding':
+                        case 'early':
+                            state = 'ringing'
+                            break
+                        case 'confirmed':
+                            state = 'busy'
+                            break
+                        case 'terminated':
+                            state = 'available'
+                            break
                     }
                 }
 
@@ -279,6 +303,8 @@ class Sip {
     * @param {Boolean} refresh - Force refreshing presence from the sip service.
     */
     async updatePresence(refresh) {
+        // The transport must be ready, in order to be able to update
+        // presence information from the SIP server.
         if (this.status !== 'started') {
             this.app.logger.warn(`${this}cannot update presence without websocket connection.`)
             return
@@ -298,9 +324,12 @@ class Sip {
             }
             this.states = {}
         } else {
-            // Set the current cached in the UI early on.
+            // Notify the current cached presence to the UI asap.
             for (let accountId in this.states) {
-                this.app.emit('sip:presence.update', {account_id: accountId, state: this.states[accountId].state})
+                this.app.emit('sip:presence.update', {
+                    account_id: accountId,
+                    state: this.states[accountId].state,
+                })
             }
         }
 
@@ -318,6 +347,7 @@ class Sip {
 
         if (accountIdsWithoutState.length) {
             this.app.emit('sip:presences.start_update')
+
             for (const accountId of accountIdsWithoutState) {
                 // We could do this in parallel, but we don't to keep the load on
                 // the websocket server low. Also subscribePresence has a fixed

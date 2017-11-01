@@ -23,8 +23,9 @@ class ContactsActions extends Actions {
         _$.searchInput = _$.widget.find('.search input')
         _$.statusIndicators = _$.widget.find('.status-indicators')
 
-        // The SIP websocket connection is not yet started at this point.
-        // Show the disconnected icon until a connected event occurs.
+        // Get the synced SIP websocket connection status from localstorage.
+        // Show the disconnected icon at startup when the websocket is
+        // not yet started.
         if (this.app.store.get('sip') && this.app.store.get('sip').status !== 'started') {
             _$.widget.find('.disconnected-status').removeClass('hide')
         }
@@ -110,7 +111,7 @@ class ContactsActions extends Actions {
          * Show a blinking presence loading icon while updating.
          */
         this.app.on('sip:presences.start_update', (data) => {
-            _$.statusIndicators.find('i').addClass('hide').filter('.updating-presence-status').removeClass('hide')
+            _$.statusIndicators.find('.updating-presence-status').removeClass('hide')
         })
 
         /**

@@ -129,8 +129,7 @@ class Timer {
                 registeredTimers[timerId].timer.timeout = setTimeout(timerFunction, timeout)
             }
         }
-        this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
-
+        if (this.app.verbose) this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
     }
 
 
@@ -142,7 +141,7 @@ class Timer {
                 registeredTimers[timerId].timer.interval = null
             }
             if (registeredTimers[timerId].timer.timeout) {
-                this.app.logger.debug(`${this}clearing timeout timer ${timerId}`)
+                if (this.app.verbose) this.app.logger.debug(`${this}clearing timeout timer ${timerId}`)
                 clearTimeout(registeredTimers[timerId].timer.timeout)
                 registeredTimers[timerId].timer.timeout = null
             }
@@ -174,7 +173,7 @@ class Timer {
         }
 
         retry.timeout = retry.interval + jitter(retry.interval, 30)
-        this.app.logger.debug(`${this}increase timeout interval to '${retry.interval}'`)
+        if (this.app.verbose) this.app.logger.debug(`${this}increase timeout to '${retry.timeout}'`)
         return retry
     }
 

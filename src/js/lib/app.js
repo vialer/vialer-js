@@ -92,6 +92,18 @@ class App extends Skeleton {
 
 
     /**
+     * Check to see if the basic auth credentials are all available.
+     * @returns {Boolean} - True if username and password are present.
+     */
+    hasCredentials() {
+        if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
+            return true
+        }
+        return false
+    }
+
+
+    /**
     * Reload all modules that have this method implemented.
     * @param {Boolean} update - Module indicator to update instead of (re)load.
     */
