@@ -55,7 +55,7 @@ class UiActions extends Actions {
             this.app.logger.info(`${this}mainpanel.settings`)
             this.app.api.client.get('api/autologin/token/').then((res) => {
                 let path = `client/${this.app.store.get('user').client_id}/user/${this.app.store.get('user').id}/change/#tc0=user-tab-2` // eslint-disable-line max-len
-                if (res.data) {
+                if (res.data.token) {
                     const token = res.data.token
                     path = `user/autologin/?token=${token}&username=${this.app.store.get('username')}&next=/${path}`
                 }
