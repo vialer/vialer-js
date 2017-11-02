@@ -96,7 +96,7 @@
             }
 
             .unauthorized-icon {
-                color: $vg-info-color-failed-dark;
+                color: $vg-button-failed-text-color;
                 display: inline-block;
             }
         }
@@ -191,7 +191,7 @@
                     position: absolute;
                     line-height: $vg-widget-header-size;
                     right: 0;
-                    color: $vg-info-color-success-dark;
+                    color: $vg-state-available-color;
                     font-size: 1.2em;
                     font-family: "click-to-dial";
                     content: $icon-check;

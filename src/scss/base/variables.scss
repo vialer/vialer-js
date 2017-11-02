@@ -11,7 +11,6 @@ $vg-spacing-12: 60px;
 // a 1.3rem centered font in a 45px box.
 $vg-spacing-gap: 13px;
 
-
 $vg-widget-header-size: 45px;
 $vg-widget-header-size-small: 30px;
 $vg-widget-header-size-combined: $vg-widget-header-size + $vg-widget-header-size-small;
@@ -33,21 +32,20 @@ $icon-check: "\e901";
 $icon-checkbox-checked: "\f046";
 $icon-checkbox-unchecked: "\f096";
 
-// Default colors; can be overriden by brand.json.
+// Default colors; can be overriden by vialer-jsrc
+$vg-button-failed-text-color: #d9534f !default;
+$vg-button-failed-background-color: lighten($vg-button-failed-text-color, 40%) !default;
+$vg-button-failed-border-color: lighten($vg-button-failed-text-color, 30%) !default;
+
+$vg-button-info-text-color: #31708f !default;
+$vg-button-info-background-color: lighten($vg-button-info-text-color, 40%) !default;
+$vg-button-info-border-color: lighten($vg-button-info-text-color, 30%) !default;
+
+$vg-grey-light: #999 !default;
+$vg-grey-lighter: #e5e5e5 !default;
+$vg-grey-lightest: #fbfbfb !default;
+
 $vg-primary-color: #3c3c50 !default;
 
-$vg-info-color-failed-dark: #d9534f !default;
-$vg-info-color-failed-light: lighten($vg-info-color-failed-dark, 30%) !default;
-$vg-info-color-failed-lighter: lighten($vg-info-color-failed-dark, 40%) !default;
-
-$vg-info-color-info-dark: #31708f !default;
-$vg-info-color-info-light: lighten($vg-info-color-info-dark, 30%) !default;
-$vg-info-color-info-lighter: lighten($vg-info-color-info-dark, 40%) !default;
-
-$vg-info-color-success-dark: #5cb85c !default;
-$vg-info-color-success-light: lighten($vg-info-color-success-dark, 30%) !default;
-$vg-info-color-success-lighter: lighten($vg-info-color-success-dark, 40%) !default;
-
-$vg-grey-lightest: #fbfbfb !default;
-$vg-grey-lighter: #e5e5e5 !default;
-$vg-grey-light: #999 !default;
+$vg-state-available-color: #5cb85c !default;
+$vg-state-busy-color: #d9534f !default;

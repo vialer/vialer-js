@@ -1,17 +1,43 @@
 {
-    "firefox": {
-        "gecko": {
-            "id": "",
-             "strict_min_version": "55.0"
-        },
-        "apiKey": "",
-        "apiSecret": ""
-    },
-    "chrome": {
-        "extensionId": "",
-        "extensionId_test": "",
-        "clientId": "",
-        "clientSecret": "",
-        "refreshToken": ""
+    "brands": {
+        "vialer": {
+            "permissions": "https://partner.voipgrid.nl/",
+            "sip_endpoint": "websocket.voipgrid.nl",
+            "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
+            "name": "Vialer",
+            "analytics_id": "",
+            "colors": {
+                "vg-button-failed-text-color": "#d9534f",
+                "vg-button-failed-background-color": "lighten($vg-button-failed-text-color, 40%)",
+                "vg-button-failed-border-color": "lighten($vg-button-failed-text-color, 30%)",
+                "vg-button-info-text-color": "#31708f",
+                "vg-button-info-background-color": "lighten($vg-button-info-text-color, 40%)",
+                "vg-button-info-border-color": "lighten($vg-button-info-text-color, 30%)",
+                "vg-grey-light": "#999",
+                "vg-grey-lighter": "#e5e5e5",
+                "vg-grey-lightest": "#fbfbfb",
+                "vg-primary-color": "#3c3c50",
+                "vg-state-available-color": "#5cb85c",
+                "vg-state-busy-color": "#d9534f"
+            },
+            "store": {
+                "firefox": {
+                    "gecko": {
+                        "id": "",
+                        "id_beta": "",
+                         "strict_min_version": "50.0"
+                    },
+                    "apiKey": "",
+                    "apiSecret": ""
+                },
+                "chrome": {
+                    "extensionId": "",
+                    "extensionId_beta": "",
+                    "clientId": "",
+                    "clientSecret": "",
+                    "refreshToken": ""
+                }
+            }
+        }
     }
 }

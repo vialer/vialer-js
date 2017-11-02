@@ -81,9 +81,9 @@ class AvailabilityModule {
                 this.app.logger.info(`${this}changed selected userdestination api request ok`)
 
                 // Set an icon depending on whether the user is available.
-                let icon = 'img/icon-red-small.png'
+                let icon = 'img/icon-menubar-unavailable.png'
                 if (id) {
-                    icon = 'img/icon-green-small.png'
+                    icon = 'img/icon-menubar-active.png'
                 }
                 let widgetState = this.app.store.get('widgets')
                 widgetState.availability.icon = icon
@@ -169,9 +169,9 @@ class AvailabilityModule {
                 }
 
                 // Set an icon depending on whether the user is available.
-                let icon = 'img/icon-red-small.png'
+                let icon = 'img/icon-menubar-unavailable.png'
                 if (selectedFixeddestinationId || selectedPhoneaccountId) {
-                    icon = 'img/icon-green-small.png'
+                    icon = 'img/icon-menubar-active.png'
                 }
                 this.app.logger.info(`${this}setting icon ${icon}`)
 
@@ -202,7 +202,7 @@ class AvailabilityModule {
     _reset() {
         this.app.emit('availability:reset')
         this.app.logger.info(`${this}set icon to grey`)
-        if (this.app.env.extension) this.app.browser.browserAction.setIcon({path: 'img/icon-grey-small.png'})
+        if (this.app.env.extension) this.app.browser.browserAction.setIcon({path: 'img/icon-menubar-inactive.png'})
     }
 
 

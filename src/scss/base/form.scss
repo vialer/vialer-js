@@ -111,15 +111,15 @@ html body {
         }
 
         &.failed {
-            border: 1px solid $vg-info-color-failed-light;
-            background: $vg-info-color-failed-lighter;
-            color: $vg-info-color-failed-dark;
+            border: 1px solid $vg-button-failed-border-color;
+            background: $vg-button-failed-background-color;
+            color: $vg-button-failed-text-color;
         }
 
         &.info {
-            border: 1px solid $vg-info-color-info-light;
-            background: $vg-info-color-info-lighter;
-            color: $vg-info-color-info-dark;
+            border: 1px solid $vg-button-info-border-color;
+            background: $vg-button-info-background-color;
+            color: $vg-button-info-text-color;
         }
     }
 }

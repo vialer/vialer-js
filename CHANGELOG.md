@@ -1,13 +1,18 @@
 # Changelog
 
+## Version 2.0.17
+* [108](https://github.com/VoIPGRID/vialer-js/issues/108) Changed event-based reconnection mechanism to
+  scheduler-based to address reconnection issue.
+* [110](https://github.com/VoIPGRID/vialer-js/issues/110) Added branded build and deployment. Added beta deployments.
+
 ## Version 2.0.16
-* Fix websocket reconnection issue (for real, hopefully!)
+* Tweak websocket reconnection issue
 
 ## Version 2.0.15
 * Fix invalid call to modules.
 
 ## Version 2.0.14
-* Fixed websocket reconnection issue. 
+* Fixed websocket reconnection issue.
 
 ## Version 2.0.13
 * [101](https://github.com/VoIPGRID/vialer-js/issues/101): Add db schema check to account for old localstorage data.

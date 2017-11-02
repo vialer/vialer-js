@@ -156,7 +156,7 @@ class UiActions extends Actions {
         })
 
         $('#popout').click((e) => {
-            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('webext_popup.html?popout=true')})
+            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('index.html?popout=true')})
             this._checkCloseMainPanel()
         })
         $('#help').click((e) => {

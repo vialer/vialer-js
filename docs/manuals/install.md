@@ -1,4 +1,4 @@
-# Build from source
+# Building from source
 ## Requirements
 * Node.js 8.0.0 or higher
 * Npm 5 or higher

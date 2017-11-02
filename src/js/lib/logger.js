@@ -54,15 +54,14 @@ class Logger {
             title: title,
             type: 'basic',
         }
-        if (this.app.env.extension) {
-            if (type === 'info') options.iconUrl = this.app.browser.runtime.getURL('img/icon-green-spacing.png')
-            else if (type === 'warning') options.iconUrl = this.app.browser.runtime.getURL('img/icon-red-spacing.png')
-            else options.iconUrl = this.app.browser.runtime.getURL('img/icon-grey-spacing.png')
+        if (type === 'warning') options.iconUrl = 'img/icon-notification-warning.png'
+        else options.iconUrl = 'img/icon-notification-info.png'
 
+        if (this.app.env.extension) {
+            options.iconUrl = this.app.browser.runtime.getURL(options.iconUrl)
             if (!stack) chrome.notifications.clear('c2d')
             this.app.browser.notifications.create('c2d', options)
         } else {
-            options.iconUrl = 'img/icon-c2d.png'
             if (Notification.permission === 'granted') {
                 if (!stack && this._notification) this._notification.close()
                 this._notification = new Notification(message, options) // eslint-disable-line no-new

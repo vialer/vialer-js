@@ -141,17 +141,14 @@ class Sip {
 
         switch (e.o_event.i_code) {
             case tsip_event_code_e.STACK_STARTING:
-                this._stopped = false
                 this.app.logger.info(`${this}SIP stack starting`)
                 this.app.emit('sip:starting', {}, 'both')
                 break
             case tsip_event_code_e.STACK_FAILED_TO_START:
-                this._stopped = false
                 this.app.logger.warn(`${this}SIP stack failed to start`)
                 this.app.emit('sip:failed_to_start', {}, 'both')
                 break
             case tsip_event_code_e.STACK_STARTED:
-                this._stopped = false
                 this.app.logger.info(`${this}SIP stack started`)
                 // Reset the connection retry timer.
                 this.retry = Object.assign({}, this.retryDefault)

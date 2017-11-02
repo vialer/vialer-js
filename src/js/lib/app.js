@@ -46,7 +46,7 @@ class App extends Skeleton {
             this.reloadModules(false)
 
             if (this.env.extension && this.env.extension.background) {
-                this.browser.browserAction.setIcon({path: 'img/icon-green-small.png'})
+                this.browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
             }
         }
     }
@@ -162,7 +162,7 @@ class App extends Skeleton {
     */
     _init() {
         this.settings = {
-            analyticsId: 'UA-60726618-9',
+            analyticsId: process.env.ANALYTICS_ID,
             c2d: 'true',
             platformUrl: this.getPlatformUrl(),
             realm: this.getWebsocketUrl(),

@@ -1,4 +1,4 @@
-# Development
+# Using gulp
 Use the gulp watch method to work on the plugin like:
 
 ```bash
