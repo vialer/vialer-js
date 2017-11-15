@@ -77,6 +77,13 @@ class UserActions extends Actions {
             // Reset the login form input.
             $('.login-form :input:visible').val('')
             this.app.modules.ui.resetLoginButton()
+
+            // Set the username/emailaddress field on load, when we still
+            // have a cached value from localstorage.
+            if (this.app.store.get('username')) {
+                $('#username').val(this.app.store.get('username'))
+            }
+
             // Focus the first input field.
             $('.login-form :input:visible:first').focus()
 

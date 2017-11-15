@@ -63,7 +63,6 @@ class UserModule {
         this.app.modules.ui.resetWidgetState()
         this.app.resetModules()
         // Remove credentials for basic auth.
-        this.app.store.remove('user')
         this.app.store.remove('password')
         // Remove cached sip status.
         this.app.store.remove('sip')
