@@ -44,8 +44,8 @@
         .widget-item {
             &.hide {display: none;}
             .icon i {color: $vg-grey-light;}
-            .icon.busy i {color: $vg-info-color-failed-dark;}
-            .icon.available i {color: $vg-info-color-success-dark;}
+            .icon.busy i {color: $vg-state-busy-color;}
+            .icon.available i {color: $vg-state-available-color;}
 
             // Ringing state is a css keyframe animation.
             .icon.ringing i {

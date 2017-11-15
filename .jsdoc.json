@@ -13,7 +13,7 @@
         "default": {
             "staticFiles": {
               "include": [
-                  "./src/img/logo-64.png"
+                  "./src/brand/vialer/img/logo-64.png"
               ]
             }
         },

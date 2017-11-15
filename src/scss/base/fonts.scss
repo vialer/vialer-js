@@ -74,9 +74,9 @@ $font-path: "../fonts";
 }
 
 @keyframes ringing {
-    0% {color: $vg-info-color-failed-dark;}
-    50% {color: $vg-info-color-success-dark;}
-    100% {color: $vg-info-color-failed-dark;}
+    0% {color: $vg-state-busy-color;}
+    50% {color: $vg-state-available-color;}
+    100% {color: $vg-state-busy-color;}
 }
 
 // The click-to-dial font icons.

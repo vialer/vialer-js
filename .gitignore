@@ -4,6 +4,8 @@ dist
 docs/build
 src/brand.json
 .tags
+.publish
 ./*.zip
 .vialer-jsrc
 .directory
+src/brand

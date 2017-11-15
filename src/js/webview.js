@@ -1,8 +1,7 @@
 /**
 * This is the Vialer-js app that runs all scripts
 * combined, replacing all ipc messaging with local
-* event emitters. This version also runs in Electron as
-* a desktop app.
+* event emitters.
 */
 const VialerApp = require('./lib/app')
 
