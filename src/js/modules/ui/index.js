@@ -87,24 +87,23 @@ class UiModule {
         let widget = this.getWidget(widgetOrWidgetName)
         const data = widget.data()
         this.app.logger.debug(`${this}open widget ${data.widget}`)
-        const widgetName = data.widget
 
-        let widgetState = this.app.store.get('widgets')
+        let widgetState = this.app.store.get('widgets') ? this.app.store.get('widgets') : {}
+        if (!widgetState.isOpen) widgetState.isOpen = {}
         // Opening widgets act as an accordeon. All other widgets are closed,
         // except the widget that needs to be open.
-        for (const moduleName of Object.keys(widgetState.isOpen)) {
-            let _widget = this.getWidget(widgetOrWidgetName)
-            if (moduleName !== widgetName) {
-                widgetState.isOpen[moduleName] = false
-                this.closeWidget(moduleName)
+        for (const widgetName of ['contacts', 'availability', 'queues']) {
+            let _widget = this.getWidget(widgetName)
+            if (widgetName !== data.widget) {
+                widgetState.isOpen[widgetName] = false
+                this.closeWidget(widgetName)
             } else {
-                widgetState.isOpen[moduleName] = true
+                widgetState.isOpen[widgetName] = true
                 $(_widget).data('opened', true).attr('data-opened', true)
             }
         }
         this.app.store.set('widgets', widgetState)
-
-        this.app.emit('ui:widget.open', {name: widgetName})
+        this.app.emit('ui:widget.open', {name: data.widget})
     }
 
 

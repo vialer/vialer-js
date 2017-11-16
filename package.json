@@ -1,6 +1,6 @@
 {
   "name": "vialer-js",
-  "version": "2.0.17.5",
+  "version": "2.0.17.10",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
     "node": ">=8.0.0"
@@ -79,6 +79,7 @@
     "axios": "^0.16.2",
     "css-element-queries": "^0.4.0",
     "jquery": "^3.2.1",
-    "roboto-fontface": "^0.8.0"
+    "roboto-fontface": "^0.8.0",
+    "webextension-polyfill": "^0.2.1"
   }
 }

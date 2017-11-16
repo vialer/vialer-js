@@ -49,6 +49,8 @@ class Logger {
 
 
     notification(message, title = 'Vialer', stack = false, type = 'info') {
+        // Edge doesn't support webextension Notifications yet.
+        if (app.env.extension && app.env.extension.isEdge) return
         const options = {
             message: message,
             title: title,
@@ -58,9 +60,9 @@ class Logger {
         else options.iconUrl = 'img/icon-notification-info.png'
 
         if (this.app.env.extension) {
-            options.iconUrl = this.app.browser.runtime.getURL(options.iconUrl)
-            if (!stack) chrome.notifications.clear('c2d')
-            this.app.browser.notifications.create('c2d', options)
+            options.iconUrl = browser.runtime.getURL(options.iconUrl)
+            if (!stack) browser.notifications.clear('c2d')
+            browser.notifications.create('c2d', options)
         } else {
             if (Notification.permission === 'granted') {
                 if (!stack && this._notification) this._notification.close()

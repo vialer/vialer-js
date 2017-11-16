@@ -17,7 +17,7 @@ class UiActions extends Actions {
     _background() {
         this.app.on('help', (data) => {
             // Open the plugin wiki page.
-            this.app.browser.tabs.create({url: process.env.HOMEPAGE})
+            browser.tabs.create({url: process.env.HOMEPAGE})
         })
 
         /**
@@ -59,7 +59,7 @@ class UiActions extends Actions {
                     const token = res.data.token
                     path = `user/autologin/?token=${token}&username=${this.app.store.get('username')}&next=/${path}`
                 }
-                this.app.browser.tabs.create({url: `${this.app.getPlatformUrl()}${path}`})
+                browser.tabs.create({url: `${this.app.getPlatformUrl()}${path}`})
             })
         })
 
@@ -156,7 +156,7 @@ class UiActions extends Actions {
         })
 
         $('#popout').click((e) => {
-            this.app.browser.tabs.create({url: this.app.browser.runtime.getURL('index.html?popout=true')})
+            browser.tabs.create({url: browser.runtime.getURL('index.html?popout=true')})
             this._checkCloseMainPanel()
         })
         $('#help').click((e) => {
@@ -178,8 +178,8 @@ class UiActions extends Actions {
         // Switch between logged-in and login state.
         if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
             this.app.emit('ui:ui.restore')
-            let user = this.app.store.get('user')
-            $('#user-name').text(user.email)
+            let user = this.app.store.get('username')
+            $('#user-name').text(user)
 
             this.module.showPopup()
         } else {

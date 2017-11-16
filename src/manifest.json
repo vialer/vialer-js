@@ -1,4 +1,5 @@
 {
+    "author": "Devhouse Spindle",
     "manifest_version": 2,
     "description": "__MSG_extDescription__",
     "icons": {
@@ -6,10 +7,11 @@
         "32": "img/logo-32.png",
         "64": "img/logo-64.png",
         "128": "img/logo-128.png"
-
     },
     "browser_action": {
-        "default_icon": "img/icon-menubar-inactive.png",
+        "default_icon": {
+          "22": "img/icon-menubar-inactive.png"
+        },
         "default_popup": "index.html"
     },
     "background": {

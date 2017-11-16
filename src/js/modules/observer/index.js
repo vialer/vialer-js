@@ -24,7 +24,7 @@ class ObserverModule {
         this.parkedNodes = []
 
         this.printStyle = $(
-            `<link rel="stylesheet" href="${this.app.browser.runtime.getURL('css/webext_print.css')}" media="print">`)
+            `<link rel="stylesheet" href="${browser.runtime.getURL('css/webext_print.css')}" media="print">`)
 
         /**
         * Stop listening to DOM mutations. Triggered when
@@ -152,7 +152,7 @@ class ObserverModule {
             '-moz-border-radius': '9px !important',
             '-moz-box-shadow': '0 1px 1px rgba(0, 0, 0, 0.2) !important',
             'background-color': 'transparent !important',
-            'background-image': `url("${this.app.browser.runtime.getURL('img/icon-click2dial.png')}")`,
+            'background-image': `url("${browser.runtime.getURL('img/icon-click2dial.png')}")`,
             'background-position': 'center center',
             'background-repeat': 'no-repeat',
             'border-radius': '9px !important',

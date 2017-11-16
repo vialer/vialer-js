@@ -168,6 +168,13 @@ class Helpers {
 
         if (buildType === 'chrome') {
             manifest.options_ui.chrome_style = false
+        } else if (buildType === 'edge') {
+            manifest.background.persistent = true
+            manifest.browser_specific_settings = {
+                edge: {
+                    browser_action_next_to_addressbar: true,
+                },
+            }
         } else if (buildType === 'firefox') {
             // The id_beta property should not end up in the manifest.
             let betaId = this.settings.brands[brandName].store.firefox.gecko.id_beta
@@ -183,7 +190,12 @@ class Helpers {
         }
 
         manifest.browser_action.default_title = this.settings.brands[brandName].name
-        manifest.permissions.push(this.settings.brands[brandName].permissions)
+        // Make sure this permission is not pushed multiple times
+        // to the same manifest.
+        if (!manifest.permissions.includes(this.settings.brands[brandName].permissions)) {
+            manifest.permissions.push(this.settings.brands[brandName].permissions)
+        }
+
         manifest.homepage_url = this.settings.brands[brandName].homepage_url
         manifest.version = PACKAGE.version
         return manifest
