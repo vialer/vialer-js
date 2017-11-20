@@ -33,13 +33,7 @@ $icon-checkbox-checked: "\f046";
 $icon-checkbox-unchecked: "\f096";
 
 // Default colors; can be overriden by vialer-jsrc
-$vg-button-failed-text-color: #d9534f !default;
-$vg-button-failed-background-color: lighten($vg-button-failed-text-color, 40%) !default;
-$vg-button-failed-border-color: lighten($vg-button-failed-text-color, 30%) !default;
-
-$vg-button-info-text-color: #31708f !default;
-$vg-button-info-background-color: lighten($vg-button-info-text-color, 40%) !default;
-$vg-button-info-border-color: lighten($vg-button-info-text-color, 30%) !default;
+$vg-failed-color: #d9534f !default;
 
 $vg-grey-light: #999 !default;
 $vg-grey-lighter: #e5e5e5 !default;

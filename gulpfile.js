@@ -63,10 +63,6 @@ if (['deploy', 'build-dist'].includes(argv._[0])) {
 
 settings.NODE_ENV = process.env.NODE_ENV
 
-
-
-
-
 // Loads the Vialer settings from ~/.vialer-jsrc into the
 // existing settings object.
 rc('vialer-js', settings)
@@ -196,7 +192,7 @@ gulp.task('build-dist', 'Make an optimized build and generate a WebExtension zip
             })
         } else {
             gulp.src([`${buildDir}/**`], {base: buildDir})
-                .pipe(zip(helpers.distributionName(settings.BRAND_TARGET)))
+                .pipe(zip(`${helpers.distributionName(settings.BRAND_TARGET)}.zip`))
                 .pipe(gulp.dest(`./dist/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}/`))
                 .on('end', done)
         }

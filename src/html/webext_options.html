@@ -21,8 +21,10 @@
             </div>
 
             <div class="actions">
-                <button id="save" data-i18n-content="saveButtonText"></button>
-                <div id="status" class="hide status" data-i18n-content="optionsSaveText"></div>
+                <button id="save" type="button"
+                    data-i18n-attrs='{"data-state-default": "saveButtonText", "data-state-saved": "optionsSaveText"}'
+                    data-i18n-content="saveButtonText">
+                </button>
             </div>
         </div>
     </body>

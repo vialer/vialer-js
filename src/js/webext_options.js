@@ -34,16 +34,13 @@ class OptionsApp extends Skeleton {
     saveOptions() {
         this.store.set('c2d', this.$.iconsEnabled.checked)
         this.store.set('platformUrl', this.$.platformUrl.value)
-        // Update status to let user know options were saved.
-        this.$.status.classList.remove('hide')
-        setTimeout(() => {
-            this.$.status.classList.add('hide')
-            // Only logout when the endpoint value is changed and the user
-            // is currently logged in.
-            if (this.platformUrl !== this.$.platformUrl.value && this.store.get('user')) {
-                this.emit('user:logout.attempt')
-            }
-        }, 750)
+        this.modules.ui.setButtonState($('#save'), 'saved', true, 0)
+        this.modules.ui.setButtonState($('#save'), 'default', false)
+        // Only logout when the endpoint value is changed and the user
+        // is currently logged in.
+        if (this.platformUrl !== this.$.platformUrl.value && this.store.get('user')) {
+            this.emit('user:logout.attempt')
+        }
     }
 
     restoreOptions() {
@@ -66,7 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 tab: false,
             },
         },
-        modules: [],
+        modules: [
+            {Module: require('./modules/ui'), name: 'ui'},
+        ],
         name: 'options',
     })
 })

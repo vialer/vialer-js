@@ -2,6 +2,12 @@
 
     &[data-opened="true"] {
         .widget-header {
+            .widget-header-text,
+            .widget-icon {
+                transition: color 0.3s ease;
+                color: $vg-brand-color;
+            }
+
             &::after {
                 content: $icon-toggle-up;
             }
@@ -14,13 +20,22 @@
 
     &[data-opened="false"] {
         .widget-header {
+            .widget-header-text,
+            .widget-icon {
+                transition: color 0.3s ease;
+            }
+
             &::after {
                 content: $icon-toggle-down;
             }
         }
 
         .widget-content {
-            display: none;
+            max-height: 0;
+
+            .widget-item-list {
+                max-height: 0;
+            }
         }
     }
 
@@ -40,7 +55,7 @@
         &::after {
             position: absolute;
             right: $vg-spacing-gap;
-            font-family: "click-to-dial";
+            font-family: "vialer-js";
             opacity: 0.3;
             line-height: $vg-widget-header-size;
         }
@@ -96,7 +111,7 @@
             }
 
             .unauthorized-icon {
-                color: $vg-button-failed-text-color;
+                color: $vg-failed-color;
                 display: inline-block;
             }
         }
@@ -113,8 +128,19 @@
     }
 }
 
+// Animate the accordeon height only in chrome, because Firefox can't
+// recalculate popup height fluently. See:
+// https://developer.mozilla.org/en-US/Add-ons/WebExtensions/user_interface/Popups
+.chrome .widget-content {
+    transition: max-height 0.3s ease-out;
+
+    .widget-item-list {
+        transition: max-height 0.3s ease-out;
+    }
+}
 
 .widget-content {
+    max-height: 210px;
 
     .form {
         padding: 2px 13px 14px;
@@ -193,18 +219,16 @@
                     right: 0;
                     color: $vg-state-available-color;
                     font-size: 1.2em;
-                    font-family: "click-to-dial";
+                    font-family: "vialer-js";
                     content: $icon-check;
                     margin-right: $vg-spacing-gap;
                 }
             }
 
             &[disabled] {
-                opacity: .6;
-
-                &:hover {
-                    cursor: pointer;
-                }
+                background: $vg-grey-lightest;
+                color: $vg-grey-light;
+                cursor: not-allowed;
             }
 
             .icon {

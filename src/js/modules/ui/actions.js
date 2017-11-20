@@ -201,61 +201,6 @@ class UiActions extends Actions {
                 $('.login-form :input:visible:first').focus()
             }, 100)
         })
-
-
-        // Change the stored username/emailaddress on typing, so
-        // we can restore the value when the popup is restarted.
-        $('#username').keyup((e) => {
-            this.app.store.set('username', e.currentTarget.value)
-        })
-        // Set the username/emailaddress field on load, when we still
-        // have a cached value from localstorage.
-        if (this.app.store.get('username')) {
-            $('#username').val(this.app.store.get('username'))
-        }
-
-
-        /**
-        * Capture keys in login form.
-        */
-        $('.login-form :input').keydown((e) => {
-            switch (e.which) {
-                // Cycle through proper fields with tab.
-                case 9:
-                    let inputs = $('.login-form :input').filter((index, input) => {
-                        return e.currentTarget.tabIndex < input.tabIndex
-                    })
-
-                    if (inputs.length === 0) {
-                        $('#username').focus()
-                    } else {
-                        $(inputs[0]).focus()
-                    }
-
-                    e.preventDefault()
-                    break
-                // Login on enter.
-                case 13:
-                    this.module.login()
-                    e.preventDefault()
-                    break
-            }
-
-            if ($('.login-button').hasClass('temporary-text')) {
-                this.module.resetLoginButton()
-            }
-        })
-
-        /**
-        * Login with the button.
-        */
-        $('.login-button').click((e) => {
-            if ($('.login-button').hasClass('temporary-text')) {
-                this.module.resetLoginButton()
-            } else {
-                this.module.login()
-            }
-        })
     }
 }
 

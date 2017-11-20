@@ -21,3 +21,6 @@ global.app = new VialerApp({
     modules: _modules,
     name: 'popup',
 })
+
+if (app.env.extension.isChrome) $('html').addClass('chrome')
+if (app.env.extension.isFirefox) $('html').addClass('firefox')
