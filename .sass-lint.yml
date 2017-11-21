@@ -36,7 +36,7 @@ rules:
     no-qualifying-elements: 1
     no-trailing-whitespace: 1
     no-trailing-zero: 1
-    no-transition-all: 1
+    no-transition-all: 0
     no-url-protocols: 1
     no-vendor-prefixes: 0
     no-warn: 1

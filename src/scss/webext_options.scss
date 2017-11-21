@@ -30,7 +30,6 @@
 
     button {
         background-image: none !important;
-        color: #fff !important;
         box-shadow: none !important;
         text-shadow: none !important;
 
@@ -78,7 +77,7 @@
         .warning {
             padding: 0;
             margin: 0;
-            color: $vg-button-failed-text-color;
+            color: $vg-failed-color;
             line-height: 25px;
             position: absolute;
         }
@@ -89,23 +88,7 @@
         // Leave room for the platform warning, which is not part of the
         // document flow. Use padding here; not margin, otherwise the height
         // of the options dialog is not calculated correctly on Windows.
-        padding-top: 20px;
-
-        // The status indicator that says whether the settings are
-        // succesfully saved or not, when saving the options.
-        .status {
-            float: right;
-            display: block;
-            opacity: 1;
-            transition: opacity 0.5s ease-in-out;
-            line-height: 25px;
-
-            &.hide {
-                opacity: 0;
-                transition: opacity 1.5s ease-in-out;
-            }
-
-        }
+        padding: 20px 0 10px 0;
     }
 
 }

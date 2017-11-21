@@ -35,7 +35,8 @@ class I18n {
         $('[data-i18n-attrs]').not('.i18n-replaced').each((i, el) => {
             // Example format:
             // <element data-i18n-attrs='{"attr-name": "messageID"}'>
-            const attrs = $(el).data('i18n-attrs')
+            let attrs = $(el).data('i18n-attrs')
+            if (typeof attrs === 'string') throw 'i18n-attrs string must be parsable JSON'
             for (const attr in attrs) {
                 if (attrs.hasOwnProperty(attr)) {
                     $(el).attr(attr, this.translate(attrs[attr]))

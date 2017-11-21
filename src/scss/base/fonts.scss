@@ -27,14 +27,14 @@ $font-path: "../fonts";
 
 
 @font-face {
-    font-family: "click-to-dial";
-    src: url("#{$font-path}/click-to-dial.woff") format("woff");
+    font-family: "vialer-js";
+    src: url("#{$font-path}/vialer-js.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
 
 [class^="icon-"], [class*=" icon-"] {
-    font-family: "click-to-dial";
+    font-family: "vialer-js";
     speak: none;
     font-style: normal;
     font-weight: normal;
@@ -79,7 +79,7 @@ $font-path: "../fonts";
     100% {color: $vg-state-busy-color;}
 }
 
-// The click-to-dial font icons.
+// The vialer-js font icons.
 .icon-entity:before {
     content: "\e913";
 }

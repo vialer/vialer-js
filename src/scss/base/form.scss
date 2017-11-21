@@ -1,3 +1,13 @@
+@mixin selection {
+    ::-moz-selection {@content;}
+    ::selection {@content;}
+}
+
+@include selection {
+    background: $vg-brand-color;
+    color: #fff;
+}
+
 html body {
 
     input {
@@ -35,7 +45,7 @@ html body {
                 vertical-align: center;
 
                 &:before {
-                    font-family: click-to-dial;
+                    font-family: "vialer-js";
                     display: block;
                     float: left;
                     content: $icon-checkbox-unchecked;
@@ -77,10 +87,11 @@ html body {
 
     button {
         outline: none;
-        background: $vg-primary-color;
+        background: $vg-brand-color;
+        border: 1px solid lighten($vg-brand-color, 15%);
+        transition: all 0.2s linear;
         box-shadow: none;
         color: #fff;
-        border: 1px solid $vg-primary-color;
         font-weight: 500;
         height: 40px;
         position: relative;
@@ -89,6 +100,23 @@ html body {
         border-radius: 4px;
         text-align: center;
 
+        // Disable the dotted outline in Firefox.
+        &::-moz-focus-inner {
+            border: 0;
+        }
+
+        // The default disabled state uses
+        &[disabled] {
+            cursor: not-allowed;
+            background: $vg-grey-lighter;
+            border: transparent;
+        }
+
+        &:hover:enabled {
+            cursor: pointer;
+            background: lighten($vg-brand-color, 10%);
+        }
+
         i {
             position: absolute;
             line-height: 40px;
@@ -96,30 +124,26 @@ html body {
             font-size: 1rem;
         }
 
-        &:active {
-            padding: 0;
-        }
-
-        &:hover {
-            background: lighten($vg-primary-color, 10%);
-            border: 1px solid lighten($vg-primary-color, 30%);
-            cursor: pointer;
-        }
-
         &.loading {
-            background: $vg-primary-color;
+            opacity: 1;
+            transition: all 0.2s linear;
+            background: lighten($vg-brand-color, 15%);
         }
 
         &.failed {
-            border: 1px solid $vg-button-failed-border-color;
-            background: $vg-button-failed-background-color;
-            color: $vg-button-failed-text-color;
+            opacity: 1;
+            transition: all 0.2s linear;
+            border: 1px solid lighten($vg-failed-color, 30%);
+            background: $vg-failed-color;
+            color: #fff;
         }
 
         &.info {
-            border: 1px solid $vg-button-info-border-color;
-            background: $vg-button-info-background-color;
-            color: $vg-button-info-text-color;
+            opacity: 1;
+            transition: all 0.2s linear;
+            border: 1px solid $vg-brand-color;
+            background: #fff;
+            color: $vg-brand-color;
         }
     }
 }

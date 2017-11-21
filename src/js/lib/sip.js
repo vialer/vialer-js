@@ -93,8 +93,8 @@ class Sip {
             password: user.token,
             realm: this.app.settings.realm, // domain name
             sip_headers: [
-                { name: 'User-Agent', value: `Click-to-dial v${this.app.version()}`},
-                { name: 'Organization', value: 'VoIPGRID'},
+                {name: 'User-Agent', value: process.env.PLUGIN_NAME},
+                {name: 'Organization', value: 'VoIPGRID'},
             ],
             websocket_proxy_url: `wss://${this.app.settings.realm}`,
         })

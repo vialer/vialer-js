@@ -61,7 +61,7 @@ class Helpers {
             if (buildType === 'chrome') {
                 runSequence('build-dist', async() => {
                     const api = this.settings.brands[brandName].store.chrome
-                    const zipFile = fs.createReadStream(`./dist/${brandName}/${buildType}/${distributionName}`)
+                    const zipFile = fs.createReadStream(`./dist/${brandName}/${buildType}/${distributionName}.zip`)
 
                     let extensionId
                     // Deploy to production or test environment, based on DEPLOY_TARGET.
@@ -134,7 +134,6 @@ class Helpers {
         if (this.settings.DEPLOY_TARGET === 'beta') {
             distributionName += '-beta'
         }
-        distributionName += '.zip'
         return distributionName
     }
 
@@ -223,6 +222,7 @@ class Helpers {
                     HOMEPAGE: this.settings.brands[brandName].homepage_url,
                     NODE_ENV: this.settings.NODE_ENV,
                     PLATFORM_URL: this.settings.brands[brandName].permissions,
+                    PLUGIN_NAME: this.distributionName(brandName),
                     SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
                     VERBOSE: this.settings.VERBOSE,
                     VERSION: this.settings.PACKAGE.version,
