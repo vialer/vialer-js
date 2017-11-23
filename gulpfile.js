@@ -118,6 +118,7 @@ gutil.log(`- BRAND: ${settings.BRAND_TARGET}`)
 gutil.log(`- DEPLOY: ${settings.DEPLOY_TARGET}`)
 gutil.log(`- PRODUCTION: ${settings.PRODUCTION}`)
 gutil.log(`- TARGET: ${settings.BUILD_TARGET}`)
+gutil.log(`- VERBOSE: ${settings.VERBOSE}`)
 
 
 gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
@@ -312,11 +313,11 @@ gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-webview'
 
 
 gulp.task('js-webview', 'Generate webview js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'webview', done)
 })
 
 gulp.task('js-vendor', 'Generate third-party vendor js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor', done)
 }, {options: taskOptions.all})
 
 gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
@@ -334,23 +335,23 @@ gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
 }, {options: taskOptions.browser})
 
 gulp.task('js-webext-bg', 'Generate the extension background entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_bg', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'webext_bg', done)
 }, {options: taskOptions.browser})
 gulp.task('js-webext-callstatus', 'Generate the callstatus entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_callstatus', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'callstatus/index', 'webext_callstatus', done)
 }, {options: taskOptions.browser})
 gulp.task('js-webext-observer', 'Generate WebExtension observer js that runs in all tab frames.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_observer', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'webext_observer', done)
 }, {options: taskOptions.browser})
 
 gulp.task('js-webext-options', 'Generate webextension options js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_options', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'options/index', 'webext_options', done)
 }, {options: taskOptions.browser})
 gulp.task('js-webext-popup', 'Generate webextension popup/popout js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_popup', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'popup/index', 'webext_popup', done)
 }, {options: taskOptions.browser})
 gulp.task('js-webext-tab', 'Generate webextension tab js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_tab', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'tab/index', 'webext_tab', done)
 }, {options: taskOptions.browser})
 
 

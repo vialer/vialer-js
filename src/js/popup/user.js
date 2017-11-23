@@ -1,41 +1,21 @@
 /**
 * @module User
 */
-const Actions = require('../../lib/actions')
+class UserModule {
 
-
-/**
-* Actions for the User module.
-*/
-class UserActions extends Actions {
-
-    toString() {
-        return `${this.module}[actions] `
+    constructor(app) {
+        this.app = app
+        this.addListeners()
     }
 
 
-    _background() {
-        this.app.on('user:login.attempt', (data) => {
-            // Attempt to log in.
-            this.app.store.set('username', data.username)
-            this.app.store.set('password', data.password)
-            this.app.emit('user:login.in_progress')
-            this.module.login(this.app.store.get('username'), this.app.store.get('password'))
-        })
+    addListeners() {
+        let _$ = {}
+        _$.accountInfo = $('#user-name')
+        _$.emailInput = $('#username')
+        _$.loginButton = $('.login-button')
+        _$.passwordInput = $('#password')
 
-        this.app.on('user:logout.attempt', () => {
-            this.module.logout()
-        })
-    }
-
-
-    _popup() {
-        let _$ = {
-            accountInfo: $('#user-name'),
-            emailInput: $('#username'),
-            loginButton: $('.login-button'),
-            passwordInput: $('#password'),
-        }
         const login = () => {
             // Login when form is not empty.
             if (_$.emailInput.val().trim().length && _$.passwordInput.val().length) {
@@ -150,4 +130,4 @@ class UserActions extends Actions {
     }
 }
 
-module.exports = UserActions
+module.exports = UserModule

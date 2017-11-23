@@ -68,6 +68,7 @@ class Helpers {
                 runSequence('build-dist', async() => {
                     const api = this.settings.brands[brandName].store.chrome
                     const zipFile = fs.createReadStream(`./dist/${brandName}/${buildType}/${distributionName}.zip`)
+
                     let extensionId
                     // Deploy to production or test environment, based on DEPLOY_TARGET.
                     if (this.settings.DEPLOY_TARGET === 'production') extensionId = api.extensionId
@@ -216,26 +217,32 @@ class Helpers {
     * Return a browserify function task used for multiple entrypoints.
     * @param {String} brandName - Brand to produce js for.
     * @param {String} buildType - Target environment to produce js for.
-    * @param {String} jsName - Name of the js entrypoint.
-    * @param {String} cb - Callback when the task is done.
+    * @param {String} target - Path to the entrypoint.
+    * @param {String} bundleName - Name of the entrypoint.
+    * @param {Function} cb - Callback when the task is done.
     */
-    jsEntry(brandName, buildType, jsName, cb) {
-        if (!BUNDLERS[jsName]) {
-            BUNDLERS[jsName] = browserify({
+    jsEntry(brandName, buildType, target, bundleName, cb) {
+        if (!BUNDLERS[bundleName]) {
+            BUNDLERS[bundleName] = browserify({
                 cache: {},
                 debug: !this.settings.PRODUCTION,
-                entries: path.join(this.settings.SRC_DIR, 'js', `${jsName}.js`),
+                entries: path.join(this.settings.SRC_DIR, 'js', `${target}.js`),
                 packageCache: {},
             })
-            if (this.settings.LIVERELOAD) BUNDLERS[jsName].plugin(watchify)
+            if (this.settings.LIVERELOAD) BUNDLERS[bundleName].plugin(watchify)
         }
-        BUNDLERS[jsName].ignore('process')
-        BUNDLERS[jsName].bundle()
+        BUNDLERS[bundleName].ignore('process')
+        // Exclude the webextension polyfill from non-webextension builds.
+        if (bundleName === 'webview') {
+            BUNDLERS[bundleName].ignore('webextension-polyfill')
+        }
+
+        BUNDLERS[bundleName].bundle()
             .on('error', notify.onError('Error: <%= error.message %>'))
             .on('end', () => {
                 cb()
             })
-            .pipe(source(`${jsName}.js`))
+            .pipe(source(`${bundleName}.js`))
             .pipe(buffer())
             .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
             .pipe(envify({
@@ -251,7 +258,7 @@ class Helpers {
             .pipe(ifElse(this.settings.PRODUCTION, () => minifier()))
             .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.write('./')))
             .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')))
-            .pipe(size(_extend({title: `${jsName}.js`}, this.settings.SIZE_OPTIONS)))
+            .pipe(size(_extend({title: `${bundleName}.js`}, this.settings.SIZE_OPTIONS)))
     }
 
 

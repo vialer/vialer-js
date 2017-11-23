@@ -1,20 +1,15 @@
 /**
-* @module Contacts
-*/
-const Actions = require('../../lib/actions')
+ * @module Contacts
+ */
+class ContactsModule {
 
-
-/**
-* Actions for the Contacts module.
-*/
-class ContactsActions extends Actions {
-
-    toString() {
-        return `${this.module}[actions] `
+    constructor(app) {
+        this.app = app
+        this.addListeners()
     }
 
 
-    _popup() {
+    addListeners() {
         let _$ = {}
         _$.widget = $('.widget.contacts')
         _$.list = _$.widget.find('.widget-item-list.list')
@@ -64,7 +59,7 @@ class ContactsActions extends Actions {
 
             // Open the contacts widget after it's filled,
             // so it's open by default in the popout. Also after a refresh.
-            if (this.app.env.extension && this.app.env.extension.popout) {
+            if (this.app.env.isExtension && this.app.env.role.popout) {
                 const widgetElement = this.app.modules.ui.getWidget('contacts')
                 $(widgetElement).data('opened', true).attr('data-opened', true)
             }
@@ -149,7 +144,7 @@ class ContactsActions extends Actions {
             // The sender will be a tab when sending this event from the popout.
             // Use the `forceSilent` flag in this case, so callstatus
             // updates are send through notifications, instead of a modal.
-            if (this.app.env.extension && this.app.env.extension.popout) forceSilent = true
+            if (this.app.env.isExtension && this.app.env.role.popout) forceSilent = true
             this.app.emit('dialer:dial', {
                 analytics: 'Colleagues',
                 b_number: extension,
@@ -197,4 +192,4 @@ class ContactsActions extends Actions {
     }
 }
 
-module.exports = ContactsActions
+module.exports = ContactsModule

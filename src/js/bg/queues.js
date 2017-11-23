@@ -1,12 +1,6 @@
 /**
 * @module Queues
 */
-const QueuesActions = require('./actions')
-
-
-/**
-* The Queues module.
-*/
 class QueuesModule {
 
     /**
@@ -18,7 +12,42 @@ class QueuesModule {
         this.app.modules.queues = this
         this.sizes = {}
 
-        this.actions = new QueuesActions(app, this)
+        this.addListeners()
+    }
+
+
+    addListeners() {
+        // User indicated that it wants to watch a queue.
+        this.app.on('queues:queue.select', (data) => {
+            let id = data.id
+            let widgetState = this.app.store.get('widgets')
+
+            if (id) {
+                let size = NaN
+                if (this.sizes && this.sizes.hasOwnProperty(id)) {
+                    size = this.sizes[id]
+                }
+
+                if (this.app.env.isExtension) {
+                    browser.browserAction.setIcon({path: this.getIconForSize(size)})
+                }
+            } else {
+                // Restore availability icon.
+                if (widgetState.availability) {
+                    if (this.app.env.isExtension) {
+                        this.app.logger.info(`${this}set availability icon`)
+                        browser.browserAction.setIcon({
+                            path: this.app.store.get('widgets').availability.icon,
+                        })
+                    }
+                }
+            }
+
+            // Save selected queue id in storage.
+            widgetState.queues.selected = id
+            this.app.store.set('widgets', widgetState)
+            this.app.timer.update('queue.size')
+        })
     }
 
 
@@ -111,7 +140,7 @@ class QueuesModule {
 
             // Update icon for toolbarbutton if this queuecallgroup
             // was selected earlier.
-            if (this.app.env.extension) {
+            if (this.app.env.isExtension) {
                 if (queue.id === this.app.store.get('widgets').queues.selected) {
                     browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
                 }
@@ -141,7 +170,6 @@ class QueuesModule {
 
 
     _load() {
-        if (this.app.env.extension && !this.app.env.extension.background) return
         this.app.emit('ui:widget.reset', {name: 'queues'})
         // Start with showing an empty queue list.
         this.app.emit('queues:empty')

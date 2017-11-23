@@ -1,4 +1,4 @@
-const EventEmitter = require('events').EventEmitter
+const EventEmitter = require('eventemitter3')
 const I18n = require('./i18n')
 const Logger = require('./logger')
 const Store = require('./store')
@@ -14,12 +14,16 @@ class Skeleton extends EventEmitter {
 
     constructor(options) {
         super()
+        this.env = options.environment
+        if (this.env.isChrome) window.browser = require('webextension-polyfill')
+        // A webview build passes the separate apps, so they can be reached
+        // by the EventEmitter.
+        if (options.apps) this.apps = options.apps
+
         this.cache = {}
         this._listeners = 0
 
         this.utils = require('./utils')
-        this.env = this.getEnvironment(options.environment)
-
         this.modules = {}
 
         this.name = options.name
@@ -27,10 +31,12 @@ class Skeleton extends EventEmitter {
         this.store = new Store(this)
         this.i18n = new I18n(this, options.i18n)
 
-        if (this.env.extension) {
+        if (this.env.isExtension) {
+            // Make Chrome plugin API compatible with the standards
+            // WebExtension API as supported by Firefox and Edge.
             this.ipcListener()
             // Allows parent scripts to use the same EventEmitter syntax.
-            if (this.env.extension.tab) {
+            if (this.env.role.tab) {
                 window.addEventListener('message', (event) => {
                     if (this.verbose) this.logger.debug(`${this}emit '${event.data.event}' event from child`)
                     this.emit(event.data.event, event.data.data, true)
@@ -75,7 +81,7 @@ class Skeleton extends EventEmitter {
     * @param {Boolean|String} [parent=false] - Emit to script's parent over ipc.
     */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
-        if (this.env.extension && (!noIpc || noIpc === 'both')) {
+        if (this.env.isExtension && (!noIpc || noIpc === 'both')) {
             let payloadData = {
                 data: data,
                 event: event,
@@ -112,46 +118,15 @@ class Skeleton extends EventEmitter {
         }
         // The web version will always use a local emitter, no matter what
         // the value is of `noIpc`. An extension may do both.
-        if (!this.env.extension || noIpc) {
+        if (!this.env.isExtension || noIpc) {
             if (this.verbose) this.logger.debug(`${this}emit local event '${event}'`)
+            if (this.apps) {
+                for (const appName of Object.keys(this.apps)) {
+                    this.apps[appName].emit(event, data)
+                }
+            }
             super.emit(event, data)
         }
-    }
-
-
-    /**
-    * Sets environmental properties, used to distinguish between
-    * webextension, regular webapp or Electron app.
-    * @param {Object} environment - Environment properties passed
-    * to the app's Constructor.
-    * @returns {Object} - Environment flags used to make this app universal.
-    */
-    getEnvironment(environment) {
-        // If browser exists, use browser, otherwise take the Chrome API.
-        if (environment.extension) {
-            let searchParams = this.utils.parseSearch(location.search)
-            if (searchParams.popout) {
-                environment.extension.popout = true
-            } else {
-                environment.extension.popout = false
-            }
-
-            environment.extension.isEdge = navigator.userAgent.toLowerCase().includes('edge')
-            environment.extension.isChrome = navigator.userAgent.toLowerCase().includes('chrome')
-
-            if (environment.extension.isChrome) {
-                window.browser = require('webextension-polyfill')
-            }
-            environment.extension.isFirefox = navigator.userAgent.toLowerCase().includes('firefox')
-        }
-
-        environment.os = {
-            linux: navigator.platform.match(/(Linux)/i) ? true : false,
-            osx: navigator.platform.match(/(Mac)/i) ? true : false,
-            windows: navigator.platform.match(/(Windows)/i) ? true : false,
-        }
-
-        return environment
     }
 
 
@@ -173,10 +148,10 @@ class Skeleton extends EventEmitter {
                 // callstatus or observer script. Otherwise the event is
                 // ignored, because otherwise all events emitted on the tab will
                 // also be processed by the callstatus and observer scripts.
-                if (this.env.extension.callstatus || this.env.extension.observer) {
-                    if (this.env.extension.callstatus && message.data.frame && message.data.frame === 'callstatus') {
+                if (this.env.role.callstatus || this.env.role.observer) {
+                    if (this.env.role.callstatus && message.data.frame && message.data.frame === 'callstatus') {
                         this.emit(message.event, message.data, true)
-                    } else if (this.env.extension.observer && message.data.frame && message.data.frame === 'observer') {
+                    } else if (this.env.role.observer && message.data.frame && message.data.frame === 'observer') {
                         this.emit(message.event, message.data, true)
                     }
                 } else {
@@ -195,6 +170,11 @@ class Skeleton extends EventEmitter {
     */
     on(event, callback) {
         this._listeners += 1
+        if (this.apps) {
+            for (const appName of Object.keys(this.apps)) {
+                this.apps[appName].on(event, callback)
+            }
+        }
         super.on(event, callback)
     }
 

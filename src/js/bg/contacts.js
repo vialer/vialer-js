@@ -1,12 +1,6 @@
 /**
  * @module Contacts
  */
-const ContactsActions = require('./actions')
-
-
-/**
-* The Contacts module.
-*/
 class ContactsModule {
     /**
     * @param {ClickToDialApp} app - The application object.
@@ -15,7 +9,6 @@ class ContactsModule {
         this.app = app
         this.hasUI = true
         this.app.modules.contacts = this
-        this.actions = new ContactsActions(app)
     }
 
 
@@ -29,8 +22,6 @@ class ContactsModule {
     * @param {Boolean} refresh - True when the plugin is forced to refresh.
     */
     _load(refresh) {
-        if (this.app.env.extension && !this.app.env.extension.background) return
-
         this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description').then((res) => {
             this.app.emit('ui:widget.reset', {name: 'contacts'})
 

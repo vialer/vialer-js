@@ -1,12 +1,7 @@
 /**
-* @module Dialer
-*/
-const DialerActions = require('./actions')
-
-
-/**
 * The Dialer module. It takes care of actually dialing a phonenumber and
 * updating the status about a call.
+* @module Dialer
 */
 class DialerModule {
 
@@ -40,7 +35,7 @@ class DialerModule {
             '^https?.*slack\\.com.*$',
         ]
 
-        this.actions = new DialerActions(app, this)
+        this.addListeners()
     }
 
 
@@ -57,6 +52,70 @@ class DialerModule {
             },
             title: this.app.i18n.translate('contextMenuLabel'),
         })
+    }
+
+
+    addListeners() {
+        /**
+        * Emit to each tab's running observer scripts that we want to
+        * observe the DOM and add icons to phonenumbers.
+        */
+        this.app.on('user:login.success', (data) => {
+            // Only notify tabs in the context of an extension.
+            if (!this.app.env.isExtension) return
+
+            browser.tabs.query({}).then((tabs) => {
+                tabs.forEach((tab) => {
+                    if (this.switchObserver(tab)) {
+                        this.app.emit('observer:start', {frame: 'observer'}, false, tab.id)
+                    }
+                })
+            })
+        })
+
+
+        /**
+        * The callstatus dialog is closed. We don't longer poll
+        * the callstatus of the current call.
+        */
+        this.app.on('dialer:status.onhide', (data) => {
+            if (this.app.timer.getRegisteredTimer(`dialer:status.update-${data.callid}`)) {
+                this.app.timer.stopTimer(`dialer:status.update-${data.callid}`)
+                this.app.timer.unregisterTimer(`dialer:status.update-${data.callid}`)
+            }
+        })
+
+
+        /**
+        * Start callstatus timer function for callid when the callstatus
+        * dialog opens. The timer function updates the call status
+        * periodically. Check the `dial` method in `dialer/index.js` method
+        * for the used timer function.
+        */
+        this.app.on('dialer:status.start', (data) => {
+            this.app.timer.startTimer(`dialer:status.update-${data.callid}`)
+        })
+
+
+        /**
+        * Used to make the actual call. A callstatus popup will be used if
+        * the sender is a tab; otherwise fall back to html5 notifications.
+        * Silent mode can be forced by passing the `forceSilent` Boolean
+        * with the event.
+        */
+        this.app.on('dialer:dial', (data) => {
+            if (data.forceSilent || !this.app.env.isExtension) this.dial(data.b_number, null)
+            else this.dial(data.b_number, data.sender.tab)
+            if (data.analytics) this.app.analytics.trackClickToDial(data.analytics)
+        })
+
+        // The observer script in a frame indicates that it's ready to observe.
+        // Check if it should add icons.
+        if (this.app.env.isExtension) {
+            this.app.on('dialer:observer.ready', (data) => {
+                data.callback({observe: this.switchObserver(data.sender.tab)})
+            })
+        }
     }
 
 
@@ -211,45 +270,6 @@ class DialerModule {
 
 
     /**
-    * A tab triggers this function to show a status dialog.
-    * @param {String} bNumber - Pass it asap to the callstatus page.
-    * @param {String} status - Pass the initial status to the callstatus page.
-    */
-    showCallstatus(bNumber, status) {
-        // Inline style for the injected callstatus iframe.
-        let iframeStyle = {
-            height: '100vh',
-            left: '0',
-            position: 'fixed',
-            top: '0',
-            width: '100vw',
-            'z-index': '2147483647',
-        }
-
-        this.frame = $('<iframe>', {
-            scrolling: false,
-            src: browser.runtime.getURL(`webext_callstatus.html?bNumber=${bNumber}&status=${status}`),
-            style: (function() {
-                // Can't set !important with
-                // .css("property", "value !important"),
-                // so build a string to use as style.
-                let style = ''
-                for (let property in iframeStyle) {
-                    style += `${property}: ${iframeStyle[property]} !important; `
-                }
-                return style
-            }()),
-        })
-
-        $(this.frame).hide().on('load', (e) => {
-            // Show and focus the callstatus iframe after loading.
-            $(this.frame).show().get(0).contentWindow.focus()
-        })
-        $('html').append(this.frame)
-    }
-
-
-    /**
     * Called when the tab observer is initialized, by calling
     * `dialer:observer.ready` on the background. Determines whether the
     * DOM observer and c2d icons should be switched on or off.
@@ -312,7 +332,7 @@ class DialerModule {
 
 
     _reset() {
-        if (!this.app.env.extension) return
+        if (!this.app.env.isExtension) return
         // Called when logging the plugin out. Remove the contextmenu item.
         if (this._contextMenuItem) this.removeContextMenuItem()
         // Emit to each tab's running observer scripts that we don't want to

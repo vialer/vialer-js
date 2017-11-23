@@ -78,6 +78,7 @@
   "dependencies": {
     "axios": "^0.16.2",
     "css-element-queries": "^0.4.0",
+    "eventemitter3": "^2.0.3",
     "jquery": "^3.2.1",
     "roboto-fontface": "^0.8.0",
     "webextension-polyfill": "^0.2.1"

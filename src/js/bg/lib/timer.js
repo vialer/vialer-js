@@ -33,14 +33,22 @@ class Timer {
     }
 
 
-    update(timerId) {
-        if (timerId) {
-            this.startTimer(timerId)
+    /**
+    * This doubles the retry interval in each run and adds jitter.
+    * @param {object} retry - The reference retry object.
+    * @returns {object} The updated retry object.
+    */
+    increaseTimeout(retry) {
+        // Make sure that interval doesn't go past the limit.
+        if (retry.interval * 2 < retry.limit) {
+            retry.interval = retry.interval * 2
         } else {
-            for (timerId in registeredTimers) {
-                this.startTimer(timerId)
-            }
+            retry.interval = retry.limit
         }
+
+        retry.timeout = retry.interval + jitter(retry.interval, 30)
+        if (this.app.verbose) this.app.logger.debug(`${this}increase timeout to '${retry.timeout}'`)
+        return retry
     }
 
 
@@ -159,27 +167,19 @@ class Timer {
     }
 
 
-    /**
-    * This doubles the retry interval in each run and adds jitter.
-    * @param {object} retry - The reference retry object.
-    * @returns {object} The updated retry object.
-    */
-    increaseTimeout(retry) {
-        // Make sure that interval doesn't go past the limit.
-        if (retry.interval * 2 < retry.limit) {
-            retry.interval = retry.interval * 2
-        } else {
-            retry.interval = retry.limit
-        }
-
-        retry.timeout = retry.interval + jitter(retry.interval, 30)
-        if (this.app.verbose) this.app.logger.debug(`${this}increase timeout to '${retry.timeout}'`)
-        return retry
+    toString() {
+        return `${this.app}[timer] `
     }
 
 
-    toString() {
-        return `${this.app}[timer] `
+    update(timerId) {
+        if (timerId) {
+            this.startTimer(timerId)
+        } else {
+            for (timerId in registeredTimers) {
+                this.startTimer(timerId)
+            }
+        }
     }
 }
 

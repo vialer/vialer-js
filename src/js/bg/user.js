@@ -1,17 +1,26 @@
 /**
 * @module User
 */
-const UserActions = require('./actions')
-
-
-/**
-* The User module.
-*/
 class UserModule {
 
     constructor(app) {
         this.app = app
-        this.actions = new UserActions(app, this)
+        this.addListeners()
+    }
+
+
+    addListeners() {
+        this.app.on('user:login.attempt', (data) => {
+            // Attempt to log in.
+            this.app.store.set('username', data.username)
+            this.app.store.set('password', data.password)
+            this.app.emit('user:login.in_progress')
+            this.login(this.app.store.get('username'), this.app.store.get('password'))
+        })
+
+        this.app.on('user:logout.attempt', () => {
+            this.logout()
+        })
     }
 
 
@@ -60,7 +69,8 @@ class UserModule {
 
     logout() {
         this.app.logger.info(`${this}logout`)
-        this.app.modules.ui.resetWidgetState()
+        this.app.store.remove('widgets')
+        this.app.store.remove('isMainPanelOpen')
         this.app.resetModules()
         // Remove credentials for basic auth.
         this.app.store.remove('password')

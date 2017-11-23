@@ -1,61 +1,19 @@
 /**
 * @module Queues
 */
-const Actions = require('../../lib/actions')
+class QueuesModule {
 
-
-/**
-* Actions for the Queue module.
-*/
-class QueuesActions extends Actions {
-
-    toString() {
-        return `${this.module}[actions] `
+    /**
+    * @param {ClickToDialApp} app - The application object.
+    */
+    constructor(app) {
+        this.app = app
+        this.addListeners()
     }
 
 
-    /**
-    * Background script related events.
-    */
-    _background() {
-        // User indicated that it wants to watch a queue.
-        this.app.on('queues:queue.select', (data) => {
-            let id = data.id
-            let widgetState = this.app.store.get('widgets')
 
-            if (id) {
-                let size = NaN
-                if (this.module.sizes && this.module.sizes.hasOwnProperty(id)) {
-                    size = this.module.sizes[id]
-                }
-
-                if (this.app.env.extension) {
-                    browser.browserAction.setIcon({path: this.module.getIconForSize(size)})
-                }
-            } else {
-                // Restore availability icon.
-                if (widgetState.availability) {
-                    if (this.app.env.extension) {
-                        this.app.logger.info(`${this}set availability icon`)
-                        browser.browserAction.setIcon({
-                            path: this.app.store.get('widgets').availability.icon,
-                        })
-                    }
-                }
-            }
-
-            // Save selected queue id in storage.
-            widgetState.queues.selected = id
-            this.app.store.set('widgets', widgetState)
-            this.app.timer.update('queue.size')
-        })
-    }
-
-
-    /**
-    * Popup script related events.
-    */
-    _popup() {
+    addListeners() {
         let _$ = {}
         _$.widget = $('.widget.queues')
         _$.list = _$.widget.find('.widget-item-list.list')
@@ -142,4 +100,4 @@ class QueuesActions extends Actions {
     }
 }
 
-module.exports = QueuesActions
+module.exports = QueuesModule

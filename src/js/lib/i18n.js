@@ -3,7 +3,7 @@ class I18n {
         this.app = app
         this.messages = messages
 
-        if (this.app.env.extension && !this.app.env.extension.background) {
+        if (this.app.env.isExtension && !this.app.env.role.background) {
             $(() => this.processPage())
         } else {
             $(() => this.processPage())
@@ -12,7 +12,7 @@ class I18n {
 
 
     translate(messageID, args) {
-        if (this.app.env.extension) {
+        if (this.app.env.isExtension) {
             return browser.i18n.getMessage(messageID, args)
         } else {
             if (messageID in this.messages) {

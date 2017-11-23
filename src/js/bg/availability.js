@@ -1,12 +1,6 @@
 /**
 * @module Availability
 */
-const AvailabilityActions = require('./actions')
-
-
-/**
-* The Availability module.
-*/
 class AvailabilityModule {
 
     /**
@@ -16,7 +10,21 @@ class AvailabilityModule {
         this.app = app
         this.hasUI = true
         this.app.modules.availability = this
-        this.actions = new AvailabilityActions(app, this)
+
+        this.addListeners()
+    }
+
+
+    addListeners() {
+        /**
+         * Update availability by calling the API, then emit
+         * to the popup that the choices need to be updated.
+         */
+        this.app.on('availability.update', (data) => {
+            this.app.logger.debug(`${this}update selected userdestination and refresh popup`)
+            this.selectUserdestination(data.type, data.id)
+            this.app.emit('availability:refresh')
+        })
     }
 
 
@@ -89,7 +97,7 @@ class AvailabilityModule {
                 widgetState.availability.icon = icon
                 this.app.store.set('widgets', widgetState)
 
-                if (this.app.env.extension) {
+                if (this.app.env.isExtension) {
                     if (widgetState.queues && !widgetState.queues.selected) {
                         browser.browserAction.setIcon({path: icon})
                     }
@@ -132,8 +140,6 @@ class AvailabilityModule {
     * options when the module is loaded in the background.
     */
     _load() {
-        if (this.app.env.extension && !this.app.env.extension.background) return
-
         this.app.api.client.get('api/userdestination/').then((res) => {
             this.app.emit('ui:widget.reset', {name: 'availability'})
             if (this.app.api.OK_STATUS.includes(res.status)) {
@@ -175,7 +181,7 @@ class AvailabilityModule {
                 }
                 this.app.logger.info(`${this}setting icon ${icon}`)
 
-                if (this.app.env.extension) {
+                if (this.app.env.isExtension) {
                     if (!widgetState.queues.selected) {
                         browser.browserAction.setIcon({path: icon})
                     }
@@ -202,7 +208,7 @@ class AvailabilityModule {
     _reset() {
         this.app.emit('availability:reset')
         this.app.logger.info(`${this}set icon to grey`)
-        if (this.app.env.extension) browser.browserAction.setIcon({path: 'img/icon-menubar-inactive.png'})
+        if (this.app.env.isExtension) browser.browserAction.setIcon({path: 'img/icon-menubar-inactive.png'})
     }
 
 
@@ -238,7 +244,7 @@ class AvailabilityModule {
         if (widgetState && widgetState.availability.icon) {
             if (!widgetState.queues.selected) {
                 this.app.logger.info(`${this}set availability icon`)
-                if (this.app.env.extension) {
+                if (this.app.env.isExtension) {
                     browser.browserAction.setIcon({path: widgetState.availability.icon})
                 }
             }
