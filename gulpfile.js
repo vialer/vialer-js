@@ -102,15 +102,15 @@ if (settings.VERBOSE) {
             'brand=vialer': '',
             'target=chrome': 'chrome|firefox',
         },
+        targetOnly: {
+            'target=chrome': 'chrome|firefox|electron|webview',
+        },
         webview: {
             'brand=vialer': '',
             'target=chrome': 'electron|webview',
         },
     }
 }
-
-
-
 
 // Notify developer about some essential build flag values.
 gutil.log('BUILD FLAGS:')
@@ -225,16 +225,30 @@ gulp.task('deploy', 'Deploy a build to a store.', async() => {
 }, {options: taskOptions.browser})
 
 
-gulp.task('deploy-brand', 'Deploy a brand to all stores.', async() => {
-    await helpers.deploy(settings.BRAND_TARGET, 'chrome', helpers.distributionName(settings.BRAND_TARGET))
-    await helpers.deploy(settings.BRAND_TARGET, 'firefox', helpers.distributionName(settings.BRAND_TARGET))
+gulp.task('deploy-brand', 'Deploy <BRAND_TARGET> to all supported stores.', async() => {
+    const targets = ['chrome', 'firefox']
+    for (const target of targets) {
+        await helpers.deploy(settings.BRAND_TARGET, target, helpers.distributionName(settings.BRAND_TARGET))
+    }
 }, {options: taskOptions.brandOnly})
 
 
-gulp.task('deploy-brands', 'Deploy all brands to all stores.', async() => {
-    let chromeActions = settings.brands.filter((brand) => helpers.deploy(brand, 'chrome', helpers.distributionName(brand)))
-    let firefoxActions = settings.brands.filter((brand) => helpers.deploy(brand, 'firefox', helpers.distributionName(brand)))
-    await Promise.all(chromeActions.concat(firefoxActions))
+gulp.task('deploy-brands', 'Deploy all brands to <BUILD_TARGET> store.', async() => {
+    // Can't do this async, since settings are modified during deploy to work
+    // around gulp tasks not accepting parameters.
+    for (const brand of Object.keys(settings.brands)) {
+        await helpers.deploy(brand, settings.BUILD_TARGET, helpers.distributionName(brand))
+    }
+}, {options: taskOptions.targetOnly})
+
+
+gulp.task('deploy-brands-stores', 'Deploy all brands to all supported stores.', async() => {
+    const targets = ['chrome', 'firefox']
+    for (const target of targets) {
+        for (const brand of Object.keys(settings.brands)) {
+            await helpers.deploy(brand, target, helpers.distributionName(brand))
+        }
+    }
 })
 
 
@@ -297,8 +311,13 @@ gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-webview'
 })
 
 
-gulp.task('js-webview', 'Generate webview js.', helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview'))
-gulp.task('js-vendor', 'Generate third-party vendor js.', helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor'), {options: taskOptions.all})
+gulp.task('js-webview', 'Generate webview js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview', done)
+})
+
+gulp.task('js-vendor', 'Generate third-party vendor js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', done)
+}, {options: taskOptions.all})
 
 gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
     runSequence([
@@ -314,31 +333,26 @@ gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
     })
 }, {options: taskOptions.browser})
 
-gulp.task(
-    'js-webext-bg',
-    'Generate the extension background entry js.',
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_bg'), {options: taskOptions.browser})
-gulp.task(
-    'js-webext-callstatus',
-    'Generate the callstatus entry js.',
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_callstatus'), {options: taskOptions.browser})
-gulp.task(
-    'js-webext-observer',
-    'Generate WebExtension observer js that runs in all tab frames.',
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_observer'), {options: taskOptions.browser})
+gulp.task('js-webext-bg', 'Generate the extension background entry js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_bg', done)
+}, {options: taskOptions.browser})
+gulp.task('js-webext-callstatus', 'Generate the callstatus entry js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_callstatus', done)
+}, {options: taskOptions.browser})
+gulp.task('js-webext-observer', 'Generate WebExtension observer js that runs in all tab frames.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_observer', done)
+}, {options: taskOptions.browser})
 
-gulp.task(
-    'js-webext-options',
-    'Generate webextension options js.',
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_options'), {options: taskOptions.browser})
-gulp.task(
-    'js-webext-popup',
-    'Generate webextension popup/popout js.',
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_popup'), {options: taskOptions.browser})
-gulp.task(
-    'js-webext-tab',
-    'Generate webextension tab js.',
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_tab'), {options: taskOptions.browser})
+gulp.task('js-webext-options', 'Generate webextension options js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_options', done)
+}, {options: taskOptions.browser})
+gulp.task('js-webext-popup', 'Generate webextension popup/popout js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_popup', done)
+}, {options: taskOptions.browser})
+gulp.task('js-webext-tab', 'Generate webextension tab js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_tab', done)
+}, {options: taskOptions.browser})
+
 
 
 gulp.task('manifest-webext', 'Generate a manifest for a browser WebExtension.', async() => {
@@ -363,18 +377,21 @@ gulp.task('scss', 'Compile all css.', [], (done) => {
 }, {options: taskOptions.all})
 
 
-gulp.task(
-    'scss-webext', 'Generate popover webextension css.',
-    helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext'), {options: taskOptions.all})
-gulp.task(
-    'scss-webext-callstatus', 'Generate webextension callstatus dialog css.',
-    helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_callstatus'), {options: taskOptions.all})
-gulp.task(
-    'scss-webext-options', 'Generate webextension options css.',
-    helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_options'), {options: taskOptions.all})
-gulp.task(
-    'scss-webext-print', 'Generate webextension print css.',
-    helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_print'), {options: taskOptions.all})
+gulp.task('scss-webext', 'Generate popover webextension css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext')
+}, {options: taskOptions.all})
+
+gulp.task('scss-webext-callstatus', 'Generate webextension callstatus dialog css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_callstatus')
+}, {options: taskOptions.all})
+gulp.task('scss-webext-options', 'Generate webextension options css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_options')
+}, {options: taskOptions.all})
+
+gulp.task('scss-webext-print', 'Generate webextension print css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_print')
+}, {options: taskOptions.all})
+
 
 gulp.task('watch', 'Start development server and watch for changes.', () => {
     settings.LIVERELOAD = true

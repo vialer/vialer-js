@@ -55,6 +55,12 @@ class Helpers {
     * @returns {Promise} - Resolves when done deploying.
     */
     deploy(brandName, buildType, distributionName) {
+        const OLD_BRAND_TARGET = this.settings.BRAND_TARGET
+        const OLD_BUILD_TARGET = this.settings.BUILD_TARGET
+
+        this.settings.BRAND_TARGET = brandName
+        this.settings.BUILD_TARGET = buildType
+
         return new Promise((resolve, reject) => {
             const PACKAGE = require('../package')
 
@@ -62,7 +68,6 @@ class Helpers {
                 runSequence('build-dist', async() => {
                     const api = this.settings.brands[brandName].store.chrome
                     const zipFile = fs.createReadStream(`./dist/${brandName}/${buildType}/${distributionName}.zip`)
-
                     let extensionId
                     // Deploy to production or test environment, based on DEPLOY_TARGET.
                     if (this.settings.DEPLOY_TARGET === 'production') extensionId = api.extensionId
@@ -83,17 +88,19 @@ class Helpers {
                         return
                     }
 
-                    gutil.log(`Uploaded extension version ${PACKAGE.version} to chrome store.`)
+                    gutil.log(`Uploaded ${brandName} Chrome WebExtension version ${PACKAGE.version}.`)
                     // Chrome store has a distinction to publish for `trustedTesters` and
                     // `default`(world). Instead, we use a separate extension which
                     // gives us more control over the release process.
                     try {
                         const _res = await webStore.publish('default', token)
                         if (_res.status.includes('OK')) {
-                            // eslint-disable-next-line max-len
-                            gutil.log(`Succesfully published extension version ${PACKAGE.version}.`)
+                            gutil.log(`Published ${brandName} Chrome WebExtension version ${PACKAGE.version}.`)
+                            this.settings.BRAND_TARGET = OLD_BRAND_TARGET
+                            this.settings.BUILD_TARGET = OLD_BUILD_TARGET
                             resolve()
                         } else {
+                            reject()
                             gutil.log(`An error occured during publishing: ${JSON.stringify(_res, null, 4)}`)
                         }
                     } catch (err) {
@@ -112,6 +119,9 @@ class Helpers {
                     let child = childExec(_cmd, undefined, (err, stdout, stderr) => {
                         if (stderr) gutil.log(stderr)
                         if (stdout) gutil.log(stdout)
+                        gutil.log(`Published ${brandName} Firefox WebExtension version ${PACKAGE.version}.`)
+                        this.settings.BRAND_TARGET = OLD_BRAND_TARGET
+                        this.settings.BUILD_TARGET = OLD_BUILD_TARGET
                         resolve()
                     })
 
@@ -207,43 +217,41 @@ class Helpers {
     * @param {String} brandName - Brand to produce js for.
     * @param {String} buildType - Target environment to produce js for.
     * @param {String} jsName - Name of the js entrypoint.
-    * @returns {Function} - Browerserify bundle function to use.
+    * @param {String} cb - Callback when the task is done.
     */
-    jsEntry(brandName, buildType, jsName) {
-        return (done) => {
-            if (!BUNDLERS[jsName]) {
-                BUNDLERS[jsName] = browserify({
-                    cache: {},
-                    debug: !this.settings.PRODUCTION,
-                    entries: path.join(this.settings.SRC_DIR, 'js', `${jsName}.js`),
-                    packageCache: {},
-                })
-                if (this.settings.LIVERELOAD) BUNDLERS[jsName].plugin(watchify)
-            }
-            BUNDLERS[jsName].ignore('process')
-            BUNDLERS[jsName].bundle()
-                .on('error', notify.onError('Error: <%= error.message %>'))
-                .on('end', () => {
-                    done()
-                })
-                .pipe(source(`${jsName}.js`))
-                .pipe(buffer())
-                .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
-                .pipe(envify({
-                    ANALYTICS_ID: this.settings.brands[brandName].analytics_id,
-                    HOMEPAGE: this.settings.brands[brandName].homepage_url,
-                    NODE_ENV: this.settings.NODE_ENV,
-                    PLATFORM_URL: this.settings.brands[brandName].permissions,
-                    PLUGIN_NAME: this.distributionName(brandName),
-                    SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
-                    VERBOSE: this.settings.VERBOSE,
-                    VERSION: this.settings.PACKAGE.version,
-                }))
-                .pipe(ifElse(this.settings.PRODUCTION, () => minifier()))
-                .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.write('./')))
-                .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')))
-                .pipe(size(_extend({title: `${jsName}.js`}, this.settings.SIZE_OPTIONS)))
+    jsEntry(brandName, buildType, jsName, cb) {
+        if (!BUNDLERS[jsName]) {
+            BUNDLERS[jsName] = browserify({
+                cache: {},
+                debug: !this.settings.PRODUCTION,
+                entries: path.join(this.settings.SRC_DIR, 'js', `${jsName}.js`),
+                packageCache: {},
+            })
+            if (this.settings.LIVERELOAD) BUNDLERS[jsName].plugin(watchify)
         }
+        BUNDLERS[jsName].ignore('process')
+        BUNDLERS[jsName].bundle()
+            .on('error', notify.onError('Error: <%= error.message %>'))
+            .on('end', () => {
+                cb()
+            })
+            .pipe(source(`${jsName}.js`))
+            .pipe(buffer())
+            .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
+            .pipe(envify({
+                ANALYTICS_ID: this.settings.brands[brandName].analytics_id,
+                HOMEPAGE: this.settings.brands[brandName].homepage_url,
+                NODE_ENV: this.settings.NODE_ENV,
+                PLATFORM_URL: this.settings.brands[brandName].permissions,
+                PLUGIN_NAME: this.distributionName(brandName),
+                SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
+                VERBOSE: this.settings.VERBOSE,
+                VERSION: this.settings.PACKAGE.version,
+            }))
+            .pipe(ifElse(this.settings.PRODUCTION, () => minifier()))
+            .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.write('./')))
+            .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')))
+            .pipe(size(_extend({title: `${jsName}.js`}, this.settings.SIZE_OPTIONS)))
     }
 
 
@@ -256,21 +264,19 @@ class Helpers {
     */
     scssEntry(brandName, buildType, scssName) {
         const brandColors = this.formatScssVars(this.settings.brands[brandName].colors)
-        return () => {
-            return gulp.src(`./src/scss/${scssName}.scss`)
-                .pipe(insert.prepend(brandColors))
-                .pipe(sass({
-                    includePaths: this.settings.NODE_PATH,
-                    sourceMap: !this.settings.PRODUCTION,
-                    sourceMapContents: !this.settings.PRODUCTION,
-                    sourceMapEmbed: !this.settings.PRODUCTION,
-                }))
-                .on('error', notify.onError('Error: <%= error.message %>'))
-                .pipe(concat(`${scssName}.css`))
-                .pipe(ifElse(this.settings.PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
-                .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'css')))
-                .pipe(size(_extend({title: `scss-${scssName}`}, this.settings.SIZE_OPTIONS)))
-        }
+        return gulp.src(`./src/scss/${scssName}.scss`)
+            .pipe(insert.prepend(brandColors))
+            .pipe(sass({
+                includePaths: this.settings.NODE_PATH,
+                sourceMap: !this.settings.PRODUCTION,
+                sourceMapContents: !this.settings.PRODUCTION,
+                sourceMapEmbed: !this.settings.PRODUCTION,
+            }))
+            .on('error', notify.onError('Error: <%= error.message %>'))
+            .pipe(concat(`${scssName}.css`))
+            .pipe(ifElse(this.settings.PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
+            .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'css')))
+            .pipe(size(_extend({title: `scss-${scssName}`}, this.settings.SIZE_OPTIONS)))
     }
 
 
