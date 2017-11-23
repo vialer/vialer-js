@@ -49,7 +49,7 @@ class DialerModule {
      */
     addContextMenuItem() {
         this.app.logger.info(`${this}adding contextmenu`)
-        this._contextMenuItem = this.app.browser.contextMenus.create({
+        this._contextMenuItem = browser.contextMenus.create({
             contexts: ['selection'],
             onclick: (info, _tab) => {
                 this.app.modules.dialer.dial(info.selectionText, _tab)
@@ -186,7 +186,7 @@ class DialerModule {
 
     removeContextMenuItem() {
         this._contextMenuItem = null
-        this.app.browser.contextMenus.removeAll()
+        browser.contextMenus.removeAll()
     }
 
 
@@ -228,7 +228,7 @@ class DialerModule {
 
         this.frame = $('<iframe>', {
             scrolling: false,
-            src: this.app.browser.runtime.getURL(`webext_callstatus.html?bNumber=${bNumber}&status=${status}`),
+            src: browser.runtime.getURL(`webext_callstatus.html?bNumber=${bNumber}&status=${status}`),
             style: (function() {
                 // Can't set !important with
                 // .css("property", "value !important"),
@@ -318,7 +318,7 @@ class DialerModule {
         // Emit to each tab's running observer scripts that we don't want to
         // observe anymore.
         if (this.app.store.get('c2d')) {
-            this.app.browser.tabs.query({}, (tabs) => {
+            browser.tabs.query({}).then((tabs) => {
                 tabs.forEach((tab) => {
                     // Emit all observers on the tab to stop.
                     this.app.emit('observer:stop', {frame: 'observer'}, false, tab.id)

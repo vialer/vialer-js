@@ -91,7 +91,7 @@ class AvailabilityModule {
 
                 if (this.app.env.extension) {
                     if (widgetState.queues && !widgetState.queues.selected) {
-                        this.app.browser.browserAction.setIcon({path: icon})
+                        browser.browserAction.setIcon({path: icon})
                     }
                 }
 
@@ -177,7 +177,7 @@ class AvailabilityModule {
 
                 if (this.app.env.extension) {
                     if (!widgetState.queues.selected) {
-                        this.app.browser.browserAction.setIcon({path: icon})
+                        browser.browserAction.setIcon({path: icon})
                     }
                 }
 
@@ -202,7 +202,7 @@ class AvailabilityModule {
     _reset() {
         this.app.emit('availability:reset')
         this.app.logger.info(`${this}set icon to grey`)
-        if (this.app.env.extension) this.app.browser.browserAction.setIcon({path: 'img/icon-menubar-inactive.png'})
+        if (this.app.env.extension) browser.browserAction.setIcon({path: 'img/icon-menubar-inactive.png'})
     }
 
 
@@ -239,7 +239,7 @@ class AvailabilityModule {
             if (!widgetState.queues.selected) {
                 this.app.logger.info(`${this}set availability icon`)
                 if (this.app.env.extension) {
-                    this.app.browser.browserAction.setIcon({path: widgetState.availability.icon})
+                    browser.browserAction.setIcon({path: widgetState.availability.icon})
                 }
             }
         }

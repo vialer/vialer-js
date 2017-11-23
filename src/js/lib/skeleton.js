@@ -55,13 +55,9 @@ class Skeleton extends EventEmitter {
         // Increases verbosity beyond the logger's debug level. Not
         // always useful during development, so it can be switched
         // of manually.
-        if (process.env.VERBOSE === true) {
-            this.logger.info(`${this}extra verbosity is enabled`)
-            this.verbose = true
-        } else {
-            this.logger.info(`${this}extra verbosity is disabled`)
-            this.verbose = false
-        }
+        if (process.env.VERBOSE === true) this.verbose = true
+        else this.verbose = false
+        this.logger.info(`${this}verbose mode: ${this.verbose}`)
     }
 
 
@@ -87,7 +83,9 @@ class Skeleton extends EventEmitter {
 
             if (tabId) {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
-                this.browser.tabs.sendMessage(tabId, payloadData)
+                browser.tabs.sendMessage(tabId, payloadData).catch((err) => {
+                    if (this.verbose) this.logger.debug(`${this}${err.message}`)
+                })
                 return
             } else if (parent) {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to parent`)
@@ -100,10 +98,16 @@ class Skeleton extends EventEmitter {
                 const callback = data.callback
                 // Make sure that functions are not part of the payload data.
                 delete data.callback
-                this.browser.runtime.sendMessage(payloadData, callback)
+                browser.runtime.sendMessage(payloadData).then(function handleResponse(message) {
+                    callback(message)
+                }).catch((err) => {
+                    if (this.verbose) this.logger.debug(`${this}${err.message}`)
+                })
             } else {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
-                this.browser.runtime.sendMessage(payloadData)
+                browser.runtime.sendMessage(payloadData).catch((err) => {
+                    if (this.verbose) this.logger.debug(`${this}${err.message}`)
+                })
             }
         }
         // The web version will always use a local emitter, no matter what
@@ -132,13 +136,14 @@ class Skeleton extends EventEmitter {
                 environment.extension.popout = false
             }
 
+            environment.extension.isEdge = navigator.userAgent.toLowerCase().includes('edge')
             environment.extension.isChrome = navigator.userAgent.toLowerCase().includes('chrome')
+
+            if (environment.extension.isChrome) {
+                window.browser = require('webextension-polyfill')
+            }
             environment.extension.isFirefox = navigator.userAgent.toLowerCase().includes('firefox')
-
-            if (environment.extension.isChrome) this.browser = chrome
-            else this.browser = browser
         }
-
 
         environment.os = {
             linux: navigator.platform.match(/(Linux)/i) ? true : false,
@@ -155,27 +160,29 @@ class Skeleton extends EventEmitter {
     * by mapping an IPC event to the EventEmitter.
     */
     ipcListener() {
-        this.browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-            if (request.data) {
-                // Add extra contextual information about sender to payload.
-                request.data.sender = sender
-                // It may have a callback, but functions can't pass through
-                // the request.data, so map sendResponse.
-                request.data.callback = sendResponse
-            }
-            // The frame option can be used to specifically target a
-            // callstatus or observer script. Otherwise the event is
-            // ignored, because otherwise all events emitted on the tab will
-            // also be processed by the callstatus and observer scripts.
-            if (this.env.extension.callstatus || this.env.extension.observer) {
-                if (this.env.extension.callstatus && request.data.frame && request.data.frame === 'callstatus') {
-                    this.emit(request.event, request.data, true)
-                } else if (this.env.extension.observer && request.data.frame && request.data.frame === 'observer') {
-                    this.emit(request.event, request.data, true)
+        browser.runtime.onMessage.addListener((message, sender) => {
+            return new Promise((resolve, reject) => {
+                if (message.data) {
+                    // Add extra contextual information about sender to payload.
+                    message.data.sender = sender
+                    // It may have a callback, but functions can't pass through
+                    // the request.data, so map sendResponse.
+                    message.data.callback = resolve
                 }
-            } else {
-                this.emit(request.event, request.data, true)
-            }
+                // The frame option can be used to specifically target a
+                // callstatus or observer script. Otherwise the event is
+                // ignored, because otherwise all events emitted on the tab will
+                // also be processed by the callstatus and observer scripts.
+                if (this.env.extension.callstatus || this.env.extension.observer) {
+                    if (this.env.extension.callstatus && message.data.frame && message.data.frame === 'callstatus') {
+                        this.emit(message.event, message.data, true)
+                    } else if (this.env.extension.observer && message.data.frame && message.data.frame === 'observer') {
+                        this.emit(message.event, message.data, true)
+                    }
+                } else {
+                    this.emit(message.event, message.data, true)
+                }
+            })
         })
     }
 

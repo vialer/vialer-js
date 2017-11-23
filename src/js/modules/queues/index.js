@@ -113,7 +113,7 @@ class QueuesModule {
             // was selected earlier.
             if (this.app.env.extension) {
                 if (queue.id === this.app.store.get('widgets').queues.selected) {
-                    this.app.browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                    browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
                 }
             }
 

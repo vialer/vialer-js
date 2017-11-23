@@ -25,7 +25,7 @@ class DialerActions extends Actions {
             // Only notify tabs in the context of an extension.
             if (!this.app.env.extension) return
 
-            this.app.browser.tabs.query({}, (tabs) => {
+            browser.tabs.query({}).then((tabs) => {
                 tabs.forEach((tab) => {
                     if (this.module.switchObserver(tab)) {
                         this.app.emit('observer:start', {frame: 'observer'}, false, tab.id)
