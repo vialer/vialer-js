@@ -148,7 +148,7 @@ gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
 }, {options: taskOptions.all})
 
 
-gulp.task('build-all-targets', 'Build all targets.', (done) => {
+gulp.task('build-targets', 'Build all targets.', (done) => {
     // Refresh the brand content with each build.
     let electronTargetTasks = ['assets', 'html', 'scss', 'js-electron-main', 'js-webview', 'js-vendor']
     let pluginTargetTasks = ['assets', 'html', 'scss', 'js-vendor', 'js-webext']
@@ -220,12 +220,12 @@ gulp.task('build-run', 'Make a development build and run it in the target enviro
 }, {options: taskOptions.all})
 
 
-gulp.task('deploy', 'Deploy a build to a store.', async() => {
+gulp.task('deploy', 'Deploy <BRAND_TARGET> to the <BUILD_TARGET> store.', async() => {
     await helpers.deploy(settings.BRAND_TARGET, settings.BUILD_TARGET, helpers.distributionName(settings.BRAND_TARGET))
 }, {options: taskOptions.browser})
 
 
-gulp.task('deploy-brand', 'Deploy <BRAND_TARGET> to all supported stores.', async() => {
+gulp.task('deploy-brand', 'Deploy <BRAND_TARGET> to all supported target stores.', async() => {
     const targets = ['chrome', 'firefox']
     for (const target of targets) {
         await helpers.deploy(settings.BRAND_TARGET, target, helpers.distributionName(settings.BRAND_TARGET))
@@ -242,7 +242,7 @@ gulp.task('deploy-brands', 'Deploy all brands to <BUILD_TARGET> store.', async()
 }, {options: taskOptions.targetOnly})
 
 
-gulp.task('deploy-brands-stores', 'Deploy all brands to all supported stores.', async() => {
+gulp.task('deploy-brands-targets', 'Deploy all brands to all supported target stores.', async() => {
     const targets = ['chrome', 'firefox']
     for (const target of targets) {
         for (const brand of Object.keys(settings.brands)) {
