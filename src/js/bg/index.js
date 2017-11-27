@@ -1,25 +1,26 @@
-const Analytics = require('./analytics')
-const Api = require('./api')
+let env = require('../lib/env')
 
-const Sip = require('./sip')
-const Skeleton = require('./skeleton')
-const Store = require('./store')
-const Timer = require('./timer')
+const Analytics = require('./lib/analytics')
+const Api = require('./lib/api')
+const Sip = require('./lib/sip')
+const Skeleton = require('../lib/skeleton')
+const Timer = require('./lib/timer')
 
 
-/**
-* This is the main entry point for the Firefox web extension,
-* the Chrome web extension and the Electron desktop app. It is used
-* by the extension scripts for background(bg) and popup(ui).
-*/
-class App extends Skeleton {
+const _modules = [
+    {Module: require('./availability'), name: 'availability'},
+    {Module: require('./contacts'), name: 'contacts'},
+    {Module: require('./dialer'), name: 'dialer'},
+    {Module: require('./ui'), name: 'ui'},
+    {Module: require('./user'), name: 'user'},
+    {Module: require('./queues'), name: 'queues'},
+]
+
+
+class BackgroundApp extends Skeleton {
 
     constructor(options) {
         super(options)
-
-        // Some caching mechanism.
-        window.cache = {}
-        this.store = new Store(this)
 
         // Clears localstorage if the schema changed after a plugin update.
         if (!this.store.validSchema()) {
@@ -45,7 +46,7 @@ class App extends Skeleton {
             this.logger.info(`${this}reusing existing session from existing credentials`)
             this.reloadModules(false)
 
-            if (this.env.extension && this.env.extension.background) {
+            if (this.env.isExtension && this.env.role.background) {
                 browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
             }
         }
@@ -168,19 +169,25 @@ class App extends Skeleton {
             realm: this.getWebsocketUrl(),
         }
         this.timer = new Timer(this)
-        if (this.env.extension) {
-            // Only the background script in an extension has a sip stack.
-            if (this.env.extension.background) {
-                this.analytics = new Analytics(this, this.settings.analyticsId)
-                this.api = new Api(this)
-                this.sip = new Sip(this)
-            }
-        } else {
-            this.analytics = new Analytics(this, this.settings.analyticsId)
-            this.api = new Api(this)
-            this.sip = new Sip(this)
-        }
+        this.analytics = new Analytics(this, this.settings.analyticsId)
+        this.api = new Api(this)
+        this.sip = new Sip(this)
     }
 }
 
-module.exports = App
+
+function initApp(initParams) {
+    initParams.modules = _modules
+    return new BackgroundApp(initParams)
+}
+
+// For extensions, this is an executable endpoint.
+if (env.isExtension) {
+    env.role.background = true
+    global.app = initApp({
+        environment: env,
+        name: 'bg',
+    })
+}
+
+module.exports = initApp

@@ -1,13 +1,10 @@
-/**
-* @module Ui
-*/
-const UiActions = require('./actions')
-
+const ui = require('../lib/ui')
 
 /**
 * The Ui module. It holds most of the logic used to interact
 * with the Click-to-dial UI. It is mainly concerned with generic
 * actions that change the DOM.
+* @module Ui
 */
 class UiModule {
     /**
@@ -15,8 +12,127 @@ class UiModule {
     */
     constructor(app) {
         this.app = app
-        this.hasUI = false
-        this.actions = new UiActions(app, this)
+        this.addListeners()
+        Object.assign(Object.getPrototypeOf(this), ui())
+    }
+
+
+    addListeners() {
+        // The popout behaves different from the popover. The contacts
+        // widget is open by default.
+        if (this.app.env.isExtension && this.app.env.role.popout) $('html').addClass('popout')
+
+        this.app.on('ui:widget.close', (data) => {
+            // Popout has only the contacts widget open. It can't be closed.
+            if (!this.app.env.isExtension || (this.app.env.isExtension && !this.app.env.role.popout)) {
+                this.closeWidget(data.name)
+            }
+        })
+
+        this.app.on('ui:widget.busy', (data) => {
+            this.busyWidget(data.name)
+        })
+
+        this.app.on('ui.widget.open', (data) => {
+            this.openWidget(data.name)
+        })
+
+        this.app.on('ui:widget.reset', (data) => {
+            this.resetWidget(data.name)
+        })
+
+        this.app.on('ui:widget.unauthorized', (data) => {
+            this.unauthorizeWidget(data.name)
+        })
+
+        this.app.on('ui:mainpanel.loading', (data) => {
+            $('#refresh').addClass('fa-spin')
+        })
+
+        // Spin refresh icon while reloading widgets.
+        this.app.on('ui:mainpanel.ready', (data) => {
+            setTimeout(() => {
+                $('#refresh').removeClass('fa-spin')
+            }, 1000)
+        })
+
+        /**
+         * Toggles the widget's content visibility when clicking its header.
+         * Popout has only the contacts widget open and it can't be closed.
+         */
+        if (!this.app.env.isExtension || (this.app.env.isExtension && !this.app.env.role.popout)) {
+            $('html').on('click', '.widget .widget-header', (e) => {
+                let widget = $(e.currentTarget).closest('[data-opened]')
+                if (this.isWidgetOpen(widget)) {
+                    if (!$(e.target).is(':input')) {
+                        this.app.emit('ui:widget.close', {
+                            name: $(widget).data('widget'),
+                        })
+                        this.closeWidget(widget)
+                    }
+                } else {
+                    this.openWidget(widget)
+                }
+            })
+        }
+
+        $('#close').click((e) => {
+            this._checkCloseMainPanel()
+        })
+
+        /**
+         * Emit that we want to logout.
+         */
+        $('#logout').click((e) => {
+            this.app.emit('user:logout.attempt')
+        })
+
+        $('#popout').click((e) => {
+            browser.tabs.create({url: browser.runtime.getURL('index.html?popout=true')})
+            this._checkCloseMainPanel()
+        })
+        $('#help').click((e) => {
+            this.app.emit('help')
+            this._checkCloseMainPanel()
+        })
+        $('#refresh').click((e) => {
+            this.app.emit('ui:ui.refresh')
+        })
+        $('#settings').click((e) => {
+            this.app.emit('ui:settings')
+            this._checkCloseMainPanel()
+        })
+
+        if (!this.app.store.validSchema()) {
+            this.app.emit('user:logout.attempt')
+        }
+
+        // Switch between logged-in and login state.
+        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
+            this.app.emit('ui:ui.restore')
+            let user = this.app.store.get('username')
+            $('#user-name').text(user)
+
+            this.showPopup()
+        } else {
+            $('.login-section').removeClass('hide')
+        }
+
+
+        $(window).on('unload', () => {
+            this.app.store.set('isMainPanelOpen', false)
+        })
+
+
+        // Focus the first input field.
+        $(window).on('load', () => {
+            // Keep track whether this popup is open or closed.
+            this.app.store.set('isMainPanelOpen', true)
+            // setTimeout fix for FireFox.
+            setTimeout(() => {
+                $('.login-form :input:visible:first').focus()
+            }, 100)
+        })
     }
 
 
@@ -34,7 +150,7 @@ class UiModule {
         $(widget).addClass('busy')
 
         // The popout doesn't change the open/closed status of ANY widget.
-        if (this.app.env.extension && this.app.env.extension.popout) return
+        if (this.app.env.isExtension && this.app.env.role.popout) return
 
         if (this.isWidgetOpen(widget)) {
             this.openWidget(widget)
@@ -108,41 +224,6 @@ class UiModule {
 
 
     /**
-    * Refresh all widgets. Called from the refresh button in the popup.
-    * @param {Boolean} reloadModules - Whether to reload all modules or not.
-    */
-    refreshWidgets(reloadModules) {
-        // Reset widget data when none can be found.
-        if (this.app.store.get('widgets') === null) {
-            let widgetState = {isOpen: {}}
-            for (let moduleName in this.app.modules) {
-                if (this.app.modules[moduleName].hasUI) {
-                    // Initial state for widget.
-                    widgetState.isOpen[moduleName] = false
-                    // each widget can share variables here.
-                    widgetState[moduleName] = {}
-                }
-            }
-            this.app.store.set('widgets', widgetState)
-        }
-
-        // Initial state for mainpanel.
-        if (this.app.store.get('isMainPanelOpen') === null) {
-            this.app.store.set('isMainPanelOpen', false)
-        }
-
-        for (let moduleName in this.app.modules) {
-            // Modules with a UI are notified to reflect busy state.
-            if (this.app.modules[moduleName].hasUI) {
-                this.app.emit('ui:widget.close', {name: moduleName})
-                this.app.emit('ui:widget.busy', {name: moduleName})
-            }
-        }
-        this.app.reloadModules(reloadModules)
-    }
-
-
-    /**
     * Set the busy indicator.
     * @param {String} widgetOrWidgetName - Reference to widget to reset.
     */
@@ -159,7 +240,7 @@ class UiModule {
      */
     restoreWidgetState() {
         // The popout doesn't change the open/closed status of ANY widget.
-        if (this.app.env.extension && this.app.env.extension.popout) return
+        if (this.app.env.isExtension && this.app.env.role.popout) return
 
         let widgetState = this.app.store.get('widgets')
         if (widgetState && widgetState.isOpen) {
@@ -168,15 +249,6 @@ class UiModule {
                 else this.closeWidget(moduleName)
             }
         }
-    }
-
-
-    /**
-     * Reset widget state from storage.
-     */
-    resetWidgetState() {
-        this.app.store.remove('widgets')
-        this.app.store.remove('isMainPanelOpen')
     }
 
 
@@ -190,7 +262,7 @@ class UiModule {
         // that prevents the popup height to be calculated properly.
         // See https://bugs.chromium.org/p/chromium/issues/detail?id=307912
         // for more information.
-        if (this.app.env.os.osx) {
+        if (this.app.env.isOsx) {
             setTimeout(() => {
                 // Don't set the width when the html has a popout class
                 // because the popout is responsible and has a fluid width.
@@ -200,33 +272,6 @@ class UiModule {
                 }
             }, 150)
         }
-    }
-
-
-    /**
-     * A single entrypoint for setting a button's state.
-     * @param {$} button - The Jquery selector of the button.
-     * @param {String} [state=default] - The state to switch the button to.
-     * @param {Boolean|Function} [disabled=default] - Toggle the disabled state of the button.
-     * @param {Number} timeout - Time after which to restore button.
-     */
-    setButtonState(button, state = 'default', disabled = false, timeout = 2000) {
-        setTimeout(() => {
-            if (typeof disabled === 'function') disabled = disabled()
-            $(button).html($(button).data(`state-${state}`))
-            if (['failed', 'error'].includes(state)) {
-                // An error message. Mark it so.
-                $(button).removeClass('info loading').prop('disabled', disabled).addClass('failed')
-            } else if (['loading'].includes(state)) {
-                $(button).removeClass('info failed error').prop('disabled', disabled).addClass('loading')
-            } else if (['default'].includes(state)) {
-                // The default state.
-                $(button).removeClass('info failed error loading').prop('disabled', disabled)
-            } else {
-                // An info state.
-                $(button).removeClass('loading failed error').addClass('info').prop('disabled', disabled)
-            }
-        }, timeout)
     }
 
 
@@ -244,6 +289,21 @@ class UiModule {
         const widget = this.getWidget(widgetOrWidgetName)
         this.resetWidget(widget)
         widget.addClass('unauthorized')
+    }
+
+
+    /**
+    * Called when an external action occurs, like opening a new tab,
+    * which requires to shift the focus of the user to the new
+    * content. Don't close the existing window when it is called
+    * from the popout.
+    */
+    _checkCloseMainPanel() {
+        this.app.emit('ui:mainpanel.close')
+        // Only close the existing window.
+        if (this.app.env.isExtension && !this.app.env.role.popout) {
+            window.close()
+        }
     }
 
 }

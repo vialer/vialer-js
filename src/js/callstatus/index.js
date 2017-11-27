@@ -1,4 +1,5 @@
-const Skeleton = require('./lib/skeleton')
+let env = require('../lib/env')
+const Skeleton = require('../lib/skeleton')
 
 
 class CallStatusApp extends Skeleton {
@@ -21,6 +22,11 @@ class CallStatusApp extends Skeleton {
         this.setText(document.getElementById('number'), this.bNumber)
         this.setText(document.getElementById('status'), initialStatus)
 
+        this.addListeners()
+    }
+
+
+    addListeners() {
         this.on('dialer:status.update', (data) => {
             // The callid is assigned on the first status update.
             if (!this.callid) this.callid = data.callid
@@ -81,16 +87,9 @@ class CallStatusApp extends Skeleton {
     }
 }
 
-
+env.role.callstatus = true
 global.app = new CallStatusApp({
-    environment: {
-        extension: {
-            background: false,
-            callstatus: true,
-            popup: false,
-            tab: false,
-        },
-    },
+    environment: env,
     modules: [],
     name: 'callstatus',
 })

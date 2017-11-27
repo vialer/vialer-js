@@ -1,14 +1,19 @@
-const Skeleton = require('./lib/skeleton')
+let env = require('../lib/env')
+const Skeleton = require('../lib/skeleton')
+const ui = require('../lib/ui')
+
 
 class OptionsApp extends Skeleton {
 
     constructor(options) {
         super(options)
 
+        Object.assign(Object.getPrototypeOf(this), ui())
+
         // The settings pages are browser-specific. Distinguish between the
         // two by setting a css class on the html element.
-        if (this.env.extension.isChrome) $('html').addClass('chrome')
-        if (this.env.extension.isFirefox) $('html').addClass('firefox')
+        if (this.env.isChrome) $('html').addClass('chrome')
+        if (this.env.isFirefox) $('html').addClass('firefox')
 
         // Cache all queried nodes.
         this.$ = {
@@ -34,8 +39,8 @@ class OptionsApp extends Skeleton {
     saveOptions() {
         this.store.set('c2d', this.$.iconsEnabled.checked)
         this.store.set('platformUrl', this.$.platformUrl.value)
-        this.modules.ui.setButtonState($('#save'), 'saved', true, 0)
-        this.modules.ui.setButtonState($('#save'), 'default', false)
+        this.setButtonState($('#save'), 'saved', true, 0)
+        this.setButtonState($('#save'), 'default', false)
         // Only logout when the endpoint value is changed and the user
         // is currently logged in.
         if (this.platformUrl !== this.$.platformUrl.value && this.store.get('user')) {
@@ -53,19 +58,10 @@ class OptionsApp extends Skeleton {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    env.role.options = true
     global.app = new OptionsApp({
-        environment: {
-            extension: {
-                background: false,
-                callstatus: false,
-                options: true,
-                popup: false,
-                tab: false,
-            },
-        },
-        modules: [
-            {Module: require('./modules/ui'), name: 'ui'},
-        ],
+        environment: env,
+        modules: [],
         name: 'options',
     })
 })
