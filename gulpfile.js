@@ -270,16 +270,14 @@ gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
 
 
 gulp.task('html', 'Preprocess and build application HTML.', () => {
-    let jsbottom, jshead, target
+    let jsbottom, target
 
     if (['electron', 'webview'].includes(settings.BUILD_TARGET)) {
         target = 'electron'
-        jshead = '<script src="js/lib/thirdparty/SIPml-api.js"></script>'
         jsbottom = '<script src="js/webview.js"></script>'
 
     } else {
         target = 'webext'
-        jshead = ''
         jsbottom = '<script src="js/webext_popup.js"></script>'
     }
 
@@ -287,7 +285,6 @@ gulp.task('html', 'Preprocess and build application HTML.', () => {
     // Appropriate scripts are inserted based on the build target.
     return gulp.src(path.join('src', 'html', 'index.html'))
         .pipe(replace('<!--JSBOTTOM-->', jsbottom))
-        .pipe(replace('<!--JSHEAD-->', jshead))
         .pipe(flatten())
         .pipe(ifElse((target === 'webext'), () => addsrc(path.join('src', 'html', 'webext_{options,callstatus}.html'))))
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))

@@ -78,16 +78,7 @@ class ContactsModule {
             _$.searchInput.val('')
         })
 
-
-        this.app.on('sip:before_start', () => {
-            _$.statusIndicators.find('i').addClass('hide').filter('.disconnected-status').removeClass('hide')
-        })
-
         this.app.on('sip:starting', (e) => {
-            _$.statusIndicators.find('i').addClass('hide').filter('.disconnected-status').removeClass('hide')
-        })
-
-        this.app.on('sip:failed_to_start', (data) => {
             _$.statusIndicators.find('i').addClass('hide').filter('.disconnected-status').removeClass('hide')
         })
 

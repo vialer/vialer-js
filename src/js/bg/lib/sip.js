@@ -1,6 +1,7 @@
+const SIP = require('sip.js')
 // Wait x miliseconds before resolving the subscribe event,
 // to prevent the server from being hammered.
-const SUBSCRIBE_DELAY = 200
+const SUBSCRIBE_DELAY = 150
 
 
 /**
@@ -14,10 +15,6 @@ class Sip {
     */
     constructor(app) {
         this.app = app
-        // Set the verbosity of the Sip library. Useful when you need to
-        // debug SIP messages. Supported values are: info, warn, error and
-        // fatal.
-        SIPml.setDebugLevel('error')
 
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
@@ -31,36 +28,9 @@ class Sip {
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
 
-        // Periodically checks the websocket status.
-        this.app.timer.registerTimer('sip.check_connection', () => {
-            // A connection attempt without user credentials is useless.
-            if (app.hasCredentials()) {
-                // The current status is disconnect and we want to reconnect.
-                if (this.reconnect && this.status === 'stopped') {
-                    this.connect()
-                    // Increase the (jittered) timeout before the next connection
-                    // attempt is made. The timeout is reset when a connection
-                    // was succesfully established (`STACK_STARTED`).
-                    // The reason for this is to offload the websocket server
-                    // when a lot of clients try to (re)connect at once.
-                    this.retry = this.app.timer.increaseTimeout(this.retry)
-                    this.app.timer.setTimeout('sip.check_connection', this.retry.timeout)
-                }
-            }
-            this.app.timer.startTimer('sip.check_connection')
-        })
-
-        // Set the initial connection check timer.
-        this.app.timer.setTimeout('sip.check_connection', this.retryDefault.interval)
-        this.app.timer.startTimer('sip.check_connection')
-
-        SIPml.init((e) => {
-            // Connect the websocket when credentials are set. Otherwise
-            // the connection is made when logging in.
-            if (app.hasCredentials()) this.connect()
-        }, (e) => {
-            this.app.logger.error(`${this}failed to initialize the SIP engine: ${e.message}`)
-        })
+        if (app.hasCredentials()) {
+            this.connect()
+        }
     }
 
 
@@ -71,34 +41,48 @@ class Sip {
     connect() {
         // Emit to the frontend that the sip client is not yet
         // ready to start.
-        if (['started', 'starting'].includes(this.status)) {
+        if (this.ua && this.ua.isConnected()) {
             this.app.logger.warn(`${this}sip backend already starting or started`)
             return
         }
 
         this.app.logger.debug(`${this}connecting to sip backend`)
-        this.app.emit('sip:before_start', {})
+        this.app.logger.info(`${this}SIP stack starting`)
+        this.app.emit('sip:starting', {}, 'both')
 
         let user = this.app.store.get('user')
 
-        this._sip = new SIPml.Stack({
-            display_name: '',
-            enable_rtcweb_breaker: false,
-            events_listener: {
-                events: '*',
-                listener: this.sipStatusEvent.bind(this),
+        this.ua = new SIP.UA({
+            authorizationUser: user.email,
+            log: {
+                builtinEnabled: process.env.VERBOSE,
+                debug: 'error',
             },
-            impi: user.email, // authorization name (IMS Private Identity)
-            impu: `sip:${user.email}@${this.app.settings.realm}`, // valid SIP Uri (IMS Public Identity)
             password: user.token,
-            realm: this.app.settings.realm, // domain name
-            sip_headers: [
-                {name: 'User-Agent', value: process.env.PLUGIN_NAME},
-                {name: 'Organization', value: 'VoIPGRID'},
-            ],
-            websocket_proxy_url: `wss://${this.app.settings.realm}`,
+            register: false,
+            traceSip: process.env.VERBOSE,
+            uri: `sip:${user.email}`,
+            userAgentString: process.env.PLUGIN_NAME,
+            wsServers: [`wss://${this.app.settings.realm}`],
         })
-        this._sip.start()
+
+        this.ua.on('connected', () => {
+            this.app.logger.info(`${this}SIP stack started`)
+            // Reset the connection retry timer.
+            this.app.emit('sip:started', {}, 'both')
+            this.updatePresence()
+        })
+
+
+        this.ua.on('disconnected', () => {
+            this.app.logger.info(`${this}SIP stack stopped`)
+            this.app.emit('sip:stopped', {}, 'both')
+
+            if (this.reconnect) {
+                this.app.logger.info(`${this}SIP stack reconnecting`)
+                this.ua.start()
+            }
+        })
     }
 
 
@@ -117,117 +101,53 @@ class Sip {
                 this.unsubscribePresence(accountId)
             })
         }
-        if (this._sip && this._sip.stop(0) === 0) {
-            // A succesful disconnect returns 0.
-            this.app.logger.debug(`${this}disconnect`)
+        if (this.ua && this.ua.isConnected()) {
+            this.ua.stop()
+            this.app.logger.debug(`${this}disconnected`)
         } else {
-            this.app.logger.debug(`${this}not (yet) connected`)
+            this.app.logger.debug(`${this}not connection to stop`)
         }
     }
 
 
     /**
-    * The SIP stack fires a new event, which is handled by this function.
-    * @param {Event} e - Catch-all event when SipML UA tries to connect to
-    * the websocket proxy.
+    * Parse an incoming dialog XML request body and return
+    * the account state from it.
+    * @param {Request} notification - A SIP.js Request object.
+    * @returns {String} - The state of the account.
     */
-    sipStatusEvent(e) {
-        this.status = e.type
-        // Keep the websocket connection status in sync with localstorage.
-        this.app.store.set('sip', {status: this.status})
+    parseStateFromDialog(notification) {
+        let parser = new DOMParser()
+        let xmlDoc = parser ? parser.parseFromString(notification.request.body, 'text/xml') : null
+        let dialogNode = xmlDoc ? xmlDoc.getElementsByTagName('dialog-info')[0] : null
+        if (!dialogNode) throw Error('Notification message is missing a dialog node')
 
-        // SipML5 hack to trigger STACK_STOPPED event logic just once.
-        if (e.o_event.i_code !== tsip_event_code_e.STACK_STOPPED) this._stopped = false
+        let stateAttr = dialogNode.getAttribute('state')
+        // let localNode = dialogNode.getElementsByTagName('local')[0]
+        let stateNode = dialogNode.getElementsByTagName('state')[0]
+        let state = 'unavailable'
 
-        switch (e.o_event.i_code) {
-            case tsip_event_code_e.STACK_STARTING:
-                this.app.logger.info(`${this}SIP stack starting`)
-                this.app.emit('sip:starting', {}, 'both')
-                break
-            case tsip_event_code_e.STACK_FAILED_TO_START:
-                this.app.logger.warn(`${this}SIP stack failed to start`)
-                this.app.emit('sip:failed_to_start', {}, 'both')
-                break
-            case tsip_event_code_e.STACK_STARTED:
-                this.app.logger.info(`${this}SIP stack started`)
-                // Reset the connection retry timer.
-                this.retry = Object.assign({}, this.retryDefault)
-                this.app.emit('sip:started', {}, 'both')
-                // Start updating presence information.
-                this.updatePresence()
-                break
-            case tsip_event_code_e.STACK_STOPPED:
-                // SipML5 hack to trigger STACK_STOPPED event logic just once.
-                if (!this._stopped) {
-                    this.app.logger.info(`${this}SIP stack stopped`)
-                    this.app.emit('sip:stopped', {}, 'both')
-                }
-
-                this._stopped = true
-                break
+        if (stateAttr === 'full') {
+            state = 'available'
         }
-    }
 
-
-    /**
-    * Called multiple times for each presence subscription is registered.
-    * @param {Event} e - Catch-all event when a subscribe event is triggered.
-    * @param {Number} accountId - The accountId of the subscriber.
-    * @param {Function} resolve - The Promise resolver function.
-    */
-    subscribeEvent(e, accountId, resolve) {
-        if (e.type === 'connected') {
-            setTimeout(() => {
-                resolve({
-                    accountId: accountId,
-                    event: e,
-                })
-            }, SUBSCRIBE_DELAY)
-        } else if (e.type === 'i_notify') {
-            let parser = new DOMParser()
-            let xmlDoc = parser ? parser.parseFromString(e.getContentString(), 'text/xml') : null
-            let dialogNode = xmlDoc ? xmlDoc.getElementsByTagName('dialog-info')[0] : null
-            if (dialogNode) {
-                let entityUri = dialogNode.getAttribute('entity')
-                let stateAttr = dialogNode.getAttribute('state')
-                // let localNode = dialogNode.getElementsByTagName('local')[0]
-                let stateNode = dialogNode.getElementsByTagName('state')[0]
-
-                let state = 'unavailable'
-                if (stateAttr === 'full') {
+        // State node has final say, regardless of stateAttr!
+        if (stateNode) {
+            switch (stateNode.textContent) {
+                case 'trying':
+                case 'proceeding':
+                case 'early':
+                    state = 'ringing'
+                    break
+                case 'confirmed':
+                    state = 'busy'
+                    break
+                case 'terminated':
                     state = 'available'
-                }
-
-                // State node has final say, regardless of stateAttr!
-                if (stateNode) {
-                    switch (stateNode.textContent) {
-                        case 'trying':
-                        case 'proceeding':
-                        case 'early':
-                            state = 'ringing'
-                            break
-                        case 'confirmed':
-                            state = 'busy'
-                            break
-                        case 'terminated':
-                            state = 'available'
-                            break
-                    }
-                }
-
-                // Broadcast presence for account.
-                this.app.emit('sip:presence.update', {
-                    account_id: accountId,
-                    state: state,
-                })
-                // Remember subscribed accounts and its state at the time
-                // of an update.
-                this.states[accountId] = {
-                    entityUri: entityUri,
-                    state: state,
-                }
+                    break
             }
         }
+        return state
     }
 
 
@@ -237,34 +157,27 @@ class Sip {
     * @returns {Promise} - Resolved when the subscription is ready.
     */
     subscribePresence(accountId) {
-        if (this.status !== 'started') return false
-
         return new Promise((resolve, reject) => {
-            // Keep reference to prevent subscribing multiple times.
-            this.subscriptions[accountId] = this._sip.newSession('subscribe', {
-                events_listener: {
-                    events: '*',
-                    listener: (e) => {
-                        this.subscribeEvent(e, accountId, resolve)
-                    },
-                },
-                expires: 3600,
-                sip_caps: [
-                    {name: '+g.oma.sip-im', value: null},
-                    {name: '+audio', value: null },
-                    {name: 'language', value: '\"en\"'},
-                ],
-                sip_headers: [
-                    // Only notify for 'dialog' events.
-                    {name: 'Event', value: 'dialog'},
-                    // Subscribe to dialog-info.
-                    {name: 'Accept', value: 'application/dialog-info+xml'},
-                ],
-            })
+            this.subscriptions[accountId] = this.ua.subscribe(`${accountId}@voipgrid.nl`, 'dialog')
+            this.subscriptions[accountId].on('notify', (notification) => {
+                const state = this.parseStateFromDialog(notification)
+                // Broadcast presence for account.
+                this.app.emit('sip:presence.update', {
+                    account_id: accountId,
+                    state: state,
+                })
+                // Remember subscribed accounts and its state at the time
+                // of an update.
+                this.states[accountId] = {
+                    state: state,
+                }
 
-            // Start watching for entity's presence status. Make
-            // sure to pass the accountId as string.
-            this.subscriptions[accountId].subscribe(`${accountId}`)
+                setTimeout(() => {
+                    resolve({
+                        state: state,
+                    })
+                }, SUBSCRIBE_DELAY)
+            })
         })
     }
 
@@ -280,11 +193,13 @@ class Sip {
     * @param {Number} accountId - The accountId to deregister.
     */
     unsubscribePresence(accountId) {
+        if (this.ua.isConnected()) {
+            this.app.logger.debug(`${this}cannot unsubscribe presence ${accountId} without connection`)
+            return
+        }
         this.app.logger.debug(`${this}unsubscribe presence ${accountId}`)
         if (this.subscriptions.hasOwnProperty(accountId)) {
-            if (this._sip && this._sip.o_stack.e_state === tsip_transport_state_e.STARTED) {
-                this.subscriptions[accountId].unsubscribe()
-            }
+            this.subscriptions[accountId].unsubscribe()
             delete this.subscriptions[accountId]
             delete this.states[accountId]
         }
@@ -302,7 +217,7 @@ class Sip {
     async updatePresence(refresh) {
         // The transport must be ready, in order to be able to update
         // presence information from the SIP server.
-        if (this.status !== 'started') {
+        if (!this.ua.isConnected()) {
             this.app.logger.warn(`${this}cannot update presence without websocket connection.`)
             return
         }

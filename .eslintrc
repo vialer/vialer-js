@@ -22,8 +22,7 @@
         "tsip_transport_state_e": true,
         "webkitNotifications": true,
         "electron": true,
-        "$": true,
-        "SIPml": true
+        "$": true
     },
     "plugins": [
         "sort-class-members"
