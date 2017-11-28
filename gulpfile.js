@@ -131,7 +131,6 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
         .pipe(addsrc('./LICENSE'))
         .pipe(addsrc('./README.md'))
         .pipe(addsrc('./src/_locales/**', {base: './src/'}))
-        .pipe(addsrc('./src/js/lib/thirdparty/**/*.js', {base: './src/'}))
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
         .pipe(size(_extend({title: 'assets'}, settings.SIZE_OPTIONS)))
         .pipe(ifElse(settings.LIVERELOAD, livereload))
@@ -270,16 +269,14 @@ gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
 
 
 gulp.task('html', 'Preprocess and build application HTML.', () => {
-    let jsbottom, jshead, target
+    let jsbottom, target
 
     if (['electron', 'webview'].includes(settings.BUILD_TARGET)) {
         target = 'electron'
-        jshead = '<script src="js/lib/thirdparty/SIPml-api.js"></script>'
         jsbottom = '<script src="js/webview.js"></script>'
 
     } else {
         target = 'webext'
-        jshead = ''
         jsbottom = '<script src="js/webext_popup.js"></script>'
     }
 
@@ -287,7 +284,6 @@ gulp.task('html', 'Preprocess and build application HTML.', () => {
     // Appropriate scripts are inserted based on the build target.
     return gulp.src(path.join('src', 'html', 'index.html'))
         .pipe(replace('<!--JSBOTTOM-->', jsbottom))
-        .pipe(replace('<!--JSHEAD-->', jshead))
         .pipe(flatten())
         .pipe(ifElse((target === 'webext'), () => addsrc(path.join('src', 'html', 'webext_{options,callstatus}.html'))))
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
@@ -413,7 +409,6 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     // Watch files related to working on the webextension.
     gulp.watch([
         path.join(__dirname, 'src', 'js', '**', '*.js'),
-        `!${path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'main.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'webview.js')}`,
