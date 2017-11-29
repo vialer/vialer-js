@@ -40,10 +40,26 @@ class UiModule {
             this.app.restoreModules()
         })
 
+
+        /**
+        * Refresh all widgets. Called from the refresh button in the popup.
+        * @param {Boolean} reloadModules - Whether to reload all modules or not.
+        */
         this.app.on('ui:ui.refresh', (data) => {
             this.app.logger.info(`${this}refresh ui`)
             this.app.emit('ui:mainpanel.loading')
-            this.refreshWidgets(true)
+            // Initial state for mainpanel.
+            if (this.app.store.get('isMainPanelOpen') === null) {
+                this.app.store.set('isMainPanelOpen', false)
+            }
+            // Close all widgets and show a busy icon.
+            this.emit('fg:set_state', {
+                availability: {widget: {active: false, state: 'busy'}},
+                contacts: {widget: {active: false, state: 'busy'}},
+                queues: {widget: {active: false, state: 'busy'}},
+            })
+
+            this.app.reloadModules(true)
             this.app.emit('ui:mainpanel.ready')
         })
 
@@ -67,69 +83,6 @@ class UiModule {
         this.app.on('ui:mainpanel.close', (data) => {
             this.app.logger.info(`${this}mainpanel.close`)
         })
-    }
-
-
-    /**
-    * Open/close a widget's content and resize.
-    * @param {String} widgetOrWidgetName - Reference to widget to open.
-    */
-    openWidget(widgetOrWidgetName) {
-        let widget = this.getWidget(widgetOrWidgetName)
-        const data = widget.data()
-        this.app.logger.debug(`${this}open widget ${data.widget}`)
-
-        let widgetState = this.app.store.get('widgets') ? this.app.store.get('widgets') : {}
-        if (!widgetState.isOpen) widgetState.isOpen = {}
-        // Opening widgets act as an accordeon. All other widgets are closed,
-        // except the widget that needs to be open.
-        for (const widgetName of ['contacts', 'availability', 'queues']) {
-            let _widget = this.getWidget(widgetName)
-            if (widgetName !== data.widget) {
-                widgetState.isOpen[widgetName] = false
-                this.closeWidget(widgetName)
-            } else {
-                widgetState.isOpen[widgetName] = true
-                $(_widget).data('opened', true).attr('data-opened', true)
-            }
-        }
-        this.app.store.set('widgets', widgetState)
-        this.app.emit('ui:widget.open', {name: data.widget})
-    }
-
-
-    /**
-    * Refresh all widgets. Called from the refresh button in the popup.
-    * @param {Boolean} reloadModules - Whether to reload all modules or not.
-    */
-    refreshWidgets(reloadModules) {
-        // Reset widget data when none can be found.
-        if (this.app.store.get('widgets') === null) {
-            let widgetState = {isOpen: {}}
-            for (let moduleName in this.app.modules) {
-                if (this.app.modules[moduleName].hasUI) {
-                    // Initial state for widget.
-                    widgetState.isOpen[moduleName] = false
-                    // each widget can share variables here.
-                    widgetState[moduleName] = {}
-                }
-            }
-            this.app.store.set('widgets', widgetState)
-        }
-
-        // Initial state for mainpanel.
-        if (this.app.store.get('isMainPanelOpen') === null) {
-            this.app.store.set('isMainPanelOpen', false)
-        }
-
-        for (let moduleName in this.app.modules) {
-            // Modules with a UI are notified to reflect busy state.
-            if (this.app.modules[moduleName].hasUI) {
-                this.app.emit('ui:widget.close', {name: moduleName})
-                this.app.emit('ui:widget.busy', {name: moduleName})
-            }
-        }
-        this.app.reloadModules(reloadModules)
     }
 
 

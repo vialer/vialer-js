@@ -1,11 +1,10 @@
 const EventEmitter = require('eventemitter3')
-const I18n = require('./i18n')
 const Logger = require('./logger')
 const Store = require('./store')
 
 
 /**
-* This is the minimal class that all parts of the Vialer-js
+* This is the minimal class that all runnable parts of the Vialer-js
 * application inherit from(tab, contentscript, background, popup/out).
 * It sets some basic properties that can be reused, like a logger, store,
 * an IPC eventemitter and some environmental properties.
@@ -14,14 +13,16 @@ class Skeleton extends EventEmitter {
 
     constructor(options) {
         super()
+
         this.env = options.environment
+        // Make Chrome plugin API compatible with the standards
+        // WebExtension API as (partly) supported by Firefox and Edge.
         if (this.env.isChrome) window.browser = require('webextension-polyfill')
 
         // A webview build passes the separate apps, so they can be reached
         // by the EventEmitter.
         if (options.apps) this.apps = options.apps
 
-        this.cache = {}
         this._listeners = 0
 
         this.utils = require('./utils')
@@ -30,11 +31,28 @@ class Skeleton extends EventEmitter {
         this.name = options.name
         this.logger = new Logger(this)
         this.store = new Store(this)
-        this.i18n = new I18n(this, options.i18n)
+
+        this._init()
+
+        // A state object that can be mutated across instances
+        // using {app_name}:set_state and {app_name}:get_state emitters.
+        this.on(`${options.name}:get_state`, (data) => {
+            // Send this script's state back to the requesting script.
+            data.callback(this.state)
+        })
+
+        // Another script wants to sync this script's state.
+        this.on(`${options.name}:set_state`, (state) => {
+            this.mergeDeep(this.state, state)
+            this.logger.debug(`${this}updating state`)
+            // The background state is the source of truth for persistant
+            // state storage. Don't use the fg state for this.
+            if (this.name === 'bg') this.store.set('state', this.state)
+        })
+
+        this.initStore()
 
         if (this.env.isExtension) {
-            // Make Chrome plugin API compatible with the standards
-            // WebExtension API as supported by Firefox and Edge.
             this.ipcListener()
             // Allows parent scripts to use the same EventEmitter syntax.
             if (this.env.role.tab) {
@@ -45,7 +63,7 @@ class Skeleton extends EventEmitter {
             }
         }
 
-        this._init()
+
         // Init these modules.
         for (let module of options.modules) {
             this.modules[module.name] = new module.Module(this)
@@ -134,6 +152,60 @@ class Skeleton extends EventEmitter {
     }
 
 
+    getDefaultState() {
+        return {
+            availability: {
+                available: 'yes',
+                destinations: {
+                    options: [],
+                    selected: null,
+                },
+                widget: {
+                    active: false,
+                    state: '',
+                },
+            },
+            contacts: {
+                contacts: [],
+                search: {
+                    disabled: false,
+                    input: '',
+                },
+                sip: {
+                    state: 'disconnected',
+                },
+                widget: {
+                    active: false,
+                    state: '',
+                },
+            },
+            queues: {
+                queues: [],
+                selectedQueue: null,
+                widget: {
+                    active: false,
+                    state: '',
+                },
+            },
+            user: {
+                authenticated: (this.store.get('user') && this.store.get('username') && this.store.get('password')),
+                language: 'nl',
+                userdestination: {
+                    selecteduserdestination: {
+                        fixeddestination: {},
+                        phoneaccount: {},
+                    },
+                },
+            },
+        }
+    }
+
+
+    initStore() {
+        this.state = {}
+    }
+
+
     /**
     * Make the EventEmitter `.on` method compatible with web extension IPC,
     * by mapping an IPC event to the EventEmitter.
@@ -163,6 +235,31 @@ class Skeleton extends EventEmitter {
                 }
             })
         })
+    }
+
+
+    isObject(item) {
+        return (item && typeof item === 'object' && !Array.isArray(item))
+    }
+
+
+
+    mergeDeep(target, ...sources) {
+        if (!sources.length) return target
+        const source = sources.shift()
+
+        if (this.isObject(target) && this.isObject(source)) {
+            for (const key in source) {
+                if (this.isObject(source[key])) {
+                    if (!target[key]) Object.assign(target, { [key]: {} })
+                    this.mergeDeep(target[key], source[key])
+                } else {
+                    Object.assign(target, { [key]: source[key] })
+                }
+            }
+        }
+
+        return this.mergeDeep(target, ...sources);
     }
 
 

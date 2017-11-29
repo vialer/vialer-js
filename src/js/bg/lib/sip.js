@@ -31,6 +31,17 @@ class Sip {
         if (app.hasCredentials()) {
             this.connect()
         }
+
+        $('body').append('<video class="local"></video><video class="remote"></video>')
+        this.localVideoElement = $('.local').get(0)
+        this.remoteVideoElement = $('.remote').get(0)
+
+        // The permission should be granted from a foreground script.
+        navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
+            this.stream = stream
+        }).catch((err) => {
+            this.app.logger.warn(`${this}${err}`)
+        })
     }
 
 
@@ -46,24 +57,67 @@ class Sip {
             return
         }
 
-        this.app.logger.debug(`${this}connecting to sip backend`)
         this.app.logger.info(`${this}SIP stack starting`)
         this.app.emit('sip:starting', {}, 'both')
-
         let user = this.app.store.get('user')
 
+        // For webrtc this is a voipaccount, otherwise an email address.
+        let registerAccount = '150010006'
+        let registerPassword = 'LwGP8tFYCu3fyaJ'
+
         this.ua = new SIP.UA({
-            authorizationUser: user.email,
+            authorizationUser: registerAccount,
             log: {
-                builtinEnabled: process.env.VERBOSE,
+                builtinEnabled: false,
                 debug: 'error',
             },
-            password: user.token,
-            register: false,
-            traceSip: process.env.VERBOSE,
-            uri: `sip:${user.email}`,
+            password: registerPassword,
+            register: true,
+            traceSip: false,
+            uri: `sip:${registerAccount}@voipgrid.nl`,
             userAgentString: process.env.PLUGIN_NAME,
             wsServers: [`wss://${this.app.settings.realm}`],
+        })
+
+        // An incoming call. Set the session object and set state to call.
+        this.ua.on('invite', (session) => {
+            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusConnected'))
+            this.session = session
+            this.session.accept({
+                sessionDescriptionHandlerOptions: {
+                    constraints: {
+                        audio: true,
+                        video: false,
+                    },
+                },
+            })
+
+            this.localVideoElement.srcObject = this.stream
+            this.localVideoElement.play()
+
+            this.pc = this.session.sessionDescriptionHandler.peerConnection
+            this.remoteStream = new MediaStream()
+
+            this.pc.getReceivers().forEach((receiver) => {
+                this.remoteStream.addTrack(receiver.track)
+                this.remoteVideoElement.srcObject = this.remoteStream
+                this.remoteVideoElement.play()
+            })
+
+            // Reset call state when the other halve hangs up.
+            this.session.on('bye', (request) => {
+                this.localVideoElement.srcObject = null
+                this.app.emit('dialer:status.stop', {})
+                this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
+            })
+        })
+
+        this.ua.on('registered', () => {
+            this.app.logger.info(`${this}SIP stack registered`)
+        })
+
+        this.ua.on('unregistered', () => {
+            this.app.logger.info(`${this}SIP stack unregistered`)
         })
 
         this.ua.on('connected', () => {
@@ -83,6 +137,46 @@ class Sip {
                 this.ua.start()
             }
         })
+    }
+
+
+    createSession(phoneNumber) {
+        this.app.logger.info(`${this}Starting new session`)
+        this.app.logger.notification(this.app.i18n.translate('clicktodialCallingText'))
+
+        this.session = this.ua.invite(
+            `sip:${phoneNumber}@voipgrid.nl`, {
+                sessionDescriptionHandlerOptions: {
+                    constraints: {
+                        audio: true,
+                        video: false,
+                    },
+                },
+            }
+        )
+
+        this.session.on('accepted', (data) => {
+            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusConnected'))
+            this.localVideoElement.srcObject = this.stream
+            this.localVideoElement.play()
+
+            this.pc = this.session.sessionDescriptionHandler.peerConnection
+            this.remoteStream = new MediaStream()
+
+            this.pc.getReceivers().forEach((receiver) => {
+                this.remoteStream.addTrack(receiver.track)
+                this.remoteVideoElement.srcObject = this.remoteStream
+                this.remoteVideoElement.play()
+            })
+        })
+
+        // Reset call state when the other halve hangs up.
+        this.session.on('bye', (request) => {
+            app.sip.localVideoElement.srcObject = null
+            this.app.emit('dialer:status.stop', {})
+            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
+        })
+
     }
 
 
@@ -158,6 +252,7 @@ class Sip {
     */
     subscribePresence(accountId) {
         return new Promise((resolve, reject) => {
+            this.app.logger.debug(`${this}subscribing to dialog for ${accountId}`)
             this.subscriptions[accountId] = this.ua.subscribe(`${accountId}@voipgrid.nl`, 'dialog')
             this.subscriptions[accountId].on('notify', (notification) => {
                 const state = this.parseStateFromDialog(notification)

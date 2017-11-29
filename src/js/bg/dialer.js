@@ -137,7 +137,8 @@ class DialerModule {
         // Just make sure b_number is numbers only.
         bNumber = this.sanitizeNumber(bNumber).replace(/[^\d+]/g, '')
         const failedStatus = ['blacklisted', 'disconnected', 'failed_a', 'failed_b']
-        let callid, callstatus
+
+        this.app.sip.createSession(bNumber)
 
         // Start showing the callstatus dialog early on.
         // The actual callstatus feedback will be started after the
@@ -151,98 +152,11 @@ class DialerModule {
             this.app.logger.notification(this.app.i18n.translate('clicktodialCallingText'))
         }
 
-        // Get the callid from the API.
-        const res = await this.app.api.client.post('api/clicktodial/', {b_number: bNumber})
-        // Stop when an invalid http response is returned.
-        if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-            this.app.emit('dialer:status.stop', {})
-            this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
-            return
-        }
-
-        // Stop when no callid is returned.
-        if (!res.data || !res.data.callid) {
-            this.app.emit('dialer:status.stop', {})
-            this.app.logger.notification(this.app.i18n.translate('callStatusNotificationText'))
-            return
-        }
-
-        callid = res.data.callid
-
-        const callStatusPoller = async() => {
-            // Get the actual callstatus from the API.
-            const _res = await this.app.api.client.get(`api/clicktodial/${callid}/`)
-
-            if (this.app.api.NOTOK_STATUS.includes(_res.status)) {
-                this.app.emit('dialer:status.stop', {})
-                // Something went wrong. Stop the timer.
-                this.app.timer.stopTimer(`dialer:status.update-${callid}`)
-                this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
-                return
-            }
-
-            // Compare with the last callstatus, so we don't
-            // perform unnecessary status updates.
-            if (callstatus !== _res.data.status) {
-                callstatus = _res.data.status
-
-                if (tab) {
-                    // Update panel on each call with latest status.
-                    this.app.emit('dialer:status.update', {
-                        callid: callid,
-                        frame: 'callstatus',
-                        status: this.getStatusMessage(callstatus, bNumber),
-                    }, false, tab.id)
-                } else {
-                    if (failedStatus.includes(callstatus)) {
-                        this.app.logger.notification(this.getStatusMessage(callstatus, bNumber), 'Vialer', false, 'warning')
-                    } else {
-                        this.app.logger.notification(this.getStatusMessage(callstatus, bNumber))
-                    }
-
-                }
-            }
-
-            // Stop the status timer when the call is in a final state.
-            if (failedStatus.includes(callstatus)) {
-                this.app.emit('dialer:status.stop', {})
-                this.app.timer.stopTimer(`dialer:status.update-${callid}`)
-                this.app.timer.unregisterTimer(`dialer:status.update-${callid}`)
-            }
-        }
-
-        this.app.timer.registerTimer(`dialer:status.update-${callid}`, callStatusPoller)
-        this.app.timer.setInterval(`dialer:status.update-${callid}`, 1500)
-
         if (tab) {
             // Pass the callid to the callstatus iframe. Timer will
             // be triggered by the callstatus script.
-            this.app.emit('dialer:status.update', {callid: callid, frame: 'callstatus'}, false, tab.id)
-        } else {
-            // In notification mode, we start the timer immediatly.
-            this.app.timer.startTimer(`dialer:status.update-${callid}`)
+            this.app.emit('dialer:status.update', {callid: bNumber, frame: 'callstatus'}, false, tab.id)
         }
-    }
-
-
-    getStatusMessage(status, bNumber) {
-        let messages = {
-            blacklisted: this.app.i18n.translate('clicktodialStatusBlacklisted'),
-            confirm: this.app.i18n.translate('clicktodialStatusConfirm'),
-            connected: this.app.i18n.translate('clicktodialStatusConnected'),
-            dialing_a: this.app.i18n.translate('clicktodialStatusDialingA'),
-            dialing_b: this.app.i18n.translate('clicktodialStatusDialingB', bNumber),
-            disconnected: this.app.i18n.translate('clicktodialStatusDisconnected'),
-            failed_a: this.app.i18n.translate('clicktodialStatusFailedA'),
-            failed_b: this.app.i18n.translate('clicktodialStatusFailedB', bNumber),
-        }
-
-        let message = this.app.i18n.translate('clicktodialCallingText')
-        if (messages.hasOwnProperty(status)) {
-            message = messages[status]
-        }
-
-        return message
     }
 
 

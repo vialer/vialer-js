@@ -12,9 +12,7 @@ class UiModule {
     */
     constructor(app) {
         this.app = app
-        $(() => {
-            this.addListeners()
-        })
+        //TODO: MOVE TO COMPONENTS
         Object.assign(Object.getPrototypeOf(this), ui())
     }
 
@@ -23,44 +21,6 @@ class UiModule {
         // The popout behaves different from the popover. The contacts
         // widget is open by default.
         if (this.app.env.isExtension && this.app.env.role.popout) $('html').addClass('popout')
-
-        this._$ = {}
-        this._$.allViews = $('.view')
-        this._$.telemetryView = $('.telemetry-opt-in')
-        this._$.loginView = $('.login-section')
-
-        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
-            this._$.currentView = $('.view-app')
-        } else {
-            this._$.currentView = $('.view-login')
-        }
-
-        this.app.on('ui:widget.close', (data) => {
-            // Popout has only the contacts widget open. It can't be closed.
-            if (!this.app.env.isExtension || (this.app.env.isExtension && !this.app.env.role.popout)) {
-                this.closeWidget(data.name)
-            }
-        })
-
-        this.app.on('ui:widget.busy', (data) => {
-            this.busyWidget(data.name)
-        })
-
-        this.app.on('ui.widget.open', (data) => {
-            this.openWidget(data.name)
-        })
-
-        this.app.on('ui:widget.reset', (data) => {
-            this.resetWidget(data.name)
-        })
-
-        this.app.on('ui:widget.unauthorized', (data) => {
-            this.unauthorizeWidget(data.name)
-        })
-
-        this.app.on('ui:mainpanel.loading', (data) => {
-            $('#refresh').addClass('fa-spin')
-        })
 
         // Spin refresh icon while reloading widgets.
         this.app.on('ui:mainpanel.ready', (data) => {
@@ -120,19 +80,6 @@ class UiModule {
             this.app.emit('user:logout.attempt')
         }
 
-        this._$.telemetryView.find('.js-telemetry-allow').on('click', (e) => {
-            this.app.emit('telemetry', {enabled: true})
-            this.showActiveView()
-        })
-
-        this._$.telemetryView.find('.js-telemetry-deny').on('click', (e) => {
-            this.app.emit('telemetry', {enabled: false})
-            this.showActiveView()
-        })
-
-        // Show the telemetry view if the user didn't make a choice yet.
-        if (this.app.store.get('telemetry') === null) this.showTelemetryView()
-        else this.showActiveView()
 
         // Focus the first input field.
         $(window).on('load', () => {
@@ -142,10 +89,6 @@ class UiModule {
             setTimeout(() => {
                 $('.login-form :input:visible:first').focus()
             }, 100)
-        })
-
-        $(window).on('unload', () => {
-            this.app.store.set('isMainPanelOpen', false)
         })
     }
 
@@ -160,7 +103,6 @@ class UiModule {
         if (!widget) return
         const data = widget.data()
         this.app.logger.debug(`${this}set ui state for widget '${data.widget}' to busy`)
-        this.resetWidget(widget)
         $(widget).addClass('busy')
 
         // The popout doesn't change the open/closed status of ANY widget.
@@ -238,18 +180,6 @@ class UiModule {
 
 
     /**
-    * Set the busy indicator.
-    * @param {String} widgetOrWidgetName - Reference to widget to reset.
-    */
-    resetWidget(widgetOrWidgetName) {
-        let widget = this.getWidget(widgetOrWidgetName)
-        const data = widget.data()
-        this.app.logger.debug(`${this}resetting ui state for widget '${data.widget}'`)
-        $(widget).removeClass('busy').removeClass('unauthorized')
-    }
-
-
-    /**
      * Restore the widget state from localstorage.
      */
     restoreWidgetState() {
@@ -267,26 +197,10 @@ class UiModule {
 
 
     /**
-    * Set the login view when the user is not authenticated or the
-    * application view for an authenticated user.
+    * Show the popup content.
     */
-    showActiveView() {
-        // Switch between logged-in and login state.
-        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
-            this.app.emit('ui:ui.restore')
-            $('#user-name').text(this.app.store.get('username'))
-            this.showAppView()
-        } else {
-            this.showLoginView()
-        }
-    }
-
-
-    /**
-    * Shows the application view for authenticated users.
-    */
-    showAppView() {
-        this._$.allViews.addClass('hide').filter('.view-app').removeClass('hide')
+    showPopup() {
+        $('.container').removeClass('hide')
         this.restoreWidgetState()
         // This is an OSX-related racing bug, caused by the popup animation
         // that prevents the popup height to be calculated properly.
@@ -305,22 +219,6 @@ class UiModule {
     }
 
 
-    /**
-    * Shows the login view for unauthenticated users.
-    */
-    showLoginView() {
-        this._$.allViews.addClass('hide').filter('.view-login').removeClass('hide')
-    }
-
-
-    /**
-    * Shows the telemetry consent view.
-    */
-    showTelemetryView() {
-        this._$.allViews.addClass('hide').filter('.view-telemetry').removeClass('hide')
-    }
-
-
     toString() {
         return `${this.app}[ui] `
     }
@@ -333,8 +231,7 @@ class UiModule {
     */
     unauthorizeWidget(widgetOrWidgetName) {
         const widget = this.getWidget(widgetOrWidgetName)
-        this.resetWidget(widget)
-        widget.addClass('unauthorized')
+        console.log("UNAUTHORIZED STATE WIDGET")
     }
 
 

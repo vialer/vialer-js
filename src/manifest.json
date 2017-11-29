@@ -53,7 +53,7 @@
         }
     ],
     "options_ui": {
-        "page": "webext_options.html"
+        "page": "index.html"
     },
     "web_accessible_resources": [
         "img/*.png",

@@ -80,11 +80,12 @@ class QueuesModule {
             if (this.app.store.get('user')) {
                 // Check every 20s when a queue is selected, no matter
                 // if the popup is opened or closed.
-                if (this.app.store.get('widgets').queues.selected) timeout = 20000
+                // TODO: FIX THIS
+                // if (this.app.store.get('widgets').queues.selected) timeout = 20000
 
                 // Check more regularly when the popup is open and the
                 // queues widget is open.
-                if (this.app.store.get('isMainPanelOpen') && this.app.store.get('widgets').isOpen.queues) timeout = 5000
+                if (this.app.store.get('isMainPanelOpen') && this.app.state.queues.widget.active) timeout = 5000
                 this.app.logger.info(`${this}set queue timer timeout to ${timeout}`)
             }
 
@@ -130,7 +131,10 @@ class QueuesModule {
         }
 
         let queues = res.data.objects
-        if (!queues.length) this.app.emit('queues:empty')
+        if (!queues.length) {
+            this.app.emit('queues:empty')
+            return 
+        }
 
         for (const queue of queues) {
             // The queue size from the API is a string.
@@ -157,7 +161,7 @@ class QueuesModule {
         // Pass the queues to the popup and update the queues ui list.
         this.app.emit('queues:fill', {
             queues: queues,
-            selectedQueue: this.app.store.get('widgets').queues.selected,
+            //selectedQueue: this.app.store.get('widgets').queues.selected,
         })
 
         let widgetState = this.app.store.get('widgets')
@@ -170,7 +174,6 @@ class QueuesModule {
 
 
     _load() {
-        this.app.emit('ui:widget.reset', {name: 'queues'})
         // Start with showing an empty queue list.
         this.app.emit('queues:empty')
         this.updateQueues()
@@ -191,22 +194,22 @@ class QueuesModule {
 
         if (!widgetState || !widgetState.queues || !Object.keys(widgetState.queues).length) {
             // No widget state. Empty the list.
-            this.app.emit('queues:empty')
-        } else if (widgetState.queues.unauthorized) {
-            this.app.emit('ui:widget.unauthorized', {name: 'queues'})
+            this.app.emit('fg:set_state', {queues: {queues: []}})
         } else {
             // Start with a queue state from localstorage.
             this.sizes = widgetState.queues.sizes
 
             let queues = widgetState.queues.list
             if (queues && queues.length) {
-                this.app.emit('queues:fill', {
-                    queues: queues,
-                    selectedQueue: widgetState.queues.selected,
+                this.app.emit('fg:set_state', {
+                    queues: {
+                        queues: queues,
+                        selectedQueue: widgetState.queues.selected,
+                    },
                 })
             } else {
                 // No queues in localstore. Empty the list.
-                this.app.emit('queues:empty')
+                this.app.emit('fg:set_state', {queues: {queues: []}})
             }
         }
 

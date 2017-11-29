@@ -54,6 +54,23 @@ class BackgroundApp extends Skeleton {
 
 
     /**
+    * Setup the SIP stack, before loading any modules.
+    */
+    _init() {
+        this.settings = {
+            analyticsId: process.env.ANALYTICS_ID,
+            c2d: 'true',
+            platformUrl: this.getPlatformUrl(),
+            realm: this.getWebsocketUrl(),
+        }
+        this.timer = new Timer(this)
+        this.analytics = new Analytics(this, this.settings.analyticsId)
+        this.api = new Api(this)
+        this.sip = new Sip(this)
+    }
+
+
+    /**
     * Get platform URL from storage or set default.
     * @returns {String} - The cleaned up API endpoint url.
     */
@@ -101,6 +118,22 @@ class BackgroundApp extends Skeleton {
             return true
         }
         return false
+    }
+
+
+    /**
+    * Restore the state from localStorage or start with a state template.
+    */
+    initStore() {
+        let stateObj = this.store.get('state')
+        if (stateObj) this.state = stateObj
+        else this.state = this.getDefaultState()
+
+        // Clears localstorage if the schema changed after a plugin update.
+        if (!this.store.validSchema()) {
+            this.modules.user.logout()
+            return
+        }
     }
 
 
@@ -155,25 +188,6 @@ class BackgroundApp extends Skeleton {
     */
     version() {
         return process.env.VERSION
-    }
-
-
-    /**
-    * Setup the SIP stack, before loading any modules.
-    */
-    _init() {
-        this.settings = {
-            analyticsId: process.env.ANALYTICS_ID,
-            c2d: true,
-            platformUrl: this.getPlatformUrl(),
-            realm: this.getWebsocketUrl(),
-        }
-
-
-        this.timer = new Timer(this)
-        this.analytics = new Analytics(this, this.settings.analyticsId)
-        this.api = new Api(this)
-        this.sip = new Sip(this)
     }
 }
 

@@ -4,16 +4,22 @@ const path = require('path')
 const addsrc = require('gulp-add-src')
 const argv = require('yargs').argv
 const childExec = require('child_process').exec
+const composer = require('gulp-uglify/composer')
+const concat = require('gulp-concat')
 const del = require('del')
 const flatten = require('gulp-flatten')
+const fuet = require('gulp-fuet')
 const ghPages = require('gulp-gh-pages')
 const gulp = require('gulp-help')(require('gulp'), {})
 const gutil = require('gulp-util')
 const Helpers = require('./gulp/helpers')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
+const insert = require('gulp-insert')
 const imagemin = require('gulp-imagemin')
+const minifier = composer(require('uglify-es'), console)
 const mkdirp = require('mkdirp')
+const notify = require('gulp-notify')
 const replace = require('gulp-replace')
 const rc = require('rc')
 const runSequence = require('run-sequence')
@@ -144,7 +150,7 @@ gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
     else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-webview', 'js-vendor']
     else targetTasks = ['js-vendor', 'js-webext']
 
-    runSequence(['assets', 'html', 'scss'].concat(targetTasks), done)
+    runSequence(['assets', 'templates', 'translations', 'html', 'scss'].concat(targetTasks), done)
 }, {options: taskOptions.all})
 
 
@@ -212,7 +218,7 @@ gulp.task('build-run', 'Make a development build and run it in the target enviro
     } else if (settings.BUILD_TARGET === 'webview') {
         helpers.startDevServer()
         const urlTarget = `http://localhost:8999/${settings.BRAND_TARGET}/webview/index.html`
-        command = `${command};chromium --user-data-dir=/tmp/vialer-js --disable-web-security --new-window ${urlTarget}`
+        command = `${command};chromium --disable-web-security --new-window ${urlTarget}`
     }
     childExec(command, undefined, (err, stdout, stderr) => {
         if (err) gutil.log(err)
@@ -269,23 +275,20 @@ gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
 
 
 gulp.task('html', 'Preprocess and build application HTML.', () => {
-    let jsbottom, target
+    let jsbottom
 
     if (['electron', 'webview'].includes(settings.BUILD_TARGET)) {
-        target = 'electron'
         jsbottom = '<script src="js/webview.js"></script>'
 
     } else {
-        target = 'webext'
         jsbottom = '<script src="js/webext_popup.js"></script>'
     }
 
     // The index.html file is shared with the electron build target.
     // Appropriate scripts are inserted based on the build target.
-    return gulp.src(path.join('src', 'html', 'index.html'))
+    return gulp.src(path.join('src', 'index.html'))
         .pipe(replace('<!--JSBOTTOM-->', jsbottom))
         .pipe(flatten())
-        .pipe(ifElse((target === 'webext'), () => addsrc(path.join('src', 'html', 'webext_{options,callstatus}.html'))))
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
         .pipe(ifElse(settings.LIVERELOAD, livereload))
 }, {options: taskOptions.all})
@@ -309,11 +312,17 @@ gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-webview'
 
 
 gulp.task('js-webview', 'Generate webview js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'webview', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'webview', () => {
+        if (settings.LIVERELOAD) livereload.changed('web.js')
+        done()
+    })
 })
 
 gulp.task('js-vendor', 'Generate third-party vendor js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor', () => {
+        if (settings.LIVERELOAD) livereload.changed('web.js')
+        done()
+    })
 }, {options: taskOptions.all})
 
 gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
@@ -390,6 +399,35 @@ gulp.task('scss-webext-print', 'Generate webextension print css.', () => {
 }, {options: taskOptions.all})
 
 
+gulp.task('templates', 'Build Vue templates', () => {
+    gulp.src('./src/js/popup/components/**/*.vue')
+        .pipe(fuet({
+            commonjs: false,
+            namespace: 'global.templates',
+            pathfilter: ['src', 'js', 'popup', 'components'],
+        }))
+        .on('error', notify.onError('Error: <%= error.message %>'))
+        .pipe(ifElse(settings.PRODUCTION, () => minifier()))
+        .on('end', () => {
+            if (settings.LIVERELOAD) livereload.changed('templates.js')
+        })
+        .pipe(concat('templates.js'))
+        .pipe(insert.prepend('global.templates={};'))
+        .pipe(gulp.dest(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')))
+        .pipe(size(_extend({title: 'templates'}, settings.SIZE_OPTIONS)))
+})
+
+
+gulp.task('translations', 'Generate translations', (done) => {
+    return gulp.src('./src/js/i18n/*.js', {base: './src/js/'})
+        .pipe(concat('translations.js'))
+        .pipe(ifElse(settings.PRODUCTION, () => minifier()))
+        .pipe(gulp.dest(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')))
+        .pipe(size(_extend({title: 'js-translations'}, settings.SIZE_OPTIONS)))
+        .pipe(ifElse(settings.LIVERELOAD, livereload))
+})
+
+
 gulp.task('watch', 'Start development server and watch for changes.', () => {
     settings.LIVERELOAD = true
     helpers.startDevServer()
@@ -412,9 +450,15 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'main.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'webview.js')}`,
+        `!${path.join(__dirname, 'src', 'js', 'i18n', '*.js')}`,
     ], () => {
-        if (settings.BUILD_TARGET === 'electron') gulp.start('js-electron')
-        else gulp.start('js-webext')
+        if (settings.BUILD_TARGET === 'electron') {
+            gulp.start('js-electron')
+        } else if (settings.BUILD_TARGET === 'webview') {
+            gulp.start('js-webview')
+        } else {
+            gulp.start('js-webext')
+        }
 
         if (WITHDOCS) gulp.start('docs')
     })
@@ -448,6 +492,8 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     ], ['assets'])
 
     // Watch files related to working on the html and css.
-    gulp.watch(path.join(__dirname, 'src', 'html', '**', '*.html'), ['html'])
+    gulp.watch(path.join(__dirname, 'src', 'index.html'), ['html'])
     gulp.watch(path.join(__dirname, 'src', 'scss', '**', '*.scss'), ['scss'])
+    gulp.watch(path.join(__dirname, 'src', 'js', 'popup', 'components', '**', '*.vue'), ['templates'])
+    gulp.watch(path.join(__dirname, 'src', 'js', 'i18n', '**', '*.js'), ['translations'])
 })

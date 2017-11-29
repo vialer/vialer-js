@@ -25,19 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     env_bg.role.background = true
-    const bgApp = require('../bg')({
+    global.bgApp = require('../bg')({
         environment: env_bg,
-        i18n: require('../../_locales/en/messages.json'),
-        name: 'webview_bg',
+        name: 'bg',
     })
 
     env_popup.role.popup = true
-    require('../popup')({
+    global.fgApp = require('../popup')({
         apps: {
-            bg: bgApp,
+            bg: global.bgApp,
         },
         environment: env_popup,
-        i18n: require('../../_locales/en/messages.json'),
-        name: 'webview_popup',
+        name: 'fg',
     })
 })

@@ -5,7 +5,6 @@ class UserModule {
 
     constructor(app) {
         this.app = app
-        this.addListeners()
     }
 
 
@@ -98,27 +97,13 @@ class UserModule {
             this.app.modules.ui.setButtonState($('.login-button'), 'loading', true, 0)
         })
 
-        // After login, show the user's e-mail address.
-        this.app.on('user:login.success', (data) => {
-            _$.accountInfo.text(data.user.email)
-            this.app.modules.ui.showAppView()
-        })
-
         this.app.on('user:logout.success', (data) => {
-            if (this.app.store.get('telemetry') === null) {
-                this.app.modules.ui.showTelemetryView()
-            } else {
-                this.app.modules.ui.showLoginView()
-                $('.login-form :input:visible').val('')
-                $('.login-form :input:visible:first').focus()
-            }
 
             // Set the username/emailaddress field on load, when we still
             // have a cached value from localstorage.
             if (this.app.store.get('username')) {
                 _$.emailInput.val(this.app.store.get('username'))
             }
-
 
 
             // Show a message on logout.

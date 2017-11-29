@@ -22,7 +22,12 @@
         "tsip_transport_state_e": true,
         "webkitNotifications": true,
         "electron": true,
-        "$": true
+        "$": true,
+        "templates": true,
+        "Vue": true,
+        "translations": true,
+        "I18nStore": true,
+        "i18n": true
     },
     "plugins": [
         "sort-class-members"
@@ -179,13 +184,13 @@
         "semi-spacing": [2, {"before": false, "after": true}],
         "sort-class-members/sort-class-members": [2, {
         "order": [
+                "constructor",
+                "[conventional-private-properties]",
+                "[conventional-private-methods]",
                 "[static-properties]",
                 "[static-methods]",
                 "[properties]",
-                "[conventional-private-properties]",
-                "constructor",
                 "[methods]",
-                "[conventional-private-methods]",
                 "[everything-else]"
             ],
             "accessorPairPositioning": "getThenSet",

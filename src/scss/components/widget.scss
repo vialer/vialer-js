@@ -1,6 +1,6 @@
 .widget {
 
-    &[data-opened="true"] {
+    &.active {
         .widget-header {
             .widget-header-text,
             .widget-icon {
@@ -18,7 +18,7 @@
         }
     }
 
-    &[data-opened="false"] {
+    &.inactive {
         .widget-header {
             .widget-header-text,
             .widget-icon {

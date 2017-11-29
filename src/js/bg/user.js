@@ -15,7 +15,7 @@ class UserModule {
             this.app.store.set('username', data.username)
             this.app.store.set('password', data.password)
             this.app.emit('user:login.in_progress')
-            this.login(this.app.store.get('username'), this.app.store.get('password'))
+            this.login(data.username, data.password)
         })
 
         this.app.on('user:logout.attempt', () => {
@@ -33,9 +33,11 @@ class UserModule {
     */
     login(username, password) {
         this.app.api.setupClient(username, password)
-        this.app.api.client.get('api/permission/systemuser/profile/').then((res) => {
+        this.app.api.client.get('api/permission/systemuser/profile/').then(async(res) => {
+            console.log(res)
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 let user = res.data
+                console.log('IUSER:', user)
                 if (!user.client) {
                     this.logout()
                     return
@@ -43,8 +45,20 @@ class UserModule {
 
                 // Parse and set the client id as a new property.
                 user.client_id = user.client.replace(/[^\d.]/g, '')
+
+                const _res = await this.app.api.client.get('api/userdestination/')
+
+                const phoneAccountId = _res.data.objects[0].selecteduserdestination.phoneaccount
+                const __res = await this.app.api.client.get(`api/phoneaccount/phoneaccount/${phoneAccountId}`)
+                Object.assign(user, {
+                    selectedUserdestination: __res.data,
+                })
+                user.authenticated = true
                 this.app.store.set('user', user)
 
+                this.app.emit('fg:set_state', {
+                    user: user,
+                })
                 // Perform some actions on login.
                 this.app.emit('user:login.success', {user: user}, 'both')
                 // Reset seen notifications.

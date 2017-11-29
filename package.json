@@ -1,6 +1,6 @@
 {
   "name": "vialer-js",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
     "node": ">=8.0.0"
@@ -82,6 +82,9 @@
     "jquery": "^3.2.1",
     "roboto-fontface": "^0.8.0",
     "sip.js": "^0.8.4",
+    "vue": "^2.4.4",
+    "vue-i18n-stash": "git+https://github.com/wearespindle/vue-stash-i18n.git#master",
+    "vue-stash": "^2.0.1-beta",
     "webextension-polyfill": "^0.2.1"
   }
 }
