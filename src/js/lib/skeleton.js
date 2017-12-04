@@ -16,6 +16,7 @@ class Skeleton extends EventEmitter {
         super()
         this.env = options.environment
         if (this.env.isChrome) window.browser = require('webextension-polyfill')
+
         // A webview build passes the separate apps, so they can be reached
         // by the EventEmitter.
         if (options.apps) this.apps = options.apps
@@ -111,9 +112,12 @@ class Skeleton extends EventEmitter {
                 })
             } else {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
-                browser.runtime.sendMessage(payloadData).catch((err) => {
-                    if (this.verbose) this.logger.debug(`${this}${err.message}`)
-                })
+                let _promise = browser.runtime.sendMessage(payloadData)
+                if (_promise) {
+                    _promise.catch((err) => {
+                        if (this.verbose) this.logger.debug(`${this}${err.message}`)
+                    })
+                }
             }
         }
         // The web version will always use a local emitter, no matter what

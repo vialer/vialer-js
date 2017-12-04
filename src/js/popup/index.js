@@ -22,7 +22,11 @@ class PopupApp extends Skeleton {
 
 function initApp(initParams) {
     initParams.modules = _modules
-    return new PopupApp(initParams)
+    const app = new PopupApp(initParams)
+    if (app.env.isChrome) $('html').addClass('chrome')
+    if (app.env.isEdge) $('html').addClass('edge')
+    if (app.env.isFirefox) $('html').addClass('firefox')
+    return app
 }
 
 

@@ -295,8 +295,8 @@ class Helpers {
         gutil.log('Starting development server. Hit Ctrl-c to quit.')
         const app = connect()
         livereload.listen({silent: false})
-        app.use(serveStatic(path.join(__dirname, 'build')))
-        app.use('/', serveIndex(path.join(__dirname, 'build'), {icons: false}))
+        app.use(serveStatic(this.settings.BUILD_DIR))
+        app.use('/', serveIndex(this.settings.BUILD_DIR, {icons: false}))
         app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
         http.createServer(app).listen(8999)
     }

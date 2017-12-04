@@ -70,7 +70,7 @@ html body {
     select {
         // Set the pading instead of the height here, otherwise the
         // size of the select dropdown is miscalculated on Chrome for Windows.
-        padding: 8px 0;
+        height: 35px;
         background: $vg-grey-lightest;
         outline: none;
         border: 1px solid $vg-grey-lighter;

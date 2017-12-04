@@ -31,6 +31,9 @@
         }
 
         .widget-content {
+            // Fixes popup height calculation issue for Chrome Windows.
+            overflow: hidden;
+
             max-height: 0;
 
             .widget-item-list {
