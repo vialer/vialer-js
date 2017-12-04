@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 2.1.0
+* Replaced SipML5 with SIP.js. This should fix reoccuring connectivity issues and will make it easier to implement SIP register.
+* Restructered JavaScript project files and build. This makes it easier for developers to understand and find the appropriate code.
+* Several fixes and improvements for multi-brand deployment. This makes it easier to deploy a new version for multiple brands at once.
+* Cleanup button-logic, added generic state-handler for it. Button in settings and for login now use the same state handling.
+* Added branding colors to buttons and popup widget header. Login and Save button in options now show in branded colors.
+* Chrome has a CSS animation for collapse/expand popup accordeon.
+
 ## Version 2.0.17
 * [108](https://github.com/VoIPGRID/vialer-js/issues/108) Changed event-based reconnection mechanism to
   scheduler-based to address reconnection issue.
