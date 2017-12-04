@@ -7,6 +7,8 @@
 * Cleanup button-logic, added generic state-handler for it. Button in settings and for login now use the same state handling.
 * Added branding colors to buttons and popup widget header. Login and Save button in options now show in branded colors.
 * Chrome has a CSS animation for collapse/expand popup accordeon.
+* Remember email address between sessions.
+* Fix for autologin url token. Fixes an edge-case where the settings page was incorrectly opened.
 
 ## Version 2.0.17
 * [108](https://github.com/VoIPGRID/vialer-js/issues/108) Changed event-based reconnection mechanism to
