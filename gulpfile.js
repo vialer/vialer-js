@@ -49,8 +49,8 @@ settings.SIZE_OPTIONS = {showFiles: true, showTotal: true}
 settings.VERBOSE = argv.verbose ? true : false
 
 // Force production mode when running certain tasks from
-// the commandline. Use this with care.
-if (['deploy', 'build-dist'].includes(argv._[0])) {
+// the commandline or when using a deploy command.
+if (argv._[0] && (['deploy', 'build-dist'].includes(argv._[0]) || argv._[0].includes('deploy'))) {
     settings.PRODUCTION = true
     // Force NODE_ENV to production for envify.
     process.env.NODE_ENV = 'production'
