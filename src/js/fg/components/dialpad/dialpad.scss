@@ -1,0 +1,56 @@
+.c-dialpad {
+
+    width: 100%;
+
+    .number-input {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: center;
+    }
+
+    .numbers {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        flex-wrap: wrap;
+        align-content: center;
+        width: 100%;
+
+        button {
+            width: 33.3333%;
+            height: 60px;
+            break-inside: avoid;
+            font-size: 1rem;
+            font-weight: bold;
+            border-spacing: 1px1;
+            border-radius: 0;
+        }
+    }
+
+    button {
+        width: 100%;
+    }
+
+    .dial {
+        color: $vg-state-available-color;
+        font-weight: bold;
+        font-size: 3rem;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .actions {
+        text-align: center;
+        padding: 10px;
+    }
+}
+
+a, a:visited {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}

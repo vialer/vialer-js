@@ -48,7 +48,6 @@ class AvailabilityModule {
 
                 // Build options for the availability dropdown.
                 let destinations = this.availabilityOptions(userdestination, selectedFixeddestinationId, selectedPhoneaccountId)
-                console.log("DESTINATIONS:", destinations)
 
                 // Fill the dropdown with these choices.
                 if (destinations.options.length) {
@@ -72,11 +71,12 @@ class AvailabilityModule {
                     }
                 }
 
-                // Save icon in storage.
+                // Save icon in storage. WHY?
                 this.app.state.availability.icon = icon
             } else if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                 this.app.logger.warn(`${this}unauthorized availability request`)
                 this.app.state.availability.widget.state = 'unauthorized'
+                this.app.emit('fg:set_state', {availability: {widget: {state: 'unauthorized'}}})
             }
         })
     }

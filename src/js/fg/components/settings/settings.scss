@@ -1,0 +1,50 @@
+@import "../../../../scss/base/variables";
+
+
+.options {
+    padding: 7px;
+
+    button {
+        width: 100%;
+    }
+
+    input {
+        &[type="text"] {
+            width: 100%;
+        }
+    }
+
+
+    .field {
+        padding-bottom: $vg-spacing-1;
+
+        label {
+            font-weight: 500;
+            vertical-align: middle;
+            display: inline-block;
+            padding-bottom: $vg-spacing-1;
+        }
+
+        label + input {
+            clear: both;
+            display: block;
+        }
+
+        .warning {
+            padding: 0;
+            margin: 0;
+            color: $vg-failed-color;
+            line-height: 25px;
+            position: absolute;
+        }
+    }
+
+    // Container for the save button.
+    .actions {
+        // Leave room for the platform warning, which is not part of the
+        // document flow. Use padding here; not margin, otherwise the height
+        // of the options dialog is not calculated correctly on Windows.
+        padding: 20px 0 10px 0;
+    }
+
+}

@@ -79,6 +79,14 @@ $font-path: "../fonts";
     100% {color: $vg-state-busy-color;}
 }
 
+.icon-phone-hang-up:before {
+    content: "\e915";
+}
+
+.icon-dialpad:before {
+    content: "\e914";
+}
+
 // The vialer-js font icons.
 .icon-entity:before {
     content: "\e913";
@@ -162,6 +170,10 @@ $font-path: "../fonts";
 
 .icon-cloud-download:before {
     content: "\f0ed";
+}
+
+.icon-bars:before {
+    content: "\f0c9";
 }
 
 .icon-check-square-o:before {

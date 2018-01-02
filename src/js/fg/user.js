@@ -57,11 +57,6 @@ class UserModule {
         })
 
 
-        // Login with the button.
-        _$.loginButton.on('click', (e) => {
-            login()
-        })
-
         // Change the stored username/emailaddress on typing, so
         // we can restore the value when the popup is restarted.
         _$.emailInput.keyup((e) => {

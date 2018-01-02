@@ -4,7 +4,7 @@
 * event emitters.
 */
 let env_bg = require('../lib/env')
-let env_popup = require('../lib/env')
+let env_fg = require('../lib/env')
 const resizeSensor = require('css-element-queries').ResizeSensor
 
 
@@ -30,12 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
         name: 'bg',
     })
 
-    env_popup.role.popup = true
-    global.fgApp = require('../popup')({
+    env_fg.role.popup = true
+    global.fgApp = require('../fg')({
         apps: {
             bg: global.bgApp,
         },
-        environment: env_popup,
+        environment: env_fg,
         name: 'fg',
     })
 })

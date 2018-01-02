@@ -53,13 +53,6 @@ class UiModule {
             this._checkCloseMainPanel()
         })
 
-        /**
-         * Emit that we want to logout.
-         */
-        $('#logout').click((e) => {
-            this.app.emit('user:logout.attempt')
-        })
-
         $('#popout').click((e) => {
             browser.tabs.create({url: browser.runtime.getURL('index.html?popout=true')})
             this._checkCloseMainPanel()

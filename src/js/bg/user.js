@@ -34,10 +34,10 @@ class UserModule {
     login(username, password) {
         this.app.api.setupClient(username, password)
         this.app.api.client.get('api/permission/systemuser/profile/').then(async(res) => {
-            console.log(res)
+
             if (this.app.api.OK_STATUS.includes(res.status)) {
                 let user = res.data
-                console.log('IUSER:', user)
+
                 if (!user.client) {
                     this.logout()
                     return
@@ -56,6 +56,7 @@ class UserModule {
                 user.authenticated = true
                 this.app.store.set('user', user)
 
+                this.app.state.user = user
                 this.app.emit('fg:set_state', {
                     user: user,
                 })
@@ -67,7 +68,6 @@ class UserModule {
                 notificationsData.unauthorized = false
                 this.app.store.set('notifications', notificationsData)
                 // Start loading the widgets.
-                this.app.modules.ui.refreshWidgets(false)
                 this.app.logger.info(`${this}login successful`)
                 // Connect to the sip service on succesful login.
                 this.app.sip.connect()

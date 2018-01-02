@@ -1,5 +1,5 @@
 <div class="widget contacts" :class="widgetState">
-    <div class="widget-header" v-on:click="toggleActive('contacts')">
+    <div class="widget-header" @click="toggleActive('contacts')">
         <div class="widget-header-icons">
             <i class="widget-icon icon-entity"></i>
             <i class="busy-icon icon-refresh icon-spin"></i>
@@ -23,7 +23,7 @@
 
     <div class="widget-content">
         <ul class="widget-item-list">
-            <li class="widget-item contact" v-for="contact in filteredContacts" v-on:click="callContact(contact)">
+            <li class="widget-item contact" v-for="contact in filteredContacts" @click="callContact(contact)">
                 <div class="icon status-icon" :class="contact.state">
                     <i class="icon-availability"></i>
                 </div>
@@ -41,7 +41,7 @@
             </li>
 
             <!-- no contacts -->
-            <li class="widget-item contact" v-if="!module.contacts.length">
+            <li class="widget-item contact" v-else-if="!module.contacts.length">
                 <div class="icon status-icon"><i class="icon-availability"></i></div>
                 <div class="info">
                     <div class="name">{{$t('No contacts')}}</div>

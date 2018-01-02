@@ -1,19 +1,22 @@
-<div class="options">
-    <div class="field">
-        <input id="c2d" type="checkbox" value="true" />
-        <label for="c2d" data-i18n-content="c2dOptionLabel"></label>
+<div class="c-dialpad">
+    <input class="number-input" type="text" :placeholder="$t('Number to dial')"
+    @keyup="stopDtmf()" @keydown="playDtmf(null, $event)"
+    v-model="module.dialNumber"/>
+    <div class="numbers">
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(1)">1</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(2)">2</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(3)">3</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(4)">4</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(5)">5</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(6)">6</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(7)">7</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(8)">8</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(9)">9</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf('#')">#</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf(0)">0</button>
+        <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf('*')">*</button>
     </div>
-
-    <div class="field">
-        <label for="platformUrl" data-i18n-content="platformUrlOptionlabel"></label>
-        <input id="platform-url" type="text" placeholder="https://" />
-        <p class="warning platform-warning hide" data-i18n-content="platformUrlOptionWarninglabel"></p>
-    </div>
-
     <div class="actions">
-        <button id="save" type="button"
-            data-i18n-attrs='{"data-state-default": "saveButtonText", "data-state-saved": "optionsSaveText"}'
-            data-i18n-content="saveButtonText">
-        </button>
+        <i class="dial icon-availability"></i>
     </div>
 </div>

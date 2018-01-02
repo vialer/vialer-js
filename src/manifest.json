@@ -20,6 +20,13 @@
             "js/webext_bg.js"
         ]
     },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+V"
+            }
+        }
+  },
     "permissions": [
         "*://*/*",
         "contextMenus",

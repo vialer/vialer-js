@@ -8,8 +8,8 @@ module.exports = (app) => {
                 })
             },
         },
-        render: templates.login.r,
-        staticRenderFns: templates.login.s,
+        render: templates.settings.r,
+        staticRenderFns: templates.settings.s,
         store: {
             user: 'user',
         },

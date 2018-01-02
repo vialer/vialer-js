@@ -5,7 +5,7 @@
             .widget-header-text,
             .widget-icon {
                 transition: color 0.3s ease;
-                color: $vg-brand-color;
+
             }
 
             &::after {
@@ -43,15 +43,16 @@
     }
 
     .widget-header {
-        @include vg-gradient;
+        background: $vg-brand-color;
+        color: #fff;
         @include no-select;
         position: relative;
         height: $vg-widget-header-size;
-        font-weight: 400;
-
+        font-weight: 500;
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        border-bottom: 1px solid #fff;
 
         // Move the collapse icon to the right without disturbing the
         // float of other elements, like the contacts search input.

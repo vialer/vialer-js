@@ -2,6 +2,7 @@ let env = require('../lib/env')
 const utils = require('../lib/utils')
 const Skeleton = require('../lib/skeleton')
 
+
 const _modules = [
     {Module: require('./availability'), name: 'availability'},
     {Module: require('./contacts'), name: 'contacts'},
@@ -18,11 +19,14 @@ class PopupApp extends Skeleton {
     }
 
     _init() {
+        this.sounds = require('./sounds')
         let actions = require('./components/actions')(this)
-        Vue.component('AccountInfo', require('./components/account_info')(this, actions))
+        Vue.component('Navigation', require('./components/navigation')(this, actions))
         Vue.component('Availability', require('./components/availability')(this, actions))
         Vue.component('Contacts', require('./components/contacts')(this, actions))
         Vue.component('Login', require('./components/login')(this, actions))
+        Vue.component('Settings', require('./components/settings')(this, actions))
+        Vue.component('Dialpad', require('./components/dialpad')(this, actions))
         Vue.component('Queues', require('./components/queues')(this, actions))
     }
 
@@ -50,7 +54,6 @@ class PopupApp extends Skeleton {
         // Initialize with the initial state from the background.
         this.emit('bg:get_state', {
             callback: (state) => {
-                console.log("STATE FROM BG:", state)
                 this.state = state
                 this._initI18n()
                 this.vm = new Vue({

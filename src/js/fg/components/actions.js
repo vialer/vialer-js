@@ -1,13 +1,28 @@
 module.exports = function(app) {
 
-    let helpers = {}
+    let actions = {}
 
     /**
-    * Toggles widgets lika an accordeon and emits widget state back
+    * Set user state to unauthenticated and notify the background.
+    */
+    actions.logout = function() {
+        this.$store.user.authenticated = false
+        this.$store.user.password = null
+        app.emit('bg:set_state', {
+            user: {
+                authenticated: false,
+                password: null,
+            },
+        })
+    }
+
+
+    /**
+    * Toggles widgets likaan accordeon and emits widget state back
     * to the background. Switches all widgets off, except the current one.
     * @param {String} widgetName - The widget to toggle.
     */
-    helpers.toggleActive = function(widgetName) {
+    actions.toggleActive = function(widgetName) {
         // Minimal template for deep merge.
         let widgetState = {
             availability: {widget: {active: null}},
@@ -30,5 +45,5 @@ module.exports = function(app) {
         app.emit('bg:set_state', widgetState)
     }
 
-    return helpers
+    return actions
 }

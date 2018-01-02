@@ -281,7 +281,7 @@ gulp.task('html', 'Preprocess and build application HTML.', () => {
         jsbottom = '<script src="js/webview.js"></script>'
 
     } else {
-        jsbottom = '<script src="js/webext_popup.js"></script>'
+        jsbottom = '<script src="js/webext_fg.js"></script>'
     }
 
     // The index.html file is shared with the electron build target.
@@ -328,10 +328,8 @@ gulp.task('js-vendor', 'Generate third-party vendor js.', (done) => {
 gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
     runSequence([
         'js-webext-bg',
-        'js-webext-callstatus',
+        'js-webext-fg',
         'js-webext-observer',
-        'js-webext-options',
-        'js-webext-popup',
         'js-webext-tab',
     ], 'manifest-webext', () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
@@ -342,19 +340,15 @@ gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
 gulp.task('js-webext-bg', 'Generate the extension background entry js.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'webext_bg', done)
 }, {options: taskOptions.browser})
-gulp.task('js-webext-callstatus', 'Generate the callstatus entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'callstatus/index', 'webext_callstatus', done)
+
+gulp.task('js-webext-fg', 'Generate webextension fg/popout js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'webext_fg', done)
 }, {options: taskOptions.browser})
+
 gulp.task('js-webext-observer', 'Generate WebExtension observer js that runs in all tab frames.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'webext_observer', done)
 }, {options: taskOptions.browser})
 
-gulp.task('js-webext-options', 'Generate webextension options js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'options/index', 'webext_options', done)
-}, {options: taskOptions.browser})
-gulp.task('js-webext-popup', 'Generate webextension popup/popout js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'popup/index', 'webext_popup', done)
-}, {options: taskOptions.browser})
 gulp.task('js-webext-tab', 'Generate webextension tab js.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'tab/index', 'webext_tab', done)
 }, {options: taskOptions.browser})
@@ -371,8 +365,6 @@ gulp.task('manifest-webext', 'Generate a manifest for a browser WebExtension.', 
 gulp.task('scss', 'Compile all css.', [], (done) => {
     runSequence([
         'scss-webext',
-        'scss-webext-callstatus',
-        'scss-webext-options',
         'scss-webext-print',
     ], () => {
         // Targetting webext.css for livereload changed only works in the
@@ -387,24 +379,17 @@ gulp.task('scss-webext', 'Generate popover webextension css.', () => {
     return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext')
 }, {options: taskOptions.all})
 
-gulp.task('scss-webext-callstatus', 'Generate webextension callstatus dialog css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_callstatus')
-}, {options: taskOptions.all})
-gulp.task('scss-webext-options', 'Generate webextension options css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_options')
-}, {options: taskOptions.all})
-
 gulp.task('scss-webext-print', 'Generate webextension print css.', () => {
     return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_print')
 }, {options: taskOptions.all})
 
 
 gulp.task('templates', 'Build Vue templates', () => {
-    gulp.src('./src/js/popup/components/**/*.vue')
+    gulp.src('./src/js/fg/components/**/*.vue')
         .pipe(fuet({
             commonjs: false,
             namespace: 'global.templates',
-            pathfilter: ['src', 'js', 'popup', 'components'],
+            pathfilter: ['src', 'js', 'fg', 'components'],
         }))
         .on('error', notify.onError('Error: <%= error.message %>'))
         .pipe(ifElse(settings.PRODUCTION, () => minifier()))
@@ -493,7 +478,10 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
 
     // Watch files related to working on the html and css.
     gulp.watch(path.join(__dirname, 'src', 'index.html'), ['html'])
-    gulp.watch(path.join(__dirname, 'src', 'scss', '**', '*.scss'), ['scss'])
-    gulp.watch(path.join(__dirname, 'src', 'js', 'popup', 'components', '**', '*.vue'), ['templates'])
+    gulp.watch([
+        path.join(__dirname, 'src', 'scss', '**', '*.scss'),
+        path.join(__dirname, 'src', 'js', 'fg', 'components', '**', '*.scss'),
+    ], ['scss'])
+    gulp.watch(path.join(__dirname, 'src', 'js', 'fg', 'components', '**', '*.vue'), ['templates'])
     gulp.watch(path.join(__dirname, 'src', 'js', 'i18n', '**', '*.js'), ['translations'])
 })

@@ -153,7 +153,7 @@ class Skeleton extends EventEmitter {
 
 
     getDefaultState() {
-        return {
+        let defaultState = {
             availability: {
                 available: 'yes',
                 destinations: {
@@ -179,6 +179,9 @@ class Skeleton extends EventEmitter {
                     state: '',
                 },
             },
+            dialpad: {
+                dialNumber: '',
+            },
             queues: {
                 queues: [],
                 selectedQueue: null,
@@ -187,8 +190,13 @@ class Skeleton extends EventEmitter {
                     state: '',
                 },
             },
+            settings: {
+
+            },
+            ui: {
+                layer: 'app',
+            },
             user: {
-                authenticated: (this.store.get('user') && this.store.get('username') && this.store.get('password')),
                 language: 'nl',
                 userdestination: {
                     selecteduserdestination: {
@@ -198,6 +206,14 @@ class Skeleton extends EventEmitter {
                 },
             },
         }
+
+        defaultState.user.authenticated = (this.store.get('user') && this.store.get('username') && this.store.get('password'))
+        // Deliberately named username and not email, because this can be both
+        // an account id (raw softphone) or an email address with platform
+        // integration.
+        defaultState.user.username = this.store.get('username')
+        defaultState.user.password = this.store.get('password')
+        return defaultState
     }
 
 
