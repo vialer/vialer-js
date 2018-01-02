@@ -22,6 +22,7 @@ class OptionsApp extends Skeleton {
             platformWarning: document.querySelector('.platform-warning'),
             saveButton: document.getElementById('save'),
             status: document.getElementById('status'),
+            telemetry: document.getElementById('telemetry'),
         }
 
         // Handler for the save action.
@@ -39,6 +40,8 @@ class OptionsApp extends Skeleton {
     saveOptions() {
         this.store.set('c2d', this.$.iconsEnabled.checked)
         this.store.set('platformUrl', this.$.platformUrl.value)
+        // The background sets the localStorage option.
+        this.emit('telemetry', {enabled: this.$.telemetry.checked})
         this.setButtonState($('#save'), 'saved', true, 0)
         this.setButtonState($('#save'), 'default', false)
         // Only logout when the endpoint value is changed and the user
@@ -51,6 +54,7 @@ class OptionsApp extends Skeleton {
     restoreOptions() {
         this.$.iconsEnabled.checked = this.store.get('c2d')
         this.$.platformUrl.value = this.store.get('platformUrl')
+        this.$.telemetry.checked = Boolean(this.store.get('telemetry'))
         // Keep a reference to the original platform url.
         this.platformUrl = this.$.platformUrl.value
     }

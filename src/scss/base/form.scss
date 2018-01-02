@@ -90,15 +90,16 @@ html body {
         background: $vg-brand-color;
         border: 1px solid lighten($vg-brand-color, 15%);
         transition: all 0.2s linear;
-        box-shadow: none;
+        box-shadow: inset 0 -2px 0 0 rgba(0, 0, 0, 0.25);
         color: #fff;
-        font-weight: 500;
+        font-weight: 600;
         height: 40px;
-        position: relative;
         line-height: 40px;
-        display: block;
         border-radius: 4px;
         text-align: center;
+        position: relative;
+        text-transform: uppercase;
+        padding: 0 $vg-spacing-3;
 
         // Disable the dotted outline in Firefox.
         &::-moz-focus-inner {
@@ -109,12 +110,14 @@ html body {
         &[disabled] {
             cursor: not-allowed;
             background: $vg-grey-lighter;
-            border: transparent;
+            border: 1px solid transparent;
+            box-shadow: none;
         }
 
         &:hover:enabled {
             cursor: pointer;
             background: lighten($vg-brand-color, 10%);
+            box-shadow: none;
         }
 
         i {

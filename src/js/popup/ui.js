@@ -12,7 +12,9 @@ class UiModule {
     */
     constructor(app) {
         this.app = app
-        this.addListeners()
+        $(() => {
+            this.addListeners()
+        })
         Object.assign(Object.getPrototypeOf(this), ui())
     }
 
@@ -21,6 +23,17 @@ class UiModule {
         // The popout behaves different from the popover. The contacts
         // widget is open by default.
         if (this.app.env.isExtension && this.app.env.role.popout) $('html').addClass('popout')
+
+        this._$ = {}
+        this._$.allViews = $('.view')
+        this._$.telemetryView = $('.telemetry-opt-in')
+        this._$.loginView = $('.login-section')
+
+        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
+            this._$.currentView = $('.view-app')
+        } else {
+            this._$.currentView = $('.view-login')
+        }
 
         this.app.on('ui:widget.close', (data) => {
             // Popout has only the contacts widget open. It can't be closed.
@@ -107,22 +120,19 @@ class UiModule {
             this.app.emit('user:logout.attempt')
         }
 
-        // Switch between logged-in and login state.
-        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
-            this.app.emit('ui:ui.restore')
-            let user = this.app.store.get('username')
-            $('#user-name').text(user)
-
-            this.showPopup()
-        } else {
-            $('.login-section').removeClass('hide')
-        }
-
-
-        $(window).on('unload', () => {
-            this.app.store.set('isMainPanelOpen', false)
+        this._$.telemetryView.find('.js-telemetry-allow').on('click', (e) => {
+            this.app.emit('telemetry', {enabled: true})
+            this.showActiveView()
         })
 
+        this._$.telemetryView.find('.js-telemetry-deny').on('click', (e) => {
+            this.app.emit('telemetry', {enabled: false})
+            this.showActiveView()
+        })
+
+        // Show the telemetry view if the user didn't make a choice yet.
+        if (this.app.store.get('telemetry') === null) this.showTelemetryView()
+        else this.showActiveView()
 
         // Focus the first input field.
         $(window).on('load', () => {
@@ -132,6 +142,10 @@ class UiModule {
             setTimeout(() => {
                 $('.login-form :input:visible:first').focus()
             }, 100)
+        })
+
+        $(window).on('unload', () => {
+            this.app.store.set('isMainPanelOpen', false)
         })
     }
 
@@ -253,10 +267,26 @@ class UiModule {
 
 
     /**
-    * Show the popup content.
+    * Set the login view when the user is not authenticated or the
+    * application view for an authenticated user.
     */
-    showPopup() {
-        $('.container').removeClass('hide')
+    showActiveView() {
+        // Switch between logged-in and login state.
+        if (this.app.store.get('user') && this.app.store.get('username') && this.app.store.get('password')) {
+            this.app.emit('ui:ui.restore')
+            $('#user-name').text(this.app.store.get('username'))
+            this.showAppView()
+        } else {
+            this.showLoginView()
+        }
+    }
+
+
+    /**
+    * Shows the application view for authenticated users.
+    */
+    showAppView() {
+        this._$.allViews.addClass('hide').filter('.view-app').removeClass('hide')
         this.restoreWidgetState()
         // This is an OSX-related racing bug, caused by the popup animation
         // that prevents the popup height to be calculated properly.
@@ -272,6 +302,22 @@ class UiModule {
                 }
             }, 150)
         }
+    }
+
+
+    /**
+    * Shows the login view for unauthenticated users.
+    */
+    showLoginView() {
+        this._$.allViews.addClass('hide').filter('.view-login').removeClass('hide')
+    }
+
+
+    /**
+    * Shows the telemetry consent view.
+    */
+    showTelemetryView() {
+        this._$.allViews.addClass('hide').filter('.view-telemetry').removeClass('hide')
     }
 
 

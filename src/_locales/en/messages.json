@@ -218,5 +218,25 @@
     "saveButtonText": {
         "message": "Save",
         "description": "Text for the button to save settings."
+    },
+    "telemetryOptionLabel": {
+        "message": "Enable anonymized telemetry data",
+        "description": "Label for the 'options' form of the field 'telemtry'."
+    },
+    "telemetryTitle": {
+        "message": "Usage Statistics",
+        "description": ""
+    },
+    "telemetryExplanation": {
+        "message": "Allowing us to collect <b>anonymized data</b> gives us insight on general usage patterns which helps us to improve the software. You can always change this option from the settings page. Would you like to help?",
+        "description": ""
+    },
+    "telemetryButtonAllow": {
+        "message": "Yes, let me help",
+        "description": ""
+    },
+    "telemetryButtonDeny": {
+        "message": "No thanks",
+        "description": ""
     }
 }

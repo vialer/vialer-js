@@ -11,7 +11,15 @@
     </head>
 
     <body>
-        <div class="login-section hide">
+        <div class="view view-telemetry telemetry-opt-in hide">
+            <h2 data-i18n-content="telemetryTitle"></h2>
+            <p data-i18n-content="telemetryExplanation"></p>
+            <div class="actions">
+                <button class="js-telemetry-allow" data-i18n-content="telemetryButtonAllow"></button>
+                <button class="js-telemetry-deny" data-i18n-content="telemetryButtonDeny"></button>
+            </div>
+        </div>
+        <div class="view view-login login-section hide">
             <form class="login-form">
                 <label for="username" data-i18n-content="loginFormUsernameLabel"></label>
                 <input id="username" type="text" tabindex="1" />
@@ -24,7 +32,7 @@
             </form>
         </div>
 
-        <div class="container hide">
+        <div class="view view-app container hide">
 
             <div class="account-info">
                 <span id="user-name" class="user-name"></span>

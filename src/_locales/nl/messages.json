@@ -218,5 +218,25 @@
     "saveButtonText": {
         "message": "Opslaan",
         "description": "Tekst van de knop om instellingen op te slaan."
+    },
+    "telemetryOptionLabel": {
+        "message": "Verzamel geanonimiseerde telemetrie data",
+        "description": "Label voor het 'options'-formulier van het veld 'telemetry'."
+    },
+    "telemetryTitle": {
+        "message": "Anonieme statistieken",
+        "description": ""
+    },
+    "telemetryExplanation": {
+        "message": "Door ons toe te staan om <b>geanonimiseerde data</b> te verzamelen krijgen we een beter beeld van gebruikspatronen en kunnen we onze software verder verbeteren. Je kunt deze optie altijd aanpassen in de instellingen. Wil je helpen?",
+        "description": ""
+    },
+    "telemetryButtonAllow": {
+        "message": "Ja, ik wil helpen",
+        "description": ""
+    },
+    "telemetryButtonDeny": {
+        "message": "Nee bedankt",
+        "description": ""
     }
 }

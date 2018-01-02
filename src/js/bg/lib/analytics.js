@@ -13,6 +13,20 @@ class Analytics {
         this.app = app
         this.analyticsId = analyticsId
         this.clientId = this.getClientId()
+
+        if (this.app.store.get('telemetry') !== null) {
+            this.enabled = Boolean(this.app.store.get('telemetry'))
+        } else {
+            this.enabled = false
+        }
+
+        // Popup scripts sends an event to notify about the user's
+        // choice for telemetry.
+        this.app.on('telemetry', (data) => {
+            this.enabled = data.enabled
+            this.app.store.set('telemetry', this.enabled ? 1 : 0)
+            this.app.logger.debug(`${this}telemetry switched ${this.enabled ? 'on' : 'off'}`)
+        })
     }
 
 
@@ -72,7 +86,11 @@ class Analytics {
     * @param {String} eventLabel - Label that will be given to the event.
     */
     trackClickToDial(eventLabel) {
-        this.app.logger.debug(`${this}send call event`)
+        if (!this.enabled) {
+            this.app.logger.debug(`${this}telemetry disabled`)
+            return
+        }
+        this.app.logger.debug(`${this}telemetry call event`)
         let data = this.formatEvent('Calls', 'Initiate ConnectAB', eventLabel)
         navigator.sendBeacon('https://www.google-analytics.com/r/collect', data)
     }

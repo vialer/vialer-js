@@ -101,26 +101,25 @@ class UserModule {
         // After login, show the user's e-mail address.
         this.app.on('user:login.success', (data) => {
             _$.accountInfo.text(data.user.email)
-            $('.login-section').addClass('hide')
-            this.app.modules.ui.showPopup()
+            this.app.modules.ui.showAppView()
         })
 
         this.app.on('user:logout.success', (data) => {
-            // Hide the main panel.
-            $('.container').addClass('hide')
+            if (this.app.store.get('telemetry') === null) {
+                this.app.modules.ui.showTelemetryView()
+            } else {
+                this.app.modules.ui.showLoginView()
+                $('.login-form :input:visible').val('')
+                $('.login-form :input:visible:first').focus()
+            }
 
-            // Show the login form.
-            $('.login-section').removeClass('hide')
-            // Reset the login form input.
-            $('.login-form :input:visible').val('')
             // Set the username/emailaddress field on load, when we still
             // have a cached value from localstorage.
             if (this.app.store.get('username')) {
                 _$.emailInput.val(this.app.store.get('username'))
             }
 
-            // Focus the first input field.
-            $('.login-form :input:visible:first').focus()
+
 
             // Show a message on logout.
             let button = $('.login-button')
