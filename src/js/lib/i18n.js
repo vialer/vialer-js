@@ -27,7 +27,7 @@ class I18n {
 
         // Translate text content.
         $('[data-i18n-content]').not('.i18n-replaced').each((i, el) => {
-            $(el).text(this.translate($(el).attr('data-i18n-content')))
+            $(el).html(this.translate($(el).attr('data-i18n-content')))
             translated.push($(el))
         })
 

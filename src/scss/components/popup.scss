@@ -110,3 +110,36 @@
 .unauthorized-warning {
     padding: 14px 10px 14px;
 }
+
+.telemetry-opt-in {
+    text-align: center;
+
+    h2 {
+        color: #6c798d;
+        padding-bottom: $vg-spacing-5;
+        font-size: 24px;
+        margin: 0;
+        margin-top: $vg-spacing-6;
+    }
+
+    p {
+        font-style: italic;
+        font-size: 16px;
+        text-align: center;
+        margin: 0;
+        padding-bottom: $vg-spacing-5;
+    }
+
+    .actions {
+        margin: 0 auto;
+        text-align: center;
+        width: 100%;
+        margin-bottom: $vg-spacing-6;
+
+        button {
+            margin-right: $vg-spacing-1;
+        }
+    }
+
+
+}

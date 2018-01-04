@@ -11,14 +11,68 @@ class Analytics {
     */
     constructor(app, analyticsId) {
         this.app = app
+        this.analyticsId = analyticsId
+        this.clientId = this.getClientId()
 
-        // Keep the semi-colon here to prevent ASI ambiguity.
-        ;(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js','ga');
-        ga('create', analyticsId, 'auto')
-        ga('set', 'checkProtocolTask', function(){})
+        if (this.app.store.get('telemetry') !== null) {
+            this.enabled = Boolean(this.app.store.get('telemetry'))
+        } else {
+            this.enabled = false
+        }
+
+        // Popup scripts sends an event to notify about the user's
+        // choice for telemetry.
+        this.app.on('telemetry', (data) => {
+            this.enabled = data.enabled
+            this.app.store.set('telemetry', this.enabled ? 1 : 0)
+            this.app.logger.debug(`${this}telemetry switched ${this.enabled ? 'on' : 'off'}`)
+        })
+    }
+
+
+
+    /**
+    * Format the minimal amount of Google Analytics data that is being sent
+    * Google servers for usage statistics.
+    * See https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#required
+    * @param {String} eventName - The event category in GA.
+    * @param {String} eventAction - The event action in GA.
+    * @param {String} eventLabel - The event label in GA.
+    * @returns {String} - A querystring of the tracking data.
+    */
+    formatEvent(eventName, eventAction, eventLabel) {
+        let analyticsData = {
+            cid: this.clientId,  // An anonymous ID to identify the client with.
+            ea: eventAction,  // GA event action.
+            ec: eventName,  // GA event name.
+            el: eventLabel,  // GA event label.
+            t: 'event',  // GA hit type.
+            tid: this.analyticsId,  // GA tracking or property ID.
+            v: 1,  // Version.
+        }
+
+        return this.app.utils.stringifySearch(analyticsData)
+    }
+
+
+    /**
+    * Maintain a client UUID during sessions by storing/retrieving
+    * it to/from localStorage.
+    * @returns {String} - A persistent client ID.
+    */
+    getClientId() {
+        let clientId = this.app.store.get('clientId')
+        if (!clientId) {
+            var d = new Date().getTime()
+            clientId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (d + Math.random() * 16) % 16 | 0
+                d = Math.floor(d / 16)
+                return (c=='x' ? r : (r&0x3|0x8)).toString(16)
+            })
+            this.app.store.set('clientId', clientId)
+        }
+
+        return clientId
     }
 
 
@@ -29,11 +83,16 @@ class Analytics {
 
     /**
     * A function that will POST a Click-to-Dial Event to Google Analytics.
-    * @param {String} origin - Label that will be given to the event.
+    * @param {String} eventLabel - Label that will be given to the event.
     */
-    trackClickToDial(origin) {
-        this.app.logger.debug(`${this}send call event`)
-        ga('send', 'event', 'Calls', 'Initiate ConnectAB', origin)
+    trackClickToDial(eventLabel) {
+        if (!this.enabled) {
+            this.app.logger.debug(`${this}telemetry disabled`)
+            return
+        }
+        this.app.logger.debug(`${this}telemetry call event`)
+        let data = this.formatEvent('Calls', 'Initiate ConnectAB', eventLabel)
+        navigator.sendBeacon('https://www.google-analytics.com/r/collect', data)
     }
 }
 
