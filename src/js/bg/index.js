@@ -22,22 +22,23 @@ class BackgroundApp extends Skeleton {
     constructor(options) {
         super(options)
 
-        // Clears localstorage if the schema changed after a plugin update.
-        if (!this.store.validSchema()) {
-            this.modules.user.logout()
-            return
-        }
-
         // Keep track of some notifications.
         this.store.set('notifications', {})
 
-        // Store settings to localstorage.
+        // Make application settings persistent.
+        const nonPersistent = ['analyticsId']
         for (let key in this.settings) {
-            if (this.settings.hasOwnProperty(key)) {
+            if (!nonPersistent.includes(key)) {
                 if (this.store.get(key) === null) {
                     this.store.set(key, this.settings[key])
                 }
             }
+        }
+
+        // Clears localstorage if the schema changed after a plugin update.
+        if (!this.store.validSchema()) {
+            this.modules.user.logout()
+            return
         }
 
         // Continue last session if credentials are available.
@@ -161,10 +162,9 @@ class BackgroundApp extends Skeleton {
     * Setup the SIP stack, before loading any modules.
     */
     _init() {
-        if (!this.store.get('c2d')) this.store.set('c2d', true)
         this.settings = {
             analyticsId: process.env.ANALYTICS_ID,
-            c2d: this.store.get('c2d'),
+            c2d: true,
             platformUrl: this.getPlatformUrl(),
             realm: this.getWebsocketUrl(),
         }

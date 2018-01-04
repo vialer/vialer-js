@@ -5,7 +5,13 @@
             "sip_endpoint": "websocket.voipgrid.nl",
             "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
             "name": "Vialer",
-            "analytics_id": "",
+            "analytics_id": {
+                "chrome": "",
+                "edge": ""
+                "electron": "",
+                "firefox": "",
+                "webview": ""
+            },
             "colors": {
                 "vg-brand-color": "#de6b35",
                 "vg-failed-color": "#d9534f",

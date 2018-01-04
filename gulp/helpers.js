@@ -246,7 +246,7 @@ class Helpers {
             .pipe(buffer())
             .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
             .pipe(envify({
-                ANALYTICS_ID: this.settings.brands[brandName].analytics_id,
+                ANALYTICS_ID: this.settings.brands[brandName].analytics_id[buildType],
                 HOMEPAGE: this.settings.brands[brandName].homepage_url,
                 NODE_ENV: this.settings.NODE_ENV,
                 PLATFORM_URL: this.settings.brands[brandName].permissions,
