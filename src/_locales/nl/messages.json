@@ -224,7 +224,7 @@
         "description": "Label voor het 'options'-formulier van het veld 'telemetry'."
     },
     "telemetryTitle": {
-        "message": "Anonieme statistieken",
+        "message": "Gebruiksstatistieken",
         "description": ""
     },
     "telemetryExplanation": {

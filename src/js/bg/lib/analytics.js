@@ -13,6 +13,7 @@ class Analytics {
         this.app = app
         this.analyticsId = analyticsId
         this.clientId = this.getClientId()
+        this.telemetryServer = 'https://www.google-analytics.com/r/collect'
 
         if (this.app.store.get('telemetry') !== null) {
             this.enabled = Boolean(this.app.store.get('telemetry'))
@@ -25,6 +26,7 @@ class Analytics {
         this.app.on('telemetry', (data) => {
             this.enabled = data.enabled
             this.app.store.set('telemetry', this.enabled ? 1 : 0)
+            this.telemetryEvent('Telemetry', 'ToggleOnOff', this.enabled ? 'on' : 'off', true)
             this.app.logger.debug(`${this}telemetry switched ${this.enabled ? 'on' : 'off'}`)
         })
     }
@@ -32,16 +34,21 @@ class Analytics {
 
 
     /**
-    * Format the minimal amount of Google Analytics data that is being sent
-    * Google servers for usage statistics.
+    * Format and send a minimal amount of usage data to the Telemetry
+    * server for anonymized usage statistics when telemetry is enabled.
     * See https://developers.google.com/analytics/devguides/collection/protocol/v1/devguide#required
     * @param {String} eventName - The event category in GA.
     * @param {String} eventAction - The event action in GA.
     * @param {String} eventLabel - The event label in GA.
     * @returns {String} - A querystring of the tracking data.
     */
-    formatEvent(eventName, eventAction, eventLabel) {
-        let analyticsData = {
+    telemetryEvent(eventName, eventAction, eventLabel, override = false) {
+        if (!override && !this.enabled) {
+            this.app.logger.debug(`${this}telemetry disabled`)
+            return
+        }
+
+        let telemetryData = {
             cid: this.clientId,  // An anonymous ID to identify the client with.
             ea: eventAction,  // GA event action.
             ec: eventName,  // GA event name.
@@ -50,8 +57,8 @@ class Analytics {
             tid: this.analyticsId,  // GA tracking or property ID.
             v: 1,  // Version.
         }
-
-        return this.app.utils.stringifySearch(analyticsData)
+        navigator.sendBeacon(this.telemetryServer, this.app.utils.stringifySearch(telemetryData))
+        this.app.logger.debug(`${this}sending telemetry data: "${eventName}:${eventAction}:${eventLabel}"`)
     }
 
 
@@ -78,21 +85,6 @@ class Analytics {
 
     toString() {
         return `${this.app}[analytics] `
-    }
-
-
-    /**
-    * A function that will POST a Click-to-Dial Event to Google Analytics.
-    * @param {String} eventLabel - Label that will be given to the event.
-    */
-    trackClickToDial(eventLabel) {
-        if (!this.enabled) {
-            this.app.logger.debug(`${this}telemetry disabled`)
-            return
-        }
-        this.app.logger.debug(`${this}telemetry call event`)
-        let data = this.formatEvent('Calls', 'Initiate ConnectAB', eventLabel)
-        navigator.sendBeacon('https://www.google-analytics.com/r/collect', data)
     }
 }
 

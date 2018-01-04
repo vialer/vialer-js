@@ -40,7 +40,6 @@ class BackgroundApp extends Skeleton {
             }
         }
 
-
         // Continue last session if credentials are available.
         if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
             this.logger.info(`${this}reusing existing session from existing credentials`)
@@ -162,12 +161,15 @@ class BackgroundApp extends Skeleton {
     * Setup the SIP stack, before loading any modules.
     */
     _init() {
+        if (!this.store.get('c2d')) this.store.set('c2d', true)
         this.settings = {
             analyticsId: process.env.ANALYTICS_ID,
-            c2d: 'true',
+            c2d: this.store.get('c2d'),
             platformUrl: this.getPlatformUrl(),
             realm: this.getWebsocketUrl(),
         }
+
+
         this.timer = new Timer(this)
         this.analytics = new Analytics(this, this.settings.analyticsId)
         this.api = new Api(this)

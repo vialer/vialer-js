@@ -36,6 +36,7 @@ class DialerModule {
         ]
 
         this.addListeners()
+        this.addContextMenuItem()
     }
 
 
@@ -44,13 +45,15 @@ class DialerModule {
      */
     addContextMenuItem() {
         this.app.logger.info(`${this}adding contextmenu`)
-        this._contextMenuItem = browser.contextMenus.create({
-            contexts: ['selection'],
-            onclick: (info, _tab) => {
-                this.app.modules.dialer.dial(info.selectionText, _tab)
-                this.app.analytics.trackClickToDial('Webpage')
-            },
-            title: this.app.i18n.translate('contextMenuLabel'),
+        browser.contextMenus.removeAll().then(() => {
+            this._contextMenuItem = browser.contextMenus.create({
+                contexts: ['selection'],
+                onclick: (info, _tab) => {
+                    this.app.modules.dialer.dial(info.selectionText, _tab)
+                    this.app.analytics.telemetryEvent('Calls', 'Initiate ConnectAB', 'Webpage')
+                },
+                title: this.app.i18n.translate('contextMenuLabel'),
+            })
         })
     }
 
@@ -106,7 +109,9 @@ class DialerModule {
         this.app.on('dialer:dial', (data) => {
             if (data.forceSilent || !this.app.env.isExtension) this.dial(data.b_number, null)
             else this.dial(data.b_number, data.sender.tab)
-            if (data.analytics) this.app.analytics.trackClickToDial(data.analytics)
+            if (data.analytics) {
+                this.app.analytics.telemetryEvent('Calls', 'Initiate ConnectAB', data.analytics)
+            }
         })
 
         // The observer script in a frame indicates that it's ready to observe.
@@ -283,12 +288,6 @@ class DialerModule {
             this.removeContextMenuItem()
             return false
         }
-
-        // Add the context menu to dial the selected number when
-        // right mouse-clicking. The contextmenu is available, even when
-        // c2d icons are disabled. Also, this can't be switched per tab,
-        // so don't take blacklisted tabs in account.
-        if (!this._contextMenuItem) this.addContextMenuItem()
 
         if (!this.app.store.get('c2d')) {
             this.app.logger.info(`${this}not observing because icons are disabled`)
