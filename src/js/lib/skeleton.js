@@ -191,7 +191,22 @@ class Skeleton extends EventEmitter {
                 },
             },
             settings: {
-
+                click2dial: true,
+                platform: {
+                    enabled: true,
+                    url: process.env.PLATFORM_URL,
+                },
+                sipEndpoint: process.env.SIP_ENDPOINT,
+                telemetry: {
+                    analyticsId: process.env.ANALYTICS_ID,
+                    clientId: null,
+                    enabled: false,
+                },
+                webrtc: {
+                    enabled: false,
+                    password: '',
+                    username: '',
+                },
             },
             ui: {
                 layer: 'app',

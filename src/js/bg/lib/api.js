@@ -13,7 +13,7 @@ class Api {
         this.OK_STATUS = [200, 201, 202, 204]
         this.NOTOK_STATUS = [400, 401, 403, 404, 'Network Error']
         this.UNAUTHORIZED_STATUS = [401]
-        this.setupClient(this.app.store.get('username'), this.app.store.get('password'))
+        this.setupClient(this.app.state.user.username, this.app.state.user.password)
     }
 
     /**
@@ -23,7 +23,7 @@ class Api {
     */
     setupClient(username, password) {
         let clientOptions = {
-            baseURL: this.app.store.get('platformUrl'),
+            baseURL: this.app.state.settings.platform.url,
             timeout: 15000,
         }
         if (username && password) {
@@ -68,7 +68,7 @@ class Api {
                 this.app.logger.notification(this.app.i18n.translate('unauthorizedNotificationText'))
                 let notificationsData = this.app.store.get('notifications')
                 notificationsData.unauthorized = true
-                this.app.store.set('notifications', notificationsData)
+
             }
         }
     }

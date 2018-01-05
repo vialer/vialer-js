@@ -25,6 +25,7 @@ class ContactsModule {
 
         // Fill the contact list.
         this.app.on('contacts:fill', (data) => {
+            console.log("CONTACTS FILL")
             // Fill with initial values, so Vue knows that this is a reactive
             // property.
             for (let contact of data.contacts) {

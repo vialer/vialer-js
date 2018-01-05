@@ -8,7 +8,6 @@ class AvailabilityModule {
     */
     constructor(app) {
         this.app = app
-        this.hasUI = true
         this.app.modules.availability = this
 
         /**
@@ -20,6 +19,8 @@ class AvailabilityModule {
             this.selectUserdestination(data.type, data.id)
             this.app.emit('availability:refresh')
         })
+
+        if (app.state.user.authenticated) this._load()
     }
 
 
@@ -39,7 +40,6 @@ class AvailabilityModule {
                     userData.userdestination = userdestination
                     // Save id for reference when changing the userdestination.
                     userData.selectedUserdestinationId = userdestination.selecteduserdestination.id
-                    this.app.store.set('user', userData)
                 }
 
                 // Currently selected destination.

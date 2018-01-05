@@ -1,39 +1,46 @@
 <div class="options">
     <div class="field">
-        <input id="c2d" type="checkbox" value="true" />
+        <label for="sip_endpoint">{{$t('SIP Endpoint')}}</label>
+        <input id="sip_endpoint" type="text" placeholder="SIP Server" v-model="settings.sipEndpoint" />
+    </div>
+
+    <div class="field">
+        <input id="webrtc_enabled" type="checkbox" v-model="settings.webrtc.enabled" />
+        <label for="webrtc_enabled">{{$t('Enable WebRTC')}}</label>
+    </div>
+
+    <div class="field" v-if="settings.webrtc.enabled">
+        <label for="webrtc_enabled">{{$t('WebRTC VoIP account')}}</label>
+        <input type="text" placeholder="VoIP account name" v-model="settings.webrtc.username" />
+        <input type="password" placeholder="VoIP account password" v-model="settings.webrtc.password" />
+    </div>
+
+    <div class="field">
+
+    </div>
+
+    <div class="field">
+        <input id="platform_enabled" type="checkbox" v-model="settings.platform.enabled" />
+        <label for="platform_enabled">{{$t('Enable platform features')}}</label>
+    </div>
+
+    <div class="field" v-if="settings.platform.enabled">
+        <label for="platformUrl">{{$t('Platform URL')}}</label>
+        <input id="platform-url" type="text" placeholder="https://" v-model="settings.platform.url" />
+        <p class="warning platform-warning hide">{{$t('You will be automatically logged out when changing this setting')}}</p>
+    </div>
+
+    <div class="field">
+        <input id="c2d" type="checkbox" v-model="settings.click2dial" />
         <label for="c2d">{{$t('Click-to-Dial icons in websites')}}</label>
     </div>
 
     <div class="field">
-        <input id="webrtc_enabled" type="checkbox" value="true" />
-        <label for="webrtc_enabled">{{$t('WebRTC softphone')}}</label>
-    </div>
-
-    <div class="field">
-        <input type="text" placeholder="SIP Server" />
-    </div>
-
-
-    <div class="field">
-        <input type="text" placeholder="VoIP account name" />
-    </div>
-
-    <div class="field">
-        <input type="password" placeholder="VoIP account password" />
-    </div>
-
-    <div class="field">
-        <input id="platform_enabled" type="checkbox" value="true" />
-        <label for="platform_enabled">{{$t('Use platform features')}}</label>
-    </div>
-
-    <div class="field">
-        <label for="platformUrl">{{$t('Platform URL')}}</label>
-        <input id="platform-url" type="text" placeholder="https://" />
-        <p class="warning platform-warning hide">{{$t('You will be automatically logged out when changing this setting')}}</p>
+        <input id="telemetry_enabled" type="checkbox" v-model="settings.telemetry.enabled" />
+        <label for="telemetry_enabled">{{$t('Enable telemetry')}}</label>
     </div>
 
     <div class="actions">
-        <button id="save" type="button">{{$t('Save')}}</button>
+        <button id="save" type="button" @click="save">{{$t('Save')}}</button>
     </div>
 </div>

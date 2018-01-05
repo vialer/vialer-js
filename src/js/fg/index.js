@@ -6,7 +6,6 @@ const Skeleton = require('../lib/skeleton')
 const _modules = [
     {Module: require('./availability'), name: 'availability'},
     {Module: require('./contacts'), name: 'contacts'},
-    {Module: require('./ui'), name: 'ui'},
     {Module: require('./user'), name: 'user'},
     {Module: require('./queues'), name: 'queues'},
 ]

@@ -28,10 +28,8 @@ class Sip {
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
 
-        if (app.hasCredentials()) {
-            this.connect()
-        }
-
+        this.connect()
+        // Append the elements in the background DOM.
         $('body').append('<video class="local"></video><video class="remote"></video>')
         this.localVideoElement = $('.local').get(0)
         this.remoteVideoElement = $('.remote').get(0)
@@ -59,24 +57,25 @@ class Sip {
 
         this.app.logger.info(`${this}SIP stack starting`)
         this.app.emit('sip:starting', {}, 'both')
-        let user = this.app.store.get('user')
-
         // For webrtc this is a voipaccount, otherwise an email address.
-        let registerAccount = '150010006'
-        let registerPassword = 'LwGP8tFYCu3fyaJ'
+        let {username, password} = this.app.state.settings.webrtc
+        if (!(username && password)) {
+            return
+            // Fallback to email registration.
+        }
 
         this.ua = new SIP.UA({
-            authorizationUser: registerAccount,
+            authorizationUser: username,
             log: {
                 builtinEnabled: false,
                 debug: 'error',
             },
-            password: registerPassword,
+            password: password,
             register: true,
             traceSip: false,
-            uri: `sip:${registerAccount}@voipgrid.nl`,
+            uri: `sip:${username}@voipgrid.nl`,
             userAgentString: process.env.PLUGIN_NAME,
-            wsServers: [`wss://${this.app.settings.realm}`],
+            wsServers: [`wss://${this.app.state.settings.sipEndpoint}`],
         })
 
         // An incoming call. Set the session object and set state to call.

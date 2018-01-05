@@ -7,8 +7,9 @@ class ContactsModule {
     */
     constructor(app) {
         this.app = app
-        this.hasUI = true
+
         this.app.modules.contacts = this
+        if (app.state.user.authenticated) this._load()
     }
 
 
@@ -42,47 +43,10 @@ class ContactsModule {
 
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
-                    this.app.logger.info(`${this}unauthorized contacts`)
-                    // Update authorization status.
-                    let widgetState = this.app.store.get('widgets')
-                    widgetState.contacts.unauthorized = true
-                    this.app.store.set('widgets', widgetState)
-
                     this.app.emit('fg:set_state', {contacts: {widget: {state: 'unauthorized'}}})
                 }
             }
         })
-    }
-
-
-    _reset() {
-        this.app.logger.info(`${this}reset`)
-        this.app.emit('contacts:reset')
-        this.app.emit('contacts:empty')
-    }
-
-
-    /**
-    * Called when restoring the popup.
-    */
-    _restore() {
-        let widgetState = this.app.store.get('widgets')
-        if (!widgetState) this.app.emit('contacts:empty')
-
-        // Check if unauthorized.
-        else if (widgetState.contacts.unauthorized) {
-            this.app.emit('fg:set_state', {contacts: {widget: {state: 'unauthorized'}}})
-        } else {
-            this.app.logger.info(`${this}restoring contacts`)
-            // Restore contacts.
-            let contacts = widgetState.contacts.list
-            if (contacts && contacts.length) {
-                this.app.emit('fg:set_state', {contacts: {contacts: contacts}})
-                this.app.sip.updatePresence()
-            } else {
-                this.app.emit('fg:set_state', {contacts: {contacts: []}})
-            }
-        }
     }
 
 

@@ -7,10 +7,16 @@ module.exports = (app) => {
                     username: this.user.email,
                 })
             },
+            save: function(e) {
+                app.emit('bg:set_state', {
+                    settings: this.settings,
+                })
+            },
         },
         render: templates.settings.r,
         staticRenderFns: templates.settings.s,
         store: {
+            settings: 'settings',
             user: 'user',
         },
     }

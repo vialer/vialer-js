@@ -2,31 +2,26 @@
 
 
 /**
-* Google analytics helper class.
+* Basic telemetry using Google analytics platform.
 */
-class Analytics {
+class Telemetry {
     /**
     * @param {ClickToDialApp} app - The application object.
     * @param {String} analyticsId - Google Analytics id.
     */
-    constructor(app, analyticsId) {
+    constructor(app) {
         this.app = app
-        this.analyticsId = analyticsId
-        this.clientId = this.getClientId()
-        this.telemetryServer = 'https://www.google-analytics.com/r/collect'
+        this.settings = this.app.state.settings.telemetry
 
-        if (this.app.store.get('telemetry') !== null) {
-            this.enabled = Boolean(this.app.store.get('telemetry'))
-        } else {
-            this.enabled = false
-        }
+        this.settings.clientId = this.getClientId()
+        this.telemetryServer = 'https://www.google-analytics.com/r/collect'
+        // Map telemetry setting from the store to this object.
 
         // Popup scripts sends an event to notify about the user's
         // choice for telemetry.
         this.app.on('telemetry', (data) => {
-            this.enabled = data.enabled
-            this.app.store.set('telemetry', this.enabled ? 1 : 0)
-            this.telemetryEvent('Telemetry', 'ToggleOnOff', this.enabled ? 'on' : 'off', true)
+            this.settings.enabled = data.enabled
+            this.event('Telemetry', 'ToggleOnOff', this.enabled ? 'on' : 'off', true)
             this.app.logger.debug(`${this}telemetry switched ${this.enabled ? 'on' : 'off'}`)
         })
     }
@@ -42,7 +37,7 @@ class Analytics {
     * @param {String} eventLabel - The event label in GA.
     * @returns {String} - A querystring of the tracking data.
     */
-    telemetryEvent(eventName, eventAction, eventLabel, override = false) {
+    event(eventName, eventAction, eventLabel, override = false) {
         if (!override && !this.enabled) {
             this.app.logger.debug(`${this}telemetry disabled`)
             return
@@ -54,7 +49,7 @@ class Analytics {
             ec: eventName,  // GA event name.
             el: eventLabel,  // GA event label.
             t: 'event',  // GA hit type.
-            tid: this.analyticsId,  // GA tracking or property ID.
+            tid: this.settings.analyticsId,  // GA tracking or property ID.
             v: 1,  // Version.
         }
         navigator.sendBeacon(this.telemetryServer, this.app.utils.stringifySearch(telemetryData))
@@ -68,18 +63,16 @@ class Analytics {
     * @returns {String} - A persistent client ID.
     */
     getClientId() {
-        let clientId = this.app.store.get('clientId')
-        if (!clientId) {
+        if (!this.settings.clientId) {
             var d = new Date().getTime()
-            clientId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            this.settings.clientId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = (d + Math.random() * 16) % 16 | 0
                 d = Math.floor(d / 16)
                 return (c=='x' ? r : (r&0x3|0x8)).toString(16)
             })
-            this.app.store.set('clientId', clientId)
         }
 
-        return clientId
+        return this.settings.clientId
     }
 
 
@@ -88,4 +81,4 @@ class Analytics {
     }
 }
 
-module.exports = Analytics
+module.exports = Telemetry

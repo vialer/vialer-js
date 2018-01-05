@@ -11,9 +11,11 @@ class UserModule {
 
     addListeners() {
         this.app.on('user:login.attempt', (data) => {
-            // Attempt to log in.
-            this.app.store.set('username', data.username)
-            this.app.store.set('password', data.password)
+            Object.assign(this.app.state.user, {
+                password: data.password,
+                username: data.username,
+            })
+
             this.app.emit('user:login.in_progress')
             this.login(data.username, data.password)
         })
@@ -31,50 +33,45 @@ class UserModule {
     * @param {String} username - Username to login with.
     * @param {String} password - Password to login with.
     */
-    login(username, password) {
-        this.app.api.setupClient(username, password)
+    login(email, password) {
+        this.app.api.setupClient(email, password)
         this.app.api.client.get('api/permission/systemuser/profile/').then(async(res) => {
-
             if (this.app.api.OK_STATUS.includes(res.status)) {
-                let user = res.data
+                let _user = res.data
 
-                if (!user.client) {
+                if (!_user.client) {
                     this.logout()
                     return
                 }
 
-                // Parse and set the client id as a new property.
-                user.client_id = user.client.replace(/[^\d.]/g, '')
 
                 const _res = await this.app.api.client.get('api/userdestination/')
 
                 const phoneAccountId = _res.data.objects[0].selecteduserdestination.phoneaccount
                 const __res = await this.app.api.client.get(`api/phoneaccount/phoneaccount/${phoneAccountId}`)
-                Object.assign(user, {
+
+                Object.assign(this.app.state.user, {
+                    authenticated: true,
+                    client_id: _user.client.replace(/[^\d.]/g, ''),
+                    email: email,
+                    password: password, // TODO: Use tokens.
                     selectedUserdestination: __res.data,
                 })
-                user.authenticated = true
-                this.app.store.set('user', user)
 
-                this.app.state.user = user
                 this.app.emit('fg:set_state', {
-                    user: user,
+                    user: this.app.state.user,
                 })
-                // Perform some actions on login.
-                this.app.emit('user:login.success', {user: user}, 'both')
-                // Reset seen notifications.
-                let notificationsData = this.app.store.get('notifications')
-                if (!notificationsData) notificationsData = {}
-                notificationsData.unauthorized = false
-                this.app.store.set('notifications', notificationsData)
+                // Persist state.
+                this.app.store.set('state', this.app.state)
+
                 // Start loading the widgets.
                 this.app.logger.info(`${this}login successful`)
                 // Connect to the sip service on succesful login.
                 this.app.sip.connect()
             } else if (this.app.api.NOTOK_STATUS.includes(res.status)) {
                 // Remove credentials from the store.
-                this.app.store.remove('username')
-                this.app.store.remove('password')
+                this.app.state.user.username = ''
+                this.app.state.user.password = ''
                 this.app.emit('user:login.failed', {reason: res.status})
             }
         })
@@ -86,12 +83,8 @@ class UserModule {
         this.app.store.remove('widgets')
         this.app.store.remove('isMainPanelOpen')
         this.app.resetModules()
+        this.app.state.user.password = ''
         // Remove credentials for basic auth.
-        this.app.store.remove('password')
-        // Remove cached sip status.
-        this.app.store.remove('sip')
-        // Remove the widget cache.
-        this.app.store.remove('widgets')
         this.app.emit('user:logout.success')
         this.app.api.setupClient()
         this.app.timer.stopAllTimers()
