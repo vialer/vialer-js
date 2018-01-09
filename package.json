@@ -81,7 +81,7 @@
     "eventemitter3": "^2.0.3",
     "jquery": "^3.2.1",
     "roboto-fontface": "^0.8.0",
-    "sip.js": "^0.8.4",
+    "sip.js": "^0.9.1",
     "vue": "^2.4.4",
     "vue-i18n-stash": "git+https://github.com/wearespindle/vue-stash-i18n.git#master",
     "vue-stash": "^2.0.1-beta",

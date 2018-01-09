@@ -7,7 +7,7 @@
         <i class="icon-support" data-link="help" :title="$t('Help')"></i>
         <i class="icon-refresh" :title="$t('Refresh your data')"></i>
         <i class="icon-settings" :title="$t('Settings')" :class="{active: layer === 'settings'}" @click="setLayer('settings')"></i>
-        <i class="icon-dialpad" :title="$t('Close')" :class="{active: layer === 'dialpad'}" @click="setLayer('dialpad')"></i>
         <i class="icon-bars" :title="$t('Colleagues, Queues and Availability')" :class="{active: layer === 'app'}" @click="setLayer('app')"></i>
+        <i class="icon-dialpad" :title="$t('Close')" :class="{active: layer === 'dialpad'}" @click="setLayer('dialpad')"></i>
     </div>
 </div>

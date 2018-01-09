@@ -29,12 +29,30 @@ class BackgroundApp extends Skeleton {
         }
 
         // Continue last session if credentials are available.
-        if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
+        if (this.state.user.authenticated) {
             this.logger.info(`${this}reusing existing session from existing credentials`)
-            this.reloadModules(false)
 
-            if (this.env.isExtension && this.env.role.background) {
-                browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
+            this.getModuleApiData()
+
+            if (this.env.isExtension) {
+                browser.browserAction.setIcon({
+                    path: 'img/icon-menubar-active.png',
+                })
+            }
+        }
+    }
+
+
+    /**
+    * Refreshes data from the API for each module.
+    */
+    getModuleApiData() {
+        for (let module in this.modules) {
+            // Use 'load' instead of 'restore' to refresh the data on
+            // browser restart.
+            if (this.modules[module].getApiData) {
+                this.logger.debug(`${this}(re)refreshing api data for module ${module}`)
+                this.modules[module].getApiData()
             }
         }
     }
@@ -58,6 +76,21 @@ class BackgroundApp extends Skeleton {
         this.telemetry = new Telemetry(this)
         this.api = new Api(this)
         this.sip = new Sip(this)
+    }
+
+
+    /**
+    * Set the background state and propagate it to the foreground.
+    * @param {Object} state - The state to update.
+    * @param {Boolean} persist - Whether to persist the changed state to localStorage.
+    */
+    setState(state, persist = false) {
+        console.log("MERGE DEEP:", state)
+        this.mergeDeep(this.state, state)
+        this.logger.debug(`${this}updating state`, state)
+        if (persist) this.store.set('state', this.state)
+        // Update the foreground's state with it.
+        this.emit('fg:set_state', state)
     }
 
 

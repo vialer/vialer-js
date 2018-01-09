@@ -102,14 +102,12 @@ class DialerModule {
 
 
         /**
-        * Used to make the actual call. A callstatus popup will be used if
-        * the sender is a tab; otherwise fall back to html5 notifications.
-        * Silent mode can be forced by passing the `forceSilent` Boolean
-        * with the event.
+        * Used to make the actual call
         */
         this.app.on('dialer:dial', (data) => {
-            if (data.forceSilent || !this.app.env.isExtension) this.dial(data.b_number, null)
-            else this.dial(data.b_number, data.sender.tab)
+            // Just make sure b_number is numbers only.
+            const phonenumber = this.sanitizeNumber(data.b_number).replace(/[^\d+]/g, '')
+            this.app.sip.createSession(phonenumber)
             if (data.analytics) {
                 this.app.telemetry.event('Calls', 'Initiate ConnectAB', data.analytics)
             }
@@ -121,43 +119,6 @@ class DialerModule {
             this.app.on('dialer:observer.ready', (data) => {
                 data.callback({observe: this.switchObserver(data.sender.tab)})
             })
-        }
-    }
-
-
-    /**
-    * Calling this method with a provided tab will display the callstatus
-    * on top of that tab in an iframe. The poller is stopped whenever the
-    * callstatus dialog is closed or the returned status is final.
-    * Without a provided tab(like when called from the colleagues widget)
-    * there won't be a visible popup, but a html5 notification that is
-    * triggered when the status changes.
-    * @param {Number} bNumber - The number the user wants to call.
-    * @param {Tab} [tab] - The tab from which the call was initialized,
-    *                      or null to use notifcations.
-    */
-    async dial(bNumber, tab) {
-        // Just make sure b_number is numbers only.
-        bNumber = this.sanitizeNumber(bNumber).replace(/[^\d+]/g, '')
-
-        this.app.sip.createSession(bNumber)
-
-        // Start showing the callstatus dialog early on.
-        // The actual callstatus feedback will be started after the
-        // initial API requests.
-        if (tab) {
-            this.app.emit('dialer:status.show', {
-                bNumber: bNumber,
-                status: this.app.i18n.translate('clicktodialCallingText'),
-            }, false, tab.id)
-        } else {
-            this.app.logger.notification(this.app.i18n.translate('clicktodialCallingText'))
-        }
-
-        if (tab) {
-            // Pass the callid to the callstatus iframe. Timer will
-            // be triggered by the callstatus script.
-            this.app.emit('dialer:status.update', {callid: bNumber, frame: 'callstatus'}, false, tab.id)
         }
     }
 

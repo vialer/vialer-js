@@ -17,6 +17,6 @@
         <button class="keys" @mouseup="stopDtmf()" @mousedown="playDtmf('*')">*</button>
     </div>
     <div class="actions">
-        <i class="dial icon-availability"></i>
+        <i class="dial icon-availability" @click="dialNumber()"></i>
     </div>
 </div>

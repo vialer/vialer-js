@@ -18,4 +18,7 @@
         <Navigation></Navigation>
         <Dialpad></Dialpad>
     </template>
+    <template v-else-if="$store.ui.layer==='calling'">
+        <div>OVERLAY</div>
+    </template>
 </div>

@@ -72,7 +72,7 @@ class Sip {
             },
             password: password,
             register: true,
-            traceSip: false,
+            traceSip: true,
             uri: `sip:${username}@voipgrid.nl`,
             userAgentString: process.env.PLUGIN_NAME,
             wsServers: [`wss://${this.app.state.settings.sipEndpoint}`],
@@ -80,7 +80,7 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusConnected'))
+            this.app.logger.debug(`${this}invite coming in`)
             this.session = session
             this.session.accept({
                 sessionDescriptionHandlerOptions: {
@@ -140,11 +140,12 @@ class Sip {
 
 
     createSession(phoneNumber) {
-        this.app.logger.info(`${this}Starting new session`)
-        this.app.logger.notification(this.app.i18n.translate('clicktodialCallingText'))
+        let sessionUrl = `sip:${phoneNumber}@${this.app.state.settings.sipEndpoint}`
+        this.app.logger.info(`${this}Starting new session: ${sessionUrl}`)
 
+        //this.session = this.ua.invite(sessionUrl)
         this.session = this.ua.invite(
-            `sip:${phoneNumber}@voipgrid.nl`, {
+            sessionUrl, {
                 sessionDescriptionHandlerOptions: {
                     constraints: {
                         audio: true,
@@ -155,7 +156,6 @@ class Sip {
         )
 
         this.session.on('accepted', (data) => {
-            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusConnected'))
             this.localVideoElement.srcObject = this.stream
             this.localVideoElement.play()
 

@@ -37,6 +37,7 @@ class Skeleton extends EventEmitter {
         // A state object that can be mutated across instances
         // using {app_name}:set_state and {app_name}:get_state emitters.
         this.on(`${options.name}:get_state`, (data) => {
+            this.logger.debug(`${this}returning state request`)
             // Send this script's state back to the requesting script.
             data.callback(this.state)
         })
@@ -44,7 +45,7 @@ class Skeleton extends EventEmitter {
         // Another script wants to sync this script's state.
         this.on(`${options.name}:set_state`, (state) => {
             this.mergeDeep(this.state, state)
-            this.logger.debug(`${this}updating state`)
+            this.logger.debug(`${this}received state update:`, state)
             // The background state is the source of truth for persistant
             // state storage. Don't use the fg state for this.
             if (this.name === 'bg') this.store.set('state', this.state)
@@ -62,7 +63,6 @@ class Skeleton extends EventEmitter {
                 })
             }
         }
-
 
         // Init these modules.
         for (let module of options.modules) {
@@ -156,9 +156,11 @@ class Skeleton extends EventEmitter {
         let defaultState = {
             availability: {
                 available: 'yes',
-                destinations: {
-                    options: [],
-                    selected: null,
+                userdestination: {
+                    selecteduserdestination: {
+                        fixeddestination: {},
+                        phoneaccount: {},
+                    },
                 },
                 widget: {
                     active: false,
@@ -213,12 +215,6 @@ class Skeleton extends EventEmitter {
             },
             user: {
                 language: 'nl',
-                userdestination: {
-                    selecteduserdestination: {
-                        fixeddestination: {},
-                        phoneaccount: {},
-                    },
-                },
             },
         }
 
@@ -272,7 +268,6 @@ class Skeleton extends EventEmitter {
     isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item))
     }
-
 
 
     mergeDeep(target, ...sources) {

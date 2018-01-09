@@ -71,19 +71,19 @@ class UserModule {
         /**
         * Show an error on login fail.
         */
-        this.app.on('user:login.failed', (data) => {
-            let button = $('.login-button')
-            // This is an indication that an incorrect platform url is used.
-            if (data.reason === 404) this.app.modules.ui.setButtonState(button, 'error', true, 0)
-            else this.app.modules.ui.setButtonState(button, 'failed', true, 0)
-            this.app.modules.ui.setButtonState(button, 'default', function() {
-                if (_$.emailInput.val().trim().length && _$.passwordInput.val().length) {
-                    return false
-                } else {
-                    return true
-                }
-            })
-        })
+        // this.app.on('user:login.failed', (data) => {
+        //     let button = $('.login-button')
+        //     // This is an indication that an incorrect platform url is used.
+        //     if (data.reason === 404) this.app.modules.ui.setButtonState(button, 'error', true, 0)
+        //     else this.app.modules.ui.setButtonState(button, 'failed', true, 0)
+        //     this.app.modules.ui.setButtonState(button, 'default', function() {
+        //         if (_$.emailInput.val().trim().length && _$.passwordInput.val().length) {
+        //             return false
+        //         } else {
+        //             return true
+        //         }
+        //     })
+        // })
 
         /**
         * Display an indicator when logging in.

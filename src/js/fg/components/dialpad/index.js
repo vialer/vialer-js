@@ -13,6 +13,14 @@ module.exports = (app) => {
 
     return {
         methods: {
+            dialNumber: function() {
+                console.log("DIALNUmbEr:", this.module.dialNumber)
+                app.emit('dialer:dial', {
+                    analytics: 'Dialpad',
+                    b_number: this.module.dialNumber,
+                    forceSilent: false,
+                })
+            },
             login: function() {
                 app.emit('user:login.attempt', {
                     password: this.user.password,
