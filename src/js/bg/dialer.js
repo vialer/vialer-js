@@ -45,15 +45,13 @@ class DialerModule {
      */
     addContextMenuItem() {
         this.app.logger.info(`${this}adding contextmenu`)
-        browser.contextMenus.removeAll().then(() => {
-            this._contextMenuItem = browser.contextMenus.create({
-                contexts: ['selection'],
-                onclick: (info, _tab) => {
-                    this.app.modules.dialer.dial(info.selectionText, _tab)
-                    this.app.analytics.telemetryEvent('Calls', 'Initiate ConnectAB', 'Webpage')
-                },
-                title: this.app.i18n.translate('contextMenuLabel'),
-            })
+        this._contextMenuItem = browser.contextMenus.create({
+            contexts: ['selection'],
+            onclick: (info, _tab) => {
+                this.app.modules.dialer.dial(info.selectionText, _tab)
+                this.app.analytics.telemetryEvent('Calls', 'Initiate ConnectAB', 'Webpage')
+            },
+            title: this.app.i18n.translate('contextMenuLabel'),
         })
     }
 
@@ -283,11 +281,17 @@ class DialerModule {
     * @returns {Boolean} - Whether the observer should be listening.
     */
     switchObserver(tab) {
-        if (!this.app.store.get('user')) {
+        if (!this.app.store.get('username') || !this.app.store.get('password')) {
             this.app.logger.info(`${this}not observing because user is not logged in`)
             this.removeContextMenuItem()
             return false
         }
+
+        // Add the context menu to dial the selected number when
+        // right mouse-clicking. Thqe contextmenu is available, even when
+        // c2d icons are disabled. Also, this can't be switched per tab,
+        // so don't take blacklisted tabs in account.
+        if (!this._contextMenuItem) this.addContextMenuItem()
 
         if (!this.app.store.get('c2d')) {
             this.app.logger.info(`${this}not observing because icons are disabled`)

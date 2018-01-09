@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 2.2.0
+* Fix for click2dial icons being disabled by default
+* Analytics tracking code per build target. Fixes Firefox analytics not showing any activity anymore.
+* Telemetry opt-in modal and option in settings page. Fixes amo-editor issue for Firefox.
+* Custom analytics data and beacon request instead of script injection. Fixes amo-editor issue for Firefox.
+* Fix call number contextmenu registered multiple times.
+* Cleanup analytics/telemetry code. Added telemetry opt-in event.
+
 ## Version 2.1.0
 * Replaced SipML5 with SIP.js. This should fix reoccuring connectivity issues and will make it easier to implement SIP register.
 * Restructered JavaScript project files and build. This makes it easier for developers to understand and find the appropriate code.
