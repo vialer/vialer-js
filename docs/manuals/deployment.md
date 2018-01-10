@@ -77,6 +77,26 @@ gulp deploy-brands --deploy production
 gulp docs-deploy
 ```
 
+5. Add the following template to the Release notes for developers:		
+
+```bash		
+To confirm contents xpi and sources.zip:		
+node -v		
+# v9.3.0		
+npm -v		
+# 5.6.0
+unzip *.xpi -d /tmp/vialer-js-xpi-unzipped  # download xpi and unzip
+unzip sources.zip -d /tmp/vialer-js-sources-unzipped  # download sources and unzip		
+cd /tmp/vialer-js-sources-unzipped		
+npm i		
+cp .vialer-jsrc.example .vialer-jsrc	
+NODE_ENV=production gulp build --target firefox		
+cd -		
+diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox		
+rm -Rf /tmp/vialer-js*		
+```		
+* Upload sources.zip
+
 
 # Additional info & tips
 

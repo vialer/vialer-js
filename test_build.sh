@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "Running build integrity check..."
+echo "Running build integrity check for brand $1..."
 # Remove existing artifacts.
 if [ -d build ]; then
     rm -rf build
@@ -25,10 +25,10 @@ npm install
 PACKAGELOCK_STATUS=$(git status package-lock.json --porcelain | grep -c 'M package-lock.json')
 
 # Build add-on.
-NODE_ENV=production gulp build --target firefox
+NODE_ENV=production gulp build --target firefox --brand $1
 
 # Build webextension.
-web-ext build --source-dir build/firefox --artifacts-dir ./dist/firefox/
+web-ext build --source-dir build/$1/firefox --artifacts-dir ./dist/$1/firefox/
 
 if [ $PACKAGELOCK_STATUS != 0 ]; then
     echo 'WARN: change detected in package-lock.json, commit this file:'
@@ -44,29 +44,29 @@ else
     zipfile=$(ls -t dist/firefox/ | awk '{ print $0; exit }')
 
     # Remove tmp artifacts.
-    if [ -d /tmp/webext-clicktodial-unzipped ]; then
-        rm -rf /tmp/webext-clicktodial-unzipped
+    if [ -d /tmp/vialerjs-unzipped ]; then
+        rm -rf /tmp/vialerjs-unzipped
     fi
 
-    if [ -d /tmp/webext-clicktodial-unzipped-src ]; then
-        rm -rf /tmp/webext-clicktodial-unzipped-src
+    if [ -d /tmp/vialerjs-unzipped-src ]; then
+        rm -rf /tmp/vialerjs-unzipped-src
     fi
 
-    unzip dist/firefox/$zipfile -d /tmp/webext-clicktodial-unzipped
-    unzip dist/sources.zip -d /tmp/webext-clicktodial-unzipped-src
+    unzip dist/$1/firefox/$zipfile -d /tmp/vialerjs-unzipped
+    unzip dist/sources.zip -d /tmp/vialerjs-unzipped-src
 
     # Build from source.
-    cd /tmp/webext-clicktodial-unzipped-src
-    cp src/brand.json.example src/brand.json
+    cd /tmp/vialerjs-unzipped-src
+    cp .vialer-jsrc.example .vialer-jsrc
     npm install
     NODE_ENV=production gulp build --target firefox
 
     # The generated source build must be equal to the web-ext build.
-    DIFF=$(diff -r /tmp/webext-clicktodial-unzipped /tmp/webext-clicktodial-unzipped-src/build/firefox)
+    DIFF=$(diff -r /tmp/vialerjs-unzipped /tmp/vialerjs-unzipped-src/build/$1/firefox)
     if [ "$DIFF" != "" ]
     then
-        echo "Build integrity check failed. Checkout the diff."
-        echo "diff -r /tmp/webext-clicktodial-unzipped /tmp/webext-clicktodial-unzipped-src/build/firefox"
+        echo "Sources and differ. Checkout the diff."
+        echo "diff -r /tmp/vialerjs-unzipped /tmp/vialerjs-unzipped-src/build/firefox"
     else
         echo "Build integrity check passed..."
     fi
