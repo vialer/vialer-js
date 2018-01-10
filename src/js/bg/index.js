@@ -2,7 +2,7 @@ let env = require('../lib/env')
 
 const Api = require('./lib/api')
 const Sip = require('./lib/sip')
-const Skeleton = require('../lib/skeleton')
+const App = require('../lib/app')
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
 
@@ -17,7 +17,7 @@ const _modules = [
 ]
 
 
-class BackgroundApp extends Skeleton {
+class BackgroundApp extends App {
 
     constructor(options) {
         super(options)
@@ -27,6 +27,20 @@ class BackgroundApp extends Skeleton {
             this.modules.user.logout()
             return
         }
+
+        // A state object that can be mutated across instances
+        // using {app_name}:set_state and {app_name}:get_state emitters.
+        this.on('bg:get_state', (data) => {
+            this.logger.debug(`${this}returning state request`)
+            // Send this script's state back to the requesting script.
+            data.callback(this.state)
+        })
+
+        // Another script wants to sync this script's state.
+        this.on('bg:set_state', (data) => {
+            this.mergeDeep(this.state, data.state)
+            if (data.persist) this.store.set('state', this.state)
+        })
 
         // Continue last session if credentials are available.
         if (this.state.user.authenticated) {
@@ -63,14 +77,17 @@ class BackgroundApp extends Skeleton {
     */
     initStore() {
         let stateObj = this.store.get('state')
-        if (stateObj) this.state = stateObj
-        else this.state = this.getDefaultState()
 
-        // Clears localstorage if the schema changed after a plugin update.
-        if (!this.store.validSchema()) {
+        // Clear localstorage if the data schema changed.
+        if (!this.store.validSchema() && stateObj) {
             this.modules.user.logout()
             return
         }
+
+        if (stateObj) this.state = stateObj
+        else this.state = this.getDefaultState()
+
+
 
         this.timer = new Timer(this)
         this.telemetry = new Telemetry(this)
@@ -85,9 +102,7 @@ class BackgroundApp extends Skeleton {
     * @param {Boolean} persist - Whether to persist the changed state to localStorage.
     */
     setState(state, persist = false) {
-        console.log("MERGE DEEP:", state)
         this.mergeDeep(this.state, state)
-        this.logger.debug(`${this}updating state`, state)
         if (persist) this.store.set('state', this.state)
         // Update the foreground's state with it.
         this.emit('fg:set_state', state)

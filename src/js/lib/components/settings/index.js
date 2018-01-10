@@ -9,7 +9,10 @@ module.exports = (app) => {
             },
             save: function(e) {
                 app.emit('bg:set_state', {
-                    settings: this.settings,
+                    persist: true,
+                    state: {
+                        settings: this.settings,
+                    },
                 })
             },
         },

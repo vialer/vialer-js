@@ -273,7 +273,7 @@ class Helpers {
     scssEntry(brandName, buildType, scssName) {
         const brandColors = this.formatScssVars(this.settings.brands[brandName].colors)
         return gulp.src(`./src/scss/${scssName}.scss`)
-            .pipe(addsrc(path.join(this.settings.SRC_DIR, 'js', 'fg', 'components', '**', '*.scss')))
+            .pipe(addsrc(path.join(this.settings.SRC_DIR, 'js', 'lib', 'components', '**', '*.scss')))
             .pipe(insert.prepend(brandColors))
             .pipe(sass({
                 includePaths: this.settings.NODE_PATH,

@@ -34,24 +34,6 @@ class Skeleton extends EventEmitter {
 
         this._init()
 
-        // A state object that can be mutated across instances
-        // using {app_name}:set_state and {app_name}:get_state emitters.
-        this.on(`${options.name}:get_state`, (data) => {
-            this.logger.debug(`${this}returning state request`)
-            // Send this script's state back to the requesting script.
-            data.callback(this.state)
-        })
-
-        // Another script wants to sync this script's state.
-        this.on(`${options.name}:set_state`, (state) => {
-            this.mergeDeep(this.state, state)
-            this.logger.debug(`${this}received state update:`, state)
-            // The background state is the source of truth for persistant
-            // state storage. Don't use the fg state for this.
-            if (this.name === 'bg') this.store.set('state', this.state)
-        })
-
-        this.initStore()
 
         if (this.env.isExtension) {
             this.ipcListener()
@@ -84,6 +66,13 @@ class Skeleton extends EventEmitter {
         else this.verbose = false
         this.logger.info(`${this}verbose mode: ${this.verbose}`)
     }
+
+
+    /**
+    * This method may be overriden to initialize logic
+    * before loading modules.
+    */
+    _init() {}
 
 
     /**
@@ -149,87 +138,6 @@ class Skeleton extends EventEmitter {
             }
             super.emit(event, data)
         }
-    }
-
-
-    getDefaultState() {
-        let defaultState = {
-            availability: {
-                available: 'yes',
-                userdestination: {
-                    selecteduserdestination: {
-                        fixeddestination: {},
-                        phoneaccount: {},
-                    },
-                },
-                widget: {
-                    active: false,
-                    state: '',
-                },
-            },
-            contacts: {
-                contacts: [],
-                search: {
-                    disabled: false,
-                    input: '',
-                },
-                sip: {
-                    state: 'disconnected',
-                },
-                widget: {
-                    active: false,
-                    state: '',
-                },
-            },
-            dialpad: {
-                dialNumber: '',
-            },
-            queues: {
-                queues: [],
-                selectedQueue: null,
-                widget: {
-                    active: false,
-                    state: '',
-                },
-            },
-            settings: {
-                click2dial: true,
-                platform: {
-                    enabled: true,
-                    url: process.env.PLATFORM_URL,
-                },
-                sipEndpoint: process.env.SIP_ENDPOINT,
-                telemetry: {
-                    analyticsId: process.env.ANALYTICS_ID,
-                    clientId: null,
-                    enabled: false,
-                },
-                webrtc: {
-                    enabled: false,
-                    password: '',
-                    username: '',
-                },
-            },
-            ui: {
-                layer: 'app',
-            },
-            user: {
-                language: 'nl',
-            },
-        }
-
-        defaultState.user.authenticated = (this.store.get('user') && this.store.get('username') && this.store.get('password'))
-        // Deliberately named username and not email, because this can be both
-        // an account id (raw softphone) or an email address with platform
-        // integration.
-        defaultState.user.username = this.store.get('username')
-        defaultState.user.password = this.store.get('password')
-        return defaultState
-    }
-
-
-    initStore() {
-        this.state = {}
     }
 
 
@@ -309,13 +217,6 @@ class Skeleton extends EventEmitter {
     toString() {
         return `[${this.name}] `
     }
-
-
-    /**
-    * This method may be overriden to initialize logic before loading
-    * modules, e.g. like initializing a sip stack.
-    */
-    _init() {}
 }
 
 module.exports = Skeleton

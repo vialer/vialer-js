@@ -384,12 +384,12 @@ gulp.task('scss-webext-print', 'Generate webextension print css.', () => {
 }, {options: taskOptions.all})
 
 
-gulp.task('templates', 'Build Vue templates', () => {
-    gulp.src('./src/js/fg/components/**/*.vue')
+gulp.task('templates', 'Build Vue component templates', () => {
+    gulp.src('./src/js/lib/components/**/*.vue')
         .pipe(fuet({
             commonjs: false,
             namespace: 'global.templates',
-            pathfilter: ['src', 'js', 'fg', 'components'],
+            pathfilter: ['src', 'js', 'lib', 'components'],
         }))
         .on('error', notify.onError('Error: <%= error.message %>'))
         .pipe(ifElse(settings.PRODUCTION, () => minifier()))
@@ -480,8 +480,8 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     gulp.watch(path.join(__dirname, 'src', 'index.html'), ['html'])
     gulp.watch([
         path.join(__dirname, 'src', 'scss', '**', '*.scss'),
-        path.join(__dirname, 'src', 'js', 'fg', 'components', '**', '*.scss'),
+        path.join(__dirname, 'src', 'js', 'lib', 'components', '**', '*.scss'),
     ], ['scss'])
-    gulp.watch(path.join(__dirname, 'src', 'js', 'fg', 'components', '**', '*.vue'), ['templates'])
+    gulp.watch(path.join(__dirname, 'src', 'js', 'lib', 'components', '**', '*.vue'), ['templates'])
     gulp.watch(path.join(__dirname, 'src', 'js', 'i18n', '**', '*.js'), ['translations'])
 })

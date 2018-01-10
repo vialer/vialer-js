@@ -23,44 +23,11 @@ class ContactsModule {
             this.app.state.contacts.contacts = []
         })
 
-        // Fill the contact list.
-        this.app.on('contacts:fill', (data) => {
-            console.log("CONTACTS FILL")
-            // Fill with initial values, so Vue knows that this is a reactive
-            // property.
-            for (let contact of data.contacts) {
-                contact.state = 'unavailable'
-            }
-            this.app.state.contacts.contacts = data.contacts
-            // Trigger the callback function to receive presence data
-            // after the list is fully built.
-            data.callback({})
-        })
-
         this.app.on('contacts:reset', (data) => {
             this.app.state.contacts.contacts = []
             this.app.state.contacts.search.input = ''
         })
 
-        this.app.on('sip:starting', (e) => {
-            this.app.state.contacts.sip.state = 'disconnected'
-        })
-
-        this.app.on('sip:started', () => {
-            this.app.state.contacts.sip.state = 'started'
-        })
-
-        this.app.on('sip:stopped', (e) => {
-            this.app.state.contacts.sip.state = 'disconnected'
-        })
-
-        /**
-         * Show a blinking presence loading icon while updating.
-         */
-        this.app.on('sip:presences.start_update', (data) => {
-            console.log("STATE:", this.app.state)
-            this.app.state.contacts.sip.state = 'updating'
-        })
 
         /**
         * Update the status of each account in the contact list when it's

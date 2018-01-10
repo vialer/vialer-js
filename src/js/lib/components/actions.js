@@ -8,12 +8,12 @@ module.exports = function(app) {
     actions.logout = function() {
         this.$store.user.authenticated = false
         this.$store.user.password = null
-        app.emit('bg:set_state', {
+        app.setState({
             user: {
                 authenticated: false,
                 password: null,
             },
-        })
+        }, true)
     }
 
 
@@ -42,7 +42,10 @@ module.exports = function(app) {
             }
         }
 
-        app.emit('bg:set_state', widgetState)
+        app.emit('bg:set_state', {
+            persist: true,
+            state: widgetState,
+        })
     }
 
     return actions

@@ -44,7 +44,6 @@ class UserModule {
                 email: '',
                 password: '',
             })
-            // this.app.emit('user:login.failed', {reason: res.status})
         }
 
         let user = res.data
@@ -57,15 +56,17 @@ class UserModule {
         this.app.modules.availability.getApiData()
 
         this.app.setState({
+            ui: {
+                layer: 'app',
+            },
             user: {
                 authenticated: true,
                 client_id: user.client.replace(/[^\d.]/g, ''),
                 email: email,
-                password: password, // TODO: Use tokens.
+                password: password,
             },
         }, true)
-        // Start loading the widgets.
-        this.app.logger.info(`${this}login successful`)
+
         // Connect to the sip service on succesful login.
         this.app.sip.connect()
     }
@@ -73,9 +74,15 @@ class UserModule {
 
     logout() {
         this.app.logger.info(`${this}logout`)
-        this.app.store.remove('widgets')
-        this.app.store.remove('isMainPanelOpen')
         this.app.resetModules()
+        this.app.setState({
+            ui: {
+                layer: 'login',
+            },
+            user: {
+                password: '',
+            },
+        })
         this.app.state.user.password = ''
         // Remove credentials for basic auth.
         this.app.emit('user:logout.success')

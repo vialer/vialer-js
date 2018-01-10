@@ -7,7 +7,6 @@ let env_bg = require('../lib/env')
 let env_fg = require('../lib/env')
 const resizeSensor = require('css-element-queries').ResizeSensor
 
-
 document.addEventListener('DOMContentLoaded', () => {
     // Set content height for electron.
     if (env_bg.isElectron) {

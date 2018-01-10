@@ -1,6 +1,6 @@
+const App = require('../lib/app')
 let env = require('../lib/env')
 const utils = require('../lib/utils')
-const Skeleton = require('../lib/skeleton')
 
 
 const _modules = [
@@ -11,41 +11,15 @@ const _modules = [
 ]
 
 
-class PopupApp extends Skeleton {
+class VialerUi extends App {
 
     constructor(options) {
         super(options)
-    }
 
-    _init() {
-        this.sounds = require('./sounds')
-        let actions = require('./components/actions')(this)
-        Vue.component('Navigation', require('./components/navigation')(this, actions))
-        Vue.component('Availability', require('./components/availability')(this, actions))
-        Vue.component('Contacts', require('./components/contacts')(this, actions))
-        Vue.component('Login', require('./components/login')(this, actions))
-        Vue.component('Settings', require('./components/settings')(this, actions))
-        Vue.component('Dialpad', require('./components/dialpad')(this, actions))
-        Vue.component('Queues', require('./components/queues')(this, actions))
-    }
-
-
-    _initI18n() {
-        // Create a I18n stash store and pass it to the I18n plugin.
-        const i18nStore = new I18nStore(this.store)
-        Vue.use(i18n, i18nStore)
-        if (global.translations && this.state.user.language in translations) {
-            Vue.i18n.add(this.state.user.language, translations.nl)
-            Vue.i18n.set(this.state.user.language)
-        } else {
-            // Warn about a missing language when it's a different one than
-            // the default.
-            if (this.state.user.language !== 'en') {
-                this.logger.warn(`No translations found for ${this.state.user.language}`)
-            }
-        }
-        // Add a simple reference to the translation module.
-        this.$t = Vue.i18n.translate
+        // Another script wants to sync this script's state.
+        this.on('fg:set_state', (state) => {
+            this.mergeDeep(this.state, state)
+        })
     }
 
 
@@ -54,19 +28,24 @@ class PopupApp extends Skeleton {
         this.emit('bg:get_state', {
             callback: (state) => {
                 this.state = state
-                this._initI18n()
-                this.vm = new Vue({
-                    data: {
-                        store: this.state,
-                    },
-                    render: h => h({
-                        render: templates.main.r,
-                        staticRenderFns: templates.main.s,
-                        store: this.state,
-                    }),
-                })
+                this.initVm()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
             },
+        })
+    }
+
+
+    /**
+    * Set the background state and propagate it to the foreground.
+    * @param {Object} state - The state to update.
+    * @param {Boolean} persist - Whether to persist the changed state to localStorage.
+    */
+    setState(state, persist = false) {
+        this.mergeDeep(this.state, state)
+        // Update the foreground's state with it.
+        this.emit('bg:set_state', {
+            persist: persist,
+            state: state,
         })
     }
 }
@@ -74,7 +53,7 @@ class PopupApp extends Skeleton {
 
 function initApp(initParams) {
     initParams.modules = _modules
-    const app = new PopupApp(initParams)
+    const app = new VialerUi(initParams)
 
     if (app.env.isChrome) $('html').addClass('chrome')
     if (app.env.isEdge) $('html').addClass('edge')

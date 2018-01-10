@@ -54,29 +54,41 @@ class Sip {
             this.app.logger.warn(`${this}sip backend already starting or started`)
             return
         }
+        this.app.setState({contacts: {sip: {state: 'disconnected'}}})
 
-        this.app.logger.info(`${this}SIP stack starting`)
-        this.app.emit('sip:starting', {}, 'both')
+        const settings = this.app.state.settings
+
         // For webrtc this is a voipaccount, otherwise an email address.
-        let {username, password} = this.app.state.settings.webrtc
-        if (!(username && password)) {
-            return
-            // Fallback to email registration.
-        }
-
-        this.ua = new SIP.UA({
-            authorizationUser: username,
+        let uaOptions = {
             log: {
                 builtinEnabled: false,
                 debug: 'error',
             },
-            password: password,
-            register: true,
             traceSip: true,
-            uri: `sip:${username}@voipgrid.nl`,
             userAgentString: process.env.PLUGIN_NAME,
-            wsServers: [`wss://${this.app.state.settings.sipEndpoint}`],
-        })
+            wsServers: [`wss://${settings.sipEndpoint}`],
+        }
+
+        // Login with the WebRTC account and register.
+        if (settings.webrtc.enabled) {
+            uaOptions.authorizationUser = settings.webrtc.username
+            uaOptions.password = settings.webrtc.password
+            uaOptions.register = true
+            uaOptions.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
+        } else {
+            // Login with platform email without register.
+            uaOptions.authorizationUser = this.app.state.user.email
+            uaOptions.password = this.app.state.user.password
+            uaOptions.register = false
+            uaOptions.uri = `sip:${this.app.state.user.email}`
+        }
+
+        if (!uaOptions.authorizationUser || !uaOptions.password) {
+            this.app.logger.warn(`${this}cannot connect without username and password`)
+            return
+        }
+
+        this.ua = new SIP.UA(uaOptions)
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
@@ -121,15 +133,14 @@ class Sip {
 
         this.ua.on('connected', () => {
             this.app.logger.info(`${this}SIP stack started`)
-            // Reset the connection retry timer.
-            this.app.emit('sip:started', {}, 'both')
+            this.app.setState({contacts: {sip: {state: 'started'}}})
             this.updatePresence()
         })
 
 
         this.ua.on('disconnected', () => {
             this.app.logger.info(`${this}SIP stack stopped`)
-            this.app.emit('sip:stopped', {}, 'both')
+            this.app.setState({contacts: {sip: {state: 'disconnected'}}})
 
             if (this.reconnect) {
                 this.app.logger.info(`${this}SIP stack reconnecting`)
@@ -251,8 +262,9 @@ class Sip {
     */
     subscribePresence(accountId) {
         return new Promise((resolve, reject) => {
-            this.app.logger.debug(`${this}subscribing to dialog for ${accountId}`)
+            this.app.logger.debug(`${this}subscribe ${accountId}@voipgrid.nl dialog`)
             this.subscriptions[accountId] = this.ua.subscribe(`${accountId}@voipgrid.nl`, 'dialog')
+
             this.subscriptions[accountId].on('notify', (notification) => {
                 const state = this.parseStateFromDialog(notification)
                 // Broadcast presence for account.
@@ -311,31 +323,28 @@ class Sip {
     async updatePresence(refresh) {
         // The transport must be ready, in order to be able to update
         // presence information from the SIP server.
-        if (!this.ua.isConnected()) {
+        if (!this.ua || !this.ua.isConnected()) {
             this.app.logger.warn(`${this}cannot update presence without websocket connection.`)
             return
         }
 
-        // Get the current account ids from localstorage.
-        let widgetState = this.app.store.get('widgets')
-        // The SIP stack already started, but the contacts were not filled yet.
-        if (!widgetState || !widgetState.contacts || !widgetState.contacts.list) return
-        let accountIds = widgetState.contacts.list.map((c) => c.account_id)
+        let accountIds = this.app.state.contacts.contacts.map((c) => c.account_id)
 
         if (refresh) {
-            // Set all colleagues to unavailable in the UI and
-            // clear the states object.
-            for (let accountId in this.states) {
-                this.app.emit('sip:presence.update', {account_id: accountId, state: 'unavailable'})
+            for (let contact of this.app.state.contacts.contacts) {
+                contact.state = 'unavailable'
             }
+
+            console.log("CONTACTS STATE ALL UNAVAILABLE")
+
             this.states = {}
         } else {
             // Notify the current cached presence to the UI asap.
             for (let accountId in this.states) {
-                this.app.emit('sip:presence.update', {
-                    account_id: accountId,
-                    state: this.states[accountId].state,
-                })
+                // this.app.emit('sip:presence.update', {
+                //     account_id: accountId,
+                //     state: this.states[accountId].state,
+                // })
             }
         }
 
@@ -343,16 +352,19 @@ class Sip {
         // the accountIds refresh array.
         const oldCachedAccountIds = Object.keys(this.states).filter((k, v) => !accountIds.includes(Number(k)))
 
-        this.app.logger.debug(`${this}SIP subscription unsubscribe cleanup for ${oldCachedAccountIds.length} accounts`)
-        for (let accountId of oldCachedAccountIds) {
-            this.unsubscribePresence(Number(accountId))
+        if (oldCachedAccountIds.length) {
+            this.app.logger.debug(`${this}SIP subscription unsubscribe cleanup for ${oldCachedAccountIds.length} accounts`)
+            for (let accountId of oldCachedAccountIds) {
+                this.unsubscribePresence(Number(accountId))
+            }
         }
 
         const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
-        this.app.logger.debug(`${this}SIP subscription update for ${accountIdsWithoutState.length} accounts`)
 
         if (accountIdsWithoutState.length) {
+            this.app.logger.info(`${this}subscribe presence for ${accountIdsWithoutState.length} accounts`)
             this.app.emit('sip:presences.start_update')
+            this.app.setState({contacts: {sip: {state: 'updating'}}})
 
             for (const accountId of accountIdsWithoutState) {
                 // We could do this in parallel, but we don't to keep the load on
