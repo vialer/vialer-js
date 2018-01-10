@@ -71,23 +71,30 @@ module.exports = (app, actions) => {
             */
             vChange: function(event, value, options) {
                 // Toggles value of a checkbox.
-                if (value === true || value === false) {
-                    value = !value
-                }
-                // A multiselect.
-                if (event.target.multiple) {
-                    let selectedOptions = Array.prototype.filter.apply(event.target.options, [(i) => i.selected])
-                    // Note that the value is parsed to a Number. Selected
-                    // state fails without casting to the proper type.
-                    value = selectedOptions.map((o) => parseInt(o.value))
-                }
+                if (event.target.type === 'checkbox') {
+                    if (value === true || value === false) {
+                        value = !value
+                    }
+                } else {
+                    // A multiselect.
+                    if (event.target.multiple) {
+                        let selectedOptions = Array.prototype.filter.apply(event.target.options, [(i) => i.selected])
+                        // Note that the value is parsed to a Number. Selected
+                        // state fails without casting to the proper type.
+                        value = selectedOptions.map((o) => parseInt(o.value))
+                    }
 
-                // We sync an object as vmodel.
-                for (const option of options) {
-                    if (option.id === parseInt(value)) {
-                        this.$emit('update:model', option)
+                    // We sync an object as vmodel.
+                    if (options) {
+                        for (const option of options) {
+                            if (option.id === parseInt(value)) {
+                                this.$emit('update:model', option)
+                            }
+                        }
                     }
                 }
+
+
                 if (this.validation) this.validation.$touch()
             },
             /**

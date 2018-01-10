@@ -10,64 +10,8 @@
 
 html body {
 
-    input {
-        background: $vg-grey-lightest;
-
-        &:focus {
-            outline: 1px solid $vg-grey-light;
-        }
-
-        &[type="text"],
-        &[type="password"] {
-            border: 1px solid $vg-grey-lighter;
-            border-radius: 2px;
-            height: 35px;
-            padding: 0 12px;
-        }
-
-        &[type="radio"] {
-            &:focus {
-                outline: none;
-            }
-        }
-
-        &[disabled] {
-            background: $vg-grey-lighter;
-            cursor: not-allowed;
-        }
-
-        &[type="checkbox"] {
-            display: none;
-
-            // Unchecked icon.
-            & + label {
-                line-height: 1.5rem;
-                vertical-align: center;
-
-                &:before {
-                    font-family: "vialer-js";
-                    display: block;
-                    float: left;
-                    content: $icon-checkbox-unchecked;
-                    font-size: 1.2rem;
-                    width: 1.5rem;
-                    margin-top: 0.05rem;
-                }
-            }
-
-            // Checked icon.
-            &:checked + label:before {
-                content: $icon-checkbox-checked;
-            }
-
-            &:disabled + label {
-                color: #999;
-            }
-        }
-    }
-
-
     select {
+        width: 100%;
         // Set the pading instead of the height here, otherwise the
         // size of the select dropdown is miscalculated on Chrome for Windows.
         height: 35px;

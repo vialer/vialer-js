@@ -1,33 +1,23 @@
 <div class="options">
 
-    <div class="field">
-        <label class="label">{{$t('SIP Endpoint')}}</label>
-        <div class="control has-icons-left has-icons-right">
-            <input class="input is-success" type="text" placeholder="SIP Server" v-model="settings.sipEndpoint">
-            <span class="icon is-small is-left">
-                <i class="fa fa-user"></i>
-            </span>
-            <span class="icon is-small is-right">
-                <i class="fa fa-check"></i>
-            </span>
-        </div>
-    </div>
+    <Field name="sip_endpoint" type="text"
+        :label="$t('SIP Endpoint')" :model.sync="settings.sipEndpoint"
+        :help="$t('The URL to the websocket SIP backend')"
+        :placeholder="$t('SIP Server')"/>
 
+    <Field name="webrtc_enabled" type="checkbox"
+        :label="$t('Enable softphone')" :model.sync="settings.webrtc.enabled"
+        :help="$t('Additional SIP register and audio over WebRTC')"/>
 
-    <div class="field">
-        <input id="webrtc_enabled" type="checkbox" v-model="settings.webrtc.enabled" />
-        <label for="webrtc_enabled">{{$t('Enable WebRTC')}}</label>
-    </div>
+    <Field name="webrtc_username" type="text"
+        :disabled="!settings.webrtc.enabled"
+        :label="$t('Username')" :model.sync="settings.webrtc.username"
+        :placeholder="$t('VoIP-account username')"/>
 
-    <div class="field" v-if="settings.webrtc.enabled">
-        <label for="webrtc_enabled">{{$t('WebRTC VoIP account')}}</label>
-        <input type="text" placeholder="VoIP account name" v-model="settings.webrtc.username" />
-        <input type="password" placeholder="VoIP account password" v-model="settings.webrtc.password" />
-    </div>
-
-    <div class="field">
-
-    </div>
+    <Field name="webrtc_password" type="password"
+        :disabled="!settings.webrtc.enabled"
+        :label="$t('Password')" :model.sync="settings.webrtc.password"
+        :placeholder="$t('VoIP-account password')"/>
 
     <div class="field">
         <input id="platform_enabled" type="checkbox" v-model="settings.platform.enabled" />
