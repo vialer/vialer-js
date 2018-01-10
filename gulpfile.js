@@ -131,6 +131,7 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
     const robotoPath = path.join(settings.NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
     return gulp.src(path.join(robotoPath, '{Roboto-Light.woff2,Roboto-Regular.woff2,Roboto-Medium.woff2}'))
         .pipe(addsrc(path.join(settings.SRC_DIR, 'fonts', '*'), {base: settings.SRC_DIR}))
+        .pipe(addsrc(path.join(settings.NODE_PATH, 'font-awesome', 'fonts', 'fontawesome-webfont.woff2')))
         .pipe(flatten({newPath: './fonts'}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(ifElse(settings.PRODUCTION, imagemin))
@@ -364,32 +365,36 @@ gulp.task('manifest-webext', 'Generate a manifest for a browser WebExtension.', 
 
 gulp.task('scss', 'Compile all css.', [], (done) => {
     runSequence([
-        'scss-webext',
-        'scss-webext-print',
+        'scss-main',
+        'scss-print',
     ], () => {
         // Targetting webext.css for livereload changed only works in the
         // webview. In the callstatus html, it will trigger a page reload.
-        if (settings.LIVERELOAD) livereload.changed('webext.css')
+        if (settings.LIVERELOAD) livereload.changed('main.css')
         done()
     })
 }, {options: taskOptions.all})
 
 
-gulp.task('scss-webext', 'Generate popover webextension css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext')
+gulp.task('scss-main', 'Generate main application css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'main')
 }, {options: taskOptions.all})
 
-gulp.task('scss-webext-print', 'Generate webextension print css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_print')
+gulp.task('scss-print', 'Generate print css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'print')
+}, {options: taskOptions.all})
+
+gulp.task('scss-vendor', 'Generate vendor css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor')
 }, {options: taskOptions.all})
 
 
 gulp.task('templates', 'Build Vue component templates', () => {
-    gulp.src('./src/js/lib/components/**/*.vue')
+    gulp.src('./src/components/**/*.vue')
         .pipe(fuet({
             commonjs: false,
             namespace: 'global.templates',
-            pathfilter: ['src', 'js', 'lib', 'components'],
+            pathfilter: ['src', 'components'],
         }))
         .on('error', notify.onError('Error: <%= error.message %>'))
         .pipe(ifElse(settings.PRODUCTION, () => minifier()))
@@ -432,6 +437,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     // Watch files related to working on the webextension.
     gulp.watch([
         path.join(__dirname, 'src', 'js', '**', '*.js'),
+        path.join(__dirname, 'src', 'components', '**', '*.js'),
         `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'main.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'webview.js')}`,
@@ -455,21 +461,6 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         gulp.watch(path.join(__dirname, 'src', 'brand.json'), ['build'])
     }
 
-    // Watch files related to working on linked packages.
-    if (WATCHLINKED) {
-        gutil.log('Watching linked development packages')
-        gulp.watch([
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'static', 'styles', '*.css'),
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'static', 'js', '*.js'),
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'publish.js'),
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'tmpl', '**', '*.tmpl'),
-        ], ['docs'])
-
-        gulp.watch([
-            path.join(settings.NODE_PATH, 'webextension-polyfill', 'src', '*'),
-        ], ['js-webext'])
-    }
-
     // Watch files related to working on assets.
     gulp.watch([
         path.join(__dirname, 'src', '_locales', '**', '*.json'),
@@ -480,8 +471,23 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     gulp.watch(path.join(__dirname, 'src', 'index.html'), ['html'])
     gulp.watch([
         path.join(__dirname, 'src', 'scss', '**', '*.scss'),
-        path.join(__dirname, 'src', 'js', 'lib', 'components', '**', '*.scss'),
+        path.join(__dirname, 'src', 'components', '**', '*.scss'),
     ], ['scss'])
-    gulp.watch(path.join(__dirname, 'src', 'js', 'lib', 'components', '**', '*.vue'), ['templates'])
+
+    gulp.watch(path.join(__dirname, 'src', 'scss', 'vendor.scss'), ['scss-vendor'])
+
+    gulp.watch(path.join(__dirname, 'src', 'components', '**', '*.vue'), ['templates'])
     gulp.watch(path.join(__dirname, 'src', 'js', 'i18n', '**', '*.js'), ['translations'])
+
+
+    // Add linked packages here that are used during development.
+    if (WATCHLINKED) {
+        gutil.log('Watching linked development packages')
+        gulp.watch([
+            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'static', 'styles', '*.css'),
+            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'static', 'js', '*.js'),
+            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'publish.js'),
+            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'tmpl', '**', '*.tmpl'),
+        ], ['docs'])
+    }
 })

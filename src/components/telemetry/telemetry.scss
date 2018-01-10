@@ -1,25 +1,4 @@
-@import "../base/form";
-@import "widget";
-
-.popup {
-    overflow-y: hidden;
-}
-
-.flip-horizontal {
-    transform: scaleX(-1);
-}
-
-// Different cursor for clickable stuff.
-.shortcuts i,
-.logout,
-.widget .widget-header {
-    cursor: pointer;
-}
-
-
-.unauthorized-warning {
-    padding: 14px 10px 14px;
-}
+@import "../../scss/base/variables";
 
 .telemetry-opt-in {
     text-align: center;
@@ -50,6 +29,4 @@
             margin-right: $vg-spacing-1;
         }
     }
-
-
 }

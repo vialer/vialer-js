@@ -1,8 +1,18 @@
 <div class="options">
+
     <div class="field">
-        <label for="sip_endpoint">{{$t('SIP Endpoint')}}</label>
-        <input id="sip_endpoint" type="text" placeholder="SIP Server" v-model="settings.sipEndpoint" />
+        <label class="label">{{$t('SIP Endpoint')}}</label>
+        <div class="control has-icons-left has-icons-right">
+            <input class="input is-success" type="text" placeholder="SIP Server" v-model="settings.sipEndpoint">
+            <span class="icon is-small is-left">
+                <i class="fa fa-user"></i>
+            </span>
+            <span class="icon is-small is-right">
+                <i class="fa fa-check"></i>
+            </span>
+        </div>
     </div>
+
 
     <div class="field">
         <input id="webrtc_enabled" type="checkbox" v-model="settings.webrtc.enabled" />

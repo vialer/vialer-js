@@ -1,5 +1,5 @@
 <div class="widget availability" :class="widgetState">
-    <div class="widget-header" v-on:click="toggleActive('availability')">
+    <div class="widget-header" v-on:click="toggleActive($event, 'availability')">
         <div class="widget-header-icons">
             <i class="widget-icon icon-availability"></i>
             <i class="busy-icon icon-refresh icon-spin"></i>

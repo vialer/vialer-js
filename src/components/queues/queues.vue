@@ -1,6 +1,6 @@
 <div class="widget queues" :class="widgetState">
 
-    <div class="widget-header" v-on:click="toggleActive('queues')">
+    <div class="widget-header" v-on:click="toggleActive($event, 'queues')">
         <div class="widget-header-icons">
             <i class="widget-icon icon-queue"></i>
             <i class="busy-icon icon-refresh icon-spin"></i>

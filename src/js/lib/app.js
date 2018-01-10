@@ -15,15 +15,15 @@ class App extends Skeleton {
     _init() {
         this.sounds = require('./sounds')
 
-        let actions = require('./components/actions')(this)
-        Vue.component('Field', require('./components/field')(this, actions))
-        Vue.component('Navigation', require('./components/navigation')(this, actions))
-        Vue.component('Availability', require('./components/availability')(this, actions))
-        Vue.component('Contacts', require('./components/contacts')(this, actions))
-        Vue.component('Login', require('./components/login')(this, actions))
-        Vue.component('Settings', require('./components/settings')(this, actions))
-        Vue.component('Dialpad', require('./components/dialpad')(this, actions))
-        Vue.component('Queues', require('./components/queues')(this, actions))
+        let actions = require('../../components/actions')(this)
+        Vue.component('Field', require('../../components/field')(this, actions))
+        Vue.component('Navigation', require('../../components/navigation')(this, actions))
+        Vue.component('Availability', require('../../components/availability')(this, actions))
+        Vue.component('Contacts', require('../../components/contacts')(this, actions))
+        Vue.component('Login', require('../../components/login')(this, actions))
+        Vue.component('Settings', require('../../components/settings')(this, actions))
+        Vue.component('Dialpad', require('../../components/dialpad')(this, actions))
+        Vue.component('Queues', require('../../components/queues')(this, actions))
         this.initStore()
     }
 

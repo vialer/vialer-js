@@ -1,5 +1,5 @@
-<div class="widget contacts" :class="widgetState">
-    <div class="widget-header" @click="toggleActive('contacts')">
+<div class="widget contacts updating-presence-status" :class="widgetState">
+    <div class="widget-header" @click="toggleActive($event, 'contacts')">
         <div class="widget-header-icons">
             <i class="widget-icon icon-entity"></i>
             <i class="busy-icon icon-refresh icon-spin"></i>
@@ -9,10 +9,8 @@
         <div class="widget-header-text">{{$t('Colleagues')}}</div>
 
         <span class="status-indicators">
-            <i v-if="module.sip.state=='updating'" class="icon-blink icon-cloud-download"
-                :title="$t('Waiting for presence information.')"></i>
-            <i v-else-if="module.sip.state=='disconnected'" class="icon-blink icon-lost-connection"
-                :title="$t('No presence information available right now.')"></i>
+            <i v-if="module.sip.state=='updating'" class="icon-blink icon-cloud-download" :title="$t('Waiting for presence information.')"></i>
+            <i v-else-if="module.sip.state=='disconnected'" class="icon-blink icon-lost-connection" :title="$t('No presence information available right now.')"></i>
         </span>
 
         <div class="search">

@@ -43,9 +43,9 @@
     }
 
     .widget-header {
+        @include no-select;
         background: $vg-brand-color;
         color: #fff;
-        @include no-select;
         position: relative;
         height: $vg-widget-header-size;
         font-weight: 500;

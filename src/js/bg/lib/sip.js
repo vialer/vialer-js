@@ -151,10 +151,9 @@ class Sip {
 
 
     createSession(phoneNumber) {
-        let sessionUrl = `sip:${phoneNumber}@${this.app.state.settings.sipEndpoint}`
+        let sessionUrl = `sip:${phoneNumber}@voipgrid.nl`
         this.app.logger.info(`${this}Starting new session: ${sessionUrl}`)
 
-        //this.session = this.ua.invite(sessionUrl)
         this.session = this.ua.invite(
             sessionUrl, {
                 sessionDescriptionHandlerOptions: {
@@ -264,19 +263,13 @@ class Sip {
         return new Promise((resolve, reject) => {
             this.app.logger.debug(`${this}subscribe ${accountId}@voipgrid.nl dialog`)
             this.subscriptions[accountId] = this.ua.subscribe(`${accountId}@voipgrid.nl`, 'dialog')
+            let contacts = this.app.state.contacts.contacts
+            let contactsLookup = new Map(contacts.map((c) => [c.account_id, c]))
 
             this.subscriptions[accountId].on('notify', (notification) => {
                 const state = this.parseStateFromDialog(notification)
-                // Broadcast presence for account.
-                this.app.emit('sip:presence.update', {
-                    account_id: accountId,
-                    state: state,
-                })
-                // Remember subscribed accounts and its state at the time
-                // of an update.
-                this.states[accountId] = {
-                    state: state,
-                }
+                let contact = contactsLookup.get(accountId)
+                contact.state = state
 
                 setTimeout(() => {
                     resolve({
@@ -320,7 +313,7 @@ class Sip {
     * have their presence updated from the SIP server.
     * @param {Boolean} refresh - Force refreshing presence from the sip service.
     */
-    async updatePresence(refresh) {
+    async updatePresence() {
         // The transport must be ready, in order to be able to update
         // presence information from the SIP server.
         if (!this.ua || !this.ua.isConnected()) {
@@ -329,25 +322,6 @@ class Sip {
         }
 
         let accountIds = this.app.state.contacts.contacts.map((c) => c.account_id)
-
-        if (refresh) {
-            for (let contact of this.app.state.contacts.contacts) {
-                contact.state = 'unavailable'
-            }
-
-            console.log("CONTACTS STATE ALL UNAVAILABLE")
-
-            this.states = {}
-        } else {
-            // Notify the current cached presence to the UI asap.
-            for (let accountId in this.states) {
-                // this.app.emit('sip:presence.update', {
-                //     account_id: accountId,
-                //     state: this.states[accountId].state,
-                // })
-            }
-        }
-
         // Always unsubscribe lost contacts that are in cache, but not in
         // the accountIds refresh array.
         const oldCachedAccountIds = Object.keys(this.states).filter((k, v) => !accountIds.includes(Number(k)))

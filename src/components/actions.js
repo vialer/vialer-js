@@ -20,9 +20,12 @@ module.exports = function(app) {
     /**
     * Toggles widgets likaan accordeon and emits widget state back
     * to the background. Switches all widgets off, except the current one.
+    * @param {Event} e - The click event.
     * @param {String} widgetName - The widget to toggle.
     */
-    actions.toggleActive = function(widgetName) {
+    actions.toggleActive = function(e, widgetName) {
+        // Don't toggle widgets when clicking on an input.
+        if (e.srcElement.tagName === 'INPUT') return
         // Minimal template for deep merge.
         let widgetState = {
             availability: {widget: {active: null}},

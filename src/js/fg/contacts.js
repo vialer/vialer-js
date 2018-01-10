@@ -30,18 +30,6 @@ class ContactsModule {
 
 
         /**
-        * Update the status of each account in the contact list when it's
-        * available.
-        */
-        this.app.on('sip:presence.update', (data) => {
-            for (let contact of this.app.state.contacts.contacts) {
-                if (data.account_id === contact.account_id) {
-                    contact.state = data.state
-                }
-            }
-        })
-
-        /**
         * Hide the sip presence update indicator when the update
         * process is done.
         */
