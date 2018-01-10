@@ -72,10 +72,10 @@ module.exports = (app, actions) => {
             vChange: function(event, value, options) {
                 // Toggles value of a checkbox.
                 if (event.target.type === 'checkbox') {
-                    if (value === true || value === false) {
-                        value = !value
-                    }
-                } else {
+                    this.$emit('update:model', event.target.checked)
+                } else if (['password', 'text'].includes(event.target.type)) {
+                    this.$emit('update:model', event.target.value)
+                } else if (event.target.type === 'select') {
                     // A multiselect.
                     if (event.target.multiple) {
                         let selectedOptions = Array.prototype.filter.apply(event.target.options, [(i) => i.selected])
@@ -93,7 +93,6 @@ module.exports = (app, actions) => {
                         }
                     }
                 }
-
 
                 if (this.validation) this.validation.$touch()
             },

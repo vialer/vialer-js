@@ -1,5 +1,5 @@
 <div class="c-dialpad">
-    <input class="number-input" type="text" :placeholder="$t('Number to dial')"
+    <input class="input" type="text" :placeholder="$t('Who you ganna call?')"
     @keyup="stopDtmf()" @keydown="playDtmf(null, $event)"
     v-model="module.dialNumber"/>
     <div class="numbers">

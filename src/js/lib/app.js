@@ -74,7 +74,10 @@ class App extends Skeleton {
                 },
             },
             settings: {
-                click2dial: true,
+                click2dial: {
+                    blacklist: [],
+                    enabled: true,
+                },
                 platform: {
                     enabled: true,
                     url: process.env.PLATFORM_URL,

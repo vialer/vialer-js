@@ -1,7 +1,7 @@
 <div class="field" v-if="type === 'checkbox'">
     <p class="control">
         <label :id="name" class="checkbox" :for="name">
-            <input type="checkbox" v-bind:checked="vmodel" :id="name"/>
+            <input type="checkbox" v-on:change="vChange($event, $event.target.value)" v-bind:checked="vmodel" :id="name"/>
                 {{label}}
         </label>
         <em class="help" v-if="help">{{help}}</em>

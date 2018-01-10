@@ -7,7 +7,7 @@
 
     <Field name="webrtc_enabled" type="checkbox"
         :label="$t('Enable softphone')" :model.sync="settings.webrtc.enabled"
-        :help="$t('Additional SIP register and audio over WebRTC')"/>
+        :help="$t('SIP register and WebRTC audio')"/>
 
     <Field name="webrtc_username" type="text"
         :disabled="!settings.webrtc.enabled"
@@ -19,26 +19,24 @@
         :label="$t('Password')" :model.sync="settings.webrtc.password"
         :placeholder="$t('VoIP-account password')"/>
 
-    <div class="field">
-        <input id="platform_enabled" type="checkbox" v-model="settings.platform.enabled" />
-        <label for="platform_enabled">{{$t('Enable platform features')}}</label>
-    </div>
+    <Field name="platform_enabled" type="checkbox"
+        :label="$t('Enable platform integration')" :model.sync="settings.platform.enabled"
+        :help="$t('Adds platform features like Availability, queues status & Click-to-dial')"/>
 
-    <div class="field" v-if="settings.platform.enabled">
-        <label for="platformUrl">{{$t('Platform URL')}}</label>
-        <input id="platform-url" type="text" placeholder="https://" v-model="settings.platform.url" />
-        <p class="warning platform-warning hide">{{$t('You will be automatically logged out when changing this setting')}}</p>
-    </div>
+    <Field name="platform_url" type="text"
+        :disabled="!settings.platform.enabled"
+        :label="$t('Platform URL')" :model.sync="settings.platform.url"
+        :help="$t('The URL to the websocket SIP backend')"
+        placeholder="https://"/>
 
-    <div class="field">
-        <input id="c2d" type="checkbox" v-model="settings.click2dial" />
-        <label for="c2d">{{$t('Click-to-Dial icons in websites')}}</label>
-    </div>
+    <Field name="click2dial" type="checkbox"
+        :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
+        :help="$t('Add clickable icons next to phonenumbers in webpages')"
+        :placeholder="$t('SIP Server')"/>
 
-    <div class="field">
-        <input id="telemetry_enabled" type="checkbox" v-model="settings.telemetry.enabled" />
-        <label for="telemetry_enabled">{{$t('Enable telemetry')}}</label>
-    </div>
+    <Field name="telemetry_enabled" type="checkbox"
+        :label="$t('Enable telemetry')" :model.sync="settings.telemetry.enabled"
+        :help="$t('Helps us improving this software')"/>
 
     <div class="actions">
         <button id="save" type="button" @click="save">{{$t('Save')}}</button>

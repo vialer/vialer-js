@@ -23,6 +23,10 @@
             line-height: $vg-widget-header-size;
             padding-right: $vg-widget-header-size - 5px;
 
+            .control {
+                margin-top: 10px;
+            }
+
             // The search icon inside the input element.
             i {
                 position: absolute;
@@ -35,13 +39,6 @@
                 font-size: 1rem;
             }
 
-            // The input element to search with.
-            input {
-                // Place the cursor to the right of the search icon.
-                padding-left: $vg-widget-header-size-small;
-                font-size: .9rem;
-                width: 100%;
-            }
         }
     }
 

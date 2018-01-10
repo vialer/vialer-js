@@ -151,7 +151,7 @@ gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
     else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-webview', 'js-vendor']
     else targetTasks = ['js-vendor', 'js-webext']
 
-    runSequence(['assets', 'templates', 'translations', 'html', 'scss'].concat(targetTasks), done)
+    runSequence(['assets', 'templates', 'translations', 'html', 'scss', 'scss-vendor'].concat(targetTasks), done)
 }, {options: taskOptions.all})
 
 

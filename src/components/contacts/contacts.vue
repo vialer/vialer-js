@@ -13,9 +13,13 @@
             <i v-else-if="module.sip.state=='disconnected'" class="icon-blink icon-lost-connection" :title="$t('No presence information available right now.')"></i>
         </span>
 
-        <div class="search">
-            <i class="icon-search"></i>
-            <input type="text" :disabled="module.search.disabled" v-model="module.search.input" />
+        <div class="search field">
+            <p class="control has-icons-left has-icons-right">
+                <input class="input" type="email" placeholder="Find colleagues" :disabled="module.search.disabled" v-model="module.search.input">
+                <span class="icon is-small is-left">
+                    <i class="fa fa-envelope"></i>
+                </span>
+            </p>
         </div>
     </div>
 
