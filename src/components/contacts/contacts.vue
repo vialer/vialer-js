@@ -17,7 +17,7 @@
             <p class="control has-icons-left has-icons-right">
                 <input class="input" type="email" placeholder="Find colleagues" :disabled="module.search.disabled" v-model="module.search.input">
                 <span class="icon is-small is-left">
-                    <i class="fa fa-envelope"></i>
+                    <i class="fa fa-search"></i>
                 </span>
             </p>
         </div>

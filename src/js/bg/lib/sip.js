@@ -92,6 +92,9 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
+            var audio = new Audio('ringtones/default.ogg');
+            audio.play();
+
             this.app.logger.debug(`${this}invite coming in`)
             this.session = session
             this.session.accept({
