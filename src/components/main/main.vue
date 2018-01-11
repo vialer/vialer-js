@@ -1,25 +1,26 @@
-<div class="container" id="app">
+<div id="app">
     <template v-if="!$store.user.authenticated">
         <Navigation></Navigation>
         <Settings v-if="$store.ui.layer==='settings'"></Settings>
         <Login v-if="$store.ui.layer==='login'"></Login>
     </template>
     <template v-else>
-        <Navigation></Navigation>
-
         <template v-if="$store.ui.layer==='app'">
+            <Navigation></Navigation>
             <Availability></Availability>
             <Contacts></Contacts>
             <Queues></Queues>
         </template>
         <template v-else-if="$store.ui.layer==='settings'">
+            <Navigation></Navigation>
             <Settings></Settings>
         </template>
         <template v-else-if="$store.ui.layer==='dialpad'">
+            <Navigation></Navigation>
             <Dialpad></Dialpad>
         </template>
-        <template v-else-if="$store.ui.layer==='calling'">
-            <div>OVERLAY</div>
+        <template v-else-if="$store.ui.layer==='calldialog'">
+            <CallDialog></CallDialog>
         </template>
     </template>
 </div>

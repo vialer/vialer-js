@@ -43,6 +43,37 @@ class Sip {
     }
 
 
+    acceptSession() {
+        this.session.accept({
+            sessionDescriptionHandlerOptions: {
+                constraints: {
+                    audio: true,
+                    video: false,
+                },
+            },
+        })
+
+        this.localVideoElement.srcObject = this.stream
+        this.localVideoElement.play()
+
+        this.pc = this.session.sessionDescriptionHandler.peerConnection
+        this.remoteStream = new MediaStream()
+
+        this.pc.getReceivers().forEach((receiver) => {
+            this.remoteStream.addTrack(receiver.track)
+            this.remoteVideoElement.srcObject = this.remoteStream
+            this.remoteVideoElement.play()
+        })
+
+        // Reset call state when the other halve hangs up.
+        this.session.on('bye', (request) => {
+            this.localVideoElement.srcObject = null
+            this.app.emit('dialer:status.stop', {})
+            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
+        })
+    }
+
+
     /**
     * Init and start a new stack, connecting
     * SipML5 to the websocket SIP backend.
@@ -92,37 +123,27 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            var audio = new Audio('ringtones/default.ogg');
-            audio.play();
+            this.ringtone = new Audio(`ringtones/${this.app.state.settings.ringtones.selected.name}`)
+            this.ringtone.addEventListener('ended', function() {
+                this.currentTime = 0
+                this.play()
+            }, false)
+            this.ringtone.play()
+            this.previousLayer = this.app.state.ui.layer
+            this.app.setState({ui: {layer: 'calldialog'}})
 
             this.app.logger.debug(`${this}invite coming in`)
             this.session = session
-            this.session.accept({
-                sessionDescriptionHandlerOptions: {
-                    constraints: {
-                        audio: true,
-                        video: false,
-                    },
-                },
+
+            session.on('accepted', () => {
+                this.ringtone.pause()
+                this.ringtone.currentTime = 0
             })
 
-            this.localVideoElement.srcObject = this.stream
-            this.localVideoElement.play()
-
-            this.pc = this.session.sessionDescriptionHandler.peerConnection
-            this.remoteStream = new MediaStream()
-
-            this.pc.getReceivers().forEach((receiver) => {
-                this.remoteStream.addTrack(receiver.track)
-                this.remoteVideoElement.srcObject = this.remoteStream
-                this.remoteVideoElement.play()
-            })
-
-            // Reset call state when the other halve hangs up.
-            this.session.on('bye', (request) => {
-                this.localVideoElement.srcObject = null
-                this.app.emit('dialer:status.stop', {})
-                this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
+            session.on('rejected', () => {
+                this.ringtone.pause()
+                this.ringtone.currentTime = 0
+                this.app.setState({ui: {layer: this.previousLayer}})
             })
         })
 
@@ -156,6 +177,8 @@ class Sip {
     createSession(phoneNumber) {
         let sessionUrl = `sip:${phoneNumber}@voipgrid.nl`
         this.app.logger.info(`${this}Starting new session: ${sessionUrl}`)
+        this.previousLayer = this.app.state.ui.layer
+        this.app.setState({ui: {layer: 'calldialog'}})
 
         this.session = this.ua.invite(
             sessionUrl, {

@@ -19,6 +19,12 @@
         :label="$t('Password')" :model.sync="settings.webrtc.password"
         :placeholder="$t('VoIP-account password')"/>
 
+    <Field name="ringtone" type="select"
+        :disabled="!settings.webrtc.enabled"
+        :label="$t('Ringone')" :model.sync="settings.ringtones.selected"
+        :options="settings.ringtones.options"
+        :placeholder="$t('Select a ringtone')"/>
+
     <Field name="platform_enabled" type="checkbox"
         :label="$t('Enable platform integration')" :model.sync="settings.platform.enabled"
         :help="$t('Adds platform features like Availability, queues status & Click-to-dial')"/>
@@ -36,9 +42,11 @@
 
     <Field name="telemetry_enabled" type="checkbox"
         :label="$t('Enable telemetry')" :model.sync="settings.telemetry.enabled"
-        :help="$t('Helps us improving this software')"/>
+        :help="$t('Help us improving this software by allowing telemetry data to be sent')"/>
 
-    <div class="actions">
-        <button id="save" type="button" @click="save">{{$t('Save')}}</button>
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-primary" @click="save">{{$t('Save')}}</button>
+        </div>
     </div>
 </div>

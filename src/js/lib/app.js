@@ -11,12 +11,13 @@ class App extends Skeleton {
         super(options)
     }
 
-
     _init() {
         this.sounds = require('./sounds')
 
         let actions = require('../../components/actions')(this)
+
         Vue.component('Field', require('../../components/field')(this, actions))
+        Vue.component('CallDialog', require('../../components/calldialog')(this, actions))
         Vue.component('Navigation', require('../../components/navigation')(this, actions))
         Vue.component('Availability', require('../../components/availability')(this, actions))
         Vue.component('Contacts', require('../../components/contacts')(this, actions))
@@ -46,6 +47,14 @@ class App extends Skeleton {
                 widget: {
                     active: false,
                     state: '',
+                },
+            },
+            calldialog: {
+                mode: null, // `callee` or `caller`
+                number: null,
+                onhold: false,
+                transfer: {
+                    number: null,
                 },
             },
             contacts: {
@@ -82,6 +91,12 @@ class App extends Skeleton {
                     enabled: true,
                     url: process.env.PLATFORM_URL,
                 },
+                ringtones: {
+                    options: [
+                        {id: 1, name: 'default.ogg'},
+                    ],
+                    selected: {id: 1, name: 'default.ogg'},
+                },
                 sipEndpoint: process.env.SIP_ENDPOINT,
                 telemetry: {
                     analyticsId: process.env.ANALYTICS_ID,
@@ -95,19 +110,16 @@ class App extends Skeleton {
                 },
             },
             ui: {
-                layer: 'app',
+                layer: 'login',
             },
             user: {
+                authenticated: false,
+                email: '',
                 language: 'nl',
+                password: '',
             },
         }
 
-        defaultState.user.authenticated = (this.store.get('user') && this.store.get('username') && this.store.get('password'))
-        // Deliberately named username and not email, because this can be both
-        // an account id (raw softphone) or an email address with platform
-        // integration.
-        defaultState.user.username = this.store.get('username')
-        defaultState.user.password = this.store.get('password')
         return defaultState
     }
 

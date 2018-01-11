@@ -14,7 +14,6 @@ module.exports = (app) => {
     return {
         methods: {
             dialNumber: function() {
-                console.log("DIALNUmbEr:", this.module.dialNumber)
                 app.emit('dialer:dial', {
                     analytics: 'Dialpad',
                     b_number: this.module.dialNumber,
@@ -37,6 +36,9 @@ module.exports = (app) => {
                 dtmfTone.playKey(key)
 
             },
+            removeLastNumber: function() {
+                this.module.dialNumber = this.module.dialNumber.substring(0, this.module.dialNumber.length - 1)
+            },
             stopDtmf: function() {
                 dtmfTone.stop()
             },
@@ -47,14 +49,11 @@ module.exports = (app) => {
             module: 'dialpad',
         },
         watch: {
-            /**
-            * Basic number input validation.
-            */
             'module.dialNumber': function(newVal, oldVal) {
                 if (isNaN(newVal)) {
                     this.module.dialNumber = oldVal
                 }
-            }
-        }
+            },
+        },
     }
 }

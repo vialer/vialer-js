@@ -1,0 +1,49 @@
+.calldialog-component {
+    background: $vg-brand-color;
+    height: 400px;
+    display: flex;
+    align-items: stretch;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    .number-display {
+        align-self: flex-start;
+        color: #fff;
+        width: 100%;
+        text-align: center;
+        font-weight: 500;
+        font-size: 2rem;
+    }
+
+    .timer {
+        width: 100%;
+        font-weight: 500;
+        font-size: 2rem;
+        text-align: center;
+        color: #fff;
+    }
+
+    .options {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+
+    }
+
+    .actions {
+        width: 100%;
+        align-self: flex-end;
+        display: flex;
+        justify-content: center;
+
+        .decline {
+            color: $vg-state-busy-color;
+        }
+
+        .accept {
+            color: $vg-state-available-color;
+        }
+    }
+}

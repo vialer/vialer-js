@@ -36,3 +36,7 @@
     -moz-user-select: none;
     user-select: none;
 }
+
+@mixin no-outline {
+    outline: none;
+}
