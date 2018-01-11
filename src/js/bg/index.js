@@ -42,6 +42,8 @@ class BackgroundApp extends App {
             if (data.persist) this.store.set('state', this.state)
         })
 
+
+
         // Continue last session if credentials are available.
         if (this.state.user.authenticated) {
             this.logger.info(`${this}reusing existing session from existing credentials`)
@@ -87,7 +89,7 @@ class BackgroundApp extends App {
         if (stateObj) this.state = stateObj
         else this.state = this.getDefaultState()
 
-
+        this.initVm()
 
         this.timer = new Timer(this)
         this.telemetry = new Telemetry(this)

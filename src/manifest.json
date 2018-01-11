@@ -17,6 +17,8 @@
     "background": {
         "scripts": [
             "js/vendor.js",
+            "js/templates.js",
+            "js/translations.js",
             "js/webext_bg.js"
         ]
     },

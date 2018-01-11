@@ -46,6 +46,7 @@ class DialerModule {
      */
     addContextMenuItem() {
         this.app.logger.info(`${this}adding contextmenu`)
+
         browser.contextMenus.removeAll().then(() => {
             this._contextMenuItem = browser.contextMenus.create({
                 contexts: ['selection'],
@@ -53,7 +54,7 @@ class DialerModule {
                     this.app.modules.dialer.dial(info.selectionText, _tab)
                     this.app.telemetry.event('Calls', 'Initiate ConnectAB', 'Webpage')
                 },
-                title: this.app.i18n.translate('contextMenuLabel'),
+                title: this.app.$t('Call selected number'),
             })
         })
     }
