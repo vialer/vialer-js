@@ -6,6 +6,15 @@
     flex-direction: row;
     flex-wrap: wrap;
 
+    .session-status {
+        align-self: flex-start;
+        color: #fff;
+        width: 100%;
+        text-align: center;
+        font-weight: 500;
+        font-size: 1.5rem;
+    }
+
     .number-display {
         align-self: flex-start;
         color: #fff;

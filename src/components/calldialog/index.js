@@ -26,6 +26,7 @@ module.exports = (app, actions) => {
             return {
                 date: Math.trunc((new Date()).getTime() / 1000),
                 now: Math.trunc((new Date()).getTime() / 1000),
+                timerStarted: false,
             }
         },
         destroyed: function() {
@@ -33,22 +34,41 @@ module.exports = (app, actions) => {
         },
         methods: {
             acceptSession: function() {
-
+                app.emit('sip:accept_session')
             },
-            declineSession: function() {
-
+            startTimer: function() {
+                this.timerStarted = true
+                this.date = Math.trunc((new Date()).getTime() / 1000)
+                this.now = this.date
+                this.interval = window.setInterval(() => {
+                    this.now = Math.trunc((new Date()).getTime() / 1000)
+                }, 1000)
+            },
+            stopSession: function() {
+                clearInterval(this.interval)
+                app.emit('sip:stop_session')
             },
         },
         mounted: function() {
+            this.timerStarted = false
             this.date = Math.trunc((new Date()).getTime() / 1000)
-            this.interval = window.setInterval(() => {
-                this.now = Math.trunc((new Date()).getTime() / 1000)
-            }, 1000)
+            this.now = this.date
         },
         render: templates.calldialog.r,
         staticRenderFns: templates.calldialog.s,
         store: {
             module: 'calldialog',
+            sip: 'sip',
+        },
+        watch: {
+            'sip.session.state': function(newVal, oldVal) {
+                // Remote party hangs up. Stop the timer.
+                if (newVal === 'accepted') {
+                    this.startTimer()
+                } else if (newVal === 'bye') {
+                    clearInterval(this.interval)
+                }
+            },
         },
     }
 }

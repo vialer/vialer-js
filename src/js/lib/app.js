@@ -109,6 +109,16 @@ class App extends Skeleton {
                     username: '',
                 },
             },
+            sip: {
+                callerid: null,
+                number: null,
+                session: {
+                    state: null,
+                },
+                ua: {
+                    state: null,
+                },
+            },
             ui: {
                 layer: 'login',
             },

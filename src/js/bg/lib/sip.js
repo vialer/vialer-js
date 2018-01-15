@@ -19,7 +19,7 @@ class Sip {
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
         this.reconnect = true
-
+        this.state = this.app.state.sip
         this.states = {}
         this.subscriptions = {}
 
@@ -39,6 +39,21 @@ class Sip {
             this.stream = stream
         }).catch((err) => {
             this.app.logger.warn(`${this}${err}`)
+        })
+
+        this.app.on('sip:accept_session', () => {
+            this.acceptSession()
+        })
+
+        this.app.on('sip:stop_session', () => {
+            if (['create', 'invite'].includes(this.state.session.state)) {
+                this.session.reject()
+            } else if (['accepted'].includes(this.state.session.state)) {
+                this.session.bye()
+            } else {
+                this.app.logger.warn(`${this}cannot stop sessesion from state '${this.state.session.state}'`)
+            }
+
         })
     }
 
@@ -67,9 +82,13 @@ class Sip {
 
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (request) => {
+            this.app.setState({session: {state: 'bye'}})
+            window.setTimeout(() => {
+                this.app.setState({sip: {session: {state: null}}})
+            }, 3000)
             this.localVideoElement.srcObject = null
-            this.app.emit('dialer:status.stop', {})
-            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
+            // this.app.emit('dialer:status.stop', {})
+            // this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
         })
     }
 
@@ -79,6 +98,7 @@ class Sip {
     * SipML5 to the websocket SIP backend.
     */
     connect() {
+        this.app.setState({sip: {session: {state: null}}})
         // Emit to the frontend that the sip client is not yet
         // ready to start.
         if (this.ua && this.ua.isConnected()) {
@@ -95,7 +115,7 @@ class Sip {
                 builtinEnabled: false,
                 debug: 'error',
             },
-            traceSip: true,
+            traceSip: false,
             userAgentString: process.env.PLUGIN_NAME,
             wsServers: [`wss://${settings.sipEndpoint}`],
         }
@@ -123,39 +143,62 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
+            this.app.setState({
+                sip: {
+                    callerid: session.remoteIdentity.displayName,
+                    session: {state: 'invite'},
+                },
+            })
+
             this.ringtone = new Audio(`ringtones/${this.app.state.settings.ringtones.selected.name}`)
             this.ringtone.addEventListener('ended', function() {
                 this.currentTime = 0
                 this.play()
             }, false)
             this.ringtone.play()
-            this.previousLayer = this.app.state.ui.layer
-            this.app.setState({ui: {layer: 'calldialog'}})
 
-            this.app.logger.debug(`${this}invite coming in`)
             this.session = session
 
-            session.on('accepted', () => {
+            this.session.on('accepted', () => {
+                this.app.setState({sip: {session: {state: 'accepted'}}})
                 this.ringtone.pause()
                 this.ringtone.currentTime = 0
             })
 
-            session.on('rejected', () => {
+            this.session.on('rejected', () => {
                 this.ringtone.pause()
                 this.ringtone.currentTime = 0
-                this.app.setState({ui: {layer: this.previousLayer}})
+                this.app.setState({sip: {session: {state: 'rejected'}}})
+                window.setTimeout(() => {
+                    this.app.setState({sip: {session: {state: null}}})
+                }, 3000)
             })
+
+            this.session.on('bye', () => {
+                this.app.setState({
+                    sip: {session: {state: 'bye'}},
+                })
+
+                window.setTimeout(() => {
+                    this.app.setState({sip: {session: {state: null}}})
+                }, 3000)
+            })
+
+            this.app.logger.debug(`${this}invite coming in`)
         })
 
         this.ua.on('registered', () => {
+            this.app.setState({ua: {state: 'registered'}})
             this.app.logger.info(`${this}SIP stack registered`)
         })
 
         this.ua.on('unregistered', () => {
+            this.app.setState({ua: {state: 'unregistered'}})
             this.app.logger.info(`${this}SIP stack unregistered`)
         })
 
         this.ua.on('connected', () => {
+            this.app.setState({ua: {state: 'connected'}})
             this.app.logger.info(`${this}SIP stack started`)
             this.app.setState({contacts: {sip: {state: 'started'}}})
             this.updatePresence()
@@ -163,6 +206,7 @@ class Sip {
 
 
         this.ua.on('disconnected', () => {
+            this.app.setState({ua: {state: 'disconnected'}})
             this.app.logger.info(`${this}SIP stack stopped`)
             this.app.setState({contacts: {sip: {state: 'disconnected'}}})
 
@@ -174,11 +218,15 @@ class Sip {
     }
 
 
-    createSession(phoneNumber) {
-        let sessionUrl = `sip:${phoneNumber}@voipgrid.nl`
+    createSession(phonenumber) {
+        let sessionUrl = `sip:${phonenumber}@voipgrid.nl`
         this.app.logger.info(`${this}Starting new session: ${sessionUrl}`)
-        this.previousLayer = this.app.state.ui.layer
-        this.app.setState({ui: {layer: 'calldialog'}})
+        this.app.setState({
+            sip: {
+                number: phonenumber,
+                session: {state: 'create'},
+            },
+        })
 
         this.session = this.ua.invite(
             sessionUrl, {
@@ -188,10 +236,11 @@ class Sip {
                         video: false,
                     },
                 },
-            }
-        )
+            })
 
         this.session.on('accepted', (data) => {
+            this.app.setState({sip: {session: {state: 'accepted'}}})
+
             this.localVideoElement.srcObject = this.stream
             this.localVideoElement.play()
 
@@ -207,11 +256,12 @@ class Sip {
 
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (request) => {
-            app.sip.localVideoElement.srcObject = null
-            this.app.emit('dialer:status.stop', {})
-            this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
+            this.app.setState({session: {state: 'bye'}})
+            window.setTimeout(() => {
+                this.app.setState({sip: {session: {state: null}}})
+            }, 3000)
+            this.localVideoElement.srcObject = null
         })
-
     }
 
 

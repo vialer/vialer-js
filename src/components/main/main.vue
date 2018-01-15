@@ -5,7 +5,10 @@
         <Login v-if="$store.ui.layer==='login'"></Login>
     </template>
     <template v-else>
-        <template v-if="$store.ui.layer==='app'">
+        <template v-if="$store.sip.session.state">
+            <CallDialog></CallDialog>
+        </template>
+        <template v-else-if="$store.ui.layer==='app'">
             <Navigation></Navigation>
             <Availability></Availability>
             <Contacts></Contacts>
@@ -19,8 +22,6 @@
             <Navigation></Navigation>
             <Dialpad></Dialpad>
         </template>
-        <template v-else-if="$store.ui.layer==='calldialog'">
-            <CallDialog></CallDialog>
-        </template>
+
     </template>
 </div>
