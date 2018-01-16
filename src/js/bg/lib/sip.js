@@ -61,8 +61,10 @@ class Sip {
                 this.session.reject()
             } else if (['accepted'].includes(this.state.session.state)) {
                 this.session.bye()
+                // The bye event on the session is not triggered.
+                this.app.setState({sip: {session: {state: 'bye'}}})
             } else {
-                this.app.logger.warn(`${this}cannot stop sessesion from state '${this.state.session.state}'`)
+                this.app.logger.warn(`${this}cannot stop session from state '${this.state.session.state}'`)
             }
 
         })
@@ -93,13 +95,11 @@ class Sip {
 
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (request) => {
-            this.app.setState({session: {state: 'bye'}})
+            this.app.setState({sip: {session: {state: 'bye'}}})
             window.setTimeout(() => {
-                this.app.setState({sip: {session: {state: null}}})
+                this.app.setState({sip: this.app.getDefaultState().sip})
             }, 3000)
             this.localVideoElement.srcObject = null
-            // this.app.emit('dialer:status.stop', {})
-            // this.app.logger.notification(this.app.i18n.translate('clicktodialStatusDisconnected'), 'Vialer', false, 'warning')
         })
     }
 
@@ -157,6 +157,7 @@ class Sip {
             this.app.setState({
                 sip: {
                     callerid: session.remoteIdentity.displayName,
+                    number: session.remoteIdentity.uri.user,
                     session: {state: 'invite'},
                 },
             })
@@ -181,17 +182,15 @@ class Sip {
                 this.ringtone.currentTime = 0
                 this.app.setState({sip: {session: {state: 'rejected'}}})
                 window.setTimeout(() => {
-                    this.app.setState({sip: {session: {state: null}}})
+                    this.app.setState({sip: this.app.getDefaultState().sip})
                 }, 3000)
             })
 
             this.session.on('bye', () => {
-                this.app.setState({
-                    sip: {session: {state: 'bye'}},
-                })
+                this.app.setState({sip: {session: {state: 'bye'}}})
 
                 window.setTimeout(() => {
-                    this.app.setState({sip: {session: {state: null}}})
+                    this.app.setState({sip: this.app.getDefaultState().sip})
                 }, 3000)
             })
 
@@ -250,7 +249,12 @@ class Sip {
             }, this.formatSdp)
 
         this.session.on('accepted', (data) => {
-            this.app.setState({sip: {session: {state: 'accepted'}}})
+            this.app.setState({
+                sip: {
+                    callerid: data.from.uri.user,
+                    session: {state: 'accepted'},
+                },
+            })
 
             this.localVideoElement.srcObject = this.stream
             this.localVideoElement.play()
@@ -269,7 +273,7 @@ class Sip {
         this.session.on('bye', (request) => {
             this.app.setState({session: {state: 'bye'}})
             window.setTimeout(() => {
-                this.app.setState({sip: {session: {state: null}}})
+                this.app.setState({sip: this.app.getDefaultState().sip})
             }, 3000)
             this.localVideoElement.srcObject = null
         })

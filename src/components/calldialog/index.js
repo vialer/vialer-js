@@ -25,12 +25,13 @@ module.exports = (app, actions) => {
         data: function() {
             return {
                 date: Math.trunc((new Date()).getTime() / 1000),
+                intervalId: 0,
                 now: Math.trunc((new Date()).getTime() / 1000),
-                timerStarted: false,
+                timer: false,
             }
         },
         destroyed: function() {
-            clearInterval(this.interval)
+            clearInterval(this.intervalId)
         },
         methods: {
             acceptSession: function() {
@@ -44,26 +45,24 @@ module.exports = (app, actions) => {
                 })
             },
             startTimer: function() {
-                this.timerStarted = true
                 this.date = Math.trunc((new Date()).getTime() / 1000)
                 this.now = this.date
-                this.interval = window.setInterval(() => {
+
+                this.intervalId = window.setInterval(() => {
                     this.now = Math.trunc((new Date()).getTime() / 1000)
                 }, 1000)
+                this.timer = true
             },
             stopSession: function() {
-                clearInterval(this.interval)
                 app.emit('sip:stop_session')
             },
             toggleHold: function() {
                 this.hold = !this.hold
                 app.emit('sip:toggle_hold')
             },
-        },
-        mounted: function() {
-            this.timerStarted = false
-            this.date = Math.trunc((new Date()).getTime() / 1000)
-            this.now = this.date
+            toggleKeypad: function() {
+                this.keypad = !this.keypad
+            },
         },
         props: {
             keypad: {
@@ -81,8 +80,12 @@ module.exports = (app, actions) => {
                 // Remote party hangs up. Stop the timer.
                 if (newVal === 'accepted') {
                     this.startTimer()
-                } else if (newVal === 'bye') {
-                    clearInterval(this.interval)
+                } else if (['bye', 'rejected'].includes(newVal)) {
+                    // Stop timer on hangup.
+                    clearInterval(this.intervalId)
+                } else if (!newVal) {
+                    // Hide timer when the callstate is reset.
+                    this.timer = false
                 }
             },
         },

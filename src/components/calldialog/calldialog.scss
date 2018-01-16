@@ -1,15 +1,21 @@
 @import "../../scss/base/variables";
 
 .calldialog-component {
-    background: $vg-brand-color;
+    background: $vg-grey-lightest;
     display: flex;
     align-items: stretch;
     flex-direction: row;
     flex-wrap: wrap;
+    color: $vg-brand-color;
+
+    .option {
+        &:hover {
+            cursor: pointer;
+        }
+    }
 
     .session-status {
         align-self: flex-start;
-        color: #fff;
         width: 100%;
         text-align: center;
         font-weight: 500;
@@ -18,7 +24,6 @@
 
     .number-display {
         align-self: flex-start;
-        color: #fff;
         width: 100%;
         text-align: center;
         font-weight: 500;
@@ -30,7 +35,6 @@
         font-weight: 500;
         font-size: 2rem;
         text-align: center;
-        color: #fff;
     }
 
     .options {
@@ -39,13 +43,6 @@
         justify-content: center;
         align-items: center;
         flex-direction: row;
-
-        .option {
-            &:hover {
-                cursor: pointer;
-            }
-        }
-
     }
 
     .actions {

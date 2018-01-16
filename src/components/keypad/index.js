@@ -43,7 +43,7 @@ module.exports = (app) => {
             module: 'dialpad',
         },
         watch: {
-            _number: function(newVal, oldVal) {
+            number: function(newVal, oldVal) {
                 if (isNaN(newVal)) {
                     this.$emit('update:model', oldVal)
                 }

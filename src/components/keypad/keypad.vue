@@ -1,5 +1,5 @@
 <div class="keypad-component">
-    <div class="dialpad-input">
+    <div class="number-input">
         <input type="text" @keyup="unpressKey()" @keydown="pressKey(null, $event)" v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
         <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
     </div>
