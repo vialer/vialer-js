@@ -1,7 +1,7 @@
 @import "../../scss/base/variables";
 @import "../../scss/base/mixins";
 
-.c-dialpad {
+.keypad-component {
 
     width: 100%;
 
@@ -20,7 +20,7 @@
         }
 
         i {
-            font-size: 3rem;
+            font-size: 2rem;
             height: 60px;
             line-height: 60px;
             vertical-align: center;
@@ -43,8 +43,8 @@
 
         .key {
             @include no-outline;
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             margin: 15px;
             break-inside: avoid;
             font-size: 1rem;
@@ -83,15 +83,6 @@
         padding: 10px;
     }
 
-    .dial-button {
-        .fa-circle {
-            color: $vg-state-available-color;
-        }
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
 }
 
 a, a:visited {

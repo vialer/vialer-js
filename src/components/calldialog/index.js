@@ -36,6 +36,13 @@ module.exports = (app, actions) => {
             acceptSession: function() {
                 app.emit('sip:accept_session')
             },
+            dial: function(number) {
+                app.emit('dialer:dial', {
+                    analytics: 'Dialpad',
+                    b_number: number,
+                    forceSilent: false,
+                })
+            },
             startTimer: function() {
                 this.timerStarted = true
                 this.date = Math.trunc((new Date()).getTime() / 1000)
@@ -48,11 +55,20 @@ module.exports = (app, actions) => {
                 clearInterval(this.interval)
                 app.emit('sip:stop_session')
             },
+            toggleHold: function() {
+                this.hold = !this.hold
+                app.emit('sip:toggle_hold')
+            },
         },
         mounted: function() {
             this.timerStarted = false
             this.date = Math.trunc((new Date()).getTime() / 1000)
             this.now = this.date
+        },
+        props: {
+            keypad: {
+                default: false,
+            },
         },
         render: templates.calldialog.r,
         staticRenderFns: templates.calldialog.s,

@@ -21,6 +21,7 @@ const minifier = composer(require('uglify-es'), console)
 const mount = require('connect-mount')
 const notify = require('gulp-notify')
 const path = require('path')
+const plumber = require('gulp-plumber')
 const runSequence = require('run-sequence')
 const sass = require('gulp-sass')
 const serveIndex = require('serve-index')
@@ -268,24 +269,30 @@ class Helpers {
     * @param {String} brandName - Brand to produce scss for.
     * @param {String} buildType - Target environment to produce scss for.
     * @param {String} scssName - Name of the scss entrypoint.
+    * @param {String} sourcemap - Generate sourcemaps.
+    * @param {String} extraSource - Add extra entrypoints.
     * @returns {Function} - Sass function to use.
     */
-    scssEntry(brandName, buildType, scssName) {
+    scssEntry(brandName, buildType, scssName, sourcemap = false, extraSource = false) {
         const brandColors = this.formatScssVars(this.settings.brands[brandName].colors)
         return gulp.src(`./src/scss/${scssName}.scss`)
-            .pipe(addsrc(path.join(this.settings.SRC_DIR, 'components', '**', '*.scss')))
+            .pipe(ifElse(extraSource, () => addsrc(extraSource)))
             .pipe(insert.prepend(brandColors))
+            .pipe(ifElse(sourcemap, () => sourcemaps.init({loadMaps: true})))
             .pipe(sass({
                 includePaths: this.settings.NODE_PATH,
-                sourceMap: !this.settings.PRODUCTION,
-                sourceMapContents: !this.settings.PRODUCTION,
-                sourceMapEmbed: !this.settings.PRODUCTION,
+                sourceMap: false,
+                sourceMapContents: false,
             }))
             .on('error', notify.onError('Error: <%= error.message %>'))
             .pipe(concat(`${scssName}.css`))
             .pipe(ifElse(this.settings.PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
+            .pipe(ifElse(sourcemap, () => sourcemaps.write('./')))
             .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'css')))
             .pipe(size(_extend({title: `scss-${scssName}`}, this.settings.SIZE_OPTIONS)))
+            .on('end', () => {
+                if (this.settings.LIVERELOAD) livereload.changed(`${scssName}.css`)
+            })
     }
 
 

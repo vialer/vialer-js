@@ -23,7 +23,7 @@ class App extends Skeleton {
         Vue.component('Contacts', require('../../components/contacts')(this, actions))
         Vue.component('Login', require('../../components/login')(this, actions))
         Vue.component('Settings', require('../../components/settings')(this, actions))
-        Vue.component('Dialpad', require('../../components/dialpad')(this, actions))
+        Vue.component('Keypad', require('../../components/keypad')(this, actions))
         Vue.component('Queues', require('../../components/queues')(this, actions))
         this.initStore()
     }
@@ -111,7 +111,8 @@ class App extends Skeleton {
             },
             sip: {
                 callerid: null,
-                number: null,
+                hold: false,
+                number: '',
                 session: {
                     state: null,
                 },

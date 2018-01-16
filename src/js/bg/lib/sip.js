@@ -1,4 +1,5 @@
 const SIP = require('sip.js')
+const transform = require('sdp-transform')
 // Wait x miliseconds before resolving the subscribe event,
 // to prevent the server from being hammered.
 const SUBSCRIBE_DELAY = 150
@@ -43,6 +44,16 @@ class Sip {
 
         this.app.on('sip:accept_session', () => {
             this.acceptSession()
+        })
+
+        this.app.on('sip:toggle_hold', () => {
+            if (!this.state.hold) {
+                this.session.hold()
+                this.state.hold = true
+            } else {
+                this.session.unhold()
+                this.state.hold = false
+            }
         })
 
         this.app.on('sip:stop_session', () => {
@@ -236,7 +247,7 @@ class Sip {
                         video: false,
                     },
                 },
-            })
+            }, this.formatSdp)
 
         this.session.on('accepted', (data) => {
             this.app.setState({sip: {session: {state: 'accepted'}}})
@@ -286,6 +297,30 @@ class Sip {
         } else {
             this.app.logger.debug(`${this}not connection to stop`)
         }
+    }
+
+
+    formatSdp(description) {
+        //
+        let blacklistCodecs = ['PCMU', 'PCMA']
+        let sdpObj = transform.parse(description.sdp)
+        // console.log(sdpObj)
+        description.sdp = transform.write(sdpObj)
+        let rtpMedia = []
+        let payloads = []
+        for (let codec of sdpObj.media[0].rtp) {
+            if (!blacklistCodecs.includes(codec.codec)) {
+                rtpMedia.push(codec)
+                payloads.push(codec.payload)
+            }
+        }
+
+        sdpObj.media[0].payloads = payloads.join(' ')
+        sdpObj.media[0].rtp = rtpMedia
+        console.log(sdpObj)
+        description.sdp = transform.write(sdpObj)
+        // description.sdp = description.sdp.replace(/^a=candidate:\d+ \d+ tcp .*?\r\n/img, "")
+        return Promise.resolve(description)
     }
 
 

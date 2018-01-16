@@ -378,15 +378,20 @@ gulp.task('scss', 'Compile all css.', [], (done) => {
 
 
 gulp.task('scss-main', 'Generate main application css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'main')
+    return helpers.scssEntry(
+        settings.BRAND_TARGET,
+        settings.BUILD_TARGET,
+        'main',
+        !settings.PRODUCTION,
+        path.join(settings.SRC_DIR, 'components', '**', '*.scss'))
 }, {options: taskOptions.all})
 
 gulp.task('scss-print', 'Generate print css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'print')
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'print', !settings.PRODUCTION)
 }, {options: taskOptions.all})
 
 gulp.task('scss-vendor', 'Generate vendor css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor')
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', false)
 }, {options: taskOptions.all})
 
 
@@ -473,7 +478,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     gulp.watch([
         path.join(__dirname, 'src', 'scss', '**', '*.scss'),
         path.join(__dirname, 'src', 'components', '**', '*.scss'),
-    ], ['scss'])
+    ], ['scss-main'])
 
     gulp.watch(path.join(__dirname, 'src', 'scss', 'vendor.scss'), ['scss-vendor'])
 

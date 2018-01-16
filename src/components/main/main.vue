@@ -20,8 +20,7 @@
         </template>
         <template v-else-if="$store.ui.layer==='dialpad'">
             <Navigation></Navigation>
-            <Dialpad></Dialpad>
+            <CallDialog keypad=true></CallDialog>
         </template>
-
     </template>
 </div>

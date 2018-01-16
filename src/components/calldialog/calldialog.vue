@@ -10,7 +10,7 @@
         {{minutes | two_digits}}:{{seconds | two_digits}}
     </div>
 
-    <div class="options">
+    <div class="options" v-if="['accepted'].includes(sip.session.state)">
         <div class="option">
             <span class="decline fa-stack fa-3x">
               <i class="fa fa-circle fa-stack-2x"></i>
@@ -19,9 +19,9 @@
         </div>
 
         <div class="option">
-            <span class="decline fa-stack fa-3x">
+            <span class="decline fa-stack fa-3x" @click="toggleHold">
               <i class="fa fa-circle fa-stack-2x"></i>
-              <i class="fa fa-pause fa-stack-1x fa-inverse"></i>
+              <i class="fa fa-stack-1x fa-inverse" :class="{'fa-pause': !sip.hold, 'fa-play': sip.hold}"></i>
             </span>
         </div>
 
@@ -32,6 +32,8 @@
             </span>
         </div>
     </div>
+
+    <Keypad :model.sync="sip.number" :number="sip.number" v-if="keypad"></Keypad>
 
 
     <div class="actions">
@@ -53,5 +55,15 @@
                 </span>
             </p>
         </div>
+
+        <div class="field is-grouped is-grouped-centered" v-if="keypad">
+            <p class="control">
+                <span class="dial-button fa-stack fa-2x" @click="dial(sip.number)">
+                  <i class="fa fa-circle fa-stack-2x"></i>
+                  <i class="fa fa-phone fa-stack-1x fa-inverse"></i>
+                </span>
+            </p>
+        </div>
+
     </div>
 </div>

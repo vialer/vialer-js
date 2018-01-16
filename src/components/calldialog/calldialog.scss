@@ -1,6 +1,7 @@
+@import "../../scss/base/variables";
+
 .calldialog-component {
     background: $vg-brand-color;
-    height: 400px;
     display: flex;
     align-items: stretch;
     flex-direction: row;
@@ -39,6 +40,12 @@
         align-items: center;
         flex-direction: row;
 
+        .option {
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
     }
 
     .actions {
@@ -53,6 +60,17 @@
 
         .accept {
             color: $vg-state-available-color;
+        }
+
+
+        .dial-button {
+            .fa-circle {
+                color: $vg-state-available-color;
+            }
+
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 }
