@@ -30,7 +30,8 @@ class Sip {
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
 
-        // Append the elements in the background DOM.
+        // Append the AV-elements in the background DOM, so the audio
+        // can still be played after the popup closes.
         $('body').append('<video class="local"></video><video class="remote"></video>')
 
         // Start with a clean state.
@@ -40,12 +41,17 @@ class Sip {
             this.session.answer()
         })
 
+        this.app.on('sip:dtmf', ({key}) => {
+            this.session.session.dtmf(key)
+        })
+
+
         this.app.on('sip:toggle_hold', () => {
             if (!this.state.hold) {
-                this.session.hold()
+                this.session.session.hold()
                 this.state.hold = true
             } else {
-                this.session.unhold()
+                this.session.session.unhold()
                 this.state.hold = false
             }
         })

@@ -1,0 +1,19 @@
+.main-component {
+    display: flex;
+    flex-direction: column;
+
+    .panel {
+        display: flex;
+
+        .panel-content {
+            padding: 24px;
+            width: 100%;
+
+            h1 {
+                text-transform: uppercase;
+                color: $vg-brand-color;
+                font-weight: 500;
+            }
+        }
+    }
+}

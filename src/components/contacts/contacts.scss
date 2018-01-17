@@ -1,10 +1,7 @@
 @import "../../scss/base/variables";
 
-.firefox .widget.contacts .widget-header .search {
-    margin-top: 1px;
-}
 
-.widget.contacts {
+.contacts-component {
 
     // The widget is marked as unauthorized.
     &.unauthorized {

@@ -1,27 +1,27 @@
 @import "../../scss/base/variables";
 
-.widget.availability {
-    .widget-content {
-        // Container for availability radio buttons.
-        .availability-toggle {
-            padding: 10px 0;
+.availability-component {
 
-            > label {
-                margin-right: 10px;
-            }
+    // Container for availability radio buttons.
+    .availability-toggle {
+        padding: 10px 0;
 
-            .radio {
-                margin-left: 10px;
-
-                .form-control {
-                    margin-right: 5px;
-                }
-            }
+        > label {
+            margin-right: 10px;
         }
 
-        // Availability choices select.
-        .availability-destination select {
-            width: 100%;
+        .radio {
+            margin-left: 10px;
+
+            .form-control {
+                margin-right: 5px;
+            }
         }
     }
+
+    // Availability choices select.
+    .availability-destination select {
+        width: 100%;
+    }
+
 }

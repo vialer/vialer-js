@@ -12,8 +12,13 @@ module.exports = (app, actions) => {
                 return state
             },
         },
+        data: function() {
+            return {
+                name: 'Availability',
+            }
+        },
         methods: {
-            toggleActive: actions.toggleActive,
+
         },
         render: templates.availability.r,
         staticRenderFns: templates.availability.s,

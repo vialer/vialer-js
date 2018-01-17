@@ -2,65 +2,76 @@
 
 // The most upper box containing account info and
 // icon-links to several locations.
-.c-navigation {
-    height: $vg-widget-header-size-small;
+.navigation-component {
+    background: $vg-brand-variant-color;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: #fff;
+    height: 32px;
     border-bottom: 1px solid $vg-grey-lighter;
 
     [class^="icon-"], [class*=" icon-"]:hover {
         color: $vg-brand-color;
     }
 
-    .logout-button,
-    .user-name {
-        display: inline-block;
-        float: left;
-        line-height: $vg-widget-header-size-small;
-    }
-
     .user-name {
         // don't wrap but put dots at the end if it doesn't fit.
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        margin-left: $vg-spacing-3;
-        // Don't allow the email address to push the icons down.
-        max-width: 190px;
-    }
-
-    .logout-button {
-        width: $vg-widget-header-size-small;
-        text-align: center;
-        vertical-align: middle;
-        font-size: 0.9rem;
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
-
-    // The icon links container at the right top of the popup.
-    .items {
-        float: right;
-        font-size: 1.2rem;
-        display: inline-block;
-        height: $vg-widget-header-size-small;
-        // Position the last icon in line with the rest.
-        margin-right: $vg-spacing-gap - 2px;
-        vertical-align: middle;
+        margin-left: 16px;
 
         i {
-            display: inline-block;
-            margin-left: $vg-spacing-1;
-            line-height: $vg-widget-header-size-small;
-            color: $vg-primary-color;
+            line-height: 32px;
+            margin-left: 8px;
+            color: #fff;
+            width: $vg-widget-header-size-small;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 0.9rem;
 
             &:hover {
                 cursor: pointer;
             }
+        }
 
-            &.active {
-                color: $vg-brand-color;
+    }
+
+
+
+    // The icon links container at the right top of the popup.
+    .options {
+        display: flex;
+        flex-direction: row-reverse;
+        font-size: 1.2rem;
+
+
+        // Position the last icon in line with the rest.
+        margin-right: $vg-spacing-gap - 2px;
+        vertical-align: middle;
+
+        .option {
+            margin-left: $vg-spacing-1;
+            line-height: 32px;
+            height: 32px;
+            padding: 0 4px;
+
+            i {
+                font-size: 16px;
+                color: #fff;
+                &:hover {
+                    cursor: pointer;
+                    background: $vg-brand-color;
+
+                }
+
+                &.active {
+                    color: $vg-brand-color;
+                }
             }
         }
+
+
     }
 }

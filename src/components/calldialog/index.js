@@ -25,7 +25,9 @@ module.exports = (app, actions) => {
         data: function() {
             return {
                 date: Math.trunc((new Date()).getTime() / 1000),
+                dtmfnumbers: '', // Reference to the number while a call is underway.
                 intervalId: 0,
+                keypad: false,
                 now: Math.trunc((new Date()).getTime() / 1000),
                 timer: false,
             }
@@ -62,11 +64,6 @@ module.exports = (app, actions) => {
             },
             toggleKeypad: function() {
                 this.keypad = !this.keypad
-            },
-        },
-        props: {
-            keypad: {
-                default: false,
             },
         },
         render: templates.calldialog.r,

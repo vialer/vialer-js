@@ -138,6 +138,10 @@ class WebRTCSession extends Session {
             this.resetState()
             this.localVideo.srcObject = null
         })
+
+        this.session.on('dtmf', (a, b) => {
+            console.log("A B", a, b)
+        })
     }
 
 
@@ -178,6 +182,11 @@ class WebRTCSession extends Session {
                 this.remoteVideo.srcObject = this.remoteStream
                 this.remoteVideo.play()
             })
+        })
+        
+
+        this.session.on('dtmf', (a, b) => {
+            console.log("A B", a, b)
         })
 
         // Reset call state when the other halve hangs up.

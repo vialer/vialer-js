@@ -34,6 +34,10 @@ $icon-checkbox-unchecked: "\f096";
 
 // Default colors; can be overriden by vialer-jsrc
 $vg-brand-color: #de6b35 !default;
+
+$brandhue: adjust-hue($vg-brand-color, 10%);
+$vg-brand-variant-color: saturate($brandhue, 10%);
+
 $vg-failed-color: #d9534f !default;
 
 $vg-grey-light: #999 !default;

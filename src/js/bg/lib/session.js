@@ -22,6 +22,7 @@ class Session {
     resetState() {
         window.setTimeout(() => {
             this.app.setState({sip: this.app.getDefaultState().sip})
+            delete this.session
         }, 3000)
     }
 }

@@ -1,32 +1,31 @@
 @import "../../scss/base/variables";
 
-.widget.queues {
+.queues-component {
 
-    .widget-content {
-        .widget-item {
-            .icon {
-                width: $vg-widget-header-size;
-                vertical-align: center;
-                text-align: center;
+    .widget-item {
+        .icon {
+            width: $vg-widget-header-size;
+            vertical-align: center;
+            text-align: center;
 
-                // The queues icon is a somewhat deviant icons.
-                // It is a background with inside text, instead
-                // of a font.
-                i {
-                    display: inline-block;
-                    width: 1.1rem;
-                    height: 1.1rem;
-                    background: $vg-state-busy-color;
-                    line-height: 1.1rem;
-                    letter-spacing: 0;
-                    // Centers the icon in the middle of the background.
-                    font-size: 0.8rem;
-                    font-style: normal;
-                    font-weight: 500;
-                    border-radius: $vg-spacing-4;
-                    color: #fff;
-                }
+            // The queues icon is a somewhat deviant icons.
+            // It is a background with inside text, instead
+            // of a font.
+            i {
+                display: inline-block;
+                width: 1.1rem;
+                height: 1.1rem;
+                background: $vg-state-busy-color;
+                line-height: 1.1rem;
+                letter-spacing: 0;
+                // Centers the icon in the middle of the background.
+                font-size: 0.8rem;
+                font-style: normal;
+                font-weight: 500;
+                border-radius: $vg-spacing-4;
+                color: #fff;
             }
         }
     }
+
 }

@@ -1,0 +1,23 @@
+.sidebar-component {
+    width: 40px;
+    background: $vg-brand-color;
+    border-radius: 0 0 0 5px;
+    text-align: center;
+
+    .option {
+        font-size: 22px;
+        width: 40px;
+        height: 40px;
+        float: left;
+        color: #fff;
+        line-height: 40px;
+        margin-bottom: 8px;
+
+        &.active,
+        &:hover {
+            background: #fff;
+            color: $vg-brand-color;
+            cursor: pointer;
+        }
+    }
+}

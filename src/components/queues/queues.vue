@@ -1,4 +1,4 @@
-<div class="widget queues" :class="widgetState">
+<div class="queues-component panel-content" :class="widgetState">
 
     <div class="widget-header" v-on:click="toggleActive($event, 'queues')">
         <div class="widget-header-icons">

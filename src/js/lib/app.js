@@ -16,6 +16,7 @@ class App extends Skeleton {
 
         let actions = require('../../components/actions')(this)
 
+        Vue.component('Sidebar', require('../../components/sidebar')(this, actions))
         Vue.component('Field', require('../../components/field')(this, actions))
         Vue.component('CallDialog', require('../../components/calldialog')(this, actions))
         Vue.component('Navigation', require('../../components/navigation')(this, actions))
@@ -111,9 +112,9 @@ class App extends Skeleton {
             },
             sip: {
                 displayName: null,
-                hold: false,
                 number: '',
                 session: {
+                    hold: false,
                     state: null,
                 },
                 ua: {

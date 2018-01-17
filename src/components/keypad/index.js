@@ -1,13 +1,15 @@
 module.exports = (app) => {
-    const dtmfTone = new app.sounds.DtmfTone(350, 440)
-    const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#']
+    const keyTone = new app.sounds.DtmfTone(350, 440)
+    const allowedKeys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '*', '#']
 
     // we detect the mouseup event on the window tag as opposed to the li
     // tag because otherwise if we release the mouse when not over a button,
     // the tone will remain playing.
-    $(window).on('mouseup touchend', function(){
-        if (dtmfTone.status) {
-            dtmfTone.stop()
+    $(window).on('mouseup touchend', function() {
+        if (keyTone.status) {
+            window.setTimeout(() => {
+                keyTone.stop()
+            }, 50)
         }
     })
 
@@ -16,23 +18,30 @@ module.exports = (app) => {
             inputChange: function(newVal) {
                 this.$emit('update:model', newVal)
             },
-            pressKey: function(key, e) {
-                if (e) {
-                    if (!allowedKeys.includes(e.key)) return
-                    key = e.key
-                } else {
-                    this.$emit('update:model', `${this.number}${key}`)
+            pressKey: function(key) {
+                if (!allowedKeys.includes(key)) return
+
+                keyTone.play(key)
+                this.$emit('update:model', `${this.number}${key}`)
+                if (this.dtmf) {
+                    app.emit('sip:dtmf', {key})
                 }
-                dtmfTone.play(key)
             },
             removeLastNumber: function() {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))
             },
             unpressKey: function() {
-                dtmfTone.stop()
+                window.setTimeout(() => {
+                    keyTone.stop()
+                }, 50)
+
             },
         },
         props: {
+            dtmf: {
+                default: false,
+                type: Boolean,
+            },
             number: {
                 default: '',
             },

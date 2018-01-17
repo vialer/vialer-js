@@ -24,6 +24,11 @@ module.exports = (app, actions) => {
                 return state
             },
         },
+        data: function() {
+            return {
+                name: 'Contacts'
+            }
+        },
         methods: {
             callContact: function(contact) {
                 let forceSilent = false
