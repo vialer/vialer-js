@@ -23,7 +23,7 @@ module.exports = (app) => {
                 } else {
                     this.$emit('update:model', `${this.number}${key}`)
                 }
-                dtmfTone.playKey(key)
+                dtmfTone.play(key)
             },
             removeLastNumber: function() {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))

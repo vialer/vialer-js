@@ -9,17 +9,12 @@ class Session {
 
 
     muteRingtone() {
-        this.ringtone.pause()
-        this.ringtone.currentTime = 0
+        this.ringtone.stop()
     }
 
 
     playRingtone() {
-        this.ringtone = new Audio(`ringtones/${this.app.state.settings.ringtones.selected.name}`)
-        this.ringtone.addEventListener('ended', function() {
-            this.currentTime = 0
-            this.play()
-        }, false)
+        this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringtone.play()
     }
 

@@ -129,6 +129,7 @@ class WebRTCSession extends Session {
 
         this.session.on('rejected', () => {
             this.app.setState({sip: {session: {state: 'rejected'}}})
+            this.muteRingtone()
             this.resetState()
         })
 
@@ -144,27 +145,24 @@ class WebRTCSession extends Session {
         this.type = 'outgoing'
         // An outgoing call.
         this.number = number
-
-        let sessionUrl = `sip:${number}@voipgrid.nl`
-        this.session = this.ua.invite(sessionUrl, this._sessionOptions, this._formatSdp)
-
-        this.number = this.session.request.ruri.aor.split('@')[0]
-        this.displayName = this.session.remoteIdentity.friendlyName
-        console.log(this.session)
-
-        this.app.logger.info(`${this}Starting new session: ${sessionUrl}`)
+        this.session = this.ua.invite(`sip:${this.number}@voipgrid.nl`, this._sessionOptions, this._formatSdp)
         this.app.setState({
             sip: {
-                displayName: this.displayName,
                 number: this.number,
                 session: {state: 'create'},
             },
         })
 
+        // Notify user that it's ringing.
+        const ringBackTone = new this.app.sounds.RingBackTone(350, 440)
+        ringBackTone.play()
         this.session.on('accepted', (data) => {
+            ringBackTone.stop()
+            // Displayname
+            this.displayName = data.from.uri.user
             this.app.setState({
                 sip: {
-                    callerid: data.from.uri.user,
+                    displayName: data.from.uri.user,
                     session: {state: 'accepted'},
                 },
             })
@@ -185,10 +183,14 @@ class WebRTCSession extends Session {
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (request) => {
             this.app.setState({sip: {session: {state: 'bye'}}})
-            window.setTimeout(() => {
-                this.app.setState({sip: this.app.getDefaultState().sip})
-            }, 3000)
+            this.resetState()
             this.localVideo.srcObject = null
+        })
+
+        this.session.on('rejected', (request) => {
+            this.app.setState({sip: {session: {state: 'rejected'}}})
+            this.resetState()
+            ringBackTone.stop()
         })
     }
 }
