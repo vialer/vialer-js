@@ -1,5 +1,6 @@
+const Session = require('./session_webrtc')
 const SIP = require('sip.js')
-const transform = require('sdp-transform')
+
 // Wait x miliseconds before resolving the subscribe event,
 // to prevent the server from being hammered.
 const SUBSCRIBE_DELAY = 150
@@ -29,21 +30,14 @@ class Sip {
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
 
-        this.connect()
         // Append the elements in the background DOM.
         $('body').append('<video class="local"></video><video class="remote"></video>')
-        this.localVideoElement = $('.local').get(0)
-        this.remoteVideoElement = $('.remote').get(0)
 
-        // The permission should be granted from a foreground script.
-        navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
-            this.stream = stream
-        }).catch((err) => {
-            this.app.logger.warn(`${this}${err}`)
-        })
+        // Start with a clean state.
+        this.app.setState({sip: this.app.getDefaultState().sip})
 
         this.app.on('sip:accept_session', () => {
-            this.acceptSession()
+            this.session.answer()
         })
 
         this.app.on('sip:toggle_hold', () => {
@@ -56,51 +50,13 @@ class Sip {
             }
         })
 
+        // Self-initiated request to stop the session during one of
+        // the phases of a call.
         this.app.on('sip:stop_session', () => {
-            if (['create', 'invite'].includes(this.state.session.state)) {
-                this.session.reject()
-            } else if (['accepted'].includes(this.state.session.state)) {
-                this.session.bye()
-                // The bye event on the session is not triggered.
-                this.app.setState({sip: {session: {state: 'bye'}}})
-            } else {
-                this.app.logger.warn(`${this}cannot stop session from state '${this.state.session.state}'`)
-            }
-
-        })
-    }
-
-
-    acceptSession() {
-        this.session.accept({
-            sessionDescriptionHandlerOptions: {
-                constraints: {
-                    audio: true,
-                    video: false,
-                },
-            },
+            this.session.hangup()
         })
 
-        this.localVideoElement.srcObject = this.stream
-        this.localVideoElement.play()
-
-        this.pc = this.session.sessionDescriptionHandler.peerConnection
-        this.remoteStream = new MediaStream()
-
-        this.pc.getReceivers().forEach((receiver) => {
-            this.remoteStream.addTrack(receiver.track)
-            this.remoteVideoElement.srcObject = this.remoteStream
-            this.remoteVideoElement.play()
-        })
-
-        // Reset call state when the other halve hangs up.
-        this.session.on('bye', (request) => {
-            this.app.setState({sip: {session: {state: 'bye'}}})
-            window.setTimeout(() => {
-                this.app.setState({sip: this.app.getDefaultState().sip})
-            }, 3000)
-            this.localVideoElement.srcObject = null
-        })
+        this.connect()
     }
 
 
@@ -109,15 +65,12 @@ class Sip {
     * SipML5 to the websocket SIP backend.
     */
     connect() {
-        this.app.setState({sip: {session: {state: null}}})
         // Emit to the frontend that the sip client is not yet
         // ready to start.
         if (this.ua && this.ua.isConnected()) {
             this.app.logger.warn(`${this}sip backend already starting or started`)
             return
         }
-        this.app.setState({contacts: {sip: {state: 'disconnected'}}})
-
         const settings = this.app.state.settings
 
         // For webrtc this is a voipaccount, otherwise an email address.
@@ -150,133 +103,46 @@ class Sip {
             return
         }
 
+        this.app.setState({sip: {ua: {state: 'disconnected'}}})
+
         this.ua = new SIP.UA(uaOptions)
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            this.app.setState({
-                sip: {
-                    callerid: session.remoteIdentity.displayName,
-                    number: session.remoteIdentity.uri.user,
-                    session: {state: 'invite'},
-                },
-            })
-
-            this.ringtone = new Audio(`ringtones/${this.app.state.settings.ringtones.selected.name}`)
-            this.ringtone.addEventListener('ended', function() {
-                this.currentTime = 0
-                this.play()
-            }, false)
-            this.ringtone.play()
-
-            this.session = session
-
-            this.session.on('accepted', () => {
-                this.app.setState({sip: {session: {state: 'accepted'}}})
-                this.ringtone.pause()
-                this.ringtone.currentTime = 0
-            })
-
-            this.session.on('rejected', () => {
-                this.ringtone.pause()
-                this.ringtone.currentTime = 0
-                this.app.setState({sip: {session: {state: 'rejected'}}})
-                window.setTimeout(() => {
-                    this.app.setState({sip: this.app.getDefaultState().sip})
-                }, 3000)
-            })
-
-            this.session.on('bye', () => {
-                this.app.setState({sip: {session: {state: 'bye'}}})
-
-                window.setTimeout(() => {
-                    this.app.setState({sip: this.app.getDefaultState().sip})
-                }, 3000)
-            })
-
-            this.app.logger.debug(`${this}invite coming in`)
+            this.session = new Session(this, session)
         })
 
         this.ua.on('registered', () => {
-            this.app.setState({ua: {state: 'registered'}})
+            this.app.setState({sip: {ua: {state: 'registered'}}})
             this.app.logger.info(`${this}SIP stack registered`)
         })
 
         this.ua.on('unregistered', () => {
-            this.app.setState({ua: {state: 'unregistered'}})
+            this.app.setState({sip: {ua: {state: 'unregistered'}}})
             this.app.logger.info(`${this}SIP stack unregistered`)
         })
 
         this.ua.on('connected', () => {
-            this.app.setState({ua: {state: 'connected'}})
+            this.app.setState({sip: {ua: {state: 'connected'}}})
             this.app.logger.info(`${this}SIP stack started`)
-            this.app.setState({contacts: {sip: {state: 'started'}}})
             this.updatePresence()
         })
 
 
         this.ua.on('disconnected', () => {
-            this.app.setState({ua: {state: 'disconnected'}})
+            this.app.setState({sip: {ua: {state: 'disconnected'}}})
             this.app.logger.info(`${this}SIP stack stopped`)
-            this.app.setState({contacts: {sip: {state: 'disconnected'}}})
 
             if (this.reconnect) {
-                this.app.logger.info(`${this}SIP stack reconnecting`)
+                this.app.logger.debug(`${this}reconnecting ua`)
                 this.ua.start()
             }
         })
     }
 
 
-    createSession(phonenumber) {
-        let sessionUrl = `sip:${phonenumber}@voipgrid.nl`
-        this.app.logger.info(`${this}Starting new session: ${sessionUrl}`)
-        this.app.setState({
-            sip: {
-                number: phonenumber,
-                session: {state: 'create'},
-            },
-        })
-
-        this.session = this.ua.invite(
-            sessionUrl, {
-                sessionDescriptionHandlerOptions: {
-                    constraints: {
-                        audio: true,
-                        video: false,
-                    },
-                },
-            }, this.formatSdp)
-
-        this.session.on('accepted', (data) => {
-            this.app.setState({
-                sip: {
-                    callerid: data.from.uri.user,
-                    session: {state: 'accepted'},
-                },
-            })
-
-            this.localVideoElement.srcObject = this.stream
-            this.localVideoElement.play()
-
-            this.pc = this.session.sessionDescriptionHandler.peerConnection
-            this.remoteStream = new MediaStream()
-
-            this.pc.getReceivers().forEach((receiver) => {
-                this.remoteStream.addTrack(receiver.track)
-                this.remoteVideoElement.srcObject = this.remoteStream
-                this.remoteVideoElement.play()
-            })
-        })
-
-        // Reset call state when the other halve hangs up.
-        this.session.on('bye', (request) => {
-            this.app.setState({session: {state: 'bye'}})
-            window.setTimeout(() => {
-                this.app.setState({sip: this.app.getDefaultState().sip})
-            }, 3000)
-            this.localVideoElement.srcObject = null
-        })
+    call(number) {
+        this.session = new Session(this, number)
     }
 
 
@@ -301,30 +167,6 @@ class Sip {
         } else {
             this.app.logger.debug(`${this}not connection to stop`)
         }
-    }
-
-
-    formatSdp(description) {
-        //
-        let blacklistCodecs = ['PCMU', 'PCMA']
-        let sdpObj = transform.parse(description.sdp)
-        // console.log(sdpObj)
-        description.sdp = transform.write(sdpObj)
-        let rtpMedia = []
-        let payloads = []
-        for (let codec of sdpObj.media[0].rtp) {
-            if (!blacklistCodecs.includes(codec.codec)) {
-                rtpMedia.push(codec)
-                payloads.push(codec.payload)
-            }
-        }
-
-        sdpObj.media[0].payloads = payloads.join(' ')
-        sdpObj.media[0].rtp = rtpMedia
-        console.log(sdpObj)
-        description.sdp = transform.write(sdpObj)
-        // description.sdp = description.sdp.replace(/^a=candidate:\d+ \d+ tcp .*?\r\n/img, "")
-        return Promise.resolve(description)
     }
 
 

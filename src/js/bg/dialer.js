@@ -107,8 +107,8 @@ class DialerModule {
         */
         this.app.on('dialer:dial', (data) => {
             // Just make sure b_number is numbers only.
-            const phonenumber = this.sanitizeNumber(data.b_number).replace(/[^\d+]/g, '')
-            this.app.sip.createSession(phonenumber)
+            const number = this.sanitizeNumber(data.b_number).replace(/[^\d+]/g, '')
+            this.app.sip.call(number)
             if (data.analytics) {
                 this.app.telemetry.event('Calls', 'Initiate ConnectAB', data.analytics)
             }

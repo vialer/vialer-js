@@ -1,8 +1,8 @@
 <div class="calldialog-component">
 
-    <div class="number-display" v-if="['accepted', 'create', 'invite'].includes(sip.session.state)">
-        {{sip.number}}
-        <span v-if="sip.callerid"> - {{sip.callerid}}</span>
+    <div class="call-info" v-if="sip.session.state">
+        <div class="call-name" v-if="sip.displayName">{{sip.displayName}}</div>
+        <div class="call-number">{{sip.number}}</div>
     </div>
     <div class="timer" v-if="timer">
         {{minutes | two_digits}}:{{seconds | two_digits}}

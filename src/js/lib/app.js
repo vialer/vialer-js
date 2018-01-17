@@ -110,7 +110,7 @@ class App extends Skeleton {
                 },
             },
             sip: {
-                callerid: null,
+                displayName: null,
                 hold: false,
                 number: '',
                 session: {
