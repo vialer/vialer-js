@@ -8,8 +8,6 @@ class ContactsModule {
     constructor(app) {
         this.app = app
         this.lookup = {}
-
-        this.app.modules.contacts = this
     }
 
 

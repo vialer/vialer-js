@@ -11,7 +11,6 @@ const _modules = [
     {Module: require('./availability'), name: 'availability'},
     {Module: require('./contacts'), name: 'contacts'},
     {Module: require('./dialer'), name: 'dialer'},
-    {Module: require('./ui'), name: 'ui'},
     {Module: require('./user'), name: 'user'},
     {Module: require('./queues'), name: 'queues'},
 ]
@@ -41,7 +40,6 @@ class BackgroundApp extends App {
             this.mergeDeep(this.state, data.state)
             if (data.persist) this.store.set('state', this.state)
         })
-
 
 
         // Continue last session if credentials are available.

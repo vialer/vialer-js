@@ -5,18 +5,13 @@ class UserModule {
 
     constructor(app) {
         this.app = app
-        this.addListeners()
-    }
 
-
-    addListeners() {
         this.app.on('user:login.attempt', (data) => {
             Object.assign(this.app.state.user, {
                 password: data.password,
                 username: data.username,
             })
 
-            this.app.emit('user:login.in_progress')
             this.login(data.username, data.password)
         })
 

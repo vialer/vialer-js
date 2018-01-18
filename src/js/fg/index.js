@@ -3,14 +3,6 @@ let env = require('../lib/env')
 const utils = require('../lib/utils')
 
 
-const _modules = [
-    {Module: require('./availability'), name: 'availability'},
-    {Module: require('./contacts'), name: 'contacts'},
-    {Module: require('./user'), name: 'user'},
-    {Module: require('./queues'), name: 'queues'},
-]
-
-
 class VialerUi extends App {
 
     constructor(options) {
@@ -52,7 +44,7 @@ class VialerUi extends App {
 
 
 function initApp(initParams) {
-    initParams.modules = _modules
+    initParams.modules = []
     const app = new VialerUi(initParams)
 
     if (app.env.isChrome) $('html').addClass('chrome')

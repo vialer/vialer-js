@@ -56,22 +56,6 @@ class Api {
     toString() {
         return `${this.app}[api] `
     }
-
-
-    unauthorizedMessage() {
-        // Show this notification after being logged in once properly.
-        if (this.app.store.get('user')) {
-            // Don't show more than once per login session.
-            if (!this.app.store.get('notifications').hasOwnProperty('unauthorized') ||
-                !this.app.store.get('notifications').unauthorized) {
-
-                this.app.logger.notification(this.app.i18n.translate('unauthorizedNotificationText'))
-                let notificationsData = this.app.store.get('notifications')
-                notificationsData.unauthorized = true
-
-            }
-        }
-    }
 }
 
 module.exports = Api

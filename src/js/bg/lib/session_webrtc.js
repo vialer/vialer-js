@@ -1,5 +1,4 @@
 const Session = require('./session')
-const transform = require('sdp-transform')
 
 
 /**
@@ -35,33 +34,6 @@ class WebRTCSession extends Session {
 
         if (numberOrSession.hasOwnProperty('acceptAndTerminate')) this.setupIncomingCall(numberOrSession)
         else this.setupOutgoingCall(numberOrSession)
-    }
-
-
-    /**
-    * Prefer to use G722.
-    * @param {String} description - sdp description.
-    * @returns {Object} - The modified sdp.
-    */
-    _formatSdp(description) {
-        let blacklistCodecs = ['PCMU', 'PCMA']
-        let sdpObj = transform.parse(description.sdp)
-        // console.log(sdpObj)
-        description.sdp = transform.write(sdpObj)
-        let rtpMedia = []
-        let payloads = []
-        for (let codec of sdpObj.media[0].rtp) {
-            if (!blacklistCodecs.includes(codec.codec)) {
-                rtpMedia.push(codec)
-                payloads.push(codec.payload)
-            }
-        }
-
-        sdpObj.media[0].payloads = payloads.join(' ')
-        sdpObj.media[0].rtp = rtpMedia
-        description.sdp = transform.write(sdpObj)
-        // description.sdp = description.sdp.replace(/^a=candidate:\d+ \d+ tcp .*?\r\n/img, "")
-        return Promise.resolve(description)
     }
 
 
@@ -138,10 +110,6 @@ class WebRTCSession extends Session {
             this.resetState()
             this.localVideo.srcObject = null
         })
-
-        this.session.on('dtmf', (a, b) => {
-            console.log("A B", a, b)
-        })
     }
 
 
@@ -149,7 +117,7 @@ class WebRTCSession extends Session {
         this.type = 'outgoing'
         // An outgoing call.
         this.number = number
-        this.session = this.ua.invite(`sip:${this.number}@voipgrid.nl`, this._sessionOptions, this._formatSdp)
+        this.session = this.ua.invite(`sip:${this.number}@voipgrid.nl`, this._sessionOptions)
         this.app.setState({
             sip: {
                 number: this.number,
@@ -184,9 +152,6 @@ class WebRTCSession extends Session {
             })
         })
 
-        this.session.on('dtmf', (a, b) => {
-            console.log("A B", a, b)
-        })
 
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (request) => {

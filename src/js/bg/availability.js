@@ -110,9 +110,6 @@ class AvailabilityModule {
     toString() {
         return `${this.app}[availability] `
     }
-
-
-
 }
 
 module.exports = AvailabilityModule
