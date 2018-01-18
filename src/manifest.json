@@ -67,7 +67,6 @@
     "web_accessible_resources": [
         "img/*.png",
         "css/*.css",
-        "webext_callstatus.html",
         "js/*.map"
     ],
     "default_locale": "en"
