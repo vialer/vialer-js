@@ -110,7 +110,7 @@ class WebRTCSession extends Session {
         // An invite; incoming call.
         this.session = session
         this.displayName = this.session.remoteIdentity.displayName
-        this.number = this.session.request.ruri.aor.split('@')[0]
+        this.number = this.session.remoteIdentity.uri.user
 
         this.app.setState({
             sip: {
@@ -163,10 +163,10 @@ class WebRTCSession extends Session {
         this.session.on('accepted', (data) => {
             ringBackTone.stop()
             // Displayname
-            this.displayName = data.from.uri.user
+            this.displayName = this.session.remoteIdentity.displayName
             this.app.setState({
                 sip: {
-                    displayName: data.from.uri.user,
+                    displayName: this.displayName,
                     session: {state: 'accepted'},
                 },
             })
@@ -183,7 +183,6 @@ class WebRTCSession extends Session {
                 this.remoteVideo.play()
             })
         })
-        
 
         this.session.on('dtmf', (a, b) => {
             console.log("A B", a, b)

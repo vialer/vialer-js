@@ -40,6 +40,21 @@ class DialerModule {
 
     }
 
+    _reset() {
+        if (!this.app.env.isExtension) return
+        // Called when logging the plugin out. Remove the contextmenu item.
+        if (this._contextMenuItem) this.removeContextMenuItem()
+        // Emit to each tab's running observer scripts that we don't want to
+        // observe anymore.
+        if (this.app.store.get('c2d')) {
+            browser.tabs.query({}).then((tabs) => {
+                tabs.forEach((tab) => {
+                    // Emit all observers on the tab to stop.
+                    this.app.emit('observer:stop', {frame: 'observer'}, false, tab.id)
+                })
+            })
+        }
+    }
 
     /**
      * Add a right-click contextmenu item to all browser tabs.
@@ -108,6 +123,7 @@ class DialerModule {
         this.app.on('dialer:dial', (data) => {
             // Just make sure b_number is numbers only.
             const number = this.sanitizeNumber(data.b_number).replace(/[^\d+]/g, '')
+
             this.app.sip.call(number)
             if (data.analytics) {
                 this.app.telemetry.event('Calls', 'Initiate ConnectAB', data.analytics)
@@ -203,23 +219,6 @@ class DialerModule {
         number = '' + number
         // Remove white space characters.
         return number.replace(/ /g, '')
-    }
-
-
-    _reset() {
-        if (!this.app.env.isExtension) return
-        // Called when logging the plugin out. Remove the contextmenu item.
-        if (this._contextMenuItem) this.removeContextMenuItem()
-        // Emit to each tab's running observer scripts that we don't want to
-        // observe anymore.
-        if (this.app.store.get('c2d')) {
-            browser.tabs.query({}).then((tabs) => {
-                tabs.forEach((tab) => {
-                    // Emit all observers on the tab to stop.
-                    this.app.emit('observer:stop', {frame: 'observer'}, false, tab.id)
-                })
-            })
-        }
     }
 }
 

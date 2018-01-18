@@ -45,7 +45,6 @@ class Sip {
             this.session.session.dtmf(key)
         })
 
-
         this.app.on('sip:toggle_hold', () => {
             if (!this.state.hold) {
                 this.session.session.hold()
