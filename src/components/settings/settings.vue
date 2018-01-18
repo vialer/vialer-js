@@ -21,7 +21,7 @@
 
     <Field name="ringtone" type="select"
         :disabled="!settings.webrtc.enabled"
-        :label="$t('Ringone')" :model.sync="settings.ringtones.selected"
+        :label="$t('Ringtone')" :model.sync="settings.ringtones.selected"
         :options="settings.ringtones.options"
         :placeholder="$t('Select a ringtone')"/>
 

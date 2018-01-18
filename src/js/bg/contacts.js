@@ -10,7 +10,6 @@ class ContactsModule {
         this.lookup = {}
 
         this.app.modules.contacts = this
-        if (app.state.user.authenticated) this.getApiData()
     }
 
 

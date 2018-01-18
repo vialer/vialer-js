@@ -10,9 +10,43 @@ class QueuesModule {
         this.app = app
         this.hasUI = true
         this.app.modules.queues = this
-        this.sizes = {}
 
         this.addListeners()
+    }
+
+
+    async getApiData() {
+        const res = await this.app.api.client.get('api/queuecallgroup/')
+        let queues = res.data.objects
+
+        for (const queue of queues) {
+            // The queue size from the API is a string.
+            queue.queue_size = parseInt(queue.queue_size, 10)
+            // Queue size is not available.
+            if (isNaN(queue.queue_size)) queue.queue_size = '?'
+
+            // Update icon for toolbarbutton if this queuecallgroup
+            // was selected earlier.
+            if (this.app.env.isExtension) {
+                if (queue.id === this.app.state.queues.selected.queues.selected.id) {
+                    browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                }
+            }
+        }
+
+        this.app.emit('queues:update_size', {queues: queues})
+        // Pass the queues to the popup and update the queues ui list.
+        this.app.emit('queues:fill', {
+            queues: queues,
+            //selectedQueue: this.app.store.get('widgets').queues.selected,
+        })
+
+        let widgetState = this.app.store.get('widgets')
+        // Save queues, sizes and ids in storage.
+        widgetState.queues.list = queues
+        widgetState.queues.sizes = this.sizes
+        widgetState.queues.unauthorized = false
+        this.app.store.set('widgets', widgetState)
     }
 
 
@@ -98,122 +132,6 @@ class QueuesModule {
 
     toString() {
         return `${this.app}[queues] `
-    }
-
-
-    /**
-    * Retrieve fresh queue statistics from the API.
-    */
-    async updateQueues() {
-        // A user may have been logged out, while this function may
-        // still be running on the background.
-        if (!this.app.store.get('user')) return
-
-        this.app.logger.info(`${this}updating queue info from api`)
-        // Suppress a timeout exception to keep the interval check alive
-        // after a timeout.
-        let res
-        try {
-            res = await this.app.api.client.get('api/queuecallgroup/')
-        } catch (e) {
-            return
-        }
-
-        if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
-            this.app.logger.debug(`${this}unauthorized queues request`)
-            // Update authorization status.
-            let widgetState = this.app.store.get('widgets')
-            widgetState.queues.unauthorized = true
-            this.app.store.set('widgets', widgetState)
-            // Display an icon explaining the user lacks permissions
-            // to use this feature of the plugin.
-            this.app.emit('ui:widget.unauthorized', {name: 'queues'})
-        }
-
-        let queues = res.data.objects
-        if (!queues.length) {
-            this.app.emit('queues:empty')
-            return 
-        }
-
-        for (const queue of queues) {
-            // The queue size from the API is a string.
-            queue.queue_size = parseInt(queue.queue_size, 10)
-            // Queue size is not available.
-            if (isNaN(queue.queue_size)) queue.queue_size = '?'
-
-            // Update icon for toolbarbutton if this queuecallgroup
-            // was selected earlier.
-            if (this.app.env.isExtension) {
-                if (queue.id === this.app.store.get('widgets').queues.selected) {
-                    browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
-                }
-            }
-
-            this.sizes[queue.id] = queue.queue_size
-            // Save sizes in storage.
-            let widgetState = this.app.store.get('widgets')
-            widgetState.queues.sizes = this.sizes
-            this.app.store.set('widgets', widgetState)
-        }
-
-        this.app.emit('queues:update_size', {queues: queues})
-        // Pass the queues to the popup and update the queues ui list.
-        this.app.emit('queues:fill', {
-            queues: queues,
-            //selectedQueue: this.app.store.get('widgets').queues.selected,
-        })
-
-        let widgetState = this.app.store.get('widgets')
-        // Save queues, sizes and ids in storage.
-        widgetState.queues.list = queues
-        widgetState.queues.sizes = this.sizes
-        widgetState.queues.unauthorized = false
-        this.app.store.set('widgets', widgetState)
-    }
-
-
-    _load() {
-        // Start with showing an empty queue list.
-        this.app.emit('queues:empty')
-        this.updateQueues()
-        this.setQueueSizesTimer()
-    }
-
-
-    _reset() {
-        this.app.emit('queues:reset')
-    }
-
-
-    _restore() {
-        this.app.logger.info(`${this}reloading widget queues`)
-        // Restore the queue from localstorage.
-        let widgetState = this.app.store.get('widgets')
-        this.sizes = {}
-
-        if (!widgetState || !widgetState.queues || !Object.keys(widgetState.queues).length) {
-            // No widget state. Empty the list.
-            this.app.emit('fg:set_state', {queues: {queues: []}})
-        } else {
-            // Start with a queue state from localstorage.
-            this.sizes = widgetState.queues.sizes
-
-            let queues = widgetState.queues.list
-            if (queues && queues.length) {
-                this.app.emit('fg:set_state', {
-                    queues: {
-                        queues: queues,
-                        selectedQueue: widgetState.queues.selected,
-                    },
-                })
-            } else {
-                // No queues in localstore. Empty the list.
-                this.app.emit('fg:set_state', {queues: {queues: []}})
-            }
-        }
-
-        this.setQueueSizesTimer()
     }
 }
 

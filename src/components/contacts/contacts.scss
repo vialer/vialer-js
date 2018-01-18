@@ -3,36 +3,30 @@
 
 .contacts-component {
 
-    // The widget is marked as unauthorized.
-    &.unauthorized {
-        .widget-header {
-            .search {
-                display: none;
+    // A single contact item in the contacts list.
+    .contact {
+        display: flex;
+        padding: 8px;
+
+        .icon i {color: $vg-grey-light;}
+        .icon.busy i {color: $vg-state-busy-color;}
+        .icon.available i {color: $vg-state-available-color;}
+
+        // Ringing state is a css keyframe animation.
+        .icon.ringing i {
+            transition-timing-function: ease;
+            animation: ringing 1.5s linear infinite;
+        }
+
+        .info {
+            .name {
+                font-weight: 500;
+            }
+
+            .description {
+                color: $vg-grey-dark;
             }
         }
     }
 
-    .widget-header {
-        .search {
-            flex: 1;
-            margin-top: 10px;
-            margin-right: $vg-spacing-3;
-        }
-    }
-
-    .widget-content {
-        // A single contact item in the contacts list.
-        .widget-item {
-            &.hide {display: none;}
-            .icon i {color: $vg-grey-light;}
-            .icon.busy i {color: $vg-state-busy-color;}
-            .icon.available i {color: $vg-state-available-color;}
-
-            // Ringing state is a css keyframe animation.
-            .icon.ringing i {
-                transition-timing-function: ease;
-                animation: ringing 1.5s linear infinite;
-            }
-        }
-    }
 }

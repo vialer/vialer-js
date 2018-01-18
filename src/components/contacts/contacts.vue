@@ -1,9 +1,11 @@
 <div class="contacts-component updating-presence-status panel-content" :class="widgetState">
 
-    <h1>{{$t(name)}}</h1>
-    
-    <ul class="widget-item-list">
-        <li class="widget-item contact" v-for="contact in filteredContacts" @click="callContact(contact)">
+    <h1>{{$t('Contacts')}}</h1>
+
+    <input class="input" type="email" placeholder="Find colleagues" :disabled="module.search.disabled" v-model="module.search.input">
+
+    <ul class="list">
+        <li class="list-item contact" v-for="contact in filteredContacts" @click="callContact(contact)">
             <div class="icon status-icon" :class="contact.state">
                 <i class="icon-availability"></i>
             </div>
@@ -13,7 +15,7 @@
             </div>
         </li>
         <!-- no search results -->
-        <li class="widget-item contact" v-if="!filteredContacts.length">
+        <li class="list-item contact" v-if="!filteredContacts.length">
             <div class="icon status-icon"><i class="icon-availability"></i></div>
             <div class="info">
                 <div class="name">{{$t('No contacts')}}</div>
@@ -21,7 +23,7 @@
         </li>
 
         <!-- no contacts -->
-        <li class="widget-item contact" v-else-if="!module.contacts.length">
+        <li class="list-item contact" v-else-if="!module.contacts.length">
             <div class="icon status-icon"><i class="icon-availability"></i></div>
             <div class="info">
                 <div class="name">{{$t('No contacts')}}</div>

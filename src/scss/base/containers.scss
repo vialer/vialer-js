@@ -20,3 +20,39 @@ body {
 .hide {
     display: none;
 }
+
+
+.list {
+
+    .list-item {
+        display: flex;
+
+        &:nth-child(even) {
+            background: $vg-grey-lightest;
+        }
+
+        &:nth-child(odd) {
+            background: $vg-grey-lighter;
+        }
+
+        .icon i {color: $vg-grey-light;}
+        .icon.busy i {color: $vg-state-busy-color;}
+        .icon.available i {color: $vg-state-available-color;}
+
+        // Ringing state is a css keyframe animation.
+        .icon.ringing i {
+            transition-timing-function: ease;
+            animation: ringing 1.5s linear infinite;
+        }
+
+        .info {
+            .name {
+                font-weight: 500;
+            }
+
+            .description {
+                color: $vg-primary-color;
+            }
+        }
+    }
+}

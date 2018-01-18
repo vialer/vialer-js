@@ -45,10 +45,6 @@ class App extends Skeleton {
                 },
                 destinations: [],
                 sud_id: null,
-                widget: {
-                    active: false,
-                    state: '',
-                },
             },
             calldialog: {
                 mode: null, // `callee` or `caller`
@@ -67,21 +63,13 @@ class App extends Skeleton {
                 sip: {
                     state: 'disconnected',
                 },
-                widget: {
-                    active: false,
-                    state: '',
-                },
             },
             dialpad: {
                 dialNumber: '',
             },
             queues: {
                 queues: [],
-                selectedQueue: null,
-                widget: {
-                    active: false,
-                    state: '',
-                },
+                selected: {id: null},
             },
             settings: {
                 click2dial: {
