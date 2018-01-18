@@ -17,7 +17,7 @@
 
 
     <div class="options" v-if="['accepted'].includes(sip.session.state)">
-        <div class="option">
+        <div class="option"  @click="transferButton">
             <div class="icon">
                 <i class="fa fa-hand-scissors-o"></i>
             </div>

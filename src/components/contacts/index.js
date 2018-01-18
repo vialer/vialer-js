@@ -26,7 +26,7 @@ module.exports = (app, actions) => {
         },
         data: function() {
             return {
-                name: 'Contacts'
+                name: 'Contacts',
             }
         },
         methods: {

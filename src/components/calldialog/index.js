@@ -30,6 +30,7 @@ module.exports = (app, actions) => {
                 keypad: false,
                 now: Math.trunc((new Date()).getTime() / 1000),
                 timer: false,
+                transfer: false,
             }
         },
         destroyed: function() {
@@ -65,6 +66,12 @@ module.exports = (app, actions) => {
             toggleKeypad: function() {
                 this.keypad = !this.keypad
             },
+            transferButton: function() {
+                console.log('Tranfer clicked');
+                // Show hide the transfer window.
+                this.transfer = !this.transfer
+                // app.emit('sip:start_transfer')
+            },
         },
         render: templates.calldialog.r,
         staticRenderFns: templates.calldialog.s,
@@ -80,6 +87,9 @@ module.exports = (app, actions) => {
                 } else if (['bye', 'rejected'].includes(newVal)) {
                     // Stop timer on hangup.
                     clearInterval(this.intervalId)
+                    if (this.keypad) {
+                        this.keypad = false
+                    }
                 } else if (!newVal) {
                     // Hide timer when the callstate is reset.
                     this.timer = false

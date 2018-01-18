@@ -117,6 +117,10 @@ class App extends Skeleton {
                     hold: false,
                     state: null,
                 },
+                transferSession: {
+                    hold: false,
+                    state: null,
+                },
                 ua: {
                     state: null,
                 },
