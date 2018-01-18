@@ -85,6 +85,12 @@ class Sip {
                 builtinEnabled: false,
                 debug: 'error',
             },
+            stunServers: [
+                'stun4.l.google.com:19302',
+                'stun3.l.google.com:19302',
+                'stun2.l.google.com:19302',
+                'stun1.l.google.com:19302',
+            ],
             traceSip: false,
             userAgentString: process.env.PLUGIN_NAME,
             wsServers: [`wss://${settings.sipEndpoint}`],
