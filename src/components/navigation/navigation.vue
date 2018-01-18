@@ -14,6 +14,11 @@
         <div class="option">
             <i class="icon-refresh" :title="$t('Refresh your data')" v-if="user.authenticated"></i>
         </div>
+
+        <div class="option" :class="{active: layer === 'settings'}" @click="setLayer('settings')">
+             <i class="fa fa-cog"></i>
+        </div>
+
         <div class="option">
             <i v-if="!user.authenticated" class="icon-logout" :title="$t('Open in separate tab')" :class="{active: layer === 'login'}" @click="setLayer('login')"></i>
         </div>

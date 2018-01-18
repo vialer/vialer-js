@@ -81,6 +81,7 @@
     "css-element-queries": "^0.4.0",
     "eventemitter3": "^2.0.3",
     "font-awesome": "^4.7.0",
+    "gulp-fuet": "^1.0.12",
     "gulp-plumber": "^1.2.0",
     "jquery": "^3.2.1",
     "roboto-fontface": "^0.8.0",
