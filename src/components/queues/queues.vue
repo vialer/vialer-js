@@ -2,7 +2,6 @@
 
     <h1>{{$t('Queues')}}</h1>
 
-
     <ul class="list">
         <li class="list-item queue" :class="{selected: module.selectedQueue == queue.id}" v-for="queue in module.queues" v-on:click="activateQueue(queue)">
             <div class="icon"><i class="indicator">{{queue.queue_size}}</i></div>

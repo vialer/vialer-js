@@ -33,6 +33,7 @@ $font-path: "../fonts";
     font-style: normal;
 }
 
+// Our own custom font, containing all icons.
 [class^="icon-"], [class*=" icon-"] {
     font-family: "vialer-js";
     speak: none;

@@ -1,34 +1,6 @@
-@import "../../scss/base/variables";
+@import "../../scss/variables";
 
 // The login container.
-.login-section {
+.login-component {
     padding: 10px;
-    padding-bottom: 5px;
-    line-height: 100%;
-    max-width: $widget;
-}
-
-.login-form {
-    label {
-        font-weight: 500;
-        display: block;
-        margin-bottom: 4px;
-    }
-
-    button,
-    input {
-        width: 100%;
-        margin-bottom: 7px;
-    }
-
-    .login-button {
-        margin-top: 5px;
-
-        i {
-            position: absolute;
-            line-height: 40px;
-            left: $vg-spacing-gap;
-            font-size: 1rem;
-        }
-    }
 }

@@ -4,7 +4,7 @@
         <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
     </div>
 
-    <div class="numbers">
+    <div class="keys">
         <button class="key" @mouseup="unpressKey()" @mousedown="pressKey(1)">1</button>
         <button class="key" @mouseup="unpressKey()" @mousedown="pressKey(2)">2<div class="sub">ABC</div></button>
         <button class="key" @mouseup="unpressKey()" @mousedown="pressKey(3)">3<div class="sub">DEF</div></button>

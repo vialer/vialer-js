@@ -1,8 +1,7 @@
-@import "../../scss/base/variables";
-@import "../../scss/base/mixins";
+@import "../../scss/variables";
+@import "../../scss/mixins";
 
 .keypad-component {
-
     width: 100%;
 
     .number-input {
@@ -41,7 +40,7 @@
         }
     }
 
-    .numbers {
+    .keys {
         display: flex;
         justify-content: space-between;
         align-items: center;

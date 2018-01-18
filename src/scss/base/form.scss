@@ -1,9 +1,0 @@
-@mixin selection {
-    ::-moz-selection {@content;}
-    ::selection {@content;}
-}
-
-@include selection {
-    background: $vg-brand-color;
-    color: #fff;
-}

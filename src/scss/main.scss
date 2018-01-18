@@ -1,1 +1,6 @@
-@import "base/all";
+// Entrypoint for all vialer-js specific SCSS. SCSS files from
+// components are blended in from the Gulp task.
+@import "variables";
+@import "containers";
+@import "fonts";
+@import "mixins";

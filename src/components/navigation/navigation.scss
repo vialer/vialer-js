@@ -1,4 +1,4 @@
-@import "../../scss/base/variables";
+@import "../../scss/variables";
 
 // The most upper box containing account info and
 // icon-links to several locations.
@@ -8,9 +8,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    color: #fff;
     height: 32px;
+    color: #fff;
     border-bottom: 1px solid $vg-grey-lighter;
 
     [class^="icon-"], [class*=" icon-"]:hover {
@@ -35,9 +34,7 @@
                 cursor: pointer;
             }
         }
-
     }
-
 
 
     // The icon links container at the right top of the popup.
@@ -45,7 +42,6 @@
         display: flex;
         flex-direction: row-reverse;
         font-size: 1.2rem;
-
 
         // Position the last icon in line with the rest.
         margin-right: $vg-spacing-gap - 2px;
@@ -60,6 +56,7 @@
             i {
                 font-size: 16px;
                 color: #fff;
+
                 &:hover {
                     cursor: pointer;
                     background: $vg-brand-color;
@@ -71,7 +68,5 @@
                 }
             }
         }
-
-
     }
 }

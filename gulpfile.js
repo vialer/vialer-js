@@ -370,7 +370,7 @@ gulp.task('scss', 'Compile all css.', [], (done) => {
         'scss-print',
     ], () => {
         // Targetting webext.css for livereload changed only works in the
-        // webview. In the callstatus html, it will trigger a page reload.
+        // webview.
         if (settings.LIVERELOAD) livereload.changed('main.css')
         done()
     })

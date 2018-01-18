@@ -21,7 +21,7 @@ const minifier = composer(require('uglify-es'), console)
 const mount = require('connect-mount')
 const notify = require('gulp-notify')
 const path = require('path')
-const plumber = require('gulp-plumber')
+
 const runSequence = require('run-sequence')
 const sass = require('gulp-sass')
 const serveIndex = require('serve-index')
@@ -32,7 +32,7 @@ const sourcemaps = require('gulp-sourcemaps')
 const watchify = require('watchify')
 
 // Browserify instance caching.
-let BUNDLERS = {bg: null, callstatus: null, popup: null, tab: null}
+let BUNDLERS = {bg: null, fg: null, tab: null}
 // Switches extra application verbosity on/off.
 
 

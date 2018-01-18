@@ -8,9 +8,11 @@
         <div class="option">
             <i class="icon-support" data-link="help" :title="$t('Help')"></i>
         </div>
+
         <div class="option">
             <i class="icon-refresh" :title="$t('Refresh your data')" v-if="user.authenticated"></i>
         </div>
+
         <div class="option">
             <i v-if="user.authenticated" class="icon-full-screen" :title="$t('Open in separate tab')"></i>
         </div>

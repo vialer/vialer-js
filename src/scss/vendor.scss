@@ -1,4 +1,5 @@
-@import "base/variables";
+// Entrypoint for all vendor SCSS.
+@import "variables";
 
 @import "bulma/sass/utilities/all";
 @import "bulma/sass/base/all";
