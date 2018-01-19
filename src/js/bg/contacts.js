@@ -32,7 +32,9 @@ class ContactsModule {
         const cachedContactsLookup = new Map(this.app.state.contacts.contacts.map((c) => [c.account_id, c]))
 
         contacts = contacts.map((c) => {
-            c.state = cachedContactsLookup.get(c.account_id).state
+            const cachedContact = cachedContactsLookup.get(c.account_id)
+            if (cachedContact) c.state = cachedContact.state
+            else c.state = null
             return c
         })
 

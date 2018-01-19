@@ -24,9 +24,9 @@ class QueuesModule {
             // Update icon for toolbarbutton if this queuecallgroup
             // was selected earlier.
             if (this.app.env.isExtension) {
-                if (queue.id === this.app.state.queues.selected.queues.selected.id) {
-                    browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
-                }
+                // if (queue.id === this.app.state.queues.selected.queues.selected.id) {
+                //     browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                // }
             }
         }
 
