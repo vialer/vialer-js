@@ -1,9 +1,5 @@
 const Session = require('./session_webrtc')
-
-
-// Wait x miliseconds before resolving the subscribe event,
-// to prevent the server from being hammered.
-const SUBSCRIBE_DELAY = 150
+const Presence = require('./presence')
 
 
 /**
@@ -17,15 +13,13 @@ class Sip {
     */
     constructor(app) {
         this.app = app
-
         this.lib = require('sip.js')
 
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
         this.reconnect = true
         this.state = this.app.state.sip
-        this.states = {}
-        this.subscriptions = {}
+
 
         // The default connection timeout to start with.
         this.retryDefault = {interval: 2500, limit: 9000000}
@@ -141,9 +135,9 @@ class Sip {
         })
 
         this.ua.on('connected', () => {
+            this.presence = new Presence(this)
             this.app.setState({sip: {ua: {state: 'connected'}}})
             this.app.logger.info(`${this}SIP stack started`)
-            this.updatePresence()
         })
 
 
@@ -170,15 +164,7 @@ class Sip {
     */
     disconnect(reconnect = true) {
         this.reconnect = reconnect
-        this.states = {}
-        this.subscriptions = {}
 
-        // Unsubscribe from all.
-        if (this.subscriptions) {
-            $.each(this.subscriptions, (accountId) => {
-                this.unsubscribePresence(accountId)
-            })
-        }
         if (this.ua && this.ua.isConnected()) {
             this.ua.stop()
             this.app.logger.debug(`${this}disconnected`)
@@ -188,145 +174,11 @@ class Sip {
     }
 
 
-    /**
-    * Parse an incoming dialog XML request body and return
-    * the account state from it.
-    * @param {Request} notification - A SIP.js Request object.
-    * @returns {String} - The state of the account.
-    */
-    parseStateFromDialog(notification) {
-        let parser = new DOMParser()
-        let xmlDoc = parser ? parser.parseFromString(notification.request.body, 'text/xml') : null
-        let dialogNode = xmlDoc ? xmlDoc.getElementsByTagName('dialog-info')[0] : null
-        if (!dialogNode) throw Error('Notification message is missing a dialog node')
-
-        let stateAttr = dialogNode.getAttribute('state')
-        // let localNode = dialogNode.getElementsByTagName('local')[0]
-        let stateNode = dialogNode.getElementsByTagName('state')[0]
-        let state = 'unavailable'
-
-        if (stateAttr === 'full') {
-            state = 'available'
-        }
-
-        // State node has final say, regardless of stateAttr!
-        if (stateNode) {
-            switch (stateNode.textContent) {
-                case 'trying':
-                case 'proceeding':
-                case 'early':
-                    state = 'ringing'
-                    break
-                case 'confirmed':
-                    state = 'busy'
-                    break
-                case 'terminated':
-                    state = 'available'
-                    break
-            }
-        }
-        return state
-    }
-
-
-    /**
-    * Does the actual subscription to the SIP server.
-    * @param {Number} accountId - Account Id of VoIP-account to subscribe to.
-    * @returns {Promise} - Resolved when the subscription is ready.
-    */
-    subscribePresence(accountId) {
-        return new Promise((resolve, reject) => {
-            this.app.logger.debug(`${this}subscribe ${accountId}@voipgrid.nl dialog`)
-            this.subscriptions[accountId] = this.ua.subscribe(`${accountId}@voipgrid.nl`, 'dialog')
-            let contacts = this.app.state.contacts.contacts
-            let contactsLookup = new Map(contacts.map((c) => [c.account_id, c]))
-
-            this.subscriptions[accountId].on('notify', (notification) => {
-                const state = this.parseStateFromDialog(notification)
-                let contact = contactsLookup.get(accountId)
-                contact.state = state
-
-                setTimeout(() => {
-                    resolve({
-                        state: state,
-                    })
-                }, SUBSCRIBE_DELAY)
-            })
-        })
-    }
-
-
     toString() {
         return `${this.app}[sip] `
     }
 
 
-    /**
-    * Stop listening for subscriber events from the SIP server and remove
-    * the cached subscriber state.
-    * @param {Number} accountId - The accountId to deregister.
-    */
-    unsubscribePresence(accountId) {
-        if (this.ua.isConnected()) {
-            this.app.logger.debug(`${this}cannot unsubscribe presence ${accountId} without connection`)
-            return
-        }
-        this.app.logger.debug(`${this}unsubscribe presence ${accountId}`)
-        if (this.subscriptions.hasOwnProperty(accountId)) {
-            this.subscriptions[accountId].unsubscribe()
-            delete this.subscriptions[accountId]
-            delete this.states[accountId]
-        }
-    }
-
-
-    /**
-    * Update presence information for given account ids. The presence info
-    * is cached and will only subscribe for account ids that are not yet
-    * in the cached states object. This behaviour can be overridden using
-    * the `refresh` option. With `refresh`, all supplied account ids will
-    * have their presence updated from the SIP server.
-    * @param {Boolean} refresh - Force refreshing presence from the sip service.
-    */
-    async updatePresence() {
-        // The transport must be ready, in order to be able to update
-        // presence information from the SIP server.
-        if (!this.ua || !this.ua.isConnected()) {
-            this.app.logger.warn(`${this}cannot update presence without websocket connection.`)
-            return
-        }
-
-        let accountIds = this.app.state.contacts.contacts.map((c) => c.account_id)
-        // Always unsubscribe lost contacts that are in cache, but not in
-        // the accountIds refresh array.
-        const oldCachedAccountIds = Object.keys(this.states).filter((k, v) => !accountIds.includes(Number(k)))
-
-        if (oldCachedAccountIds.length) {
-            this.app.logger.debug(`${this}SIP subscription unsubscribe cleanup for ${oldCachedAccountIds.length} accounts`)
-            for (let accountId of oldCachedAccountIds) {
-                this.unsubscribePresence(Number(accountId))
-            }
-        }
-
-        const accountIdsWithoutState = accountIds.filter((accountId) => !(accountId in this.states))
-
-        if (accountIdsWithoutState.length) {
-            this.app.logger.info(`${this}subscribe presence for ${accountIdsWithoutState.length} accounts`)
-            this.app.emit('sip:presences.start_update')
-            this.app.setState({contacts: {sip: {state: 'updating'}}})
-
-            for (const accountId of accountIdsWithoutState) {
-                // We could do this in parallel, but we don't to keep the load on
-                // the websocket server low. Also subscribePresence has a fixed
-                // timeout before it resolves the connected state, to further slow
-                // down the presence requests.
-                await this.subscribePresence(Number(accountId))
-            }
-
-            // Clear loading indicator in the ui.
-            this.app.emit('sip:presences.updated')
-        }
-    }
 }
 
 module.exports = Sip

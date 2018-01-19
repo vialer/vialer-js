@@ -24,17 +24,34 @@ class ContactsModule {
             return
         }
 
-        let contacts = res.data.objects
-        console.log("LENGTH:", contacts.length)
-        this.lookup.contacts = new Map(contacts.map((c) => [c.account_id, c]))
+        let contacts = res.data.objects.filter((c) => c.sipreginfo)
+
         this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
+
+        const contactsLookup = new Map(contacts.map((c) => [c.account_id, c]))
+        const cachedContactsLookup = new Map(this.app.state.contacts.contacts.map((c) => [c.account_id, c]))
+
+        contacts = contacts.map((c) => {
+            c.state = cachedContactsLookup.get(c.account_id).state
+            return c
+        })
 
         // Remove accounts that are not currently registered
         // to a device.
 
-        contacts = contacts.filter((c) => c.sipreginfo)
+        let invalidContacts = []
+
+        let cachedContacts = this.app.state.contacts.contacts
+        for (let cachedContact of cachedContacts) {
+            if (!contactsLookup.get(cachedContact.account_id)) invalidContacts.push(cachedContact)
+        }
+
+        for (const contact of invalidContacts) {
+            this.app.sip.presence.unsubscribe(contact.account_id)
+        }
+
         this.app.setState({contacts: {contacts: contacts}})
-        if (contacts.length) this.app.sip.updatePresence()
+        if (contacts.length) this.app.sip.presence.update()
     }
 
 
