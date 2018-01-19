@@ -24,5 +24,5 @@ $red-color: #d9534f !default;
 $brand-tint-color: saturate(adjust-hue($brand-color, 10%), 10%);
 $grey-darkest: darken($grey-color, 30%);
 $grey-darker: darken($grey-color, 10%);
-$grey-color-lighter: lighten($grey-color, 10%);
-$grey-color-lightest: lighten($grey-color, 30%);
+$grey-color-lighter: lighten($grey-color, 35%);
+$grey-color-lightest: lighten($grey-color, 38%);

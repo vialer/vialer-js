@@ -1,5 +1,5 @@
 // Entrypoint for all vendor SCSS.
-@import "variables";
+@import "lib/variables";
 
 // Variable overrides for included libraries.
 $primary: $brand-color;

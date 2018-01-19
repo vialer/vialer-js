@@ -366,23 +366,24 @@ gulp.task('manifest-webext', 'Generate a manifest for a browser WebExtension.', 
 
 gulp.task('scss', 'Compile all css.', [], (done) => {
     runSequence([
-        'scss-main',
+        'scss-app',
         'scss-print',
     ], () => {
         // Targetting webext.css for livereload changed only works in the
         // webview.
-        if (settings.LIVERELOAD) livereload.changed('main.css')
+        if (settings.LIVERELOAD) livereload.changed('app.css')
         done()
     })
 }, {options: taskOptions.all})
 
 
-gulp.task('scss-main', 'Generate main application css.', () => {
+gulp.task('scss-app', 'Generate application css.', () => {
     return helpers.scssEntry(
         settings.BRAND_TARGET,
         settings.BUILD_TARGET,
-        'main',
+        'app',
         !settings.PRODUCTION,
+        // Mixin the component scss.
         path.join(settings.SRC_DIR, 'components', '**', '*.scss'))
 }, {options: taskOptions.all})
 
@@ -478,7 +479,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     gulp.watch([
         path.join(__dirname, 'src', 'scss', '**', '*.scss'),
         path.join(__dirname, 'src', 'components', '**', '*.scss'),
-    ], ['scss-main'])
+    ], ['scss-app'])
 
     gulp.watch(path.join(__dirname, 'src', 'scss', 'vendor.scss'), ['scss-vendor'])
 
