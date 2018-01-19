@@ -1,5 +1,5 @@
 const Session = require('./session_webrtc')
-const SIP = require('sip.js')
+
 
 // Wait x miliseconds before resolving the subscribe event,
 // to prevent the server from being hammered.
@@ -17,6 +17,8 @@ class Sip {
     */
     constructor(app) {
         this.app = app
+
+        this.lib = require('sip.js')
 
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
@@ -48,6 +50,19 @@ class Sip {
         this.app.on('bg:sip:toggle_hold', () => {
             if (!this.state.session.hold) this.session.hold()
             else this.session.unhold()
+        })
+
+        this.app.on('bg:sip:toggle_transfer', () => {
+            if (!this.state.session.transfer) {
+                this.session.hold()
+                this.session.toggleTransferMode(true)
+            } else {
+                this.session.toggleTransferMode(false)
+            }
+        })
+
+        this.app.on('bg:sip:blind_transfer', ({number}) => {
+            this.session.blindTransfer(number)
         })
 
         // Self-initiated request to stop the session during one of
@@ -108,7 +123,7 @@ class Sip {
 
         this.app.setState({sip: {ua: {state: 'disconnected'}}})
 
-        this.ua = new SIP.UA(uaOptions)
+        this.ua = new this.lib.UA(uaOptions)
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {

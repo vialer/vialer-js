@@ -16,6 +16,9 @@ module.exports = (app, actions) => {
             },
         },
         methods: {
+            blindTransfer: function(number) {
+                app.emit('bg:sip:blind_transfer', {number})
+            },
             callContact: function(contact) {
                 let forceSilent = false
                 if (app.env.isExtension && app.env.role.popout) forceSilent = true
@@ -26,11 +29,13 @@ module.exports = (app, actions) => {
                     forceSilent: forceSilent,
                 })
             },
+
         },
         render: templates.contacts.r,
         staticRenderFns: templates.contacts.s,
         store: {
             module: 'contacts',
+            sip: 'sip',
         },
     }
 }

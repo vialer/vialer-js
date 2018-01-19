@@ -25,23 +25,15 @@ class ContactsModule {
         }
 
         let contacts = res.data.objects
+        console.log("LENGTH:", contacts.length)
         this.lookup.contacts = new Map(contacts.map((c) => [c.account_id, c]))
         this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
 
         // Remove accounts that are not currently registered
         // to a device.
-        for (let i = contacts.length - 1; i >= 0; i--) {
-            if (!contacts[i].hasOwnProperty('sipreginfo')) contacts.splice(i, 1)
-        }
 
-        this.app.state.contacts.contacts = contacts
-
-        this.app.setState({
-            contacts: {
-                contacts: this.app.state.contacts.contacts,
-            },
-        }, true)
-
+        contacts = contacts.filter((c) => c.sipreginfo)
+        this.app.setState({contacts: {contacts: contacts}})
         if (contacts.length) this.app.sip.updatePresence()
     }
 

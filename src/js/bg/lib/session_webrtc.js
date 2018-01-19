@@ -7,11 +7,7 @@ const Session = require('./session')
 class WebRTCSession extends Session {
 
     constructor(sip, numberOrSession) {
-        super(app, sip, numberOrSession)
-
-        this.app = sip.app
-        this.ua = sip.ua
-        this.state = this.app.state.sip
+        super(sip, numberOrSession)
 
         this.localVideo = document.querySelector('.local')
         this.remoteVideo = document.querySelector('.remote')
@@ -109,12 +105,15 @@ class WebRTCSession extends Session {
                 number: this.number,
                 session: {state: 'invite'},
             },
+            ui: {layer: 'calldialog'},
         })
 
         this.playRingtone()
 
         this.session.on('accepted', () => {
-            this.app.setState({sip: {session: {state: 'accepted'}}})
+            this.app.setState({
+                sip: {session: {state: 'accepted'}},
+            })
             this.muteRingtone()
             this.startTimer()
         })
@@ -130,6 +129,24 @@ class WebRTCSession extends Session {
             this.resetState()
             this.localVideo.srcObject = null
             this.stopTimer()
+        })
+
+        // Blind transfer.
+        this.session.on('refer', (target) => {
+            this.session.bye()
+        })
+
+        // Triggered when a transfer attempt is made.
+        this.session.on('referRequested', (context) => {
+            // Outgoing REFER Request
+            console.log(context)
+            // if (context instanceof this.sip.lib.ReferClientContext) {
+            //
+            // }
+            // // Incoming REFER Request
+            // if (context instanceof this.sip.lib.ReferServerContext) {
+            //
+            // }
         })
     }
 
@@ -152,6 +169,7 @@ class WebRTCSession extends Session {
         ringBackTone.play()
 
         this.session.on('accepted', (data) => {
+            console.log("ACCEPTED", data)
             ringBackTone.stop()
             // Displayname
             this.displayName = this.session.remoteIdentity.displayName
@@ -178,6 +196,12 @@ class WebRTCSession extends Session {
         })
 
 
+        // Blind transfer.
+        this.session.on('refer', (target) => {
+            console.log("REFER:", target)
+            this.session.bye()
+        })
+
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (request) => {
             this.app.setState({sip: {session: {state: 'bye'}}})
@@ -193,6 +217,15 @@ class WebRTCSession extends Session {
         })
     }
 
+
+    toggleTransferMode(active) {
+        this.app.setState({sip: {session: {transfer: active}}})
+    }
+
+
+    blindTransfer(number) {
+        this.session.refer(`sip:${number}@voipgrid.nl`)
+    }
 
     unhold() {
         this.app.setState({sip: {session: {hold: false}}})

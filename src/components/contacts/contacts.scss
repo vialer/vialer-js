@@ -3,8 +3,9 @@
 .contacts-component {
 
     // A single contact item in the contacts list.
-    .contact {
+    .list-item.contact {
         display: flex;
+        justify-content: space-between;
         padding: 8px;
 
         .icon i {color: $grey-color;}
@@ -18,12 +19,23 @@
         }
 
         .info {
+            flex-grow: 1;
+
             .name {
                 font-weight: 500;
             }
 
             .description {
                 color: $grey-darker;
+            }
+        }
+
+        .options {
+            .option {
+                &:hover {
+                    color: $brand-color;
+                    cursor: pointer;
+                }
             }
         }
     }

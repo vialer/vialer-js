@@ -3,8 +3,12 @@
 */
 class Session {
 
-    constructor(...args) {
-        Object.assign(this, args)
+    constructor(sip, numberOrSession) {
+        this.sip = sip
+
+        this.app = this.sip.app
+        this.ua = this.sip.ua
+        this.state = this.app.state.sip
     }
 
 

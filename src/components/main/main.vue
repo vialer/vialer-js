@@ -27,7 +27,7 @@
             <template v-else-if="$store.ui.layer==='settings'">
                 <Settings></Settings>
             </template>
-            <template v-else-if="$store.ui.layer==='dialpad'">
+            <template v-else-if="$store.ui.layer==='calldialog'">
                 <CallDialog :keypad="$store.sip.session.state"></CallDialog>
             </template>
         </div>

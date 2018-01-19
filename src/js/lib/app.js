@@ -108,11 +108,17 @@ class App extends Skeleton {
                         current: null,
                         start: null,
                     },
+                    transfer: false,
                     type: '',
                 },
                 transferSession: {
                     hold: false,
                     state: null,
+                    timer: {
+                        current: null,
+                        start: null,
+                    },
+                    type: 'blind',
                 },
                 ua: {
                     state: null,

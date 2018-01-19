@@ -17,7 +17,7 @@
 
     <!-- Call options during a call -->
     <div class="call-options" v-if="['accepted'].includes(sip.session.state)">
-        <div class="option"  @click="transferButton">
+        <div class="option"  @click="toggleTransfer" :class="{'active': sip.session.transfer}">
             <div class="icon"><i class="fa fa-hand-scissors-o"></i></div>
             <p>transfer</p>
         </div>

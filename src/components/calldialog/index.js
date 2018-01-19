@@ -8,7 +8,6 @@ module.exports = (app, utils) => {
                 intervalId: 0,
                 keypad: false,
                 startDate: new Date().getTime(),
-                transfer: false,
             }
         },
         destroyed: function() {
@@ -34,10 +33,8 @@ module.exports = (app, utils) => {
             toggleKeypad: function() {
                 this.keypad = !this.keypad
             },
-            transferButton: function() {
-                // Show hide the transfer window.
-                this.transfer = !this.transfer
-                // app.emit('sip:start_transfer')
+            toggleTransfer: function() {
+                app.emit('bg:sip:toggle_transfer')
             },
         },
         render: templates.calldialog.r,
