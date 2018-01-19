@@ -37,27 +37,22 @@ class Sip {
         // Start with a clean state.
         this.app.setState({sip: this.app.getDefaultState().sip})
 
-        this.app.on('sip:accept_session', () => {
+        this.app.on('bg:sip:accept_session', () => {
             this.session.answer()
         })
 
-        this.app.on('sip:dtmf', ({key}) => {
+        this.app.on('bg:sip:dtmf', ({key}) => {
             this.session.session.dtmf(key)
         })
 
-        this.app.on('sip:toggle_hold', () => {
-            if (!this.state.hold) {
-                this.session.session.hold()
-                this.state.hold = true
-            } else {
-                this.session.session.unhold()
-                this.state.hold = false
-            }
+        this.app.on('bg:sip:toggle_hold', () => {
+            if (!this.state.session.hold) this.session.hold()
+            else this.session.unhold()
         })
 
         // Self-initiated request to stop the session during one of
         // the phases of a call.
-        this.app.on('sip:stop_session', () => {
+        this.app.on('bg:sip:stop_session', () => {
             this.session.hangup()
         })
 

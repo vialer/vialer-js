@@ -54,7 +54,7 @@
         justify-content: space-between;
         align-items: center;
         flex-direction: row;
-        padding: 0 40px;
+        padding: 0 ($spacer * 5);
 
         .option {
             text-align: center;
@@ -92,6 +92,10 @@
         align-self: flex-end;
 
         .action {
+            &:hover {
+                cursor: pointer;
+            }
+
             &.decline {
                 color: $red-color;
             }
@@ -103,10 +107,6 @@
             &.dial {
                 .fa-circle {
                     color: $green-color;
-                }
-
-                &:hover {
-                    cursor: pointer;
                 }
             }
         }

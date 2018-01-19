@@ -77,6 +77,12 @@ class WebRTCSession extends Session {
     }
 
 
+    hold() {
+        this.app.setState({sip: {session: {hold: true}}})
+        this.session.hold()
+    }
+
+
     muteRingtone() {
         this.ringtone.stop()
     }
@@ -185,6 +191,12 @@ class WebRTCSession extends Session {
             this.resetState()
             ringBackTone.stop()
         })
+    }
+
+
+    unhold() {
+        this.app.setState({sip: {session: {hold: false}}})
+        this.session.unhold()
     }
 }
 

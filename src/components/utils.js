@@ -9,6 +9,7 @@ module.exports = function(app) {
         return {
             sip: {
                 accepted: {
+                    hold: $t('On hold'),
                     incoming: $t('Connected'),
                     outgoing: $t('Calling'),
                 },
@@ -25,6 +26,10 @@ module.exports = function(app) {
             callStatus: function() {
                 const translations = utils.getTranslations()
                 if (this.sip.session.state === 'accepted') {
+                    if (this.sip.session.hold) {
+                        return translations.sip.accepted.hold
+                    }
+
                     return translations.sip.accepted[this.sip.session.type]
                 }
                 return translations.sip[this.sip.session.state]

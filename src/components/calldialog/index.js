@@ -16,7 +16,7 @@ module.exports = (app, utils) => {
         },
         methods: {
             acceptSession: function() {
-                app.emit('sip:accept_session')
+                app.emit('bg:sip:accept_session')
             },
             dial: function(number) {
                 app.emit('dialer:dial', {
@@ -26,11 +26,10 @@ module.exports = (app, utils) => {
                 })
             },
             stopSession: function() {
-                app.emit('sip:stop_session')
+                app.emit('bg:sip:stop_session')
             },
             toggleHold: function() {
-                this.hold = !this.hold
-                app.emit('sip:toggle_hold')
+                app.emit('bg:sip:toggle_hold')
             },
             toggleKeypad: function() {
                 this.keypad = !this.keypad
