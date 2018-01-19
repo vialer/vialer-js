@@ -1,13 +1,13 @@
 <div id="app" class="main-component">
 
     <template v-if="!$store.user.authenticated">
-        <Navigation></Navigation>
+        <Statusbar></Statusbar>
         <Settings v-if="$store.ui.layer==='settings'"></Settings>
         <Login v-if="$store.ui.layer==='login'"></Login>
     </template>
 
     <template v-else>
-        <Navigation></Navigation>
+        <Statusbar></Statusbar>
 
         <div class="panel">
             <Sidebar></Sidebar>

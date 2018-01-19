@@ -26,7 +26,6 @@ module.exports = (app, actions) => {
                     forceSilent: forceSilent,
                 })
             },
-            toggleActive: actions.toggleActive,
         },
         render: templates.contacts.r,
         staticRenderFns: templates.contacts.s,

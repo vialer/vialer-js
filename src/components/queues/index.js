@@ -6,7 +6,6 @@ module.exports = (app, actions) => {
                 this.module.selectedQueue = queue.id
                 app.emit('queues:queue.select', {id: queue.id})
             },
-            toggleActive: actions.toggleActive,
         },
         render: templates.queues.r,
         staticRenderFns: templates.queues.s,

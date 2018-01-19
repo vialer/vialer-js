@@ -1,4 +1,4 @@
-<div class="navigation-component">
+<div class="statusbar-component">
     <div v-if="user.authenticated" class="user-name">
         {{user.username}}
         <i v-if="user.authenticated" class="icon-logout" :title="$t('Log out')" @click="logout()"></i>

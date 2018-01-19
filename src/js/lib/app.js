@@ -17,9 +17,9 @@ class App extends Skeleton {
         let actions = require('../../components/actions')(this)
 
         Vue.component('Sidebar', require('../../components/sidebar')(this, actions))
+        Vue.component('Statusbar', require('../../components/statusbar')(this, actions))
         Vue.component('Field', require('../../components/field')(this, actions))
         Vue.component('CallDialog', require('../../components/calldialog')(this, actions))
-        Vue.component('Navigation', require('../../components/navigation')(this, actions))
         Vue.component('Availability', require('../../components/availability')(this, actions))
         Vue.component('Contacts', require('../../components/contacts')(this, actions))
         Vue.component('Login', require('../../components/login')(this, actions))
