@@ -19,7 +19,7 @@
             "js/vendor.js",
             "js/templates.js",
             "js/translations.js",
-            "js/webext_bg.js"
+            "js/app_bg.js"
         ]
     },
     "commands": {
@@ -44,7 +44,7 @@
             ],
             "js": [
                 "js/vendor.js",
-                "js/webext_tab.js"
+                "js/app_tab.js"
             ],
             "run_at": "document_end",
             "all_frames": false
@@ -55,7 +55,7 @@
             ],
             "js": [
                 "js/vendor.js",
-                "js/webext_observer.js"
+                "js/app_observer.js"
             ],
             "run_at": "document_end",
             "all_frames": true
