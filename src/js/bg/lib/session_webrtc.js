@@ -139,7 +139,7 @@ class WebRTCSession extends Session {
         // Triggered when a transfer attempt is made.
         this.session.on('referRequested', (context) => {
             // Outgoing REFER Request
-            console.log(context)
+            // console.log(context)
             // if (context instanceof this.sip.lib.ReferClientContext) {
             //
             // }
@@ -169,7 +169,6 @@ class WebRTCSession extends Session {
         ringBackTone.play()
 
         this.session.on('accepted', (data) => {
-            console.log("ACCEPTED", data)
             ringBackTone.stop()
             // Displayname
             this.displayName = this.session.remoteIdentity.displayName
@@ -198,7 +197,6 @@ class WebRTCSession extends Session {
 
         // Blind transfer.
         this.session.on('refer', (target) => {
-            console.log("REFER:", target)
             this.session.bye()
         })
 
