@@ -1,3 +1,5 @@
+@import "../../scss/lib/variables";
+
 .main-component {
     display: flex;
     flex-direction: column;
@@ -5,14 +7,18 @@
     .panel {
         display: flex;
 
+        .panel-sidebar {
+            width: $spacer * 5;
+        }
+
         .panel-content {
-            padding: 24px;
+            padding: $spacer * 3;
             width: 100%;
 
             h1 {
                 text-transform: uppercase;
-                color: $brand-color;
                 font-weight: 500;
+                color: $brand-color;
             }
         }
     }

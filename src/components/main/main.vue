@@ -10,7 +10,7 @@
         <Statusbar></Statusbar>
 
         <div class="panel">
-            <Sidebar></Sidebar>
+            <Sidebar class="panel-sidebar"></Sidebar>
 
             <template v-if="$store.ui.layer==='availability'">
                 <Availability></Availability>

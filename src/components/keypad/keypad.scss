@@ -1,11 +1,10 @@
-@import "../../scss/variables";
-@import "../../scss/mixins";
+@import "../../scss/lib/variables";
+@import "../../scss/lib/mixins";
 
 .keypad-component {
     width: 100%;
 
     .number-input {
-
         color: $brand-color;
         display: flex;
         justify-content: center;
@@ -55,17 +54,14 @@
             width: 60px;
             height: 60px;
             margin-bottom: 10px;
-
+            border-radius: 100%;
             break-inside: avoid;
+
             font-size: 1rem;
             font-weight: bold;
             border: 2px solid $brand-color;
             background: #fff;
             color: $brand-color;
-
-
-            border-radius: 100%;
-
 
             &:hover {
                 cursor: pointer;
@@ -95,11 +91,4 @@
         text-align: center;
         padding: 10px;
     }
-
-}
-
-a, a:visited {
-    color: #333;
-    text-decoration: none;
-    font-weight: bold;
 }

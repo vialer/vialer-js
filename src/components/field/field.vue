@@ -63,7 +63,7 @@
 </div>
 
 <div class="field" v-else-if="type === 'text'">
-    <label :class="{'required': vRequired()}" :for="name">{{label}}</label>
+    <label :class="{'required': vRequired(), 'label': true}" :for="name">{{label}}</label>
     <div class="control">
         <input type="text" v-bind:class="{'is-danger': vInvalid(), 'input': true}"
             v-on:input="vChange($event, $event.target.value)" v-bind:value="vmodel"

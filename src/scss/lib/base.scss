@@ -1,3 +1,4 @@
+// Generic styles. Keep this file below 300 lines.
 html,
 body {
     width: 100%;
@@ -10,31 +11,29 @@ body {
 body {
     color: $primary-color;
     width: 400px;
+
+    // Bulma label class override.
+    .label {
+        color: $primary-color;
+        font-weight: 500;
+    }
 }
 
 * {
     box-sizing: border-box;
 }
 
-// Hide elements.
-.hide {
-    display: none;
-}
+.hide {display: none;}
 
-
-.list {
+.list-items {
     .list-item {
         display: flex;
 
-        &:nth-child(even) {
-            background: grey-lightest;
-        }
+        &:nth-child(even) {background: $grey-color-lightest;}
 
-        &:nth-child(odd) {
-            background: grey-lighter;
-        }
+        &:nth-child(odd) {background: $grey-color-lighter;}
 
-        .icon i {color: grey-light;}
+        .icon i {color: $grey-color;}
         .icon.busy i {color: $red-color;}
         .icon.available i {color: $green-color;}
 

@@ -1,6 +1,6 @@
-@import "../../scss/variables";
+@import "../../scss/lib/variables";
 
 // The login container.
 .login-component {
-    padding: 10px;
+    padding: $spacer * 2;
 }
