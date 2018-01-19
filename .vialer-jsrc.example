@@ -13,14 +13,11 @@
                 "webview": ""
             },
             "colors": {
-                "vg-brand-color": "#de6b35",
-                "vg-failed-color": "#d9534f",
-                "vg-grey-light": "#999",
-                "vg-grey-lighter": "#e5e5e5",
-                "vg-grey-lightest": "#fbfbfb",
-                "vg-primary-color": "#3c3c50",
-                "vg-state-available-color": "#5cb85c",
-                "vg-state-busy-color": "#d9534f"
+                "brand-color": "#de6b35",
+                "grey-color": "#999",
+                "primary-color": "#3c3c50",
+                "green-color": "#5cb85c",
+                "red-color": "#d9534f"
             },
             "store": {
                 "firefox": {

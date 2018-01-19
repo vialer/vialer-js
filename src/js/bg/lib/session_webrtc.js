@@ -79,6 +79,8 @@ class WebRTCSession extends Session {
 
     setupIncomingCall(session) {
         this.type = 'incoming'
+        this.app.setState({sip: {session: {type: this.type}}})
+
         // An invite; incoming call.
         this.session = session
         this.displayName = this.session.remoteIdentity.displayName
@@ -115,6 +117,7 @@ class WebRTCSession extends Session {
 
     setupOutgoingCall(number) {
         this.type = 'outgoing'
+        this.app.setState({sip: {session: {type: this.type}}})
         // An outgoing call.
         this.number = number
         this.session = this.ua.invite(`sip:${this.number}@voipgrid.nl`, this._sessionOptions)

@@ -1,5 +1,3 @@
-$font-path: "../fonts";
-
 .title + hr {
     margin: 1.3rem 0;
 }
@@ -25,13 +23,18 @@ $font-path: "../fonts";
     src: local("Roboto Medium"), local("Roboto-Medium"), url("#{$font-path}/Roboto-Medium.woff2") format("woff2");
 }
 
-
 @font-face {
     font-family: "vialer-js";
     src: url("#{$font-path}/vialer-js.woff") format("woff");
     font-weight: normal;
     font-style: normal;
 }
+
+$icon-toggle-up: "\e910";
+$icon-toggle-down: "\e90d";
+$icon-check: "\e901";
+$icon-checkbox-checked: "\f046";
+$icon-checkbox-unchecked: "\f096";
 
 // Our own custom font, containing all icons.
 [class^="icon-"], [class*=" icon-"] {
@@ -45,7 +48,6 @@ $font-path: "../fonts";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-
 
 .fa-blink,
 .icon-blink {
@@ -75,9 +77,9 @@ $font-path: "../fonts";
 }
 
 @keyframes ringing {
-    0% {color: $vg-state-busy-color;}
-    50% {color: $vg-state-available-color;}
-    100% {color: $vg-state-busy-color;}
+    0% {color: $red-color;}
+    50% {color: $green-color;}
+    100% {color: $red-color;}
 }
 
 .icon-phone-hang-up:before {

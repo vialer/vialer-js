@@ -6,7 +6,7 @@
 
     .number-input {
 
-        color: $vg-brand-color;
+        color: $brand-color;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -23,7 +23,7 @@
             text-align: center;
             padding: 0 50px;
             background: transparent;
-            color: $vg-brand-color;
+            color: $brand-color;
         }
 
         i {
@@ -59,9 +59,9 @@
             break-inside: avoid;
             font-size: 1rem;
             font-weight: bold;
-            border: 2px solid $vg-brand-color;
+            border: 2px solid $brand-color;
             background: #fff;
-            color: $vg-brand-color;
+            color: $brand-color;
 
 
             border-radius: 100%;
@@ -82,7 +82,7 @@
     }
 
     .dial {
-        color: $vg-state-available-color;
+        color: $green-color;
         font-weight: bold;
         font-size: 3rem;
 

@@ -104,6 +104,7 @@ class App extends Skeleton {
                 session: {
                     hold: false,
                     state: null,
+                    type: '',
                 },
                 transferSession: {
                     hold: false,

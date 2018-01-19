@@ -8,7 +8,7 @@ body {
 }
 
 body {
-    color: $vg-primary-color;
+    color: $primary-color;
     width: 400px;
 }
 
@@ -27,16 +27,16 @@ body {
         display: flex;
 
         &:nth-child(even) {
-            background: $vg-grey-lightest;
+            background: grey-lightest;
         }
 
         &:nth-child(odd) {
-            background: $vg-grey-lighter;
+            background: grey-lighter;
         }
 
-        .icon i {color: $vg-grey-light;}
-        .icon.busy i {color: $vg-state-busy-color;}
-        .icon.available i {color: $vg-state-available-color;}
+        .icon i {color: grey-light;}
+        .icon.busy i {color: $red-color;}
+        .icon.available i {color: $green-color;}
 
         // Ringing state is a css keyframe animation.
         .icon.ringing i {
@@ -50,7 +50,7 @@ body {
             }
 
             .description {
-                color: $vg-primary-color;
+                color: $primary-color;
             }
         }
     }

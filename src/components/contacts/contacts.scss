@@ -8,9 +8,9 @@
         display: flex;
         padding: 8px;
 
-        .icon i {color: $vg-grey-light;}
-        .icon.busy i {color: $vg-state-busy-color;}
-        .icon.available i {color: $vg-state-available-color;}
+        .icon i {color: grey-light;}
+        .icon.busy i {color: $red-color;}
+        .icon.available i {color: $green-color;}
 
         // Ringing state is a css keyframe animation.
         .icon.ringing i {
@@ -24,7 +24,7 @@
             }
 
             .description {
-                color: $vg-grey-dark;
+                color: $grey-darker;
             }
         }
     }

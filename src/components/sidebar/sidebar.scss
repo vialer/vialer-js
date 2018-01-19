@@ -1,6 +1,6 @@
 .sidebar-component {
     width: 40px;
-    background: $vg-brand-color;
+    background: $brand-color;
     border-radius: 0 0 0 5px;
     text-align: center;
 
@@ -16,7 +16,7 @@
         &.active,
         &:hover {
             background: #fff;
-            color: $vg-brand-color;
+            color: $brand-color;
             cursor: pointer;
         }
     }

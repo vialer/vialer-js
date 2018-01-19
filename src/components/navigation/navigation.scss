@@ -3,29 +3,28 @@
 // The most upper box containing account info and
 // icon-links to several locations.
 .navigation-component {
-    background: $vg-brand-variant-color;
+    background: $brand-tint-color;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 32px;
     color: #fff;
-    border-bottom: 1px solid $vg-grey-lighter;
+    border-bottom: 1px solid grey-lighter;
 
     [class^="icon-"], [class*=" icon-"]:hover {
-        color: $vg-brand-color;
+        color: $brand-color;
     }
 
     .user-name {
         // don't wrap but put dots at the end if it doesn't fit.
         white-space: nowrap;
-        margin-left: 16px;
+        margin-left: $spacer * 2;
 
         i {
             line-height: 32px;
             margin-left: 8px;
             color: #fff;
-            width: $vg-widget-header-size-small;
             text-align: center;
             vertical-align: middle;
             font-size: 0.9rem;
@@ -41,14 +40,11 @@
     .options {
         display: flex;
         flex-direction: row-reverse;
+        vertical-align: middle;
         font-size: 1.2rem;
 
-        // Position the last icon in line with the rest.
-        margin-right: $vg-spacing-gap - 2px;
-        vertical-align: middle;
-
         .option {
-            margin-left: $vg-spacing-1;
+            margin-left: $spacer;
             line-height: 32px;
             height: 32px;
             padding: 0 4px;
@@ -59,12 +55,12 @@
 
                 &:hover {
                     cursor: pointer;
-                    background: $vg-brand-color;
+                    background: $brand-color;
 
                 }
 
                 &.active {
-                    color: $vg-brand-color;
+                    color: $brand-color;
                 }
             }
         }

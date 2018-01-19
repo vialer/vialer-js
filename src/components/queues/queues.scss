@@ -4,7 +4,7 @@
 
     .queue {
         .icon {
-            width: $vg-widget-header-size;
+            width: $spacer * 3;
             vertical-align: center;
             text-align: center;
 
@@ -15,14 +15,14 @@
                 display: inline-block;
                 width: 1.1rem;
                 height: 1.1rem;
-                background: $vg-state-busy-color;
+                background: $red-color;
                 line-height: 1.1rem;
                 letter-spacing: 0;
                 // Centers the icon in the middle of the background.
                 font-size: 0.8rem;
                 font-style: normal;
                 font-weight: 500;
-                border-radius: $vg-spacing-4;
+                border-radius: 100%;
                 color: #fff;
             }
         }

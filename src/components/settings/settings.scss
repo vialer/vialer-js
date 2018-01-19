@@ -16,13 +16,13 @@
 
 
     .field {
-        padding-bottom: $vg-spacing-1;
+        padding-bottom: $spacer;
 
         label {
             font-weight: 500;
             vertical-align: middle;
             display: inline-block;
-            padding-bottom: $vg-spacing-1;
+            padding-bottom: $spacer;
         }
 
         label + input {
@@ -33,7 +33,7 @@
         .warning {
             padding: 0;
             margin: 0;
-            color: $vg-failed-color;
+            color: $red-color;
             line-height: 25px;
             position: absolute;
         }

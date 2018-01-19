@@ -7,15 +7,13 @@
     flex-wrap: wrap;
     color: #fff;
 
-    &.no-state {
+    &.call-active {
+        background: linear-gradient(180deg, $brand-color, $brand-tint-color);
+    }
+
+    &.no-call {
         background: #fff;
     }
-
-    &.state {
-        background: linear-gradient(180deg, $vg-brand-color, $vg-brand-variant-color);
-    }
-
-
 
     .option {
         &:hover {
@@ -23,30 +21,34 @@
         }
     }
 
-    .session-status {
-        align-self: flex-start;
-        width: 100%;
-        text-align: center;
-        font-weight: 500;
-        font-size: 1.5rem;
-    }
-
     .call-info {
         align-self: flex-start;
         width: 100%;
         text-align: center;
         font-weight: 500;
-        font-size: 2rem;
+        margin-bottom: 8px;
+
+        .info-status {
+            font-size: 1rem;
+        }
+
+        .info-number {
+            font-size: 2rem;
+        }
+
+        .info-name {
+            font-size: 1rem;
+        }
+
+        &.info-timer {
+            width: 100%;
+            font-weight: 500;
+            font-size: 2rem;
+            text-align: center;
+        }
     }
 
-    .timer {
-        width: 100%;
-        font-weight: 500;
-        font-size: 2rem;
-        text-align: center;
-    }
-
-    .options {
+    .call-options {
         width: 100%;
         display: flex;
         justify-content: space-between;
@@ -62,7 +64,7 @@
                     background: #fff;
 
                     i {
-                        color: $vg-brand-color;
+                        color: $brand-color;
                     }
                 }
             }
@@ -83,28 +85,29 @@
         }
     }
 
-    .actions {
+    .call-actions {
         width: 100%;
-        align-self: flex-end;
         display: flex;
         justify-content: center;
+        align-self: flex-end;
 
-        .decline {
-            color: $vg-state-busy-color;
-        }
-
-        .accept {
-            color: $vg-state-available-color;
-        }
-
-
-        .dial-button {
-            .fa-circle {
-                color: $vg-state-available-color;
+        .action {
+            &.decline {
+                color: $red-color;
             }
 
-            &:hover {
-                cursor: pointer;
+            &.accept {
+                color: $green-color;
+            }
+
+            &.dial {
+                .fa-circle {
+                    color: $green-color;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                }
             }
         }
     }

@@ -1,21 +1,10 @@
-// Dimensions.
-$vg-spacing-1: 8px;
-$vg-spacing-2: 16px;
-$vg-spacing-3: 24px;
-$vg-spacing-4: 32px;
-$vg-spacing-5: 40px;
-$vg-spacing-6: 48px;
-$vg-spacing-7: 56px;
+// Paths.
+$font-path: "../fonts";
 
-// Visual gap that lines out with the widget icon that is
-// a 1.3rem centered font in a 45px box.
-$vg-spacing-gap: 13px;
+// Dimensions: spacing units.
+$spacer: 8px;
 
-$vg-widget-header-size: 55px;
-$vg-widget-header-size-small: 40px;
-$vg-widget-header-size-combined: $vg-widget-header-size + $vg-widget-header-size-small;
-$vg-border-radius: $vg-spacing-1;
-
+// Dimensions: Responsive queries.
 $mini: 250px;
 $mobile: 369px;
 $widget: 400px;
@@ -24,32 +13,16 @@ $desktop: 960px;
 $widescreen: 1152px;
 $fullhd: 1344px;
 
+// Colors: Base variable color palette; overriden by vialer-jsrc colors object.
+$brand-color: #de6b35 !default;
+$grey-color: #999 !default;
+$primary-color: #3c3c50 !default;
+$green-color: #5cb85c !default;
+$red-color: #d9534f !default;
 
-// Make sure to keep these in sync with the icons in fonts.scss.
-$icon-toggle-up: "\e910";
-$icon-toggle-down: "\e90d";
-$icon-check: "\e901";
-$icon-checkbox-checked: "\f046";
-$icon-checkbox-unchecked: "\f096";
-
-// Default colors; can be overriden by vialer-jsrc
-$vg-brand-color: #de6b35 !default;
-
-$brandhue: adjust-hue($vg-brand-color, 10%);
-$vg-brand-variant-color: saturate($brandhue, 10%);
-
-$vg-failed-color: #d9534f !default;
-
-$vg-grey-dark: #e6e7eb !default;
-$vg-grey-light: #e5e5e5 !default;
-$vg-grey-lighter: #f2f3f5 !default;
-$vg-grey-lightest: #fefefe !default;
-
-$vg-primary-color: #3c3c50 !default;
-
-$vg-state-available-color: #5cb85c !default;
-$vg-state-busy-color: #d9534f !default;
-
-// Bulma
-$primary: $vg-brand-color;
-$family-primary: "Roboto";
+// Colors: Derivate colors from the base color palette.
+$brand-tint-color: saturate(adjust-hue($brand-color, 10%), 10%);
+$grey-darkest: darken($grey-color, 30%);
+$grey-darker: darken($grey-color, 10%);
+$grey-color-lighter: lighten($grey-color, 10%);
+$grey-color-lightest: lighten($grey-color, 30%);
