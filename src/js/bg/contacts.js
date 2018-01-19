@@ -35,12 +35,10 @@ class ContactsModule {
         }
 
         this.app.state.contacts.contacts = contacts
-        this.app.state.contacts.widget.state = ''
 
         this.app.setState({
             contacts: {
                 contacts: this.app.state.contacts.contacts,
-                widget: this.app.state.contacts.widget,
             },
         }, true)
 

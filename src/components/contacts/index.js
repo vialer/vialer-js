@@ -14,20 +14,6 @@ module.exports = (app, actions) => {
                     return true
                 })
             },
-            widgetState: function() {
-                let state = {
-                    active: this.module.widget.active,
-                    inactive: !this.module.widget.active,
-                }
-
-                state[this.module.widget.state] = true
-                return state
-            },
-        },
-        data: function() {
-            return {
-                name: 'Contacts',
-            }
         },
         methods: {
             callContact: function(contact) {
