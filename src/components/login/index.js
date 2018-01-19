@@ -2,7 +2,7 @@ module.exports = (app) => {
     return {
         methods: {
             login: function() {
-                app.emit('user:login.attempt', {
+                app.emit('bg:user:login', {
                     password: this.user.password,
                     username: this.user.email,
                 })

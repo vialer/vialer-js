@@ -85,10 +85,7 @@ class Sip {
                 debug: 'error',
             },
             stunServers: [
-                'stun4.l.google.com:19302',
-                'stun3.l.google.com:19302',
-                'stun2.l.google.com:19302',
-                'stun1.l.google.com:19302',
+                'stun.voipgrid.nl',
             ],
             traceSip: false,
             userAgentString: process.env.PLUGIN_NAME,

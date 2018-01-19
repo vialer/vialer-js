@@ -1,35 +1,13 @@
-module.exports = (app, actions) => {
-
-    Vue.filter('two_digits', function(value) {
-        if (value.toString().length <= 1) {
-            return `0${value.toString()}`
-        }
-        return value.toString()
-    });
+module.exports = (app, utils) => {
 
     return {
-        computed: {
-            days: function() {
-                return Math.trunc((this.now - this.date) / 60 / 60 / 24)
-            },
-            hours: function() {
-                return Math.trunc((this.now - this.date) / 60 / 60) % 24
-            },
-            minutes: function() {
-                return Math.trunc((this.now - this.date) / 60) % 60
-            },
-            seconds: function() {
-                return (this.now - this.date) % 60
-            },
-        },
+        computed: utils.sharedComputed(),
         data: function() {
             return {
-                date: Math.trunc((new Date()).getTime() / 1000),
                 dtmfnumbers: '', // Reference to the number while a call is underway.
                 intervalId: 0,
                 keypad: false,
-                now: Math.trunc((new Date()).getTime() / 1000),
-                timer: false,
+                startDate: new Date().getTime(),
                 transfer: false,
             }
         },
@@ -47,15 +25,6 @@ module.exports = (app, actions) => {
                     forceSilent: false,
                 })
             },
-            startTimer: function() {
-                this.date = Math.trunc((new Date()).getTime() / 1000)
-                this.now = this.date
-
-                this.intervalId = window.setInterval(() => {
-                    this.now = Math.trunc((new Date()).getTime() / 1000)
-                }, 1000)
-                this.timer = true
-            },
             stopSession: function() {
                 app.emit('sip:stop_session')
             },
@@ -67,7 +36,6 @@ module.exports = (app, actions) => {
                 this.keypad = !this.keypad
             },
             transferButton: function() {
-                console.log('Tranfer clicked');
                 // Show hide the transfer window.
                 this.transfer = !this.transfer
                 // app.emit('sip:start_transfer')
@@ -82,17 +50,11 @@ module.exports = (app, actions) => {
         watch: {
             'sip.session.state': function(newVal, oldVal) {
                 // Remote party hangs up. Stop the timer.
-                if (newVal === 'accepted') {
-                    this.startTimer()
-                } else if (['bye', 'rejected'].includes(newVal)) {
+                if (['bye', 'rejected'].includes(newVal)) {
                     // Stop timer on hangup.
-                    clearInterval(this.intervalId)
                     if (this.keypad) {
                         this.keypad = false
                     }
-                } else if (!newVal) {
-                    // Hide timer when the callstate is reset.
-                    this.timer = false
                 }
             },
         },

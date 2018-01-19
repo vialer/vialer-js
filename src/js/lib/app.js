@@ -14,18 +14,18 @@ class App extends Skeleton {
     _init() {
         this.sounds = require('./sounds')
 
-        let actions = require('../../components/actions')(this)
+        let utils = require('../../components/utils')(this)
 
-        Vue.component('Sidebar', require('../../components/sidebar')(this, actions))
-        Vue.component('Statusbar', require('../../components/statusbar')(this, actions))
-        Vue.component('Field', require('../../components/field')(this, actions))
-        Vue.component('CallDialog', require('../../components/calldialog')(this, actions))
-        Vue.component('Availability', require('../../components/availability')(this, actions))
-        Vue.component('Contacts', require('../../components/contacts')(this, actions))
-        Vue.component('Login', require('../../components/login')(this, actions))
-        Vue.component('Settings', require('../../components/settings')(this, actions))
-        Vue.component('Keypad', require('../../components/keypad')(this, actions))
-        Vue.component('Queues', require('../../components/queues')(this, actions))
+        Vue.component('Sidebar', require('../../components/sidebar')(this, utils))
+        Vue.component('Statusbar', require('../../components/statusbar')(this, utils))
+        Vue.component('Field', require('../../components/field')(this, utils))
+        Vue.component('CallDialog', require('../../components/calldialog')(this, utils))
+        Vue.component('Availability', require('../../components/availability')(this, utils))
+        Vue.component('Contacts', require('../../components/contacts')(this, utils))
+        Vue.component('Login', require('../../components/login')(this, utils))
+        Vue.component('Settings', require('../../components/settings')(this, utils))
+        Vue.component('Keypad', require('../../components/keypad')(this, utils))
+        Vue.component('Queues', require('../../components/queues')(this, utils))
         this.initStore()
     }
 
@@ -104,6 +104,10 @@ class App extends Skeleton {
                 session: {
                     hold: false,
                     state: null,
+                    timer: {
+                        current: null,
+                        start: null,
+                    },
                     type: '',
                 },
                 transferSession: {

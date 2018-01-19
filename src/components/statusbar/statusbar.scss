@@ -9,16 +9,22 @@
     height: $spacer * 4;
     background: $brand-tint-color;
     color: #fff;
-    border-bottom: 1px solid $grey-color-lighter;
+    padding: 0 $spacer;
+    font-size: 0.8rem;
+    font-weight: 500;
+
+
+    &.call-active {
+        background: $green-color;
+    }
 
     [class^="icon-"], [class*=" icon-"]:hover {
         color: $brand-color;
     }
 
-    .user-name {
+    .username {
         // Don't wrap but put dots at the end if it doesn't fit.
         white-space: nowrap;
-        margin-left: $spacer * 2;
 
         i {
             line-height: $spacer * 4;
@@ -47,19 +53,20 @@
             height: $spacer * 4;
             padding: 0 ($spacer / 2);
 
-            i {
-                font-size: $spacer * 2;
-                color: #fff;
+            &.active,
+            &:hover {
+                cursor: pointer;
+                background: #fff;
 
-                &:hover {
-                    cursor: pointer;
-                    background: $brand-color;
-
-                }
-
-                &.active {
+                i {
                     color: $brand-color;
                 }
+            }
+
+            i {
+                line-height: $spacer * 4;
+                font-size: $spacer * 2;
+                color: #fff;
             }
         }
     }

@@ -1,8 +1,9 @@
-module.exports = (app, actions) => {
+module.exports = (app, utils) => {
 
     return {
+        computed: utils.sharedComputed(),
         methods: {
-            logout: actions.logout,
+            logout: utils.logout,
             setLayer: function(layerName) {
                 app.setState({ui: {layer: layerName}}, true)
             },
@@ -11,6 +12,7 @@ module.exports = (app, actions) => {
         staticRenderFns: templates.statusbar.s,
         store: {
             layer: 'ui.layer',
+            sip: 'sip',
             user: 'user',
         },
     }

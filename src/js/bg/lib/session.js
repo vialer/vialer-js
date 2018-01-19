@@ -8,14 +8,17 @@ class Session {
     }
 
 
-    muteRingtone() {
-        this.ringtone.stop()
+    startTimer() {
+        this.app.setState({sip: {session: {timer: {current: new Date().getTime(), start: new Date().getTime()}}}})
+        this.timerId = window.setInterval(() => {
+            this.app.setState({sip: {session: {timer: {current: new Date().getTime()}}}})
+        }, 1000)
     }
 
 
-    playRingtone() {
-        this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
-        this.ringtone.play()
+    stopTimer() {
+        clearInterval(this.timerId)
+        this.app.setState({sip: {session: {timer: {current: null, start: null}}}})
     }
 
 

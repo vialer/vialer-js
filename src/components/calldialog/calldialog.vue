@@ -3,21 +3,14 @@
     <!-- Call information during a call -->
     <div class="call-info" v-if="sip.session.state">
         <div class="info-status">
-            <span v-if="sip.session.state === 'accepted'">
-                <template v-if="sip.session.type === 'incoming'">{{$t('Called by')}}</template>
-                <template v-if="sip.session.type === 'outgoing'">{{$t('Currently calling')}}</template>
-            </span>
-            <span v-if="sip.session.state === 'create'">{{$t('Calling')}}</span>
-            <span v-if="sip.session.state === 'invite'">{{$t('Incoming call')}}</span>
-            <span v-if="sip.session.state === 'bye'">{{$t('Terminated')}}</span>
-            <span v-if="sip.session.state === 'rejected'">{{$t('Declined')}}</span>
+            {{callStatus}}
         </div>
         <div class="info-number">{{sip.number}}</div>
         <div class="info-name" v-if="sip.displayName">{{sip.displayName}}</div>
 
         <!-- timer shown during the call -->
-        <div class="info-timer" v-if="timer">
-            {{minutes | two_digits}}:{{seconds | two_digits}}
+        <div class="info-timer" v-if="sip.session.timer.start">
+            {{sessionTime}}
         </div>
     </div>
 

@@ -1,28 +1,42 @@
-<div class="statusbar-component">
-    <div v-if="user.authenticated" class="user-name">
-        {{user.username}}
-        <i v-if="user.authenticated" class="icon-logout" :title="$t('Log out')" @click="logout()"></i>
-    </div>
-
-    <div class="options">
-        <div class="option">
-            <i class="icon-support" data-link="help" :title="$t('Help')"></i>
+<div class="statusbar-component" :class="{'call-active': sip.session.state}">
+    <template v-if="!sip.session.state">
+        <div class="username" v-if="user.authenticated">
+            {{user.username}}
+            <i class="icon-logout" :title="$t('Log out')" @click="logout()"></i>
         </div>
 
-        <div class="option">
-            <i class="icon-refresh" :title="$t('Refresh your data')" v-if="user.authenticated"></i>
+        <div class="options">
+            <div class="option">
+                <i class="icon-support" data-link="help" :title="$t('Help')"></i>
+            </div>
+
+            <div class="option" v-if="user.authenticated">
+                <i class="icon-refresh" :title="$t('Refresh your data')"></i>
+            </div>
+
+            <div class="option" v-if="user.authenticated">
+                <i class="icon-full-screen" :title="$t('Open in separate tab')"></i>
+            </div>
+
+            <div class="option" :class="{active: layer === 'settings'}" @click="setLayer('settings')" v-if="!user.authenticated">
+                 <i class="fa fa-cog"></i>
+            </div>
+
+            <div class="option" v-if="!user.authenticated">
+                <i class="icon-logout" :title="$t('Login page')" :class="{active: layer === 'login'}" @click="setLayer('login')"></i>
+            </div>
+        </div>
+    </template>
+    <template v-else>
+        <div class="caller-info">
+            <template v-if="sip.displayName">{{sip.displayName}}</template>
+            <template v-else>{{sip.number}}</template>
         </div>
 
-        <div class="option">
-            <i v-if="user.authenticated" class="icon-full-screen" :title="$t('Open in separate tab')"></i>
+        <div class="call-info">
+            <span class="status">{{callStatus}}</span>
+            <span class="timer" v-if="sip.session.timer.start"> - {{sessionTime}}</span>
         </div>
 
-        <div class="option" :class="{active: layer === 'settings'}" @click="setLayer('settings')" v-if="!user.authenticated">
-             <i class="fa fa-cog"></i>
-        </div>
-
-        <div class="option">
-            <i v-if="!user.authenticated" class="icon-logout" :title="$t('Open in separate tab')" :class="{active: layer === 'login'}" @click="setLayer('login')"></i>
-        </div>
-    </div>
+    </template>
 </div>

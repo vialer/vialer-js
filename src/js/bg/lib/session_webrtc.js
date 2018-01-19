@@ -77,6 +77,17 @@ class WebRTCSession extends Session {
     }
 
 
+    muteRingtone() {
+        this.ringtone.stop()
+    }
+
+
+    playRingtone() {
+        this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
+        this.ringtone.play()
+    }
+
+
     setupIncomingCall(session) {
         this.type = 'incoming'
         this.app.setState({sip: {session: {type: this.type}}})
@@ -99,6 +110,7 @@ class WebRTCSession extends Session {
         this.session.on('accepted', () => {
             this.app.setState({sip: {session: {state: 'accepted'}}})
             this.muteRingtone()
+            this.startTimer()
         })
 
         this.session.on('rejected', () => {
@@ -111,6 +123,7 @@ class WebRTCSession extends Session {
             this.app.setState({sip: {session: {state: 'bye'}}})
             this.resetState()
             this.localVideo.srcObject = null
+            this.stopTimer()
         })
     }
 
@@ -131,6 +144,7 @@ class WebRTCSession extends Session {
         // Notify user that it's ringing.
         const ringBackTone = new this.app.sounds.RingBackTone(350, 440)
         ringBackTone.play()
+
         this.session.on('accepted', (data) => {
             ringBackTone.stop()
             // Displayname
@@ -153,6 +167,8 @@ class WebRTCSession extends Session {
                 this.remoteVideo.srcObject = this.remoteStream
                 this.remoteVideo.play()
             })
+
+            this.startTimer()
         })
 
 
@@ -161,6 +177,7 @@ class WebRTCSession extends Session {
             this.app.setState({sip: {session: {state: 'bye'}}})
             this.resetState()
             this.localVideo.srcObject = null
+            this.stopTimer()
         })
 
         this.session.on('rejected', (request) => {

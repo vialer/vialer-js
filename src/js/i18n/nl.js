@@ -7,6 +7,7 @@ global.translations.nl = {
     'Colleagues': 'Collega\'s',
     'E-mail address': 'E-mailadres',
     'Help': 'Hulp',
+    'Incoming call': 'Inkomend gesprek',
     'Log in': 'Inloggen',
     'Log out': 'Uitloggen',
     'NO': 'NEE',

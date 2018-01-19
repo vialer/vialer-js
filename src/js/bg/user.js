@@ -6,7 +6,7 @@ class UserModule {
     constructor(app) {
         this.app = app
 
-        this.app.on('user:login.attempt', (data) => {
+        this.app.on('bg:user:login', (data) => {
             Object.assign(this.app.state.user, {
                 password: data.password,
                 username: data.username,
@@ -15,7 +15,7 @@ class UserModule {
             this.login(data.username, data.password)
         })
 
-        this.app.on('user:logout.attempt', () => {
+        this.app.on('bg:user:logout', () => {
             this.logout()
         })
     }
@@ -36,7 +36,6 @@ class UserModule {
             // Remove credentials from the store.
             Object.assign(this.app.state.user, {
                 authenticated: false,
-                email: '',
                 password: '',
             })
         }
@@ -69,21 +68,17 @@ class UserModule {
 
     logout() {
         this.app.logger.info(`${this}logout`)
-        this.app.resetModules()
         this.app.setState({
             ui: {
                 layer: 'login',
             },
             user: {
+                authenticated: false,
                 password: '',
             },
-        })
-        this.app.state.user.password = ''
+        }, true)
         // Remove credentials for basic auth.
-        this.app.emit('user:logout.success')
         this.app.api.setupClient()
-        this.app.timer.stopAllTimers()
-
         // Disconnect without reconnect attempt.
         this.app.sip.disconnect(false)
     }
