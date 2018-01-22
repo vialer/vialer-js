@@ -41,36 +41,47 @@
 
     .keys {
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
-        align-items: center;
+
         flex-wrap: wrap;
 
         align-content: center;
         width: 100%;
-        padding: 0 60px;
 
-        .key {
-            @include no-outline;
-            width: 60px;
-            height: 60px;
-            margin-bottom: 10px;
-            border-radius: 100%;
-            break-inside: avoid;
+        .row {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            padding-bottom: 5px;
 
-            font-size: 1rem;
-            font-weight: bold;
-            border: 2px solid $brand-color;
-            background: #fff;
-            color: $brand-color;
+            .key {
+                @include no-outline;
+                margin: 0 5px;
+                height: 65px;
+                width: 65px;
 
-            &:hover {
-                cursor: pointer;
-            }
+                border-radius: 100%;
+                break-inside: avoid;
 
-            .sub {
-                font-size: 0.7rem;
+                font-size: 1rem;
+                font-weight: bold;
+                border: 2px solid $brand-color;
+                background: #fff;
+                color: $brand-color;
+
+                &:hover {
+                    cursor: pointer;
+                }
+
+                .sub {
+                    font-size: 0.7rem;
+                }
             }
         }
+
+
+
     }
 
     button {

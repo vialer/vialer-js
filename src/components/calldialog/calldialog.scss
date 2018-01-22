@@ -2,13 +2,21 @@
 
 .calldialog-component {
     display: flex;
-    align-items: stretch;
-    flex-direction: row;
-    flex-wrap: wrap;
+
+    flex-direction: column;
+
     color: #fff;
 
     &.call-active {
         background: linear-gradient(180deg, $brand-color, $brand-tint-color);
+
+        .keypad-component {
+            .number-input {
+                input {
+                    color: #fff;
+                }
+            }
+        }
     }
 
     &.no-call {
@@ -89,7 +97,7 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        align-self: flex-end;
+        align-self: flex-start;
 
         .action {
             &:hover {

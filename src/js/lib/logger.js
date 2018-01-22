@@ -14,6 +14,8 @@ class Logger {
             verbose: 3,
             warn: 1,
         }
+
+        this.id = 0
         this._notification = null
     }
 
@@ -64,16 +66,19 @@ class Logger {
             if (!stack) browser.notifications.clear('c2d')
             browser.notifications.create('c2d', options)
         } else {
+            options.icon = options.iconUrl
+            options.body = message
+            console.log(options)
             if (Notification.permission === 'granted') {
                 if (!stack && this._notification) this._notification.close()
-                this._notification = new Notification(message, options) // eslint-disable-line no-new
+                this._notification = new Notification(title, options) // eslint-disable-line no-new
             } else if (Notification.permission !== 'denied') {
                 // Create a notification after the user
                 // accepted the permission.
                 Notification.requestPermission(function(permission) {
                     if (permission === 'granted') {
                         if (!stack && this._notification) this._notification.close()
-                        this._notification = new Notification(message, options) // eslint-disable-line no-new
+                        this._notification = new Notification(title, options) // eslint-disable-line no-new
                     }
                 })
             }

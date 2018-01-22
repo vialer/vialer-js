@@ -1,6 +1,6 @@
-<div class="availability-component panel-content" :class="widgetState">
+<div class="availability-component" :class="widgetState">
 
-    <h1>{{$t(name)}}</h1>
+    <h1>{{$t('Availability')}}</h1>
 
     <span>{{$t('Are you available?')}}</span>
     <div class="options">

@@ -6,12 +6,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: $spacer * 4;
+    min-height: $spacer * 4;
     background: $brand-tint-color;
     color: #fff;
-    padding: 0 $spacer;
+    padding-left: $spacer;
     font-size: 0.8rem;
     font-weight: 500;
+    position: fixed;
+    z-index: 1000;
+    width: 100%;
 
 
     &.call-active {
@@ -44,14 +47,13 @@
     // The icon links container at the right top of the popup.
     .options {
         display: flex;
-        flex-direction: row-reverse;
+        flex-direction: row;
         vertical-align: middle;
 
         .option {
-            margin-left: $spacer;
             line-height: $spacer * 4;
             height: $spacer * 4;
-            padding: 0 ($spacer / 2);
+            padding: 0 $spacer;
 
             &.active,
             &:hover {
@@ -69,5 +71,9 @@
                 color: #fff;
             }
         }
+    }
+
+    .call-info {
+        margin-right: $spacer;
     }
 }

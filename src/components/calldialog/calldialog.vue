@@ -1,7 +1,7 @@
-<div class="calldialog-component panel-content" :class="{'call-active': sip.session.state, 'no-call': !sip.session.state}">
+<div class="calldialog-component" :class="{'call-active': sip.session.state, 'no-call': !sip.session.state}">
 
     <!-- Call information during a call -->
-    <div class="call-info" v-if="sip.session.state">
+    <div class="call-info" v-if="sip.session.state && !keypad"">
         <div class="info-status">
             {{callStatus}}
         </div>

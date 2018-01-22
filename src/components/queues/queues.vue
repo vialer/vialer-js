@@ -1,4 +1,4 @@
-<div class="queues-component panel-content" :class="widgetState">
+<div class="queues-component" :class="widgetState">
 
     <h1>{{$t('Queues')}}</h1>
 

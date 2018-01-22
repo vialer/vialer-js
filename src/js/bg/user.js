@@ -33,11 +33,13 @@ class UserModule {
         const res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
+            this.app.emit('fg:notify', {icon: 'warning', message: this.app.$t('Invalid credentials'), type: 'warning'})
             // Remove credentials from the store.
             Object.assign(this.app.state.user, {
                 authenticated: false,
                 password: '',
             })
+            return
         }
 
         let user = res.data
@@ -51,7 +53,7 @@ class UserModule {
 
         this.app.setState({
             ui: {
-                layer: 'app',
+                layer: 'availability',
             },
             user: {
                 authenticated: true,
@@ -61,6 +63,7 @@ class UserModule {
             },
         }, true)
 
+        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Logged in succesfully'), type: 'success'})
         // Connect to the sip service on succesful login.
         this.app.sip.connect()
     }
@@ -81,6 +84,7 @@ class UserModule {
         this.app.api.setupClient()
         // Disconnect without reconnect attempt.
         this.app.sip.disconnect(false)
+        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('You are logged out'), type: 'success'})
     }
 
 

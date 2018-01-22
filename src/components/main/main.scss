@@ -1,24 +1,37 @@
 @import "../../scss/lib/variables";
 
 .main-component {
-    display: none;
+    display: flex;
     flex-direction: column;
 
     .panel {
+        flex: 1 1 auto;
+        overflow: auto;
         display: flex;
+
+        min-height: 224px;
 
         .panel-sidebar {
             width: $spacer * 5;
         }
 
         .panel-content {
-            padding: $spacer * 3;
+            margin-left: $spacer * 5;
+            margin-top: $spacer * 4;
+
             width: 100%;
+            overflow: auto;
 
             h1 {
                 text-transform: uppercase;
                 font-weight: 500;
                 color: $brand-color;
+                margin-bottom: $spacer * 2;
+                font-size: 1rem;
+            }
+
+            > div {
+                padding: $spacer;
             }
         }
     }

@@ -28,7 +28,13 @@ class Sip {
 
         // Append the AV-elements in the background DOM, so the audio
         // can still be played after the popup closes.
-        $('body').append('<video class="local"></video><video class="remote"></video>')
+        this.localVideo = document.createElement('video')
+        this.remoteVideo = document.createElement('video')
+        this.localVideo.classList.add('local')
+        this.remoteVideo.classList.add('remote')
+
+        document.body.prepend(this.localVideo)
+        document.body.prepend(this.remoteVideo)
 
         // Start with a clean state.
         this.app.setState({sip: this.app.getDefaultState().sip})

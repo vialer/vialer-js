@@ -8,6 +8,10 @@ class VialerUi extends App {
     constructor(options) {
         super(options)
 
+        this.on('fg:notify', (message) => {
+            this.vm.$notify(message)
+        })
+
         // Another script wants to sync this script's state.
         this.on('fg:set_state', (state) => {
             this.mergeDeep(this.state, state)

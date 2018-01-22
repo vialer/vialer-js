@@ -16,6 +16,8 @@ class App extends Skeleton {
 
         let utils = require('../../components/utils')(this)
 
+        this.MainComponent = require('../../components/main')(this, utils)
+
         Vue.component('Sidebar', require('../../components/sidebar')(this, utils))
         Vue.component('Statusbar', require('../../components/statusbar')(this, utils))
         Vue.component('Field', require('../../components/field')(this, utils))
@@ -67,6 +69,7 @@ class App extends Skeleton {
             dialpad: {
                 dialNumber: '',
             },
+            notifications: [],
             queues: {
                 queues: [],
                 selected: {id: null},
@@ -178,11 +181,17 @@ class App extends Skeleton {
             data: {
                 store: this.state,
             },
-            render: h => h({
-                render: templates.main.r,
-                staticRenderFns: templates.main.s,
-                store: this.state,
-            }),
+            mounted: () => {
+                // Chrome OSX height calculation bug, see:
+                // https://bugs.chromium.org/p/chromium/issues/detail?id=428044
+                if (this.env.isOsx) {
+                    document.body.style.display = 'none'
+                    setTimeout(() => {
+                        document.body.style.display = 'block'
+                    }, 200)
+                }
+            },
+            render: h => h(this.MainComponent),
         })
     }
 }

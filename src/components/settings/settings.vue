@@ -1,4 +1,4 @@
-<div class="settings-component panel-content">
+<div class="settings-component">
 
     <Field name="sip_endpoint" type="text"
         :label="$t('SIP Endpoint')" :model.sync="settings.sipEndpoint"

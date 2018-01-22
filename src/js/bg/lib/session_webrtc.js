@@ -9,10 +9,8 @@ class WebRTCSession extends Session {
     constructor(sip, numberOrSession) {
         super(sip, numberOrSession)
 
-        this.localVideo = document.querySelector('.local')
-        this.remoteVideo = document.querySelector('.remote')
-
         this._sessionOptions = {
+            media: {},
             sessionDescriptionHandlerOptions: {
                 constraints: {
                     audio: true,
@@ -23,6 +21,7 @@ class WebRTCSession extends Session {
 
         // The actual permission must be granted from a foreground script.
         navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
+            this._sessionOptions.media.stream = stream
             this.stream = stream
         }).catch((err) => {
             throw err
@@ -40,16 +39,17 @@ class WebRTCSession extends Session {
         if (!this.type === 'incoming') throw 'session must be incoming type'
         this.session.accept(this._sessionOptions)
 
-        this.localVideo.srcObject = this.stream
-        this.localVideo.play()
+        this.sip.localVideo.srcObject = this.stream
+        this.sip.localVideo.play()
+        // this.sip.localVideo.muted = true
 
         this.pc = this.session.sessionDescriptionHandler.peerConnection
         this.remoteStream = new MediaStream()
 
         this.pc.getReceivers().forEach((receiver) => {
             this.remoteStream.addTrack(receiver.track)
-            this.remoteVideoElement.srcObject = this.remoteStream
-            this.remoteVideoElement.play()
+            this.sip.remoteVideo.srcObject = this.remoteStream
+            this.sip.remoteVideo.play()
         })
     }
 
@@ -108,6 +108,8 @@ class WebRTCSession extends Session {
             ui: {layer: 'calldialog'},
         })
 
+        this.app.logger.notification(`${this.app.$t('Caller ID')}: ${this.displayName}`, `${this.app.$t('Incoming call')} (${this.number})`, false, 'warning')
+
         this.playRingtone()
 
         this.session.on('accepted', () => {
@@ -127,7 +129,7 @@ class WebRTCSession extends Session {
         this.session.on('bye', () => {
             this.app.setState({sip: {session: {state: 'bye'}}})
             this.resetState()
-            this.localVideo.srcObject = null
+            this.sip.localVideo.srcObject = null
             this.stopTimer()
         })
 
@@ -179,16 +181,17 @@ class WebRTCSession extends Session {
                 },
             })
 
-            this.localVideo.srcObject = this.stream
-            this.localVideo.play()
+            this.sip.localVideo.srcObject = this.stream
+            this.sip.localVideo.play()
+            this.sip.localVideo.muted = true
 
             this.pc = this.session.sessionDescriptionHandler.peerConnection
             this.remoteStream = new MediaStream()
 
             this.pc.getReceivers().forEach((receiver) => {
                 this.remoteStream.addTrack(receiver.track)
-                this.remoteVideo.srcObject = this.remoteStream
-                this.remoteVideo.play()
+                this.sip.remoteVideo.srcObject = this.remoteStream
+                this.sip.remoteVideo.play()
             })
 
             this.startTimer()
@@ -204,7 +207,7 @@ class WebRTCSession extends Session {
         this.session.on('bye', (request) => {
             this.app.setState({sip: {session: {state: 'bye'}}})
             this.resetState()
-            this.localVideo.srcObject = null
+            this.sip.localVideo.srcObject = null
             this.stopTimer()
         })
 

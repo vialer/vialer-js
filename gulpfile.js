@@ -133,7 +133,7 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
         .pipe(addsrc(path.join(settings.SRC_DIR, 'fonts', '*'), {base: settings.SRC_DIR}))
         .pipe(addsrc(path.join(settings.NODE_PATH, 'font-awesome', 'fonts', 'fontawesome-webfont.woff2')))
         .pipe(flatten({newPath: './fonts'}))
-        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/ringtones/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(ifElse(settings.PRODUCTION, imagemin))
         .pipe(addsrc('./LICENSE'))
@@ -496,5 +496,10 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
             path.join(settings.NODE_PATH, 'jsdoc-rtd', 'publish.js'),
             path.join(settings.NODE_PATH, 'jsdoc-rtd', 'tmpl', '**', '*.tmpl'),
         ], ['docs'])
+
+        gulp.watch([
+            path.join(settings.NODE_PATH, 'fuet-notify', 'src', 'js', '*.js'),
+        ], ['js-vendor'])
+
     }
 })
