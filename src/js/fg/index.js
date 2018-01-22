@@ -51,10 +51,14 @@ function initApp(initParams) {
     if (app.env.isEdge) $('html').addClass('edge')
     if (app.env.isFirefox) $('html').addClass('firefox')
 
-    if (this.app.env.isOsx) {
+    if (app.env.isOsx) {
         setTimeout(() => {
-            document.body.clientWidth = document.body.clientWidth + 1
-        }, 200)
+            const style = document.querySelector('#app').style;
+            style.display = 'flex';
+            setTimeout(() => {
+                style.opacity = 1;
+            });
+        }, 200);
     }
 
     return app
