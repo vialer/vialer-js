@@ -50,6 +50,13 @@ function initApp(initParams) {
     if (app.env.isChrome) $('html').addClass('chrome')
     if (app.env.isEdge) $('html').addClass('edge')
     if (app.env.isFirefox) $('html').addClass('firefox')
+
+    if (this.app.env.isOsx) {
+        setTimeout(() => {
+            document.body.clientWidth = document.body.clientWidth + 1
+        }, 200)
+    }
+
     return app
 }
 
@@ -74,4 +81,5 @@ if (env.isExtension) {
         app.logger.warn(`${this}${err}`)
     })
 }
+
 module.exports = initApp
