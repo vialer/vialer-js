@@ -28,6 +28,10 @@ audio {
 }
 
 .notifications {
+    position: fixed;
+    top: 32px;
+    left: 40px;
+    width: calc(100% - 40px);
 
     .notification {
         display: flex;
