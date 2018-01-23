@@ -1,16 +1,15 @@
 // Generic styles. Keep this file below 300 lines.
 html,
 body {
-    width: 100%;
     height: auto;
     padding: 0;
     margin: 0;
     zoom: 1;
+    min-width: 400px;
 }
 
 body {
     color: $primary-color;
-    width: 400px;
 
     // Bulma label class override.
     .label {
@@ -29,9 +28,9 @@ video {
 
 .notifications {
     position: fixed;
-    top: 32px;
-    left: 40px;
-    width: calc(100% - 40px);
+    top: 0px;
+    left: 0px;
+    width: calc(100%);
 
     .notification {
         display: flex;

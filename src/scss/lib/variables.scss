@@ -4,14 +4,9 @@ $font-path: "../fonts";
 // Dimensions: spacing units.
 $spacer: 8px;
 
-// Dimensions: Responsive queries.
-$mini: 250px;
-$mobile: 369px;
-$widget: 400px;
-$tablet: 769px;
-$desktop: 960px;
-$widescreen: 1152px;
-$fullhd: 1344px;
+// Dimensions: The boundaries of the popup.
+$max-popup-width: 800px;
+$max-popup-height: 600px;
 
 // Colors: Base variable color palette; overriden by vialer-jsrc colors object.
 $brand-color: #de6b35 !default;

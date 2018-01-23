@@ -16,6 +16,11 @@
             width: $spacer * 5;
         }
 
+        .panel-content-unauthenticated {
+            width: 100%;
+            padding: $spacer;
+        }
+
         .panel-content {
             margin-left: $spacer * 5;
             margin-top: $spacer * 4;

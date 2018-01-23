@@ -14,12 +14,12 @@
                 <i class="icon-logout" :title="$t('Login page')" :class="{active: layer === 'login'}" @click="setLayer('login')"></i>
             </div>
 
-            <div class="option">
-                <i class="icon-support" data-link="help" :title="$t('Help')"></i>
-            </div>
-
             <div class="option" :class="{active: layer === 'settings'}" @click="setLayer('settings')">
                  <i class="fa fa-cog"></i>
+            </div>
+
+            <div class="option">
+                <i class="icon-support" data-link="help" :title="$t('Help')" @click="openHelp"></i>
             </div>
         </div>
     </template>

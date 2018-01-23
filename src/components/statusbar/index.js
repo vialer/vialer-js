@@ -4,6 +4,9 @@ module.exports = (app, utils) => {
         computed: utils.sharedComputed(),
         methods: {
             logout: utils.logout,
+            openHelp: function() {
+
+            },
             setLayer: function(layerName) {
                 app.setState({ui: {layer: layerName}}, true)
             },
