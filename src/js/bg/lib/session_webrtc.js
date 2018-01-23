@@ -36,20 +36,22 @@ class WebRTCSession extends Session {
     * Accept an incoming session.
     */
     answer() {
-        if (!this.type === 'incoming') throw 'session must be incoming type'
+        if (!(this.type === 'incoming')) throw 'session must be incoming type'
         this.session.accept(this._sessionOptions)
 
         this.sip.localVideo.srcObject = this.stream
         this.sip.localVideo.play()
-        // this.sip.localVideo.muted = true
+        this.sip.localVideo.muted = true
 
         this.pc = this.session.sessionDescriptionHandler.peerConnection
         this.remoteStream = new MediaStream()
 
-        this.pc.getReceivers().forEach((receiver) => {
-            this.remoteStream.addTrack(receiver.track)
-            this.sip.remoteVideo.srcObject = this.remoteStream
-            this.sip.remoteVideo.play()
+        this.session.sessionDescriptionHandler.on('addStream', () => {
+            this.pc.getReceivers().forEach((receiver) => {
+                this.remoteStream.addTrack(receiver.track)
+                this.sip.remoteVideo.srcObject = this.remoteStream
+                this.sip.remoteVideo.play()
+            })
         })
     }
 
@@ -136,19 +138,6 @@ class WebRTCSession extends Session {
         // Blind transfer.
         this.session.on('refer', (target) => {
             this.session.bye()
-        })
-
-        // Triggered when a transfer attempt is made.
-        this.session.on('referRequested', (context) => {
-            // Outgoing REFER Request
-            // console.log(context)
-            // if (context instanceof this.sip.lib.ReferClientContext) {
-            //
-            // }
-            // // Incoming REFER Request
-            // if (context instanceof this.sip.lib.ReferServerContext) {
-            //
-            // }
         })
     }
 
