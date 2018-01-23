@@ -1,6 +1,6 @@
 <div id="app" class="main-component">
-    <Statusbar></Statusbar>
     <Notifications :notifications="$store.notifications"></Notifications>
+    <Statusbar></Statusbar>
 
     <div class="panel">
         <div class="panel-content-unauthenticated" v-if="!$store.user.authenticated">

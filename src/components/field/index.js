@@ -75,7 +75,7 @@ module.exports = (app, actions) => {
                     this.$emit('update:model', event.target.checked)
                 } else if (['password', 'text'].includes(event.target.type)) {
                     this.$emit('update:model', event.target.value)
-                } else if (event.target.type === 'select') {
+                } else if (event.target.tagName === 'SELECT') {
                     // A multiselect.
                     if (event.target.multiple) {
                         let selectedOptions = Array.prototype.filter.apply(event.target.options, [(i) => i.selected])
@@ -87,7 +87,7 @@ module.exports = (app, actions) => {
                     // We sync an object as vmodel.
                     if (options) {
                         for (const option of options) {
-                            if (option.id === parseInt(value)) {
+                            if (option.id === value) {
                                 this.$emit('update:model', option)
                             }
                         }

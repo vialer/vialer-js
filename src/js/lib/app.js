@@ -98,6 +98,10 @@ class App extends Skeleton {
                 webrtc: {
                     enabled: false,
                     password: '',
+                    sinks: {
+                        input: {id: '', name: ''},
+                        output: {id: '', name: ''},
+                    },
                     username: '',
                 },
             },
@@ -171,7 +175,10 @@ class App extends Skeleton {
     * hardcoded default fallback.
     */
     initStore() {
-        this.state = {}
+        this.state = {
+            env: this.env,
+            notifications: [],
+        }
     }
 
 

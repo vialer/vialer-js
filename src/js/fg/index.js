@@ -20,9 +20,11 @@ class VialerUi extends App {
 
 
     initStore() {
+        super.initStore()
         // Initialize with the initial state from the background.
         this.emit('bg:get_state', {
             callback: (state) => {
+                Object.assign(state, this.state)
                 this.state = state
                 this.initVm()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
@@ -65,6 +67,13 @@ function initApp(initParams) {
         }, 200);
     }
 
+
+    navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
+        this.stream = stream
+    }).catch((err) => {
+        app.logger.warn(`${this}${err}`)
+    })
+
     return app
 }
 
@@ -80,13 +89,6 @@ if (env.isExtension) {
     global.app = initApp({
         environment: env,
         name: 'fg',
-    })
-
-
-    navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
-        this.stream = stream
-    }).catch((err) => {
-        app.logger.warn(`${this}${err}`)
     })
 }
 

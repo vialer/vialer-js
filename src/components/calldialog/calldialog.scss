@@ -2,10 +2,9 @@
 
 .calldialog-component {
     display: flex;
-
     flex-direction: column;
-
     color: #fff;
+    min-height: 250px;
 
     &.call-active {
         background: linear-gradient(180deg, $brand-color, $brand-tint-color);
@@ -59,13 +58,14 @@
     .call-options {
         width: 100%;
         display: flex;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
         flex-direction: row;
         padding: 0 ($spacer * 5);
 
         .option {
             text-align: center;
+            padding: 10px;
 
             &.active {
                 .icon {

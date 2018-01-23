@@ -9,6 +9,40 @@ class WebRTCSession extends Session {
     constructor(sip, numberOrSession) {
         super(sip, numberOrSession)
 
+        // Append the AV-elements in the background DOM, so the audio
+        // can continue to play when the popup closes.
+        if (!document.querySelector('.local') && !document.querySelector('.remote')) {
+            this.localVideo = document.createElement('video')
+            this.remoteVideo = document.createElement('video')
+            this.localVideo.classList.add('local')
+            this.remoteVideo.classList.add('remote')
+
+            document.body.prepend(this.localVideo)
+            document.body.prepend(this.remoteVideo)
+
+            // Set the output device from settings.
+            const sinks = this.app.state.settings.webrtc.sinks
+            if (sinks.input.id) {
+                this.app.logger.info(`setting sink id: ${sinks.output.id}`)
+                this.remoteVideo.setSinkId(sinks.input.id).then(() => {
+
+                }).catch((err) => {
+                    this.app.emit('fg:notify', {message: 'Failed to set input device', type: 'danger'})
+                })
+            }
+
+            if (sinks.output.id) {
+                this.remoteVideo.setSinkId(sinks.output.id).then(() => {
+                }).catch((err) => {
+                    this.app.emit('fg:notify', {message: 'Failed to set output device', type: 'danger'})
+                })
+            }
+        } else {
+            // Reuse existing media elements.
+            this.localVideo = document.querySelector('.local')
+            this.remoteVideo = document.querySelector('.remote')
+        }
+
         this._sessionOptions = {
             media: {},
             sessionDescriptionHandlerOptions: {
@@ -23,12 +57,12 @@ class WebRTCSession extends Session {
         navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
             this._sessionOptions.media.stream = stream
             this.stream = stream
+
+            if (numberOrSession.hasOwnProperty('acceptAndTerminate')) this.setupIncomingCall(numberOrSession)
+            else this.setupOutgoingCall(numberOrSession)
         }).catch((err) => {
             throw err
         })
-
-        if (numberOrSession.hasOwnProperty('acceptAndTerminate')) this.setupIncomingCall(numberOrSession)
-        else this.setupOutgoingCall(numberOrSession)
     }
 
 
@@ -39,9 +73,9 @@ class WebRTCSession extends Session {
         if (!(this.type === 'incoming')) throw 'session must be incoming type'
         this.session.accept(this._sessionOptions)
 
-        this.sip.localVideo.srcObject = this.stream
-        this.sip.localVideo.play()
-        this.sip.localVideo.muted = true
+        this.localVideo.srcObject = this.stream
+        this.localVideo.play()
+        this.localVideo.muted = true
 
         this.pc = this.session.sessionDescriptionHandler.peerConnection
         this.remoteStream = new MediaStream()
@@ -49,8 +83,8 @@ class WebRTCSession extends Session {
         this.session.sessionDescriptionHandler.on('addStream', () => {
             this.pc.getReceivers().forEach((receiver) => {
                 this.remoteStream.addTrack(receiver.track)
-                this.sip.remoteVideo.srcObject = this.remoteStream
-                this.sip.remoteVideo.play()
+                this.remoteVideo.srcObject = this.remoteStream
+                this.remoteVideo.play()
             })
         })
     }
@@ -131,7 +165,7 @@ class WebRTCSession extends Session {
         this.session.on('bye', () => {
             this.app.setState({sip: {session: {state: 'bye'}}})
             this.resetState()
-            this.sip.localVideo.srcObject = null
+            this.localVideo.srcObject = null
             this.stopTimer()
         })
 
@@ -156,11 +190,11 @@ class WebRTCSession extends Session {
         })
 
         // Notify user that it's ringing.
-        const ringBackTone = new this.app.sounds.RingBackTone(350, 440)
-        ringBackTone.play()
+        this.ringBackTone = new this.app.sounds.RingBackTone(350, 440)
+        this.ringBackTone.play()
 
         this.session.on('accepted', (data) => {
-            ringBackTone.stop()
+            this.ringBackTone.stop()
             // Displayname
             this.displayName = this.session.remoteIdentity.displayName
             this.app.setState({
@@ -170,17 +204,17 @@ class WebRTCSession extends Session {
                 },
             })
 
-            this.sip.localVideo.srcObject = this.stream
-            this.sip.localVideo.play()
-            this.sip.localVideo.muted = true
+            this.localVideo.srcObject = this.stream
+            this.localVideo.play()
+            this.localVideo.muted = true
 
             this.pc = this.session.sessionDescriptionHandler.peerConnection
             this.remoteStream = new MediaStream()
 
             this.pc.getReceivers().forEach((receiver) => {
                 this.remoteStream.addTrack(receiver.track)
-                this.sip.remoteVideo.srcObject = this.remoteStream
-                this.sip.remoteVideo.play()
+                this.remoteVideo.srcObject = this.remoteStream
+                this.remoteVideo.play()
             })
 
             this.startTimer()
@@ -196,14 +230,14 @@ class WebRTCSession extends Session {
         this.session.on('bye', (request) => {
             this.app.setState({sip: {session: {state: 'bye'}}})
             this.resetState()
-            this.sip.localVideo.srcObject = null
+            this.localVideo.srcObject = null
             this.stopTimer()
         })
 
         this.session.on('rejected', (request) => {
             this.app.setState({sip: {session: {state: 'rejected'}}})
             this.resetState()
-            ringBackTone.stop()
+            this.ringBackTone.stop()
         })
     }
 
@@ -213,6 +247,9 @@ class WebRTCSession extends Session {
     }
 
 
+    /**
+    * Causes a new invite event on the ua object in sip.
+    */
     blindTransfer(number) {
         this.session.refer(`sip:${number}@voipgrid.nl`)
     }

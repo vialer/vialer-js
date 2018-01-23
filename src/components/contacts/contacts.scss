@@ -2,11 +2,24 @@
 
 .contacts-component {
 
+    input {
+        margin-bottom: $spacer * 2;
+    }
+
     // A single contact item in the contacts list.
     .list-item.contact {
         display: flex;
         justify-content: space-between;
         padding: 8px;
+
+        // In a call.
+        &.disabled {
+            cursor: not-allowed;
+        }
+
+        &:not(.disabled):hover {
+            cursor: pointer;
+        }
 
         .icon i {color: $grey-color;}
         .icon.busy i {color: $red-color;}

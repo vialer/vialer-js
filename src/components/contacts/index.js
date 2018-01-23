@@ -18,6 +18,7 @@ module.exports = (app, actions) => {
         methods: {
             blindTransfer: function(number) {
                 app.emit('bg:sip:blind_transfer', {number})
+                app.setState({sip: {session: {transfer: false}}})
             },
             callContact: function(contact) {
                 let forceSilent = false

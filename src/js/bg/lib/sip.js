@@ -20,21 +20,10 @@ class Sip {
         this.reconnect = true
         this.state = this.app.state.sip
 
-
         // The default connection timeout to start with.
         this.retryDefault = {interval: 2500, limit: 9000000}
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
-
-        // Append the AV-elements in the background DOM, so the audio
-        // can still be played after the popup closes.
-        this.localVideo = document.createElement('video')
-        this.remoteVideo = document.createElement('video')
-        this.localVideo.classList.add('local')
-        this.remoteVideo.classList.add('remote')
-
-        document.body.prepend(this.localVideo)
-        document.body.prepend(this.remoteVideo)
 
         // Start with a clean state.
         this.app.setState({sip: this.app.getDefaultState().sip})
@@ -124,15 +113,18 @@ class Sip {
         this.app.setState({sip: {ua: {state: 'disconnected'}}})
 
         this.ua = new this.lib.UA(uaOptions)
+        this.presence = new Presence(this)
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
+            console.log("NEW INVITE", session)
             this.session = new Session(this, session)
         })
 
         this.ua.on('registered', () => {
             this.app.setState({sip: {ua: {state: 'registered'}}})
             this.app.logger.info(`${this}SIP stack registered`)
+            this.presence.update()
         })
 
         this.ua.on('unregistered', () => {
@@ -141,9 +133,9 @@ class Sip {
         })
 
         this.ua.on('connected', () => {
-            this.presence = new Presence(this)
             this.app.setState({sip: {ua: {state: 'connected'}}})
             this.app.logger.info(`${this}SIP stack started`)
+
         })
 
 

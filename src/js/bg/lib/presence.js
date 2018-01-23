@@ -6,12 +6,11 @@ const SUBSCRIBE_DELAY = 150
 class Presence {
 
     constructor(sip) {
+        this.sip = sip
         this.app = sip.app
         this.ua = sip.ua
 
         this.subscriptions = {}
-        // Assumes sip connection.
-        this.update()
     }
 
 

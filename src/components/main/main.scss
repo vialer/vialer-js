@@ -3,7 +3,7 @@
 .main-component {
     display: flex;
     flex-direction: column;
-    max-width: 800px;
+    max-width: $max-popup-width;
 
     .panel {
         flex: 1 1 auto;

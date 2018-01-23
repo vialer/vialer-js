@@ -3,7 +3,10 @@
 * Source: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 */
 const context = new AudioContext()
+const audio = document.createElement('audio')
+document.body.prepend(audio)
 
+var source = context.createMediaElementSource(audio)
 
 class DtmfTone {
 

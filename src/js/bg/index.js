@@ -41,11 +41,14 @@ class BackgroundApp extends App {
             if (data.persist) this.store.set('state', this.state)
         })
 
+        this.on('bg:refresh_api_data', (data) => {
+            this.getModuleApiData()
+        })
+
 
         // Continue last session if credentials are available.
         if (this.state.user.authenticated) {
             this.logger.info(`${this}reusing existing session from existing credentials`)
-
             this.getModuleApiData()
 
             if (this.env.isExtension) {
@@ -76,6 +79,7 @@ class BackgroundApp extends App {
     * Restore the state from localStorage or start with a state template.
     */
     initStore() {
+        super.initStore()
         let stateObj = this.store.get('state')
 
         // Clear localstorage if the data schema changed.
@@ -84,8 +88,12 @@ class BackgroundApp extends App {
             return
         }
 
-        if (stateObj) this.state = stateObj
-        else this.state = this.getDefaultState()
+        if (stateObj) {
+            Object.assign(stateObj, this.state)
+            this.state = stateObj
+            
+        }
+        else Object.assign(this.state, this.getDefaultState())
 
         this.initVm()
 

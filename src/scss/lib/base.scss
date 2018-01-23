@@ -28,9 +28,11 @@ video {
 
 .notifications {
     position: fixed;
-    top: 0px;
-    left: 0px;
-    width: calc(100%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100000;
+    max-width: $max-popup-width;
 
     .notification {
         display: flex;

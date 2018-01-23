@@ -5,7 +5,7 @@
     <input class="input" type="email" placeholder="Find colleagues" :disabled="module.search.disabled" v-model="module.search.input">
 
     <ul class="list-items">
-        <li class="list-item contact" v-for="contact in filteredContacts" @click="callContact(contact)">
+        <li class="list-item contact" v-for="contact in filteredContacts" @click="callContact(contact)" :class="{'disabled': sip.session.state}">
             <div class="icon status-icon" :class="contact.state">
                 <i class="icon-availability"></i>
             </div>

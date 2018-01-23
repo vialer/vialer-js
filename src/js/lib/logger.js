@@ -68,7 +68,7 @@ class Logger {
         } else {
             options.icon = options.iconUrl
             options.body = message
-            console.log(options)
+
             if (Notification.permission === 'granted') {
                 if (!stack && this._notification) this._notification.close()
                 this._notification = new Notification(title, options) // eslint-disable-line no-new

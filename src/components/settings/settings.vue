@@ -25,6 +25,18 @@
         :options="settings.ringtones.options"
         :placeholder="$t('Select a ringtone')"/>
 
+    <Field name="input_device" type="select"
+        :disabled="!settings.webrtc.enabled"
+        :label="$t('Input device') + ' ' + $t('(experimental)')" :model.sync="settings.webrtc.sinks.input"
+        :options="inputDevice.options"
+        :placeholder="$t('Select an input device')"/>
+
+    <Field name="output_device" type="select"
+        :disabled="!settings.webrtc.enabled"
+        :label="$t('Output device') + ' ' + $t('(experimental)')" :model.sync="settings.webrtc.sinks.output"
+        :options="outputDevice.options"
+        :placeholder="$t('Select an output device')"/>
+
     <Field name="platform_enabled" type="checkbox"
         :label="$t('Enable platform integration')" :model.sync="settings.platform.enabled"
         :help="$t('Adds platform features like Availability, queues status & Click-to-dial')"/>
