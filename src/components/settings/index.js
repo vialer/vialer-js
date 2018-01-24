@@ -19,6 +19,7 @@ module.exports = (app) => {
                     },
                 })
                 app.vm.$notify({icon: 'database', message: app.$t('Settings stored'), type: 'info'})
+                app.emit('bg:sip:connect')
             },
         },
         mounted: function() {

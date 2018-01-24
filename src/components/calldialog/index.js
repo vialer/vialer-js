@@ -18,11 +18,8 @@ module.exports = (app, utils) => {
                 app.emit('bg:sip:accept_session')
             },
             dial: function(number) {
-                app.emit('dialer:dial', {
-                    analytics: 'Dialpad',
-                    b_number: number,
-                    forceSilent: false,
-                })
+                if (!number) return
+                app.emit('bg:sip:call', {number: number})
             },
             stopSession: function() {
                 app.emit('bg:sip:stop_session')

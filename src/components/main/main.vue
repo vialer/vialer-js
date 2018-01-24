@@ -11,7 +11,7 @@
         <template v-if="$store.user.authenticated">
                 <Sidebar class="panel-sidebar"></Sidebar>
 
-                <div class="panel-content">
+                <div class="panel-content-container">
                     <template v-if="$store.ui.layer==='availability'">
                         <Availability></Availability>
                     </template>

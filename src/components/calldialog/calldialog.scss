@@ -6,18 +6,6 @@
     color: #fff;
     min-height: 250px;
 
-    &.call-active {
-        background: linear-gradient(180deg, $brand-color, $brand-tint-color);
-
-        .keypad-component {
-            .number-input {
-                input {
-                    color: #fff;
-                }
-            }
-        }
-    }
-
     &.no-call {
         background: #fff;
     }
@@ -33,7 +21,7 @@
         width: 100%;
         text-align: center;
         font-weight: 500;
-        margin-bottom: 8px;
+        margin-bottom: $spacer * 3;
 
         .info-status {
             font-size: 1rem;
@@ -62,6 +50,29 @@
         align-items: center;
         flex-direction: row;
         padding: 0 ($spacer * 5);
+        margin-bottom: $spacer;
+
+        .rounded-button-with-text {
+            padding: $spacer;
+            text-align: center;
+
+            .rounded-button {
+                border: 2px solid #fff;
+                margin-bottom: $spacer;
+
+                &:hover,
+                &.active {
+                    background: #fff;
+                    color: $brand-color;
+                }
+
+                i {
+                    height: auto;
+                    width: auto;
+                    padding: $spacer * 2;
+                }
+            }
+        }
 
         .option {
             text-align: center;
@@ -100,21 +111,51 @@
         align-self: flex-start;
 
         .action {
-            &:hover {
-                cursor: pointer;
-            }
+            margin: $spacer;
 
             &.decline {
-                color: $red-color;
+                color: #fff;
+                background: $red-color;
+                box-shadow: 0 8px 14px 0 darken($red-color, 7%);
+
+                &:hover {background: darken($red-color, 3%);}
             }
 
             &.accept {
-                color: $green-color;
+                color: #fff;
+                background: $green-color;
+                box-shadow: 0 8px 14px 0 lighten(desaturate($green-color, 15%), 10%);
+                &:hover {background: darken($green-color, 3%);}
             }
 
             &.dial {
-                .fa-circle {
-                    color: $green-color;
+                color: #fff;
+                background: $green-color;
+                box-shadow: 0 8px 14px 0 lighten(desaturate($green-color, 15%), 10%);
+                &:hover {background: darken($green-color, 3%);}
+            }
+
+            &.disabled {
+                filter: grayscale(100%);
+            }
+        }
+    }
+
+
+    // Overrides for in-call dialog.
+    &.call-active {
+        background: linear-gradient(180deg, $brand-color, $brand-tint-color);
+
+        .call-actions {
+            .action.accept {
+                box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .keypad-component {
+            .number-input {
+                input {
+                    color: #fff;
                 }
             }
         }

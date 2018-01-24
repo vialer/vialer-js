@@ -1,3 +1,4 @@
+
 .title + hr {
     margin: 1.3rem 0;
 }
@@ -185,4 +186,20 @@ $icon-checkbox-unchecked: "\f096";
 
 .icon-square-o:before {
     content: $icon-checkbox-unchecked;
+}
+
+.icon-transfer:before {
+    content: "\e914";
+}
+
+.icon-dialpad:before {
+    content: "\e0bc";
+}
+
+.icon-pause:before {
+    content: "\e034";
+}
+
+.icon-merge_type:before {
+    content: "\e252";
 }

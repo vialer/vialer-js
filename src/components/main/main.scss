@@ -22,12 +22,16 @@
             margin-top: $spacer * 4;
         }
 
-        .panel-content {
+        .panel-content-container {
             margin-left: $spacer * 5;
             margin-top: $spacer * 4;
 
             width: 100%;
             overflow: auto;
+
+            .panel-content {
+                padding: $spacer * 3;
+            }
 
             h1 {
                 text-transform: uppercase;
@@ -37,8 +41,13 @@
                 font-size: 1rem;
             }
 
+            // Deefault panel content container.
             > div {
-                padding: $spacer;
+                padding: $spacer * 3;
+            }
+
+            > div.no-padding {
+                padding: 0;
             }
         }
     }

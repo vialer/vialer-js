@@ -10,7 +10,23 @@
     .list-item.contact {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         padding: 8px;
+
+        .status-icon {
+            height: auto;
+            width: $spacer * 6;
+            min-width: 48px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            i {
+                color: $grey-color;
+            }
+            &.busy i {color: $red-color;}
+            &.available i {color: $green-color;}
+        }
 
         // In a call.
         &.disabled {
@@ -21,9 +37,7 @@
             cursor: pointer;
         }
 
-        .icon i {color: $grey-color;}
-        .icon.busy i {color: $red-color;}
-        .icon.available i {color: $green-color;}
+
 
         // Ringing state is a css keyframe animation.
         .icon.ringing i {
@@ -39,16 +53,30 @@
             }
 
             .description {
-                color: $grey-darker;
+                color: $grey-color-darker;
             }
         }
 
-        .options {
-            .option {
-                &:hover {
-                    color: $brand-color;
-                    cursor: pointer;
-                }
+        .rounded-button {
+            background: #fff;
+            padding: 0;
+            width: $spacer * 4;
+            height: $spacer * 4;
+            text-align: center;
+            line-height: 32px;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+
+            &:hover {
+                color: $brand-color;
+                cursor: pointer;
+            }
+
+            i {
+                font-size: $spacer * 1.5;
+                padding: 0;
+
+
+
             }
         }
     }

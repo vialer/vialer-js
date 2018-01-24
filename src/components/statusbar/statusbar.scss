@@ -26,36 +26,32 @@
         color: $brand-color;
     }
 
+    .caller-status,
     .user-status {
         // Don't wrap but put dots at the end if it doesn't fit.
         white-space: nowrap;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
 
         .status-indicator {
+            width: $spacer * 5;
+
             i {
                 margin: 0;
                 width: $spacer * 5;
-                font-size: 1.3rem;
+                font-size: 1rem;
                 vertical-align: middle;
                 line-height: $spacer * 4;
                 text-align: center;
             }
         }
 
-        .option {
-            color: #fff;
-            text-align: center;
-            vertical-align: middle;
-
-            &:hover {
-                cursor: pointer;
-            }
+        .username-padding {
+            padding-left: $spacer;
         }
     }
-
-    .caller-status {
-
-    }
-
 
     // The icon links container at the right top of the popup.
     .options {

@@ -41,6 +41,28 @@ module.exports = {
 
 
     /**
+    * Process number to return a callable phone number.
+    * @param {String} number - Number to clean.
+    * @returns {String} - The cleaned number.
+    */
+    sanitizeNumber(number) {
+        // Force possible int to string.
+        number = '' + number
+        // Remove white space characters.
+        number = number.replace(/ /g, '')
+
+        // Make numbers like +31(0) work.
+        let digitsOnly = number.replace(/[^\d]/g, '')
+        if (digitsOnly.substring(0, 3) === '310') {
+            if (number.substring(3, 6) === '(0)') {
+                number = number.replace(/^\+31\(0\)/, '+31')
+            }
+        }
+
+        return number
+    },
+
+    /**
     * Convert a simple key/value object to a querystring.
     * @param {Object} params - Key/value object to convert.
     * @returns {String} - The querystring.

@@ -23,12 +23,27 @@ body {
         width: 100%;
         height: $spacer * 5;
     }
+
+    .rounded-button {
+        border-radius: 100%;
+        transition: all 300ms ease;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        i {
+            font-size: $spacer * 4;
+            padding: $spacer * 4;
+        }
+    }
 }
 
-input[type=text] {
-    height: $spacer * 5;
+input {
+    &[type="text"] {
+        height: $spacer * 5;
+    }
 }
-
 
 
 video {
@@ -42,10 +57,10 @@ video {
 .hide {display: none;}
 
 .list-items {
+    background: $grey-color-lightest;
+
     .list-item {
         display: flex;
-
-        &:nth-child(even) {background: $grey-color-lightest;}
 
         &:nth-child(odd) {background: $grey-color-lighter;}
 

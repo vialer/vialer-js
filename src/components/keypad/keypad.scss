@@ -3,6 +3,7 @@
 
 .keypad-component {
     width: 100%;
+    margin-bottom: $spacer * 2;
 
     .number-input {
         color: $brand-color;
@@ -57,7 +58,7 @@
 
             .key {
                 @include no-outline;
-                margin: 0 5px;
+                margin: 0 $spacer;
                 height: 65px;
                 width: 65px;
 
@@ -72,6 +73,8 @@
 
                 &:hover {
                     cursor: pointer;
+                    background: $brand-color;
+                    color: #fff;
                 }
 
                 .sub {
@@ -79,27 +82,39 @@
                 }
             }
         }
-
-
-
     }
 
-    button {
-        width: 100%;
-    }
 
-    .dial {
-        color: $green-color;
-        font-weight: bold;
-        font-size: 3rem;
-
-        &:hover {
-            cursor: pointer;
+    &.no-call {
+        .number-input {
+            input::placeholder {
+                color: $grey-color-light;
+            }
         }
     }
 
-    .actions {
-        text-align: center;
-        padding: 10px;
+    // Override defaults when in call.
+    &.call-active {
+        .number-input {
+            input::placeholder {
+                color: lighten($brand-color, 20%);
+            }
+        }
+
+        .keys {
+            .row {
+                .key {
+                    background: none;
+                    color: #fff;
+                    border: 2px solid #fff;
+
+                    &:hover {
+                        background: #fff;
+                        color: $brand-color;
+                    }
+
+                }
+            }
+        }
     }
 }

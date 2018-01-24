@@ -53,7 +53,7 @@ class UserModule {
 
         this.app.setState({
             ui: {
-                layer: 'availability',
+                layer: 'contacts',
             },
             user: {
                 authenticated: true,

@@ -5,19 +5,28 @@
     display: flex;
     flex-direction: column;
     text-align: center;
-    background: $brand-color;
     top: $spacer * 4;
     height: calc(100% - 32px);
     position: fixed;
+    background: $brand-color;
 
     .option {
         float: left;
-
         line-height: $spacer * 5;
         font-size: $spacer * 3;
         padding: ($spacer / 2) 0;
 
         color: #fff;
+
+        &.disabled {
+            color: rgba(255, 255, 255, 0.5);
+
+            &:hover {
+                color: rgba(255, 255, 255, 0.5);
+                cursor: not-allowed;
+                background: none;
+            }
+        }
 
         &.active,
         &:hover {

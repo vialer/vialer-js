@@ -32,6 +32,10 @@ class Sip {
             this.session.answer()
         })
 
+        this.app.on('bg:sip:call', ({number}) => {
+            this.call(number)
+        })
+
         this.app.on('bg:sip:dtmf', ({key}) => {
             this.session.session.dtmf(key)
         })
@@ -39,6 +43,10 @@ class Sip {
         this.app.on('bg:sip:toggle_hold', () => {
             if (!this.state.session.hold) this.session.hold()
             else this.session.unhold()
+        })
+
+        this.app.on('bg:sip:blind_transfer', ({number}) => {
+            this.session.blindTransfer(number)
         })
 
         this.app.on('bg:sip:toggle_transfer', () => {
@@ -50,8 +58,8 @@ class Sip {
             }
         })
 
-        this.app.on('bg:sip:blind_transfer', ({number}) => {
-            this.session.blindTransfer(number)
+        this.app.on('bg:sip:connect', () => {
+            this.connect()
         })
 
         // Self-initiated request to stop the session during one of
@@ -69,10 +77,9 @@ class Sip {
     * SipML5 to the websocket SIP backend.
     */
     connect() {
-        // Emit to the frontend that the sip client is not yet
-        // ready to start.
+        // Reconnect when already connected.
         if (this.ua && this.ua.isConnected()) {
-            this.app.logger.warn(`${this}sip backend already starting or started`)
+            this.disconnect(true)
             return
         }
         const settings = this.app.state.settings
@@ -92,13 +99,14 @@ class Sip {
         }
 
         // Login with the WebRTC account and register.
+
         if (settings.webrtc.enabled) {
             uaOptions.authorizationUser = settings.webrtc.username
             uaOptions.password = settings.webrtc.password
             uaOptions.register = true
             uaOptions.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
         } else {
-            // Login with platform email without register.
+            // Login with platform email without SIP register.
             uaOptions.authorizationUser = this.app.state.user.email
             uaOptions.password = this.app.state.user.password
             uaOptions.register = false

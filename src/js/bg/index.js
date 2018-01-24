@@ -10,7 +10,6 @@ const Timer = require('./lib/timer')
 const _modules = [
     {Module: require('./availability'), name: 'availability'},
     {Module: require('./contacts'), name: 'contacts'},
-    {Module: require('./dialer'), name: 'dialer'},
     {Module: require('./user'), name: 'user'},
     {Module: require('./queues'), name: 'queues'},
 ]
@@ -91,7 +90,7 @@ class BackgroundApp extends App {
         if (stateObj) {
             Object.assign(stateObj, this.state)
             this.state = stateObj
-            
+
         }
         else Object.assign(this.state, this.getDefaultState())
 
