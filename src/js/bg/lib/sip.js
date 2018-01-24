@@ -62,6 +62,10 @@ class Sip {
             this.connect()
         })
 
+        this.app.on('bg:sip:disconnect', ({reconnect}) => {
+            this.disconnect(reconnect)
+        })
+
         // Self-initiated request to stop the session during one of
         // the phases of a call.
         this.app.on('bg:sip:stop_session', () => {
@@ -188,8 +192,6 @@ class Sip {
     toString() {
         return `${this.app}[sip] `
     }
-
-
 }
 
 module.exports = Sip

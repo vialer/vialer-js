@@ -16,6 +16,7 @@ module.exports = (app, utils) => {
             },
             refreshApiData: function() {
                 app.emit('bg:refresh_api_data')
+                app.emit('bg:sip:disconnect', {reconnect: true})
             },
             setLayer: function(layerName) {
                 app.setState({ui: {layer: layerName}}, true)

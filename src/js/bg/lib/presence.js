@@ -133,6 +133,11 @@ class Presence {
             contact.state = await this.subscribe(contact.account_id)
         }
     }
+
+
+    toString() {
+        return `${this.app}[presence] `
+    }
 }
 
 module.exports = Presence
