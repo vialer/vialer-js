@@ -112,11 +112,11 @@
 
         .action {
             margin: $spacer;
+            box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);
 
             &.decline {
                 color: #fff;
                 background: $red-color;
-                box-shadow: 0 8px 14px 0 darken($red-color, 7%);
 
                 &:hover {background: darken($red-color, 3%);}
             }
@@ -124,14 +124,12 @@
             &.accept {
                 color: #fff;
                 background: $green-color;
-                box-shadow: 0 8px 14px 0 lighten(desaturate($green-color, 15%), 10%);
                 &:hover {background: darken($green-color, 3%);}
             }
 
             &.dial {
                 color: #fff;
                 background: $green-color;
-                box-shadow: 0 8px 14px 0 lighten(desaturate($green-color, 15%), 10%);
                 &:hover {background: darken($green-color, 3%);}
             }
 
