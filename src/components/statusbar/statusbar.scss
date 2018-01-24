@@ -26,8 +26,7 @@
         color: $brand-color;
     }
 
-    .caller-status,
-    .user-status {
+    .status-left {
         // Don't wrap but put dots at the end if it doesn't fit.
         white-space: nowrap;
         display: flex;
@@ -39,18 +38,15 @@
             width: $spacer * 5;
 
             i {
-                margin: 0;
                 width: $spacer * 5;
-                font-size: 1rem;
-                vertical-align: middle;
+                margin: 0;
                 line-height: $spacer * 4;
+                font-size: 1.2rem;
+                vertical-align: middle;
                 text-align: center;
             }
         }
 
-        .username-padding {
-            padding-left: $spacer;
-        }
     }
 
     // The icon links container at the right top of the popup.
@@ -80,6 +76,12 @@
                 color: #fff;
             }
         }
+    }
+
+    .in-call-info {
+        display: flex;
+        flex-grow: 1;
+        justify-content: space-between;
     }
 
     .call-info {

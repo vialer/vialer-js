@@ -1,6 +1,8 @@
 <div class="keypad-component">
     <div class="number-input">
-        <input type="text" :placeholder="$t('Input number') + '...'" @keyup="unpressKey()" @keydown="pressKey($event.key)" v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
+        <input type="text" :placeholder="$t('Type a number') + '...'"
+            @keyup="unpressKey()" @keydown="pressKey($event.key)"
+            v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
         <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
     </div>
 

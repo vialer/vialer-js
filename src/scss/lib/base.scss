@@ -19,9 +19,11 @@ body {
         font-weight: 500;
     }
 
-    button.button {
-        width: 100%;
-        height: $spacer * 5;
+    button {
+        &.button {
+            width: 100%;
+            height: $spacer * 5;
+        }
     }
 
     .rounded-button {
@@ -45,7 +47,6 @@ input {
     }
 }
 
-
 video {
     display: none;
 }
@@ -57,11 +58,16 @@ video {
 .hide {display: none;}
 
 .list-items {
-    background: $grey-color-lightest;
 
     .list-item {
         display: flex;
 
+        &:hover {
+            &:nth-child(even) {background: lighten($grey-color-lightest, 1%);}
+            &:nth-child(odd) {background: lighten($grey-color-lighter, 1%);}
+        }
+
+        &:nth-child(even) {background: $grey-color-lightest;}
         &:nth-child(odd) {background: $grey-color-lighter;}
 
         .icon i {color: $grey-color;}

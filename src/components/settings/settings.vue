@@ -1,23 +1,23 @@
 <div class="settings-component">
 
     <Field name="sip_endpoint" type="text"
-        :label="$t('SIP Endpoint')" :model.sync="settings.sipEndpoint"
-        :help="$t('The URL to the websocket SIP backend')"
+        :label="$t('SIP Server')" :model.sync="settings.sipEndpoint"
+        :help="$t('URL to a websocket-enabled SIP server.')"
         :placeholder="$t('SIP Server')"/>
 
     <Field name="webrtc_enabled" type="checkbox"
         :label="$t('Enable softphone')" :model.sync="settings.webrtc.enabled"
-        :help="$t('SIP register and WebRTC audio')"/>
+        :help="$t('Use WebRTC to call from the browser.')"/>
 
     <Field name="webrtc_username" type="text"
         :disabled="!settings.webrtc.enabled"
         :label="$t('Username')" :model.sync="settings.webrtc.username"
-        :placeholder="$t('VoIP-account username')"/>
+        :placeholder="$t('Username')"/>
 
     <Field name="webrtc_password" type="password"
         :disabled="!settings.webrtc.enabled"
         :label="$t('Password')" :model.sync="settings.webrtc.password"
-        :placeholder="$t('VoIP-account password')"/>
+        :placeholder="$t('Password')"/>
 
     <Field name="ringtone" type="select"
         :disabled="!settings.webrtc.enabled"
@@ -39,22 +39,22 @@
 
     <Field name="platform_enabled" type="checkbox"
         :label="$t('Enable platform integration')" :model.sync="settings.platform.enabled"
-        :help="$t('Adds platform features like Availability, queues status & Click-to-dial')"/>
+        :help="$t('Add platform-specific features like Availability, queues status and ConnectAB.')"/>
 
     <Field name="platform_url" type="text"
         :disabled="!settings.platform.enabled"
         :label="$t('Platform URL')" :model.sync="settings.platform.url"
-        :help="$t('The URL to the websocket SIP backend')"
+        :help="$t('URL to the platform API.')"
         placeholder="https://"/>
 
     <Field name="click2dial" type="checkbox"
         :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
-        :help="$t('Add clickable icons next to phonenumbers in webpages')"
+        :help="$t('Add clickable icons next to phonenumbers in webpages.')"
         :placeholder="$t('SIP Server')"/>
 
     <Field name="telemetry_enabled" type="checkbox"
         :label="$t('Enable telemetry')" :model.sync="settings.telemetry.enabled"
-        :help="$t('Help us improving this software by allowing telemetry data to be sent')"/>
+        :help="$t('Help us improving this software by sending anonimized usage data.')"/>
 
     <div class="field is-grouped">
         <button class="button is-primary" @click="save">{{$t('Save')}}</button>

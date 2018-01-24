@@ -21,14 +21,11 @@ module.exports = (app, actions) => {
                 app.setState({sip: {session: {transfer: false}}})
             },
             callContact: function(contact) {
-                let forceSilent = false
-                if (app.env.isExtension && app.env.role.popout) forceSilent = true
+                // Only make the call when there is currently no call going on.
+                if (!this.sip.session.state) {
+                    app.emit('bg:sip:call', {number: contact.internal_number})
+                }
 
-                app.emit('dialer:dial', {
-                    analytics: 'Colleagues',
-                    b_number: contact.internal_number,
-                    forceSilent: forceSilent,
-                })
             },
 
         },

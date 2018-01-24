@@ -82,36 +82,9 @@ class Sip {
             this.disconnect(true)
             return
         }
-        const settings = this.app.state.settings
-
-        // For webrtc this is a voipaccount, otherwise an email address.
-        let uaOptions = {
-            log: {
-                builtinEnabled: false,
-                debug: 'error',
-            },
-            stunServers: [
-                'stun.voipgrid.nl',
-            ],
-            traceSip: false,
-            userAgentString: process.env.PLUGIN_NAME,
-            wsServers: [`wss://${settings.sipEndpoint}`],
-        }
 
         // Login with the WebRTC account and register.
-
-        if (settings.webrtc.enabled) {
-            uaOptions.authorizationUser = settings.webrtc.username
-            uaOptions.password = settings.webrtc.password
-            uaOptions.register = true
-            uaOptions.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
-        } else {
-            // Login with platform email without SIP register.
-            uaOptions.authorizationUser = this.app.state.user.email
-            uaOptions.password = this.app.state.user.password
-            uaOptions.register = false
-            uaOptions.uri = `sip:${this.app.state.user.email}`
-        }
+        let uaOptions = this.uaOptions()
 
         if (!uaOptions.authorizationUser || !uaOptions.password) {
             this.app.logger.warn(`${this}cannot connect without username and password`)
@@ -151,8 +124,12 @@ class Sip {
 
             if (this.reconnect) {
                 this.app.logger.debug(`${this}reconnecting ua`)
-                this.ua.start()
+                this.connect()
             }
+        })
+
+        this.ua.on('registrationFailed', (reason) => {
+            this.app.setState({sip: {ua: {state: 'registration_failed'}}})
         })
     }
 
@@ -171,10 +148,40 @@ class Sip {
 
         if (this.ua && this.ua.isConnected()) {
             this.ua.stop()
-            this.app.logger.debug(`${this}disconnected`)
-        } else {
-            this.app.logger.debug(`${this}not connection to stop`)
+            this.app.logger.debug(`${this}disconnected ua`)
         }
+    }
+
+    uaOptions() {
+        const settings = this.app.state.settings
+        // For webrtc this is a voipaccount, otherwise an email address.
+        let uaOptions = {
+            log: {
+                builtinEnabled: false,
+                debug: 'error',
+            },
+            stunServers: [
+                'stun.voipgrid.nl',
+            ],
+            traceSip: false,
+            userAgentString: process.env.PLUGIN_NAME,
+            wsServers: [`wss://${settings.sipEndpoint}`],
+        }
+
+        if (settings.webrtc.enabled) {
+            uaOptions.authorizationUser = settings.webrtc.username
+            uaOptions.password = settings.webrtc.password
+            uaOptions.register = true
+            uaOptions.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
+        } else {
+            // Login with platform email without SIP register.
+            uaOptions.authorizationUser = this.app.state.user.email
+            uaOptions.password = this.app.state.user.password
+            uaOptions.register = false
+            uaOptions.uri = `sip:${this.app.state.user.email}`
+        }
+
+        return uaOptions
     }
 
 

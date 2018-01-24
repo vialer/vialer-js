@@ -22,10 +22,19 @@ class VialerUi extends App {
     initStore() {
         super.initStore()
         // Initialize with the initial state from the background.
+
+
         this.emit('bg:get_state', {
             callback: (state) => {
                 Object.assign(state, this.state)
                 this.state = state
+
+                // Extension has a popout mode, where the plugin is opened
+                // in a tab. Set a flag if this is the case.
+                let searchParams = utils.parseSearch(location.search)
+                if (searchParams.popout) this.state.env.isPopout = true
+                else this.state.env.isPopout = false
+
                 this.initVm()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
             },

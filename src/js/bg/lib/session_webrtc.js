@@ -90,6 +90,11 @@ class WebRTCSession extends Session {
     }
 
 
+    blindTransfer(number) {
+        this.session.refer(`sip:${number}@voipgrid.nl`)
+    }
+
+
     /**
     * Hangup a call.
     */
@@ -144,14 +149,12 @@ class WebRTCSession extends Session {
             ui: {layer: 'calldialog'},
         })
 
-        this.app.logger.notification(`${this.app.$t('Caller ID')}: ${this.displayName}`, `${this.app.$t('Incoming call')} (${this.number})`, false, 'warning')
+        this.app.logger.notification(`${this.app.$t('From')}: ${this.displayName}`, `${this.app.$t('Incoming call')}: ${this.number}`, false, 'warning')
 
         this.playRingtone()
 
         this.session.on('accepted', () => {
-            this.app.setState({
-                sip: {session: {state: 'accepted'}},
-            })
+            this.app.setState({sip: {session: {state: 'accepted'}}})
             this.muteRingtone()
             this.startTimer()
         })
@@ -164,9 +167,9 @@ class WebRTCSession extends Session {
 
         this.session.on('bye', () => {
             this.app.setState({sip: {session: {state: 'bye'}}})
-            this.resetState()
             this.localVideo.srcObject = null
             this.stopTimer()
+            this.resetState()
         })
 
         // Blind transfer.
@@ -178,16 +181,10 @@ class WebRTCSession extends Session {
 
     setupOutgoingCall(number) {
         this.type = 'outgoing'
-        this.app.setState({sip: {session: {type: this.type}}})
         // An outgoing call.
         this.number = number
         this.session = this.ua.invite(`sip:${this.number}@voipgrid.nl`, this._sessionOptions)
-        this.app.setState({
-            sip: {
-                number: this.number,
-                session: {state: 'create'},
-            },
-        })
+        this.app.setState({sip: {number: this.number, session: {state: 'create', type: this.type}}})
 
         // Notify user that it's ringing.
         this.ringBackTone = new this.app.sounds.RingBackTone(350, 440)
@@ -195,14 +192,8 @@ class WebRTCSession extends Session {
 
         this.session.on('accepted', (data) => {
             this.ringBackTone.stop()
-            // Displayname
             this.displayName = this.session.remoteIdentity.displayName
-            this.app.setState({
-                sip: {
-                    displayName: this.displayName,
-                    session: {state: 'accepted'},
-                },
-            })
+            this.app.setState({sip: {displayName: this.displayName, session: {state: 'accepted'}}})
 
             this.localVideo.srcObject = this.stream
             this.localVideo.play()
@@ -229,15 +220,15 @@ class WebRTCSession extends Session {
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (request) => {
             this.app.setState({sip: {session: {state: 'bye'}}})
-            this.resetState()
             this.localVideo.srcObject = null
             this.stopTimer()
+            this.resetState()
         })
 
         this.session.on('rejected', (request) => {
             this.app.setState({sip: {session: {state: 'rejected'}}})
-            this.resetState()
             this.ringBackTone.stop()
+            this.resetState()
         })
     }
 
@@ -246,13 +237,6 @@ class WebRTCSession extends Session {
         this.app.setState({sip: {session: {transfer: active}}})
     }
 
-
-    /**
-    * Causes a new invite event on the ua object in sip.
-    */
-    blindTransfer(number) {
-        this.session.refer(`sip:${number}@voipgrid.nl`)
-    }
 
     unhold() {
         this.app.setState({sip: {session: {hold: false}}})

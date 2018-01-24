@@ -5,7 +5,7 @@
 
     <Field name="password" type="password"
         :label="$t('Password')" :model.sync="user.password"
-        :placeholder="$t('VoIP-account username')"/>
+        :placeholder="$t('Password')"/>
 
     <button type="button" class="button is-primary" data-link="login" @click="login">{{$t('Log in')}}</button>
 </div>

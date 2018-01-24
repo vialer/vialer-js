@@ -24,7 +24,12 @@ class ContactsModule {
             return
         }
 
-        let contacts = res.data.objects.filter((c) => c.sipreginfo)
+        // Filter non-registered accounts and the user's own account
+        // from the contact list.
+        const ownAccountId = parseInt(this.app.state.settings.webrtc.username)
+        let contacts = res.data.objects.filter((c) => {
+            return (c.sipreginfo && (c.account_id !== ownAccountId))
+        })
 
         this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
 
@@ -52,7 +57,7 @@ class ContactsModule {
             this.app.sip.presence.unsubscribe(contact.account_id)
         }
 
-        this.app.setState({contacts: {contacts: contacts}})
+        this.app.setState({contacts: {contacts: contacts}}, true)
         if (contacts.length) this.app.sip.presence.update()
     }
 

@@ -28,7 +28,14 @@ class Session {
 
     resetState() {
         window.setTimeout(() => {
-            this.app.setState({sip: this.app.getDefaultState().sip})
+            const defaultState = this.app.getDefaultState().sip
+            for (const key of Object.keys(this.app.state.sip)) {
+                // We keep these state properties.
+                if (!['ua'].includes(key)) {
+                    this.app.state.sip[key] = defaultState[key]
+                }
+            }
+
             delete this.session
         }, 3000)
     }

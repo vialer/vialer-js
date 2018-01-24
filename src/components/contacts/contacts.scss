@@ -26,6 +26,12 @@
             }
             &.busy i {color: $red-color;}
             &.available i {color: $green-color;}
+
+            // Ringing state is a css keyframe animation.
+            &.ringing i {
+                transition-timing-function: ease;
+                animation: ringing 1.5s linear infinite;
+            }
         }
 
         // In a call.
@@ -35,14 +41,6 @@
 
         &:not(.disabled):hover {
             cursor: pointer;
-        }
-
-
-
-        // Ringing state is a css keyframe animation.
-        .icon.ringing i {
-            transition-timing-function: ease;
-            animation: ringing 1.5s linear infinite;
         }
 
         .info {
