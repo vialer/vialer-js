@@ -1,3 +1,5 @@
+@import "ribbit";
+
 // Generic styles. Keep this file below 300 lines.
 html,
 body {
@@ -16,7 +18,18 @@ body {
         color: $primary-color;
         font-weight: 500;
     }
+
+    button.button {
+        width: 100%;
+        height: $spacer * 5;
+    }
 }
+
+input[type=text] {
+    height: $spacer * 5;
+}
+
+
 
 video {
     display: none;
@@ -24,57 +37,6 @@ video {
 
 * {
     box-sizing: border-box;
-}
-
-.notifications {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 100000;
-    max-width: $max-popup-width;
-
-    .notification {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-
-        margin: 0;
-        padding: 0;
-        border-radius: 0;
-
-        &.is-success {
-            background: $green-color;
-        }
-
-        &.is-warning {
-            background: $red-color;
-            color: #fff;
-        }
-
-        .icon {
-            height: 100%;
-            display: block;
-            text-align: center;
-            min-width: $spacer * 5;
-        }
-
-        .message {
-            flex-grow: 1;
-            padding-left: $spacer;
-        }
-
-        .actions {
-            line-height: $spacer * 6;
-        }
-
-        .delete {
-            vertical-align: middle;
-            margin-right: $spacer;
-            margin-left: $spacer;
-        }
-    }
 }
 
 .hide {display: none;}

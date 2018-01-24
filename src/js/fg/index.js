@@ -59,8 +59,8 @@ function initApp(initParams) {
 
     if (app.env.isOsx) {
         setTimeout(() => {
-            const style = document.querySelector('#app').style;
-            style.display = 'flex';
+            const style = document.querySelector('#app').style
+            style.display = 'flex'
             setTimeout(() => {
                 style.opacity = 1;
             });
@@ -71,7 +71,8 @@ function initApp(initParams) {
     navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
         this.stream = stream
     }).catch((err) => {
-        app.logger.warn(`${this}${err}`)
+        console.warn(err)
+        app.vm.$notify({icon: 'warning', message: `Media access failed: ${err.name}`, type: 'danger'})
     })
 
     return app

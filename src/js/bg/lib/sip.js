@@ -117,7 +117,6 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            console.log("NEW INVITE", session)
             this.session = new Session(this, session)
         })
 
@@ -135,7 +134,6 @@ class Sip {
         this.ua.on('connected', () => {
             this.app.setState({sip: {ua: {state: 'connected'}}})
             this.app.logger.info(`${this}SIP stack started`)
-
         })
 
 

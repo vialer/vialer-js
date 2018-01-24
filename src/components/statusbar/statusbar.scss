@@ -9,7 +9,6 @@
     min-height: $spacer * 4;
     background: $brand-tint-color;
     color: #fff;
-    padding-left: $spacer;
     font-size: 0.8rem;
     font-weight: 500;
     position: fixed;
@@ -27,22 +26,34 @@
         color: $brand-color;
     }
 
-    .username {
+    .user-status {
         // Don't wrap but put dots at the end if it doesn't fit.
         white-space: nowrap;
 
-        i {
-            line-height: $spacer * 4;
-            margin-left: $spacer;
+        .status-indicator {
+            i {
+                margin: 0;
+                width: $spacer * 5;
+                font-size: 1.3rem;
+                vertical-align: middle;
+                line-height: $spacer * 4;
+                text-align: center;
+            }
+        }
+
+        .option {
             color: #fff;
             text-align: center;
             vertical-align: middle;
-            font-size: 0.9rem;
 
             &:hover {
                 cursor: pointer;
             }
         }
+    }
+
+    .caller-status {
+
     }
 
 

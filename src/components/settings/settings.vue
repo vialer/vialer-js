@@ -57,8 +57,6 @@
         :help="$t('Help us improving this software by allowing telemetry data to be sent')"/>
 
     <div class="field is-grouped">
-        <div class="control">
-            <button class="button is-primary" @click="save">{{$t('Save')}}</button>
-        </div>
+        <button class="button is-primary" @click="save">{{$t('Save')}}</button>
     </div>
 </div>
