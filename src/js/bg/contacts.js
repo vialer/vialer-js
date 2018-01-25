@@ -47,7 +47,6 @@ class ContactsModule {
         // to a device.
 
         let invalidContacts = []
-
         let cachedContacts = this.app.state.contacts.contacts
         for (let cachedContact of cachedContacts) {
             if (!contactsLookup.get(cachedContact.account_id)) invalidContacts.push(cachedContact)

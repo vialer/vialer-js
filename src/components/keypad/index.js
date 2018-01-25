@@ -24,7 +24,7 @@ module.exports = (app) => {
                 keyTone.play(key)
                 this.$emit('update:model', `${this.number}${key}`)
                 if (this.dtmf) {
-                    app.emit('sip:dtmf', {key})
+                    app.emit('bg:sip:dtmf', {key})
                 }
             },
             removeLastNumber: function() {

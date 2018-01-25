@@ -1,4 +1,4 @@
-const Session = require('./session_webrtc')
+const Call = require('./call_webrtc')
 const Presence = require('./presence')
 
 
@@ -29,32 +29,32 @@ class Sip {
         this.app.setState({sip: this.app.getDefaultState().sip})
 
         this.app.on('bg:sip:accept_session', () => {
-            this.session.answer()
+            this.call.answer()
         })
 
         this.app.on('bg:sip:call', ({number}) => {
-            this.call(number)
+            this.createCall(number)
         })
 
         this.app.on('bg:sip:dtmf', ({key}) => {
-            this.session.session.dtmf(key)
+            this.call.session.dtmf(key)
         })
 
         this.app.on('bg:sip:toggle_hold', () => {
-            if (!this.state.session.hold) this.session.hold()
-            else this.session.unhold()
+            if (!this.state.session.hold) this.call.hold()
+            else this.call.unhold()
         })
 
         this.app.on('bg:sip:blind_transfer', ({number}) => {
-            this.session.blindTransfer(number)
+            this.call.blindTransfer(number)
         })
 
         this.app.on('bg:sip:toggle_transfer', () => {
             if (!this.state.session.transfer) {
-                this.session.hold()
-                this.session.toggleTransferMode(true)
+                this.call.hold()
+                this.call.toggleTransferMode(true)
             } else {
-                this.session.toggleTransferMode(false)
+                this.call.toggleTransferMode(false)
             }
         })
 
@@ -69,7 +69,7 @@ class Sip {
         // Self-initiated request to stop the session during one of
         // the phases of a call.
         this.app.on('bg:sip:stop_session', () => {
-            this.session.hangup()
+            this.call.hangup()
         })
 
         this.connect()
@@ -102,7 +102,7 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            this.session = new Session(this, session)
+            this.call = new Call(this, session)
         })
 
         this.ua.on('registered', () => {
@@ -138,8 +138,8 @@ class Sip {
     }
 
 
-    call(number) {
-        this.session = new Session(this, number)
+    createCall(number) {
+        this.call = new Call(this, number)
     }
 
 
@@ -149,7 +149,6 @@ class Sip {
     */
     disconnect(reconnect = true) {
         this.reconnect = reconnect
-
         if (this.ua && this.ua.isConnected()) {
             this.ua.stop()
             this.app.logger.debug(`${this}disconnected ua`)
@@ -172,6 +171,9 @@ class Sip {
             wsServers: [`wss://${settings.sipEndpoint}`],
         }
 
+        // Log in with the WebRTC voipaccount when it is enabled.
+        // The voipaccount should be from the same client as the logged-in
+        // user, or subscribe information won't work.
         if (settings.webrtc.enabled) {
             uaOptions.authorizationUser = settings.webrtc.username
             uaOptions.password = settings.webrtc.password

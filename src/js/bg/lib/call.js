@@ -1,7 +1,7 @@
 /**
-* Common Session class for Click-to-dial and WebRTC calling.
+* Common Call class for Click-to-dial and WebRTC calling.
 */
-class Session {
+class Call {
 
     constructor(sip, numberOrSession) {
         this.sip = sip
@@ -44,4 +44,4 @@ class Session {
 }
 
 
-module.exports = Session
+module.exports = Call

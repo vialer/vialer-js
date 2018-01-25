@@ -1,10 +1,11 @@
-const Session = require('./session')
+const Call = require('./call')
 
 
 /**
-* A SipJS wrapper to handle incoming and outgoing calls.
+* Call implementation which mainly wraps SipJS functionality to handle
+( incoming and outgoing calls with.
 */
-class WebRTCSession extends Session {
+class CallWebRTC extends Call {
 
     constructor(sip, numberOrSession) {
         super(sip, numberOrSession)
@@ -244,4 +245,4 @@ class WebRTCSession extends Session {
     }
 }
 
-module.exports = WebRTCSession
+module.exports = CallWebRTC
