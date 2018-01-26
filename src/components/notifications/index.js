@@ -1,4 +1,4 @@
-module.exports = function(app, actions) {
+module.exports = function(app) {
     // Register as a plugin.
     Vue.use({
         install(Vue, options) {

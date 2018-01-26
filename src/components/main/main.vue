@@ -1,4 +1,4 @@
-<div id="app" class="main-component">
+<div class="main-component" id="app">
     <Notifications></Notifications>
     <Statusbar></Statusbar>
 

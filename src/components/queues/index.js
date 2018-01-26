@@ -1,4 +1,4 @@
-module.exports = (app, actions) => {
+module.exports = (app) => {
 
     return {
         methods: {

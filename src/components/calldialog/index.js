@@ -1,7 +1,7 @@
-module.exports = (app, utils) => {
+module.exports = (app) => {
 
     return {
-        computed: utils.sharedComputed(),
+        computed: app.utils.sharedComputed(),
         data: function() {
             return {
                 dtmfnumbers: '', // Reference to the number while a call is underway.

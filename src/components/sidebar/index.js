@@ -1,7 +1,7 @@
-module.exports = (app, actions) => {
+module.exports = (app) => {
     return {
         methods: {
-            logout: actions.logout,
+            logout: app.utils.logout,
             setLayer: function(layerName) {
                 this.$store.ui.layer = layerName
                 app.emit('bg:set_state', {
