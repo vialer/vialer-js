@@ -90,9 +90,7 @@ class BackgroundApp extends App {
         if (stateObj) {
             Object.assign(stateObj, this.state)
             this.state = stateObj
-
-        }
-        else Object.assign(this.state, this.getDefaultState())
+        } else Object.assign(this.state, this.getDefaultState())
 
         this.initVm()
 

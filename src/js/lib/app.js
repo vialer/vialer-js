@@ -51,9 +51,7 @@ class App extends Skeleton {
                 mode: null, // `callee` or `caller`
                 number: null,
                 onhold: false,
-                transfer: {
-                    number: null,
-                },
+                transfer: false,
             },
             contacts: {
                 contacts: [],
@@ -105,26 +103,10 @@ class App extends Skeleton {
                 },
             },
             sip: {
-                displayName: null,
-                number: '',
-                session: {
-                    hold: false,
-                    state: null,
-                    timer: {
-                        current: null,
-                        start: null,
-                    },
-                    transfer: false,
-                    type: null,
+                call: {
+                    active: null,
                 },
-                sessionTransfer: {
-                    hold: false,
-                    state: null,
-                    timer: {
-                        current: null,
-                        start: null,
-                    },
-                },
+                calls: [],
                 ua: {
                     state: null,
                 },

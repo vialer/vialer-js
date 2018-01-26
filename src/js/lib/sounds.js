@@ -12,7 +12,7 @@ class DtmfTone {
 
     constructor(freq1, freq2) {
         this.context = context
-        this.status = 0
+        this.started = false
         this.freq1 = freq1
         this.freq2 = freq2
 
@@ -57,7 +57,7 @@ class DtmfTone {
 
         this.osc1.start(0)
         this.osc2.start(0)
-        this.status = 1
+        this.started = true
     }
 
 
@@ -66,18 +66,18 @@ class DtmfTone {
         this.freq1 = frequencyPair.f1
         this.freq2 = frequencyPair.f2
 
-        if (this.status === 0) {
+        if (!this.started) {
             this.start()
         }
     }
 
 
     stop() {
-        if (this.status === 1) {
+        if (this.started) {
             this.osc1.stop(0)
             this.osc2.stop(0)
         }
-        this.status = 0
+        this.status = false
     }
 }
 
@@ -92,6 +92,7 @@ class RingbackTone {
         this.status = 0
         this.freq1 = 400
         this.freq2 = 450
+        this.started = false
     }
 
 
@@ -149,10 +150,12 @@ class RingbackTone {
         // Connect the ringerLFOSource to the gain Node audio param.
         this.ringerLFOSource.connect(this.gainNode.gain)
         this.ringerLFOSource.start(0)
+        this.started = true
     }
 
 
     stop() {
+        if (!this.started) return
         this.osc1.stop(0)
         this.osc2.stop(0)
         this.status = 0

@@ -29,7 +29,7 @@
                     </template>
 
                     <template v-else-if="$store.ui.layer==='calldialog'">
-                        <CallDialog :keypad="$store.sip.session.state"></CallDialog>
+                        <CallDialog :call="call" v-for="call in $store.sip.calls"></CallDialog>
                     </template>
                 </div>
         </template>

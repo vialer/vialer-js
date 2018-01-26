@@ -2,8 +2,8 @@ const Call = require('./call')
 
 
 /**
-* Call implementation which mainly wraps SipJS functionality to handle
-( incoming and outgoing calls with.
+* Call flow wrapper around SipJS which enables incoming and outgoing
+* calls using WebRTC.
 */
 class CallWebRTC extends Call {
 
@@ -12,7 +12,7 @@ class CallWebRTC extends Call {
 
         // Query media and assign the stream. The actual permission must be
         // already granted from a foreground script running in a tab.
-        this._initMedia().then((stream) => {
+        this.hasMedia = this._initMedia().then((stream) => {
             this._sessionOptions.media.stream = stream
             this.stream = stream
 
@@ -70,21 +70,20 @@ class CallWebRTC extends Call {
     */
     _handleIncoming(session) {
         this.session = session
-        this.type = 'incoming'
+
         this.displayName = this.session.remoteIdentity.displayName
         this.number = this.session.remoteIdentity.uri.user
 
-        this.app.setState({
-            sip: {
-                displayName: this.displayName,
-                number: this.number,
-                session: {
-                    state: 'invite',
-                    type: this.type,
-                },
-            },
-            ui: {layer: 'calldialog'},
+        this.setState({
+            displayName: this.displayName,
+            id: this.session.id,
+            number: this.number,
+            status: 'invite',
+            type: 'incoming',
         })
+
+        this.app.setState({ui: {layer: 'calldialog'}})
+
         // Notify the user about an incoming call.
         this.app.logger.notification(`${this.app.$t('From')}: ${this.displayName}`, `${this.app.$t('Incoming call')}: ${this.number}`, false, 'warning')
         this.ringtone.play()
@@ -92,24 +91,21 @@ class CallWebRTC extends Call {
         // Setup some event handlers for the different stages of a call.
         this.session.on('accepted', (request) => {
             console.log("ACCEPTED FROM INCOMING:")
-            this.app.setState({sip: {session: {state: 'accepted'}}})
-            this.ringtone.stop()
+            this.setState({status: 'accepted'})
             this.startTimer()
         })
 
         this.session.on('rejected', (e) => {
             console.log("REJECTED FROM INCOMING:", e)
-            this.app.setState({sip: {session: {state: 'rejected'}}})
-            this.ringtone.stop()
-            this.resetState()
+            this.setState({status: 'rejected'})
+            this.cleanup()
         })
 
         this.session.on('bye', (e) => {
             console.log("BYE FROM INCOMING:", e)
-            this.app.setState({sip: {session: {state: 'bye'}}})
+            this.setState({status: 'bye'})
             this.localVideo.srcObject = null
-            this.stopTimer()
-            this.resetState()
+            this.cleanup()
         })
 
         // Blind transfer event.
@@ -125,12 +121,11 @@ class CallWebRTC extends Call {
     * @param {(Number|String)} number - The number to call.
     */
     _handleOutgoing(number) {
-        this.type = 'outgoing'
         this.number = number
         this.session = this.ua.invite(`sip:${this.number}@voipgrid.nl`, this._sessionOptions)
-
+        console.log('SESSION ID:', this.session.id)
         // Notify user about the new call being setup.
-        this.app.setState({sip: {number: this.number, session: {state: 'create', type: this.type}}})
+        this.setState({number: this.number, status: 'create', type: 'outgoing'})
         this.ringbackTone.play()
 
         this.session.on('accepted', (data) => {
@@ -150,7 +145,7 @@ class CallWebRTC extends Call {
                 this.remoteVideo.play()
             })
 
-            this.app.setState({sip: {displayName: this.displayName, session: {state: 'accepted'}}})
+            this.setState({displayName: this.displayName, status: 'accepted'})
             this.startTimer()
         })
 
@@ -164,17 +159,15 @@ class CallWebRTC extends Call {
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (e) => {
             console.log("BYE FROM OUTGOING:", e)
-            this.app.setState({sip: {session: {state: 'bye'}}})
             this.localVideo.srcObject = null
-            this.stopTimer()
-            this.resetState()
+            this.setState({status: 'bye'})
+            this.cleanup()
         })
 
         this.session.on('rejected', (e) => {
             console.log("ACCEPTED FROM OUTGOING:", e)
-            this.app.setState({sip: {session: {state: 'rejected'}}})
-            this.ringtone.stop()
-            this.resetState()
+            this.setState({status: 'rejected'})
+            this.cleanup()
         })
     }
 
@@ -183,7 +176,7 @@ class CallWebRTC extends Call {
     * Accept an incoming session.
     */
     answer() {
-        if (!(this.type === 'incoming')) throw 'session must be incoming type'
+        if (!(this.state.type === 'incoming')) throw 'session must be incoming type'
         this.session.accept(this._sessionOptions)
 
         this.localVideo.srcObject = this.stream
@@ -203,6 +196,12 @@ class CallWebRTC extends Call {
     }
 
 
+    hold() {
+        this.session.hold()
+        this.setState({hold: true})
+    }
+
+
     transferAttended(number) {
         this.session_transfer = ''
     }
@@ -216,31 +215,25 @@ class CallWebRTC extends Call {
     /**
     * Hangup a call.
     */
-    hangup() {
-        if (this.state.session.state === 'invite') {
+    terminate() {
+        if (this.state.status === 'invite') {
             // Decline an incoming call.
             this.session.reject()
-        } else if (this.state.session.state === 'create') {
+        } else if (this.state.status === 'create') {
             // Cancel a self-initiated call.
             this.session.terminate()
-        } else if (['accepted'].includes(this.state.session.state)) {
+        } else if (['accepted'].includes(this.state.status)) {
             // Hangup a running call.
             this.session.bye()
             // The bye event on the session is not triggered.
-            this.app.setState({sip: {session: {state: 'bye'}}})
+            this.setState({status: 'bye'})
         }
     }
 
 
-    hold() {
-        this.app.setState({sip: {session: {hold: true}}})
-        this.session.hold()
-    }
-
-
     unhold() {
-        this.app.setState({sip: {session: {hold: false}}})
         this.session.unhold()
+        this.setState({hold: false})
     }
 }
 

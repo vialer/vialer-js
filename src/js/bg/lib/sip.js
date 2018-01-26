@@ -31,8 +31,14 @@ class Sip {
         // Start with a clean state.
         this.app.setState({sip: this.app.getDefaultState().sip})
 
-        this.app.on('bg:sip:accept_session', () => {
-            this.call.answer()
+        this.app.on('bg:sip:call_answer', ({callId}) => {
+            this.calls[callId].answer()
+        })
+
+        // Self-initiated request to stop the session during one of
+        // the phases of a call.
+        this.app.on('bg:sip:call_terminate', ({callId}) => {
+            this.calls[callId].terminate()
         })
 
         this.app.on('bg:sip:call', ({number}) => {
@@ -64,11 +70,7 @@ class Sip {
             this.disconnect(reconnect)
         })
 
-        // Self-initiated request to stop the session during one of
-        // the phases of a call.
-        this.app.on('bg:sip:stop_session', () => {
-            this.call.hangup()
-        })
+
 
         this.connect()
     }
@@ -99,8 +101,10 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            console.log("NEW INVITE FROM UA:", session)
-            this.call = new Call(this, session)
+            const call = new Call(this, session)
+            call.hasMedia.then(() => {
+                this.calls[call.state.id] = call
+            })
         })
 
         this.ua.on('registered', () => {
@@ -136,8 +140,16 @@ class Sip {
     }
 
 
+    /**
+    * Switch to the calldialog and start a new call.
+    * @param {Number} number - The number to call.
+    */
     createCall(number) {
-        this.call = new Call(this, number)
+        const call = new Call(this, number)
+        call.hasMedia.then(() => {
+            this.calls[call.session.id] = call
+            this.app.setState({ui: {layer: 'calldialog'}})
+        })
     }
 
 

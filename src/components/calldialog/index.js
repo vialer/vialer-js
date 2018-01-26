@@ -7,6 +7,7 @@ module.exports = (app) => {
                 dtmfnumbers: '', // Reference to the number while a call is underway.
                 intervalId: 0,
                 keypad: false,
+                number: null,
                 startDate: new Date().getTime(),
             }
         },
@@ -14,15 +15,25 @@ module.exports = (app) => {
             clearInterval(this.intervalId)
         },
         methods: {
-            acceptSession: function() {
-                app.emit('bg:sip:accept_session')
+            callAnswer: function(call) {
+                app.emit('bg:sip:call_answer', {callId: call.id})
+            },
+            callTerminate: function(call) {
+                app.emit('bg:sip:call_terminate', {callId: call.id})
+            },
+            classes: function(block) {
+                let classes = {}
+                if (block === 'component') {
+                    if (block === 'component') {
+                        if (this.call.status) classes['call-active'] = true
+                        else classes['no-call'] = true
+                    }
+                }
+                return classes
             },
             dial: function(number) {
                 if (!number) return
                 app.emit('bg:sip:call', {number: number})
-            },
-            stopSession: function() {
-                app.emit('bg:sip:stop_session')
             },
             toggleHold: function() {
                 app.emit('bg:sip:toggle_hold')
@@ -36,10 +47,10 @@ module.exports = (app) => {
                 app.setState({sip: {session: {transfer: true}}})
             },
         },
+        props: ['call'],
         render: templates.calldialog.r,
         staticRenderFns: templates.calldialog.s,
         store: {
-            module: 'calldialog',
             sip: 'sip',
         },
         watch: {
