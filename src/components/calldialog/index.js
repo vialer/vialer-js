@@ -31,7 +31,9 @@ module.exports = (app, utils) => {
                 this.keypad = !this.keypad
             },
             toggleTransfer: function() {
-                app.emit('bg:sip:toggle_transfer')
+                // Toggle hold and set the UI in transfer mode.
+                app.emit('bg:sip:toggle_hold')
+                app.setState({sip: {session: {transfer: true}}})
             },
         },
         render: templates.calldialog.r,

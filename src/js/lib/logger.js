@@ -65,23 +65,23 @@ class Logger {
             options.iconUrl = browser.runtime.getURL(options.iconUrl)
             if (!stack) browser.notifications.clear('c2d')
             browser.notifications.create('c2d', options)
-        } else {
-            options.icon = options.iconUrl
-            options.body = message
+            return
+        }
 
-            if (Notification.permission === 'granted') {
-                if (!stack && this._notification) this._notification.close()
-                this._notification = new Notification(title, options) // eslint-disable-line no-new
-            } else if (Notification.permission !== 'denied') {
-                // Create a notification after the user
-                // accepted the permission.
-                Notification.requestPermission(function(permission) {
-                    if (permission === 'granted') {
-                        if (!stack && this._notification) this._notification.close()
-                        this._notification = new Notification(title, options) // eslint-disable-line no-new
-                    }
-                })
-            }
+        options.icon = options.iconUrl
+        options.body = message
+
+        if (Notification.permission === 'granted') {
+            if (!stack && this._notification) this._notification.close()
+            this._notification = new Notification(title, options) // eslint-disable-line no-new
+        } else if (Notification.permission !== 'denied') {
+            // Create a notification after the user
+            // accepted the permission.
+            Notification.requestPermission((permission) => {
+                if (permission === 'granted') {
+                    this._notification = new Notification(title, options) // eslint-disable-line no-new
+                }
+            })
         }
     }
 

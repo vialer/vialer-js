@@ -85,7 +85,7 @@ class DtmfTone {
 * Ring-back tone generator.
 * Source: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 */
-class RingBackTone {
+class RingbackTone {
 
     constructor(freq1, freq2) {
         this.context = context
@@ -187,4 +187,4 @@ class RingTone {
 }
 
 
-module.exports = {DtmfTone, RingBackTone, RingTone}
+module.exports = {DtmfTone, RingbackTone, RingTone}

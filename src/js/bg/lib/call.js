@@ -9,6 +9,8 @@ class Call {
         this.app = this.sip.app
         this.ua = this.sip.ua
         this.state = this.app.state.sip
+        this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
+        this.ringbackTone = new this.app.sounds.RingbackTone(350, 440)
     }
 
 

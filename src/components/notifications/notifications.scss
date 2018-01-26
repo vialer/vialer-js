@@ -1,4 +1,6 @@
-.notifications {
+@import "../../scss/lib/variables";
+
+.notifications-component {
     position: fixed;
     top: 0;
     left: 0;
@@ -15,15 +17,6 @@
         margin: 0;
         padding: 0;
         border-radius: 0;
-
-        &.is-success {
-            background: $green-color;
-        }
-
-        &.is-warning {
-            background: $red-color;
-            color: #fff;
-        }
 
         .icon {
             height: 100%;

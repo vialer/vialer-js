@@ -15,6 +15,9 @@ class Sip {
         this.app = app
         this.lib = require('sip.js')
 
+        // Keeps track of calls. Keys match Sip.js session keys.
+        this.calls = {}
+
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
         this.reconnect = true
@@ -45,16 +48,11 @@ class Sip {
             else this.call.unhold()
         })
 
-        this.app.on('bg:sip:blind_transfer', ({number}) => {
-            this.call.blindTransfer(number)
-        })
-
-        this.app.on('bg:sip:toggle_transfer', () => {
-            if (!this.state.session.transfer) {
-                this.call.hold()
-                this.call.toggleTransferMode(true)
+        this.app.on('bg:sip:transfer', ({number, type}) => {
+            if (type === 'blind') {
+                this.call.transferBlind(number)
             } else {
-                this.call.toggleTransferMode(false)
+                this.call.transferAttended(number)
             }
         })
 
@@ -89,7 +87,6 @@ class Sip {
 
         // Login with the WebRTC account and register.
         let uaOptions = this.uaOptions()
-
         if (!uaOptions.authorizationUser || !uaOptions.password) {
             this.app.logger.warn(`${this}cannot connect without username and password`)
             return
@@ -102,6 +99,7 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
+            console.log("NEW INVITE FROM UA:", session)
             this.call = new Call(this, session)
         })
 

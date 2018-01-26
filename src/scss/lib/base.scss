@@ -55,6 +55,11 @@ video {
     box-sizing: border-box;
 }
 
+::selection {
+    background: $brand-color;
+    color: #fff;
+}
+
 .hide {display: none;}
 
 .list-items {

@@ -3,8 +3,14 @@
 
 // Variable overrides for included libraries.
 $primary: $brand-color;
+$link: $brand-color;
 $family-primary: "Roboto";
+
+$success: $green-color;
+$danger: $red-color;
+
 $fa-font-path: $font-path;
+$text: $primary-color;
 
 @import "bulma/sass/utilities/all";
 @import "bulma/sass/base/all";

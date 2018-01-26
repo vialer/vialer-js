@@ -1,5 +1,5 @@
 <div id="app" class="main-component">
-    <Notifications :notifications="$store.notifications"></Notifications>
+    <Notifications></Notifications>
     <Statusbar></Statusbar>
 
     <div class="panel">

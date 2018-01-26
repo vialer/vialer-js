@@ -18,6 +18,7 @@ class App extends Skeleton {
 
         this.MainComponent = require('../../components/main')(this, utils)
 
+        Vue.component('Notifications', require('../../components/notifications')(this, utils))
         Vue.component('Sidebar', require('../../components/sidebar')(this, utils))
         Vue.component('Statusbar', require('../../components/statusbar')(this, utils))
         Vue.component('Field', require('../../components/field')(this, utils))
@@ -116,16 +117,15 @@ class App extends Skeleton {
                         start: null,
                     },
                     transfer: false,
-                    type: '',
+                    type: null,
                 },
-                transferSession: {
+                sessionTransfer: {
                     hold: false,
                     state: null,
                     timer: {
                         current: null,
                         start: null,
                     },
-                    type: 'blind',
                 },
                 ua: {
                     state: null,
