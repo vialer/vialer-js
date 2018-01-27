@@ -7,7 +7,7 @@ module.exports = function(app) {
     utils.getTranslations = function() {
         const $t = app.$t
         return {
-            sip: {
+            call: {
                 accepted: {
                     hold: $t('On hold'),
                     incoming: $t('Connected'),
@@ -25,23 +25,23 @@ module.exports = function(app) {
         return {
             callStatus: function() {
                 const translations = utils.getTranslations()
-                if (this.sip.session.state === 'accepted') {
-                    if (this.sip.session.hold) {
-                        return translations.sip.accepted.hold
+                if (this.call.status === 'accepted') {
+                    if (this.call.hold) {
+                        return translations.call.accepted.hold
                     }
 
-                    return translations.sip.accepted[this.sip.session.type]
+                    return translations.call.accepted[this.call.type]
                 }
-                return translations.sip[this.sip.session.state]
+                return translations.call[this.call.status]
             },
             hours: function() {
-                return Math.trunc((this.sip.session.timer.current - this.sip.session.timer.start) / 1000 / 60 / 60) % 24
+                return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60 / 60) % 24
             },
             minutes: function() {
-                return Math.trunc((this.sip.session.timer.current - this.sip.session.timer.start) / 1000 / 60) % 60
+                return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60) % 60
             },
             seconds: function() {
-                return Math.trunc((this.sip.session.timer.current - this.sip.session.timer.start) / 1000) % 60
+                return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000) % 60
             },
             sessionTime: function() {
                 let formattedTime

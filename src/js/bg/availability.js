@@ -22,8 +22,6 @@ class AvailabilityModule {
 
             if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                 this.app.logger.warn(`${this}unauthorized availability request`)
-                this.app.state.availability.widget.state = 'unauthorized'
-                this.app.emit('fg:set_state', {availability: {widget: {state: 'unauthorized'}}})
                 return
             }
 
@@ -56,8 +54,6 @@ class AvailabilityModule {
 
         if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
             this.app.logger.warn(`${this}unauthorized availability request`)
-            this.app.state.availability.widget.state = 'unauthorized'
-            this.app.emit('fg:set_state', {availability: {widget: {state: 'unauthorized'}}})
             return
         }
 

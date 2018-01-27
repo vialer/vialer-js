@@ -71,21 +71,20 @@ class CallWebRTC extends Call {
     _handleIncoming(session) {
         this.session = session
 
-        this.displayName = this.session.remoteIdentity.displayName
-        this.number = this.session.remoteIdentity.uri.user
-
         this.setState({
-            displayName: this.displayName,
+            displayName: this.session.remoteIdentity.displayName,
             id: this.session.id,
-            number: this.number,
+            number: this.session.remoteIdentity.uri.user,
             status: 'invite',
             type: 'incoming',
         })
 
         this.app.setState({ui: {layer: 'calldialog'}})
+        // Signal the user about the incoming call.
+        this.app.logger.notification(
+            `${this.app.$t('From')}: ${this.state.displayName}`,
+            `${this.app.$t('Incoming call')}: ${this.state.number}`, false, 'warning')
 
-        // Notify the user about an incoming call.
-        this.app.logger.notification(`${this.app.$t('From')}: ${this.displayName}`, `${this.app.$t('Incoming call')}: ${this.number}`, false, 'warning')
         this.ringtone.play()
 
         // Setup some event handlers for the different stages of a call.
@@ -121,11 +120,9 @@ class CallWebRTC extends Call {
     * @param {(Number|String)} number - The number to call.
     */
     _handleOutgoing(number) {
-        this.number = number
-        this.session = this.ua.invite(`sip:${this.number}@voipgrid.nl`, this._sessionOptions)
-        console.log('SESSION ID:', this.session.id)
+        this.session = this.ua.invite(`sip:${number}@voipgrid.nl`, this._sessionOptions)
+        this.setState({id: this.session.id, number: number, status: 'create', type: 'outgoing'})
         // Notify user about the new call being setup.
-        this.setState({number: this.number, status: 'create', type: 'outgoing'})
         this.ringbackTone.play()
 
         this.session.on('accepted', (data) => {

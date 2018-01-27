@@ -3,7 +3,7 @@ let env = require('../lib/env')
 const utils = require('../lib/utils')
 
 
-class VialerUi extends App {
+class VialerFg extends App {
 
     constructor(options) {
         super(options)
@@ -13,9 +13,47 @@ class VialerUi extends App {
         })
 
         // Another script wants to sync this script's state.
-        this.on('fg:set_state', (state) => {
+        this.on('fg:set_state', ({mount, state}) => {
+            if (mount) {
+                const paths = mount.path.split('.')
+                let target
+                for (const path of paths) {
+                    if (!target) target = this.state[path]
+                    else target = target[path]
+                }
+
+                if (mount.type === 'array') {
+                    for (const item of target) {
+                        if (item.id === mount.id) {
+                            this.mergeDeep(item, state)
+                        }
+                    }
+                }
+                return
+            }
             this.mergeDeep(this.state, state)
         })
+    }
+
+
+    _init() {
+        super._init()
+        this.utils = require('../../components/utils')(this)
+
+        Vue.component('Availability', require('../../components/availability')(this))
+        Vue.component('CallBar', require('../../components/callbar')(this))
+        Vue.component('CallDialog', require('../../components/calldialog')(this))
+        Vue.component('Contacts', require('../../components/contacts')(this))
+        Vue.component('Field', require('../../components/field')(this))
+        Vue.component('Keypad', require('../../components/keypad')(this))
+        Vue.component('Login', require('../../components/login')(this))
+        Vue.component('Notifications', require('../../components/notifications')(this))
+        Vue.component('Settings', require('../../components/settings')(this))
+        Vue.component('Sidebar', require('../../components/sidebar')(this))
+        Vue.component('Statusbar', require('../../components/statusbar')(this))
+        Vue.component('Queues', require('../../components/queues')(this))
+
+        this.initStore()
     }
 
 
@@ -23,11 +61,16 @@ class VialerUi extends App {
         super.initStore()
         // Initialize with the initial state from the background.
 
-
         this.emit('bg:get_state', {
             callback: (state) => {
-                Object.assign(state, this.state)
-                this.state = state
+                // Make sure that the webview doesn't use the referenced
+                // state object from the background. Extensions also
+                // serialize data between scripts, so this is done in
+                // webview mode as well for consistency's sake.
+                if (this.env.isExtension) this.state = state
+                else {
+                    this.state = JSON.parse(JSON.stringify(state))
+                }
 
                 // Extension has a popout mode, where the plugin is opened
                 // in a tab. Set a flag if this is the case.
@@ -60,7 +103,7 @@ class VialerUi extends App {
 
 function initApp(initParams) {
     initParams.modules = []
-    const app = new VialerUi(initParams)
+    const app = new VialerFg(initParams)
 
     if (app.env.isChrome) $('html').addClass('chrome')
     if (app.env.isEdge) $('html').addClass('edge')
@@ -71,11 +114,10 @@ function initApp(initParams) {
             const style = document.querySelector('#app').style
             style.display = 'flex'
             setTimeout(() => {
-                style.opacity = 1;
+                style.opacity = 1
             });
-        }, 200);
+        }, 200)
     }
-
 
     navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
         this.stream = stream

@@ -13,21 +13,6 @@ class App extends Skeleton {
 
     _init() {
         this.sounds = require('./sounds')
-        this.utils = require('../../components/utils')(this)
-
-        Vue.component('Notifications', require('../../components/notifications')(this))
-        Vue.component('Sidebar', require('../../components/sidebar')(this))
-        Vue.component('Statusbar', require('../../components/statusbar')(this))
-        Vue.component('Field', require('../../components/field')(this))
-        Vue.component('CallDialog', require('../../components/calldialog')(this))
-        Vue.component('Availability', require('../../components/availability')(this))
-        Vue.component('Contacts', require('../../components/contacts')(this))
-        Vue.component('Login', require('../../components/login')(this))
-        Vue.component('Settings', require('../../components/settings')(this))
-        Vue.component('Keypad', require('../../components/keypad')(this))
-        Vue.component('Queues', require('../../components/queues')(this))
-
-        this.initStore()
     }
 
 
@@ -46,12 +31,6 @@ class App extends Skeleton {
                 },
                 destinations: [],
                 sud_id: null,
-            },
-            calldialog: {
-                mode: null, // `callee` or `caller`
-                number: null,
-                onhold: false,
-                transfer: false,
             },
             contacts: {
                 contacts: [],
@@ -103,9 +82,7 @@ class App extends Skeleton {
                 },
             },
             sip: {
-                call: {
-                    active: null,
-                },
+                call: null,
                 calls: [],
                 ua: {
                     state: null,

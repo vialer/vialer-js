@@ -15,7 +15,7 @@ const _modules = [
 ]
 
 
-class BackgroundApp extends App {
+class VialerBg extends App {
 
     constructor(options) {
         super(options)
@@ -29,7 +29,6 @@ class BackgroundApp extends App {
         // A state object that can be mutated across instances
         // using {app_name}:set_state and {app_name}:get_state emitters.
         this.on('bg:get_state', (data) => {
-            this.logger.debug(`${this}returning state request`)
             // Send this script's state back to the requesting script.
             data.callback(this.state)
         })
@@ -56,6 +55,12 @@ class BackgroundApp extends App {
                 })
             }
         }
+    }
+
+
+    _init() {
+        super._init()
+        this.initStore()
     }
 
 
@@ -110,7 +115,8 @@ class BackgroundApp extends App {
         this.mergeDeep(this.state, state)
         if (persist) this.store.set('state', this.state)
         // Update the foreground's state with it.
-        this.emit('fg:set_state', state)
+        if (this.env.isExtension) this.emit('fg:set_state', {state: state})
+        else this.emit('fg:set_state', {state: JSON.parse(JSON.stringify(state))})
     }
 
 
@@ -128,7 +134,7 @@ class BackgroundApp extends App {
 
 function initApp(initParams) {
     initParams.modules = _modules
-    return new BackgroundApp(initParams)
+    return new VialerBg(initParams)
 }
 
 // For extensions, this is an executable endpoint.

@@ -6,7 +6,7 @@
     </div>
 
     <ul class="list-items">
-        <li class="list-item contact" v-for="contact in filteredContacts" @click="callContact(contact)" :class="{'disabled': sip.session.state}">
+        <li class="list-item contact" v-for="contact in filteredContacts" @click="callContact(contact)" :class="{'disabled': sip.calls.length}">
             <div class="status-icon" :class="contact.state">
                 <i class="icon icon-availability"></i>
             </div>
@@ -15,7 +15,7 @@
                 <div class="description">{{contact.internal_number}}</div>
             </div>
             <div class="contact-options">
-                <div class="rounded-button" v-if="sip.session.transfer">
+                <div class="rounded-button" v-if="sip.calls.length && sip.call && sip.call.transfer">
                     <i class="icon icon-transfer"  v-on:click.once="blindTransfer(contact.internal_number)"></i>
                 </div>
             </div>

@@ -22,7 +22,7 @@ module.exports = (app) => {
             },
             callContact: function(contact) {
                 // Only make the call when there is currently no call going on.
-                if (!this.sip.session.state) {
+                if (!this.sip.calls.length) {
                     app.emit('bg:sip:call', {number: contact.internal_number})
                 }
 

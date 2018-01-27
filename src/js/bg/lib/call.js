@@ -5,12 +5,15 @@ class Call {
 
     constructor(sip, numberOrSession) {
         this.sip = sip
-
         this.app = this.sip.app
         this.ua = this.sip.ua
-        this.state = this.app.state.sip
+
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringbackTone = new this.app.sounds.RingbackTone(350, 440)
+        // We can only match a call when the initial state already
+        // includes it's id. This flag is used to inficate when
+        // the foreground call state can be updated.
+        this._trackState = false
 
         this.state = {
             displayName: null,
@@ -22,21 +25,38 @@ class Call {
                 current: null,
                 start: null,
             },
+            transfer: false,
             type: null,
         }
-        // Allow Vue to keep track of the call state.
-        this.app.state.sip.calls.push(this.state)
     }
 
 
     /**
-    * Synchronizes call state with the foreground. The next best thing
-    * f
+    * Mutate state only using this function. It takes care of merging a
+    * state modification object with the current watched call object and
+    * propagate the updated state back to the foreground.
     * @param {Object} state - The state to update.
     */
     setState(state) {
         this.app.mergeDeep(this.state, state)
-        this.app.emit('fg:set_state', state)
+
+        if (this._trackState) {
+            this.app.emit('fg:set_state', {
+                mount: {
+                    id: this.state.id,
+                    path: 'sip.calls',
+                    type: 'array',
+                },
+                state: state,
+            })
+        } else {
+            if (state.id) {
+                this.state.id = state.id
+                this.app.state.sip.calls.push(this.state)
+                this.app.setState({sip: {calls: this.app.state.sip.calls}})
+                this._trackState = true
+            }
+        }
     }
 
 

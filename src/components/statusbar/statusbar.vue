@@ -1,5 +1,4 @@
-<div class="statusbar-component" :class="{'call-active': sip.session.state}">
-    <!-- Statusbar when not in a call -->
+<div class="statusbar-component">
 
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator">
@@ -8,16 +7,17 @@
             <i v-if="sip.ua.state === 'registered'" class="fa fa-exchange" :title="$t('Status:') + ' ' + $t('registered')"></i>
             <i v-if="sip.ua.state === 'registration_failed'" class="fa fa-chain-broken" :title="$t('Status:') + ' ' + $t('registration failed')"></i>
         </span>
-        <span class="username" v-if="!sip.session.state">{{user.username}}</span>
-        <div class="options" v-if="!sip.session.state">
+        <span class="username">{{user.username}}</span>
+        <div class="options">
             <div class="option">
                 <i class="icon-logout" :title="$t('Log out')" @click="logout()"></i>
             </div>
         </div>
     </div>
+    <!-- Empty container is here to push .options to the right. -->
     <div v-else></div>
 
-    <div class="options" v-if="!sip.session.state">
+    <div class="options">
         <div class="option" v-if="!user.authenticated" :class="{active: layer === 'login'}" @click="setLayer('login')">
             <i class="icon-logout" :title="$t('Login page')"></i>
         </div>
@@ -36,19 +36,6 @@
 
         <div class="option">
             <i class="icon-support" data-link="help" :title="$t('Help')" @click="openHelp"></i>
-        </div>
-    </div>
-
-    <!-- Statusbar when in a call -->
-    <div class="in-call-info" v-else>
-        <div class="caller-status">
-            <template v-if="sip.displayName">{{sip.displayName}}</template>
-            <template v-else>{{sip.number}}</template>
-        </div>
-
-        <div class="call-info">
-            <span class="status">{{callStatus}}</span>
-            <span class="timer" v-if="sip.session.timer.start"> {{sessionTime}}</span>
         </div>
     </div>
 </div>
