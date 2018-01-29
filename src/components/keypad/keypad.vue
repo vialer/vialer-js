@@ -1,12 +1,19 @@
 <div class="keypad-component">
-    <div class="number-input">
-        <input type="text" :placeholder="$t('Type a number') + '...'"
+
+    <div class="dense-number-input" v-if="dense">
+        <input type="text" placeholder="..."
+            @keyup="unpressKey()" @keydown="pressKey($event.key)"
+            v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
+        <i class="icon icon-transfer" @click="transferNumber"></i>
+    </div>
+    <div class="number-input" v-else>
+        <input type="text" placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
             v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
         <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
     </div>
 
-    <div class="keys">
+    <div class="keys" v-if="!dense">
         <div class="row">
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(1)">1</button>
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(2)">2<div class="sub">ABC</div></button>

@@ -5,13 +5,47 @@
     width: 100%;
     margin-bottom: $spacer * 2;
 
+    .dense-number-input {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-bottom: $spacer * 4;
+
+        input {
+            border: 1px solid #fff;
+            border-top-left-radius: $spacer / 2;
+            border-bottom-left-radius: $spacer / 2;
+            background: none;
+            font-size: 1.5rem;
+            color: #fff;
+            text-align: right;
+            height: 40px;
+            width: 200px;
+
+            &::placeholder {
+                color: #fff;
+            }
+        }
+
+        i {
+            background: #fff;
+            color: $brand-variation-color;
+            height: 40px;
+            width: 40px;
+            border: 1px solid #fff;
+            border-top-right-radius: $spacer / 2;
+            border-bottom-right-radius: $spacer / 2;
+        }
+
+    }
+
     .number-input {
         color: $brand-color;
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
-        margin-bottom: 10px;
+        margin-bottom: $spacer;
 
         input {
             @include no-outline;
@@ -44,9 +78,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-
         flex-wrap: wrap;
-
         align-content: center;
         width: 100%;
 

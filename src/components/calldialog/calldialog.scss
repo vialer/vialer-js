@@ -121,27 +121,45 @@
     .transfer-options {
         width: 100%;
         display: flex;
-        justify-content: center;
-        flex-direction: row;
+        flex-direction: column;
+        align-items: center;
 
+        .transfer-buttons {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-direction: row;
+            margin-bottom: $spacer * 4;
 
-        .transfer-button {
-            width: 130px;
-            margin: 0 ($spacer * 2);
-            border: 2px solid #fff;
-            border-radius: $spacer / 2;
-            font-weight: bold;
-            font-size: 0.7rem;
-            line-height: $spacer * 4;
-            padding: 0 $spacer;
-            text-align: center;
+            .transfer-button {
+                width: 130px;
+                margin: 0 ($spacer * 2);
+                border: 2px solid #fff;
+                border-radius: $spacer / 2;
+                font-weight: bold;
+                font-size: 0.7rem;
+                line-height: $spacer * 4;
+                padding: 0 $spacer;
+                text-align: center;
 
-            &:hover,
-            &.active {
-                background: #fff;
-                color: $brand-color;
-                cursor: pointer;
+                &:hover,
+                &.active {
+                    background: #fff;
+                    color: $brand-color;
+                    cursor: pointer;
+                }
             }
         }
+
+        .transfer-text {
+            margin-bottom: $spacer * 4;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .transfer-keypad {
+            text-align: center;
+        }
+
     }
 }

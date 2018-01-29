@@ -32,6 +32,9 @@ module.exports = (app) => {
             removeLastNumber: function() {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))
             },
+            transferNumber: function() {
+                console.log("TRANSFER NUMBER", this.number)
+            },
             unpressKey: function() {
                 window.setTimeout(() => {
                     keyTone.stop()
@@ -41,6 +44,10 @@ module.exports = (app) => {
         },
         props: {
             call: {default: null},
+            dense: {
+                default: false,
+                type: Boolean,
+            },
             dtmf: {
                 default: false,
                 type: Boolean,

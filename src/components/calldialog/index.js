@@ -4,11 +4,8 @@ module.exports = (app) => {
         computed: app.utils.sharedComputed(),
         data: function() {
             return {
-                dtmfnumbers: '', // Reference to the number while a call is underway.
                 intervalId: 0,
                 keypad: false,
-                number: null,
-                startDate: new Date().getTime(),
             }
         },
         destroyed: function() {
@@ -50,7 +47,9 @@ module.exports = (app) => {
                 app.emit('bg:sip:toggle_transfer', {callId: this.call.id})
             },
         },
-        props: ['call'],
+        props: {
+            call: {default: null},
+        },
         render: templates.calldialog.r,
         staticRenderFns: templates.calldialog.s,
         store: {
