@@ -35,6 +35,9 @@ module.exports = (app) => {
                 if (!number) return
                 app.emit('bg:sip:call', {number: number})
             },
+            setTransferMode: function(type) {
+                app.setState({transfer: {type}}, {path: `sip/calls/${this.call.id}`})
+            },
             toggleHold: function() {
                 app.emit('bg:sip:toggle_hold', {callId: this.call.id})
             },

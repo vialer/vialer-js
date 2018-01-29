@@ -79,18 +79,15 @@ class Call {
     * @param {Object} state - The state to update.
     */
     setState(state) {
+        // This merges to the call's local state; not the app's state!
         this.app.mergeDeep(this.state, state)
 
-        if (!this._trackState) {
-            if (this.state.id) {
-                Vue.set(this.app.state.sip.calls, this.state.id, this.state)
-                this.app.emit('fg:set_state', {action: 'insert', path: `sip/calls/${this.state.id}`, state: this.state})
-                this._trackState = true
-            }
-            return
+        if (this._trackState) this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: this.state})
+        else if (this.state.id) {
+            Vue.set(this.app.state.sip.calls, this.state.id, this.state)
+            this.app.emit('fg:set_state', {action: 'insert', path: `sip/calls/${this.state.id}`, state: this.state})
+            this._trackState = true
         }
-
-        this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: this.state})
     }
 
 

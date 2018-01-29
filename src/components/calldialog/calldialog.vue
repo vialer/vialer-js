@@ -32,11 +32,15 @@
     </div>
 
     <div class="transfer-options" v-if="call.transfer.active">
-        <div class="transfer-button" :class="{'active': call.transfer.type === 'attended'}">{{$t('Attended transfer')}}</div>
-        <div class="transfer-button" :class="{'active': call.transfer.type === 'blind'}">{{$t('Blind transfer')}}</div>
+        <div class="transfer-button" :class="{'active': call.transfer.type === 'attended'}" @click="setTransferMode('attended')">
+            {{$t('Attended transfer')}}
+        </div>
+        <div class="transfer-button" :class="{'active': call.transfer.type === 'blind'}" @click="setTransferMode('blind')">
+            {{$t('Blind transfer')}}
+        </div>
     </div>
 
-    <Keypad :model.sync="call.keypad.number" :call="call" :number="call.keypad.number" :dtmf="true" v-if="call.keypad.active" class="call-active"></Keypad>
+    <Keypad v-if="call.keypad.active" :model.sync="call.keypad.number" :call="call" :number="call.keypad.number" :dtmf="true" class="call-active"></Keypad>
 
     <div class="call-actions">
         <div class="rounded-button action decline" v-if="['accepted', 'create', 'invite'].includes(call.status)" @click="callTerminate(call)">

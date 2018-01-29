@@ -23,8 +23,6 @@ class VialerBg extends App {
         options.environment = env
         super(options)
 
-        // this.env = env
-
         // Clears localstorage if the schema changed after a plugin update.
         if (!this.store.validSchema()) {
             this.modules.user.logout()
@@ -130,10 +128,7 @@ function initApp(initParams) {
 
 // For extensions, this is an executable endpoint.
 if (env.isExtension) {
-    global.app = initApp({
-        environment: env,
-        name: 'bg',
-    })
+    global.app = initApp({name: 'bg'})
 }
 
 module.exports = initApp

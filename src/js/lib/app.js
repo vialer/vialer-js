@@ -166,7 +166,7 @@ class App extends Skeleton {
 
 
     mergeState({action, path, persist, state}) {
-        if (action) {
+        if (path) {
             if (action === 'insert') {
                 let {keysRight, reference} = this.queryReference(this.state, path, 1)
                 Vue.set(reference, keysRight[0], state)
@@ -186,22 +186,23 @@ class App extends Skeleton {
 
 
     /**
-    * Set the background state and propagate it to the foreground.
+    * Set the background state and propagate it to the other end.
     * @param {Object} state - The state to update.
     * @param {Boolean} options - Whether to persist the changed state to localStorage.
     */
-    setState(state, options = {action: null, path: null, persist: false}) {
+    setState(state, {action, path, persist} = {}) {
+        if (!action) action = 'merge'
         this.mergeState({
-            action: options.action,
-            path: options.path,
-            persist: options.persist,
+            action: action,
+            path: path,
+            persist: persist,
             state: state,
         })
 
         this.emit(`${this._emitTarget}:set_state`, {
-            action: options.action,
-            path: options.path,
-            persist: options.persist,
+            action: action,
+            path: path,
+            persist: persist,
             state: this.env.isExtension ? state : JSON.parse(JSON.stringify(state)),
         })
     }
