@@ -14,6 +14,7 @@
             },
             "colors": {
                 "brand-color": "#de6b35",
+                "brand-variation-color": "#fb791e",
                 "grey-color": "#999",
                 "primary-color": "#3c3c50",
                 "green-color": "#5cb85c",

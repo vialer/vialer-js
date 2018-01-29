@@ -17,14 +17,14 @@
     <!-- Call options during a call -->
     <div class="call-options" v-if="['accepted'].includes(call.status)">
         <div class="rounded-button-with-text">
-            <div class="rounded-button"  @click="toggleTransfer" :class="{'active': transfer}">
+            <div class="rounded-button"  @click="toggleTransfer" :class="{'active': call.transfer.active}">
                 <i class="icon icon-merge_type"></i>
             </div>
             <p>transfer</p>
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="toggleHold" :class="{'active': hold}">
+            <div class="rounded-button" @click="toggleHold" :class="{'active': call.hold}">
                 <i class="icon icon-pause"></i>
             </div>
             <p>on-hold</p>

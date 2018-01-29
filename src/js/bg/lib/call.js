@@ -25,37 +25,34 @@ class Call {
                 current: null,
                 start: null,
             },
-            transfer: false,
+            transfer: {
+                active: false,
+                mode: 'attended',
+            },
             type: null, // incoming or outgoing
         }
     }
 
 
     /**
-    * Mutate state only using this function. It takes care of merging a
-    * state modification object with the current watched call object and
-    * propagate the updated state back to the foreground.
+    * Keep the state local to this class, unless the
+    * call's id is known. Then we can keep track
+    * of the call from Vue.
     * @param {Object} state - The state to update.
     */
     setState(state) {
         this.app.mergeDeep(this.state, state)
-        if (this._trackState) {
-            this.app.emit('fg:set_state', {
-                mount: {
-                    id: this.state.id,
-                    path: 'sip.calls',
-                    type: 'array',
-                },
-                state: state,
-            })
-        } else {
-            if (state.id) {
-                this.state.id = state.id
-                this.app.state.sip.calls.push(this.state)
-                this.app.setState({sip: {calls: this.app.state.sip.calls}})
+
+        if (!this._trackState) {
+            if (this.state.id) {
+                Vue.set(this.app.state.sip.calls, this.state.id, this.state)
+                this.app.emit('fg:set_state', {action: 'insert', path: `sip/calls/${this.state.id}`, state: this.state})
                 this._trackState = true
             }
+            return
         }
+
+        this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: this.state})
     }
 
 
@@ -99,6 +96,9 @@ class Call {
             // Propagate to the foreground.
             this.app.setState({sip: newSipState})
             delete this.sip.calls[this.session.id]
+            this.app.emit('fg:set_state', {action: 'delete', path: `sip/calls/${this.session.id}`})
+            delete this.app.state.sip.calls[this.session.id]
+            this.app.setState({sip: {calls: this.app.state.sip.calls}})
         }, timeout)
     }
 }

@@ -82,8 +82,10 @@ class App extends Skeleton {
                 },
             },
             sip: {
-                call: null,
-                calls: [],
+                call: {
+                    active: null,
+                }, // The active/selected call.
+                calls: {}, // Maps to SipJS session ids.
                 ua: {
                     state: null,
                 },
@@ -157,6 +159,29 @@ class App extends Skeleton {
             },
             render: h => h(require('../../components/main')(this)),
         })
+    }
+
+
+    /**
+    * Find and return a (sub)object by reference.
+    * @param {Object} queryObject - The object to find a (sub)reference for.
+    * @param {String} path - The path to the sub-reference.
+    * @param {Number} fromEnd - Splits the path into reference and right keys.
+    * @returns {Object} - The (sub)reference and the right keys.
+    */
+    queryReference(queryObject, path, fromEnd = 0) {
+        let reference
+        const paths = path.split('/')
+        const slicePoint = (paths.length) - fromEnd
+        let keysLeft = paths.slice(0, slicePoint)
+        let keysRight = paths.slice(slicePoint)
+
+        for (const key of keysLeft) {
+            if (!reference) reference = queryObject[key]
+            else if (reference[key]) reference = reference[key]
+        }
+
+        return {keysRight, reference}
     }
 }
 

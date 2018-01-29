@@ -1,5 +1,4 @@
 <div class="callbar-component">
-
     <div></div>
 
     <div class="in-call-info">
@@ -10,7 +9,7 @@
 
         <div class="call-info">
             <span class="status">{{callStatus}}</span>
-            <span class="timer" v-if="call.session.timer.start"> {{sessionTime}}</span>
+            <span class="timer" v-if="call.timer.start"> {{sessionTime}}</span>
         </div>
     </div>
 </div>

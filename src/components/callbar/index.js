@@ -5,6 +5,7 @@ module.exports = (app) => {
         methods: {
 
         },
+        props: ['call'],
         render: templates.callbar.r,
         staticRenderFns: templates.callbar.s,
         store: {

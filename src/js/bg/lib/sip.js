@@ -22,6 +22,8 @@ class Sip {
         // made when the websocket connection is gone.
         this.reconnect = true
         this.state = this.app.state.sip
+        // TODO: Don't persist this at all.
+        this.state.calls = {}
 
         // The default connection timeout to start with.
         this.retryDefault = {interval: 2500, limit: 9000000}
@@ -49,9 +51,14 @@ class Sip {
             this.call.session.dtmf(key)
         })
 
-        this.app.on('bg:sip:toggle_hold', () => {
-            if (!this.state.session.hold) this.call.hold()
-            else this.call.unhold()
+        this.app.on('bg:sip:toggle_hold', ({callId}) => {
+            if (!this.calls[callId].state.hold) this.calls[callId].hold()
+            else this.calls[callId].unhold()
+        })
+
+        this.app.on('bg:sip:toggle_transfer', ({callId}) => {
+            // if (!this.calls[callId].state.transfer) this.calls[callId].hold()
+            // else this.calls[callId].unhold()
         })
 
         this.app.on('bg:sip:transfer', ({number, type}) => {
@@ -104,6 +111,7 @@ class Sip {
             const call = new Call(this, session)
             call.hasMedia.then(() => {
                 this.calls[call.state.id] = call
+                if (Object.keys(this.calls).length === 1) this.app.setState({sip: {call: {active: call.state.id}}})
             })
         })
 
@@ -148,8 +156,8 @@ class Sip {
         const call = new Call(this, number)
         call.hasMedia.then(() => {
             this.calls[call.session.id] = call
-            console.log('STATE:', call.state)
             this.app.setState({ui: {layer: 'calldialog'}})
+            this.app.setState({sip: {call: {active: call.state.id}}})
         })
     }
 

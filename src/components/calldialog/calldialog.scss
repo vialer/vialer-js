@@ -107,7 +107,7 @@
 
     // Overrides for in-call dialog.
     &.call-active {
-        background: linear-gradient(180deg, $brand-color, $brand-tint-color);
+        background: linear-gradient(180deg, $brand-color, $brand-variation-color);
 
         .call-actions {
             .action.accept {

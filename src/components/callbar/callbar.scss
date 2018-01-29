@@ -2,12 +2,12 @@
 
 // The most upper box containing account info and
 // icon-links to several locations.
-.statusbar-component {
+.callbar-component {
     display: flex;
     align-items: center;
     justify-content: space-between;
     min-height: $spacer * 4;
-    background: $brand-tint-color;
+    background: $green-color;
     color: #fff;
     font-size: 0.8rem;
     font-weight: 500;
@@ -17,10 +17,6 @@
     max-width: $max-popup-width;
     top: 0;
 
-
-    &.call-active {
-        background: $green-color;
-    }
 
     [class^="icon-"], [class*=" icon-"]:hover {
         color: $brand-color;

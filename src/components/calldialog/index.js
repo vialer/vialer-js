@@ -36,14 +36,15 @@ module.exports = (app) => {
                 app.emit('bg:sip:call', {number: number})
             },
             toggleHold: function() {
-                app.emit('bg:sip:toggle_hold')
+                app.emit('bg:sip:toggle_hold', {callId: this.call.id})
             },
             toggleKeypad: function() {
                 this.keypad = !this.keypad
             },
             toggleTransfer: function() {
                 // Toggle hold and set the UI in transfer mode.
-                app.emit('bg:sip:toggle_hold')
+                console.log('TRANSFER:', this.call)
+                app.emit('bg:sip:toggle_transfer', {callId: this.call.id})
                 app.setState({sip: {session: {transfer: true}}})
             },
         },

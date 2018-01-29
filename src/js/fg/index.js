@@ -12,26 +12,26 @@ class VialerFg extends App {
             this.vm.$notify(message)
         })
 
-        // Another script wants to sync this script's state.
-        this.on('fg:set_state', ({mount, state}) => {
-            if (mount) {
-                const paths = mount.path.split('.')
-                let target
-                for (const path of paths) {
-                    if (!target) target = this.state[path]
-                    else target = target[path]
-                }
-
-                if (mount.type === 'array') {
-                    for (const item of target) {
-                        if (item.id === mount.id) {
-                            this.mergeDeep(item, state)
-                        }
-                    }
-                }
+        /**
+        * Syncs state from the background to the foreground
+        * while keeping Vue's reactivity system happy.
+        */
+        this.on('fg:set_state', ({action, path, state}) => {
+            if (!path) {
+                this.mergeDeep(this.state, state)
                 return
             }
-            this.mergeDeep(this.state, state)
+
+            if (action === 'insert') {
+                let {keysRight, reference} = this.queryReference(this.state, path, 1)
+                Vue.set(reference, keysRight[0], state)
+            } else if (action === 'merge') {
+                let {reference} = this.queryReference(this.state, path)
+                this.mergeDeep(reference, state)
+            } else if (action === 'delete') {
+                let {keysRight, reference} = this.queryReference(this.state, path, 1)
+                delete reference[keysRight[0]]
+            }
         })
     }
 
