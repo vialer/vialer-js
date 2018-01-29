@@ -26,7 +26,7 @@ class Call {
                 start: null,
             },
             transfer: false,
-            type: null,
+            type: null, // incoming or outgoing
         }
     }
 
@@ -39,7 +39,6 @@ class Call {
     */
     setState(state) {
         this.app.mergeDeep(this.state, state)
-
         if (this._trackState) {
             this.app.emit('fg:set_state', {
                 mount: {

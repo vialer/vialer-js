@@ -41,7 +41,7 @@ class VialerFg extends App {
         this.utils = require('../../components/utils')(this)
 
         Vue.component('Availability', require('../../components/availability')(this))
-        Vue.component('CallBar', require('../../components/callbar')(this))
+        Vue.component('Callbar', require('../../components/callbar')(this))
         Vue.component('CallDialog', require('../../components/calldialog')(this))
         Vue.component('Contacts', require('../../components/contacts')(this))
         Vue.component('Field', require('../../components/field')(this))

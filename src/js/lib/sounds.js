@@ -77,7 +77,7 @@ class DtmfTone {
             this.osc1.stop(0)
             this.osc2.stop(0)
         }
-        this.status = false
+        this.started = false
     }
 }
 

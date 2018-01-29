@@ -1,6 +1,7 @@
 <div class="main-component" id="app">
     <Notifications></Notifications>
     <Statusbar v-if="!$store.sip.calls.length"></Statusbar>
+    <Callbar></Callbar>
 
     <div class="panel">
         <div class="panel-content-unauthenticated" v-if="!$store.user.authenticated">
@@ -28,9 +29,11 @@
                     <Settings></Settings>
                 </template>
 
-                <template v-else-if="$store.ui.layer==='calldialog'">
-                    <CallDialog :call="call" v-for="call in $store.sip.calls"></CallDialog>
+                <template v-else-if="$store.ui.layer==='calldialog'" v-for="call in $store.sip.calls">
+
+                    <CallDialog :call="call"></CallDialog>
                 </template>
+                <Keypad :model.sync="dtmfnumbers" :number="dtmfnumbers" v-if="!$store.sip.calls.length"></Keypad>
             </div>
         </template>
     </div>

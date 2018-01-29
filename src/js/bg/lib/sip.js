@@ -148,6 +148,7 @@ class Sip {
         const call = new Call(this, number)
         call.hasMedia.then(() => {
             this.calls[call.session.id] = call
+            console.log('STATE:', call.state)
             this.app.setState({ui: {layer: 'calldialog'}})
         })
     }

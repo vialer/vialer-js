@@ -4,13 +4,13 @@
 
     <div class="in-call-info">
         <div class="caller-status">
-            <template v-if="sip.displayName">{{sip.displayName}}</template>
-            <template v-else>{{sip.number}}</template>
+            <template v-if="call.displayName">{{call.displayName}}</template>
+            <template v-else>{{call.number}}</template>
         </div>
 
         <div class="call-info">
             <span class="status">{{callStatus}}</span>
-            <span class="timer" v-if="sip.session.timer.start"> {{sessionTime}}</span>
+            <span class="timer" v-if="call.session.timer.start"> {{sessionTime}}</span>
         </div>
     </div>
 </div>

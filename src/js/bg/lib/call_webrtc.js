@@ -18,9 +18,7 @@ class CallWebRTC extends Call {
 
             if (numberOrSession.hasOwnProperty('acceptAndTerminate')) {
                 this._handleIncoming(numberOrSession)
-            } else {
-                this._handleOutgoing(numberOrSession)
-            }
+            } else this._handleOutgoing(numberOrSession)
         })
     }
 
@@ -92,6 +90,7 @@ class CallWebRTC extends Call {
             console.log("ACCEPTED FROM INCOMING:")
             this.setState({status: 'accepted'})
             this.startTimer()
+            this.ringtone.stop()
         })
 
         this.session.on('rejected', (e) => {

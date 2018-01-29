@@ -14,15 +14,23 @@ module.exports = (app) => {
     })
 
     return {
+        data: function() {
+            return {
+                number: '',
+            }
+        },
         methods: {
+            dial: function() {
+                if (!this.number) return
+                app.emit('bg:sip:call', {number: this.number})
+            },
             inputChange: function(newVal) {
                 this.$emit('update:model', newVal)
             },
             pressKey: function(key) {
                 if (!allowedKeys.includes(key)) return
-
                 keyTone.play(key)
-                this.$emit('update:model', `${this.number}${key}`)
+                this.number = `${this.number}${key}`
                 if (this.dtmf) {
                     app.emit('bg:sip:dtmf', {key})
                 }
@@ -38,19 +46,14 @@ module.exports = (app) => {
             },
         },
         props: {
+            call: {default: null},
             dtmf: {
                 default: false,
                 type: Boolean,
             },
-            number: {
-                default: '',
-            },
         },
         render: templates.keypad.r,
         staticRenderFns: templates.keypad.s,
-        store: {
-            module: 'dialpad',
-        },
         watch: {
             number: function(newVal, oldVal) {
                 if (isNaN(newVal)) {

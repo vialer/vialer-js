@@ -61,7 +61,6 @@ video {
 .hide {display: none;}
 
 .list-items {
-
     .list-item {
         display: flex;
 
@@ -91,6 +90,42 @@ video {
             .description {
                 color: $primary-color;
             }
+        }
+    }
+}
+
+
+.call-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-self: flex-start;
+
+    .action {
+        margin: $spacer;
+        box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);
+
+        &.decline {
+            color: #fff;
+            background: $red-color;
+
+            &:hover {background: darken($red-color, 3%);}
+        }
+
+        &.accept {
+            color: #fff;
+            background: $green-color;
+            &:hover {background: darken($green-color, 3%);}
+        }
+
+        &.dial {
+            color: #fff;
+            background: $green-color;
+            &:hover {background: darken($green-color, 3%);}
+        }
+
+        &.disabled {
+            filter: grayscale(100%);
         }
     }
 }

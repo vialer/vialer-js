@@ -28,4 +28,11 @@
             <button class="rounded-button key" @mouseup="stopDunpressKeytmf()" @mousedown="pressKey('*')">*</button>
         </div>
     </div>
+
+    <div class="call-actions">
+        <!-- Dial button only visible when not in a call yet -->
+        <div class="rounded-button action dial" v-if="!call" @click="dial" :class="{'disabled': !number}">
+            <i class="icon icon-phone"></i>
+        </div>
+    </div>
 </div>
