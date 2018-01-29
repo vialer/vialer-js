@@ -6,13 +6,27 @@
     color: #fff;
     min-height: 250px;
 
+    // Keypad styling for when making a new call.
     &.no-call {
         background: #fff;
     }
 
-    .option {
-        &:hover {
-            cursor: pointer;
+    // Keypad styling for when in a call.
+    &.call-active {
+        background: linear-gradient(180deg, $brand-color, $brand-variation-color);
+
+        .call-actions {
+            .action.accept {
+                box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        .keypad-component {
+            .number-input {
+                input {
+                    color: #fff;
+                }
+            }
         }
     }
 
@@ -104,22 +118,29 @@
         }
     }
 
+    .transfer-options {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        flex-direction: row;
 
-    // Overrides for in-call dialog.
-    &.call-active {
-        background: linear-gradient(180deg, $brand-color, $brand-variation-color);
 
-        .call-actions {
-            .action.accept {
-                box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2);
-            }
-        }
+        .transfer-button {
+            width: 130px;
+            margin: 0 ($spacer * 2);
+            border: 2px solid #fff;
+            border-radius: $spacer / 2;
+            font-weight: bold;
+            font-size: 0.7rem;
+            line-height: $spacer * 4;
+            padding: 0 $spacer;
+            text-align: center;
 
-        .keypad-component {
-            .number-input {
-                input {
-                    color: #fff;
-                }
+            &:hover,
+            &.active {
+                background: #fff;
+                color: $brand-color;
+                cursor: pointer;
             }
         }
     }

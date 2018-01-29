@@ -3,13 +3,19 @@
 * combined, replacing all ipc messaging with local
 * event emitters.
 */
-let env_bg = require('../lib/env')
-let env_fg = require('../lib/env')
 const resizeSensor = require('css-element-queries').ResizeSensor
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    global.bgApp = require('../bg')({name: 'bg'})
+    global.fgApp = require('../fg')({
+        apps: {bg: global.bgApp},
+        name: 'fg',
+    })
+
+
     // Set content height for electron.
-    if (env_bg.isElectron) {
+    if (global.bgApp.env.isElectron) {
         electron.ipcRenderer.send('resize-window', {
             height: document.body.clientHeight,
             width: document.body.clientWidth,
@@ -22,19 +28,4 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         })
     }
-
-    env_bg.role.background = true
-    global.bgApp = require('../bg')({
-        environment: env_bg,
-        name: 'bg',
-    })
-
-    env_fg.role.popup = true
-    global.fgApp = require('../fg')({
-        apps: {
-            bg: global.bgApp,
-        },
-        environment: env_fg,
-        name: 'fg',
-    })
 })

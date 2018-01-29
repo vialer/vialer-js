@@ -1,10 +1,12 @@
-let env = require('../lib/env')
-
 const Api = require('./lib/api')
 const Sip = require('./lib/sip')
 const App = require('../lib/app')
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
+
+let env = JSON.parse(JSON.stringify(require('../lib/env')))
+env.role.bg = true
+
 
 
 const _modules = [
@@ -18,7 +20,10 @@ const _modules = [
 class VialerBg extends App {
 
     constructor(options) {
+        options.environment = env
         super(options)
+
+        // this.env = env
 
         // Clears localstorage if the schema changed after a plugin update.
         if (!this.store.validSchema()) {
@@ -33,11 +38,11 @@ class VialerBg extends App {
             data.callback(this.state)
         })
 
-        // Another script wants to sync this script's state.
-        this.on('bg:set_state', (data) => {
-            this.mergeDeep(this.state, data.state)
-            if (data.persist) this.store.set('state', this.state)
-        })
+        /**
+        * Syncs state from the foreground to the background
+        * while keeping Vue's reactivity system happy.
+        */
+        this.on('bg:set_state', this.mergeState.bind(this))
 
         this.on('bg:refresh_api_data', (data) => {
             this.getModuleApiData()
@@ -107,20 +112,6 @@ class VialerBg extends App {
 
 
     /**
-    * Set the background state and propagate it to the foreground.
-    * @param {Object} state - The state to update.
-    * @param {Boolean} persist - Whether to persist the changed state to localStorage.
-    */
-    setState(state, persist = false) {
-        this.mergeDeep(this.state, state)
-        if (persist) this.store.set('state', this.state)
-        // Update the foreground's state with it.
-        if (this.env.isExtension) this.emit('fg:set_state', {state: state})
-        else this.emit('fg:set_state', {state: JSON.parse(JSON.stringify(state))})
-    }
-
-
-    /**
     * Small helper that returns the version of the app.
     * The version is inserted at buildtime from the
     * package.json file.
@@ -139,7 +130,6 @@ function initApp(initParams) {
 
 // For extensions, this is an executable endpoint.
 if (env.isExtension) {
-    env.role.background = true
     global.app = initApp({
         environment: env,
         name: 'bg',

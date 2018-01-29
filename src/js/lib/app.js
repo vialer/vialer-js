@@ -13,6 +13,8 @@ class App extends Skeleton {
 
     _init() {
         this.sounds = require('./sounds')
+        if (this.env.role.bg) this._emitTarget = 'fg'
+        else if (this.env.role.fg) this._emitTarget = 'bg'
     }
 
 
@@ -84,6 +86,7 @@ class App extends Skeleton {
             sip: {
                 call: {
                     active: null,
+                    number: '',
                 }, // The active/selected call.
                 calls: {}, // Maps to SipJS session ids.
                 ua: {
@@ -158,6 +161,48 @@ class App extends Skeleton {
                 }
             },
             render: h => h(require('../../components/main')(this)),
+        })
+    }
+
+
+    mergeState({action, path, persist, state}) {
+        if (action) {
+            if (action === 'insert') {
+                let {keysRight, reference} = this.queryReference(this.state, path, 1)
+                Vue.set(reference, keysRight[0], state)
+            } else if (action === 'merge') {
+                let {reference} = this.queryReference(this.state, path)
+                this.mergeDeep(reference, state)
+            } else if (action === 'delete') {
+                let {keysRight, reference} = this.queryReference(this.state, path, 1)
+                delete reference[keysRight[0]]
+            }
+        } else {
+            this.mergeDeep(this.state, state)
+        }
+
+        if (persist) this.store.set('state', this.state)
+    }
+
+
+    /**
+    * Set the background state and propagate it to the foreground.
+    * @param {Object} state - The state to update.
+    * @param {Boolean} options - Whether to persist the changed state to localStorage.
+    */
+    setState(state, options = {action: null, path: null, persist: false}) {
+        this.mergeState({
+            action: options.action,
+            path: options.path,
+            persist: options.persist,
+            state: state,
+        })
+
+        this.emit(`${this._emitTarget}:set_state`, {
+            action: options.action,
+            path: options.path,
+            persist: options.persist,
+            state: this.env.isExtension ? state : JSON.parse(JSON.stringify(state)),
         })
     }
 

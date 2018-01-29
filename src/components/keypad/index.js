@@ -14,11 +14,6 @@ module.exports = (app) => {
     })
 
     return {
-        data: function() {
-            return {
-                number: '',
-            }
-        },
         methods: {
             dial: function() {
                 if (!this.number) return
@@ -30,10 +25,9 @@ module.exports = (app) => {
             pressKey: function(key) {
                 if (!allowedKeys.includes(key)) return
                 keyTone.play(key)
-                this.number = `${this.number}${key}`
-                if (this.dtmf) {
-                    app.emit('bg:sip:dtmf', {key})
-                }
+                // this.number = `${this.number}${key}`
+                this.$emit('update:model', `${this.number}${key}`)
+                if (this.call) app.emit('bg:sip:dtmf', {callId: this.call.id, key})
             },
             removeLastNumber: function() {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))
@@ -51,6 +45,7 @@ module.exports = (app) => {
                 default: false,
                 type: Boolean,
             },
+            number: {default: ''},
         },
         render: templates.keypad.r,
         staticRenderFns: templates.keypad.s,

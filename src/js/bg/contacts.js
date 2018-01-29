@@ -19,7 +19,7 @@ class ContactsModule {
         const res = await this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
-                this.app.setState({contacts: {widget: {state: 'unauthorized'}}}, false)
+                this.app.setState({contacts: {widget: {state: 'unauthorized'}}})
             }
             return
         }
@@ -56,7 +56,7 @@ class ContactsModule {
             this.app.sip.presence.unsubscribe(contact.account_id)
         }
 
-        this.app.setState({contacts: {contacts: contacts}}, true)
+        this.app.setState({contacts: {contacts: contacts}}, {persist: true})
         if (contacts.length) this.app.sip.presence.update()
     }
 

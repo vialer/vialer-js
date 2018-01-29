@@ -52,16 +52,14 @@ class UserModule {
         this.app.modules.availability.getApiData()
 
         this.app.setState({
-            ui: {
-                layer: 'contacts',
-            },
+            ui: {layer: 'contacts'},
             user: {
                 authenticated: true,
                 client_id: user.client.replace(/[^\d.]/g, ''),
                 email: email,
                 password: password,
             },
-        }, true)
+        }, {persist: true})
 
         this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Logged in succesfully'), type: 'success'})
         // Connect to the sip service on succesful login.
@@ -72,14 +70,12 @@ class UserModule {
     logout() {
         this.app.logger.info(`${this}logout`)
         this.app.setState({
-            ui: {
-                layer: 'login',
-            },
+            ui: {layer: 'login'},
             user: {
                 authenticated: false,
                 password: '',
             },
-        }, true)
+        }, {persist: true})
         // Remove credentials for basic auth.
         this.app.api.setupClient()
         // Disconnect without reconnect attempt.

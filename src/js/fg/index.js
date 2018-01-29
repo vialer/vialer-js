@@ -1,12 +1,17 @@
 const App = require('../lib/app')
-let env = require('../lib/env')
 const utils = require('../lib/utils')
+
+let env = JSON.parse(JSON.stringify(require('../lib/env')))
+env.role.fg = true
 
 
 class VialerFg extends App {
 
     constructor(options) {
+        options.environment = env
         super(options)
+
+        this.env = env
 
         this.on('fg:notify', (message) => {
             this.vm.$notify(message)
@@ -16,23 +21,7 @@ class VialerFg extends App {
         * Syncs state from the background to the foreground
         * while keeping Vue's reactivity system happy.
         */
-        this.on('fg:set_state', ({action, path, state}) => {
-            if (!path) {
-                this.mergeDeep(this.state, state)
-                return
-            }
-
-            if (action === 'insert') {
-                let {keysRight, reference} = this.queryReference(this.state, path, 1)
-                Vue.set(reference, keysRight[0], state)
-            } else if (action === 'merge') {
-                let {reference} = this.queryReference(this.state, path)
-                this.mergeDeep(reference, state)
-            } else if (action === 'delete') {
-                let {keysRight, reference} = this.queryReference(this.state, path, 1)
-                delete reference[keysRight[0]]
-            }
-        })
+        this.on('fg:set_state', this.mergeState.bind(this))
     }
 
 
@@ -83,21 +72,6 @@ class VialerFg extends App {
             },
         })
     }
-
-
-    /**
-    * Set the background state and propagate it to the foreground.
-    * @param {Object} state - The state to update.
-    * @param {Boolean} persist - Whether to persist the changed state to localStorage.
-    */
-    setState(state, persist = false) {
-        this.mergeDeep(this.state, state)
-        // Update the foreground's state with it.
-        this.emit('bg:set_state', {
-            persist: persist,
-            state: state,
-        })
-    }
 }
 
 
@@ -132,16 +106,12 @@ function initApp(initParams) {
 
 // For extensions, this is an executable endpoint.
 if (env.isExtension) {
-    env.role.popup = true
     let searchParams = utils.parseSearch(location.search)
     if (searchParams.popout) {
         env.role.popout = true
     }
 
-    global.app = initApp({
-        environment: env,
-        name: 'fg',
-    })
+    global.app = initApp({name: 'fg'})
 }
 
 module.exports = initApp

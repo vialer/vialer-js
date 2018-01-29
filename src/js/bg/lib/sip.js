@@ -47,8 +47,8 @@ class Sip {
             this.createCall(number)
         })
 
-        this.app.on('bg:sip:dtmf', ({key}) => {
-            this.call.session.dtmf(key)
+        this.app.on('bg:sip:dtmf', ({callId, key}) => {
+            this.calls[callId].session.dtmf(key)
         })
 
         this.app.on('bg:sip:toggle_hold', ({callId}) => {
@@ -56,9 +56,23 @@ class Sip {
             else this.calls[callId].unhold()
         })
 
+        this.app.on('bg:sip:toggle_keypad', ({callId}) => {
+            if (!this.calls[callId].state.keypad.active) {
+                this.calls[callId].setState({keypad: {active: true}})
+            } else {
+                this.calls[callId].setState({keypad: {active: false}})
+            }
+        })
+
         this.app.on('bg:sip:toggle_transfer', ({callId}) => {
-            // if (!this.calls[callId].state.transfer) this.calls[callId].hold()
-            // else this.calls[callId].unhold()
+            // Hold the current call.
+            if (!this.calls[callId].state.transfer.active) {
+                if (!this.calls[callId].state.hold) this.calls[callId].hold()
+                this.calls[callId].setState({transfer: {active: true}})
+            } else {
+                if (this.calls[callId].state.hold) this.calls[callId].unhold()
+                this.calls[callId].setState({transfer: {active: false}})
+            }
         })
 
         this.app.on('bg:sip:transfer', ({number, type}) => {
@@ -156,8 +170,10 @@ class Sip {
         const call = new Call(this, number)
         call.hasMedia.then(() => {
             this.calls[call.session.id] = call
-            this.app.setState({ui: {layer: 'calldialog'}})
-            this.app.setState({sip: {call: {active: call.state.id}}})
+            this.app.setState({
+                sip: {call: {active: call.state.id}},
+                ui: {layer: 'calldialog'},
+            })
         })
     }
 

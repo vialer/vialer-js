@@ -1,7 +1,7 @@
 <div class="main-component" id="app">
     <Notifications></Notifications>
     <Statusbar v-if="!Object.keys($store.sip.calls).length"></Statusbar>
-    <!-- <Callbar v-if="$store.sip.call.active" :call="$store.sip.calls[$store.sip.call.active]"></Callbar> -->
+    <Callbar v-if="$store.sip.call.active" :call="$store.sip.calls[$store.sip.call.active]"></Callbar>
 
     <div class="panel">
         <div class="panel-content-unauthenticated" v-if="!$store.user.authenticated">
@@ -32,7 +32,7 @@
                 <template v-else-if="$store.ui.layer==='calldialog'" >
                     <CallDialog v-if="$store.sip.call.active === call.id" :call="call" v-for="call in $store.sip.calls" :key="call.id"></CallDialog>
                     <!-- Keypad for dialing out is only visible when no calls are active yet -->
-                    <Keypad :model.sync="dtmfnumbers" :number="dtmfnumbers" v-if="!Object.keys($store.sip.calls).length"></Keypad>
+                    <Keypad :model.sync="$store.sip.call.number" :number="$store.sip.call.number" v-if="!Object.keys($store.sip.calls).length" class="no-call"></Keypad>
                 </template>
             </div>
         </template>

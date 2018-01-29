@@ -40,12 +40,11 @@ module.exports = (app) => {
             },
             toggleKeypad: function() {
                 this.keypad = !this.keypad
+                app.emit('bg:sip:toggle_keypad', {callId: this.call.id})
             },
             toggleTransfer: function() {
                 // Toggle hold and set the UI in transfer mode.
-                console.log('TRANSFER:', this.call)
                 app.emit('bg:sip:toggle_transfer', {callId: this.call.id})
-                app.setState({sip: {session: {transfer: true}}})
             },
         },
         props: ['call'],

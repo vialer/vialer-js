@@ -39,7 +39,7 @@ class AvailabilityModule {
                 }
             }
 
-            this.app.setState({availability: {destination, destinations}}, true)
+            this.app.setState({availability: {destination, destinations}}, {persist: true})
         })
     }
 
