@@ -11,15 +11,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 8px;
 
         .status-icon {
-            width: $spacer * 6;
-            height: $spacer * 6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
             i {
                 color: $grey-color;
             }
@@ -42,18 +35,6 @@
             cursor: pointer;
         }
 
-        .info {
-            flex-grow: 1;
-
-            .name {
-                font-weight: 500;
-            }
-
-            .description {
-                color: $grey-color-darker;
-            }
-        }
-
         .rounded-button {
             background: #fff;
             padding: 0;
@@ -71,9 +52,6 @@
             i {
                 font-size: $spacer * 1.5;
                 padding: 0;
-
-
-
             }
         }
     }

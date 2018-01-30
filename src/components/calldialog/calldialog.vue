@@ -1,6 +1,6 @@
 <div class="calldialog-component" :class="classes('component')">
     <!-- Call information during a call -->
-    <div class="call-info">
+    <div class="call-info" v-if="!call.keypad.active">
         <div class="info-status">{{callStatus}}</div>
         <div class="info-number">{{call.number}}</div>
         <div class="info-name" v-if="call.displayName">{{call.displayName}}</div>
@@ -31,7 +31,7 @@
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="keypadToggle" :class="{'active': call.keypad.active, disabled: transferStatus}">
+            <div class="rounded-button" @click="keypadToggle" :class="{'active': call.keypad.active, disabled: transferActive}">
                 <i class="icon icon-dialpad"></i>
             </div>
             <p>{{$t('keypad')}}</p>
@@ -56,7 +56,7 @@
         :call="call" :number="call.keypad.number" :dtmf="true" class="call-active"/>
 
     <div class="call-actions">
-        <div class="rounded-button action decline" v-if="['accepted', 'create', 'invite'].includes(call.status)" @click="callTerminate(call)">
+        <div class="rounded-button action decline" v-if="!transferActive && ['accepted', 'create', 'invite'].includes(call.status) && !call.keypad.active" @click="callTerminate(call)">
             <i class="icon icon-phone-hang-up"></i>
         </div>
 

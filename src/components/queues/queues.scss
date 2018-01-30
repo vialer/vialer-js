@@ -3,20 +3,19 @@
 .queues-component {
 
     .queue {
-        .icon {
-            width: $spacer * 3;
+        .status-icon {
             vertical-align: center;
             text-align: center;
 
             // The queues icon is a somewhat deviant icons.
             // It is a background with inside text, instead
             // of a font.
-            i {
+            .indicator {
                 display: inline-block;
-                width: 1.1rem;
-                height: 1.1rem;
+                width: $spacer * 3;
+                height: $spacer * 3;
                 background: $red-color;
-                line-height: 1.1rem;
+                line-height: $spacer * 3;
                 letter-spacing: 0;
                 // Centers the icon in the middle of the background.
                 font-size: 0.8rem;

@@ -83,13 +83,14 @@ class CallWebRTC extends Call {
             number: this.session.remoteIdentity.uri.user,
         })
 
-        this.app.setState({ui: {layer: 'calldialog'}})
         // Signal the user about the incoming call.
-        this.app.logger.notification(
-            `${this.app.$t('From')}: ${this.state.displayName}`,
-            `${this.app.$t('Incoming call')}: ${this.state.number}`, false, 'warning')
-
-        if (!this.silent) this.ringtone.play()
+        if (!this.silent) {
+            this.app.setState({ui: {layer: 'calldialog'}})
+            this.app.logger.notification(
+                `${this.app.$t('From')}: ${this.state.displayName}`,
+                `${this.app.$t('Incoming call')}: ${this.state.number}`, false, 'warning')
+            this.ringtone.play()
+        }
 
         // Setup some event handlers for the different stages of a call.
         this.session.on('accepted', (request) => {

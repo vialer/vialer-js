@@ -21,7 +21,6 @@
                 <div class="rounded-button" v-if="!transferStatus && !numbersOngoing.length">
                     <i class="icon icon-phone" v-on:click="callContact(contact)"></i>
                 </div>
-
             </div>
         </li>
         <!-- No search results -->

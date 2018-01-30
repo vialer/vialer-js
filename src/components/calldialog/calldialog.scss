@@ -6,6 +6,12 @@
     color: #fff;
     min-height: 250px;
 
+    &.with-keypad {
+        .rounded-button i {
+            font-size: $spacer * 3;
+        }
+    }
+
     // Keypad styling for when making a new call.
     &.no-call {
         background: #fff;
@@ -14,12 +20,6 @@
     // Keypad styling for when in a call.
     &.call-active {
         background: linear-gradient(180deg, $brand-color, $brand-variation-color);
-
-        .call-actions {
-            .action.accept {
-                box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.2);
-            }
-        }
 
         .keypad-component {
             .number-input {

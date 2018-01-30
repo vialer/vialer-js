@@ -6,10 +6,15 @@
 
     <ul class="list-items">
         <li class="list-item queue" :class="{selected: module.selectedQueue == queue.id}" v-for="queue in module.queues" v-on:click="activateQueue(queue)">
-            <div class="icon"><i class="indicator">{{queue.queue_size}}</i></div>
+            <div class="status-icon">
+                <i class="indicator">{{queue.queue_size}}</i>
+            </div>
             <div class="info">
                 <div class="name">{{queue.description}}</div>
                 <div class="description">{{queue.internal_number}}</div>
+            </div>
+
+            <div class="queues-options">
             </div>
         </li>
 

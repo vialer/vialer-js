@@ -1,7 +1,12 @@
 module.exports = (app) => {
 
     return {
-        computed: app.utils.sharedComputed(),
+        computed: Object.assign({
+            // If the current call is in transfer mode.
+            transferActive: function() {
+                return this.call.transfer.active
+            },
+        }, app.utils.sharedComputed()),
         data: function() {
             return {
                 intervalId: 0,
@@ -16,12 +21,14 @@ module.exports = (app) => {
                 app.emit('bg:sip:call_answer', {callId: call.id})
             },
             callTerminate: function(call) {
+                if (this.transferActive) return
                 app.emit('bg:sip:call_terminate', {callId: call.id})
             },
             classes: function(block) {
                 let classes = {}
                 if (block === 'component') {
                     if (this.call.status) classes['call-active'] = true
+                    if (this.call.keypad.active) classes['with-keypad'] = true
                     else classes['no-call'] = true
                 }
                 return classes
@@ -34,7 +41,7 @@ module.exports = (app) => {
                 app.emit('bg:sip:hold_toggle', {callId: this.call.id})
             },
             keypadToggle: function() {
-                if (this.transferStatus) return
+                if (this.transferActive) return
                 app.setState({keypad: {active: !this.call.keypad.active}}, {path: `sip/calls/${this.call.id}`})
             },
             transferFinalize: function() {

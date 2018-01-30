@@ -5,13 +5,16 @@
     width: 100%;
     margin-bottom: $spacer * 2;
 
-
+    .number-input-match {
+        font-weight: 500;
+        text-align: center;
+    }
 
     .dense-number-input {
         display: flex;
         flex-direction: row;
         justify-content: center;
-        margin-bottom: $spacer * 4;
+        margin-bottom: $spacer * 2;
 
         input {
             border: 1px solid #fff;
@@ -53,6 +56,11 @@
             }
         }
 
+        & + .number-input-match {
+            color: #fff;
+            height: $spacer * 3;
+            line-height: $spacer * 3;
+        }
     }
 
     .number-input {
@@ -61,13 +69,12 @@
         justify-content: center;
         align-items: center;
         position: relative;
-        margin-bottom: $spacer;
 
         input {
             @include no-outline;
             border: 0;
             width: 100%;
-            height: 60px;
+            height: $spacer * 6;
             font-size: 1.8rem;
             font-weight: 500;
             text-align: center;
@@ -88,12 +95,16 @@
                 cursor: pointer;
             }
         }
+
+        & + .number-input-match {
+            color: $grey-color-darker;
+            height: $spacer * 5;
+            line-height: $spacer * 5;
+        }
     }
 
 
-    .number-input-match {
-        font-weight: bold;
-    }
+
 
     .keys {
         display: flex;

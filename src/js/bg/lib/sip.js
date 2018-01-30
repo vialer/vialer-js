@@ -45,8 +45,8 @@ class Sip {
             this.calls[callId].terminate()
         })
 
-        this.app.on('bg:sip:call_activate', ({callId}) => {
-            this.setActiveCall(this.calls[callId])
+        this.app.on('bg:sip:call_activate', ({callId, holdInactive, unholdActive}) => {
+            this.setActiveCall(this.calls[callId], holdInactive, unholdActive)
         })
 
         this.app.on('bg:sip:dtmf', ({callId, key}) => {
@@ -60,6 +60,14 @@ class Sip {
                 // Unset transfer mode when switching of hold.
                 if (this.calls[callId].state.transfer.active) {
                     this.calls[callId].setState({transfer: {active: false}})
+                }
+
+                // If we unhold this call, then all other calls
+                // should be put on hold.
+                for (let _callId of Object.keys(this.calls)) {
+                    if (_callId !== callId) {
+                        this.calls[_callId].hold()
+                    }
                 }
             }
         })
@@ -104,9 +112,26 @@ class Sip {
             if (!this.calls[callId].state.transfer.active) {
                 if (!this.calls[callId].state.hold) this.calls[callId].hold()
                 this.calls[callId].setState({transfer: {active: true}})
+
+                // If we unhold this call, then all other calls
+                // should be put on hold.
+                for (let _callId of Object.keys(this.calls)) {
+                    if (_callId !== callId) {
+                        this.calls[_callId].setState({transfer: {active: false, type: 'accept'}})
+                    }
+                }
             } else {
                 if (this.calls[callId].state.hold) this.calls[callId].unhold()
                 this.calls[callId].setState({transfer: {active: false}})
+
+                // If we unhold this call, then all other calls
+                // should be put on hold.
+                for (let _callId of Object.keys(this.calls)) {
+                    if (_callId !== callId) {
+                        this.calls[_callId].hold()
+                        this.calls[_callId].setState({transfer: {active: false, type: 'attended'}})
+                    }
+                }
             }
         })
 
@@ -228,17 +253,22 @@ class Sip {
     * Set the active state on the target call, un-hold the call and
     * put all other calls on-hold.
     * @param {Call} [call] - A Call to activate.
-    * @param {Boolean} [unhold] - Unhold the call on activation.
+    * @param {Boolean} [holdInactive] - Unhold the call on activation.
+    * @param {Boolean} [unholdActive] - Unhold the call on activation.
     * @returns {Call|Boolean} - The Call or false.
     */
-    setActiveCall(call, unhold = false) {
+    setActiveCall(call, holdInactive = true, unholdActive = false) {
         // Activate the first found call when no call is given.
         let activeCall = false
+        const callIds = Object.keys(this.calls)
 
         if (!call) {
-            let callIds = Object.keys(this.calls)
-            if (callIds.length) call = this.calls[Object.keys(this.calls)[0]]
-            else return activeCall
+            for (const callId of callIds) {
+                if (this.calls[callId].state.status !== 'bye') {
+                    call = this.calls[callId]
+                }
+            }
+            if (!call) return false
         }
 
         for (const callId of Object.keys(this.calls)) {
@@ -248,10 +278,10 @@ class Sip {
                 if (call.state.id === callId) {
                     activeCall = this.calls[callId]
                     this.calls[callId].setState({active: true})
-                    if (unhold) this.calls[callId].unhold()
+                    if (unholdActive) this.calls[callId].unhold()
                 } else {
                     this.calls[callId].setState({active: false})
-                    this.calls[callId].hold()
+                    if (holdInactive) this.calls[callId].hold()
                 }
             }
         }

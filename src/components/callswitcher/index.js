@@ -13,7 +13,11 @@ module.exports = (app) => {
                 return classes
             },
             setActiveCall: function(call) {
-                app.emit('bg:sip:call_activate', {callId: call.id})
+                app.emit('bg:sip:call_activate', {
+                    callId: call.id,
+                    holdInactive: false,
+                    unholdActive: false,
+                })
             },
         },
         render: templates.callswitcher.r,

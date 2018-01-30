@@ -93,7 +93,6 @@ module.exports = function(app) {
                 } else if (callKeys.length === 1 && calls[callKeys[0]].transfer.active) {
                     transferStatus = 'select'
                 }
-
                 return transferStatus
             },
         }
