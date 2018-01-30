@@ -155,7 +155,6 @@ class Sip {
             } else {
                 const call = new Call(this, session, {active: true})
                 call.hasMedia.then(() => {
-
                     this.calls[call.state.id] = call
                 })
             }

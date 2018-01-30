@@ -5,6 +5,8 @@
     width: 100%;
     margin-bottom: $spacer * 2;
 
+
+
     .dense-number-input {
         display: flex;
         flex-direction: row;
@@ -86,6 +88,11 @@
                 cursor: pointer;
             }
         }
+    }
+
+
+    .number-input-match {
+        font-weight: bold;
     }
 
     .keys {

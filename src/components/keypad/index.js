@@ -14,6 +14,22 @@ module.exports = (app) => {
     })
 
     return {
+        computed: {
+            matchedContact: function() {
+                let _number = String(this.number)
+                let matchedContact = null
+
+                if (_number.length > 1) {
+                    matchedContact = this.contacts.find((contact) => {
+                        if (String(contact.internal_number).includes(_number)) {
+                            return true
+                        }
+                        return false
+                    })
+                }
+                return matchedContact
+            }
+        },
         methods: Object.assign({
             dial: function() {
                 if (!this.number) return
@@ -36,7 +52,6 @@ module.exports = (app) => {
                 window.setTimeout(() => {
                     keyTone.stop()
                 }, 50)
-
             },
         }, app.utils.sharedMethods()),
         props: {
@@ -53,6 +68,9 @@ module.exports = (app) => {
         },
         render: templates.keypad.r,
         staticRenderFns: templates.keypad.s,
+        store: {
+            contacts: 'contacts.contacts',
+        },
         watch: {
             number: function(newVal, oldVal) {
                 if (isNaN(newVal)) {

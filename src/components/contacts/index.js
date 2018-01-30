@@ -26,6 +26,7 @@ module.exports = (app) => {
         render: templates.contacts.r,
         staticRenderFns: templates.contacts.s,
         store: {
+            calls: 'sip.calls',
             module: 'contacts',
             sip: 'sip',
         },

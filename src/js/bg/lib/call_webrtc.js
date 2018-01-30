@@ -232,7 +232,7 @@ class CallWebRTC extends Call {
                 let call = await this.sip.createCall(callTarget)
                 call.setState({transfer: {type: 'accept'}})
                 // Activate the new call's dialog.
-                this.sip.setActiveCall(call,)
+                this.sip.setActiveCall(call, false)
             }
         }
     }

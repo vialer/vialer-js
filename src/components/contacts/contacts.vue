@@ -6,7 +6,7 @@
     </div>
 
     <ul class="list-items">
-        <li class="list-item contact" v-for="contact in filteredContacts" @click="callContact(contact)" :class="{'disabled': sip.calls.length}">
+        <li class="list-item contact" v-for="contact in filteredContacts" :class="{'disabled': sip.calls.length}">
             <div class="status-icon" :class="contact.state">
                 <i class="icon icon-availability"></i>
             </div>
@@ -15,9 +15,13 @@
                 <div class="description">{{contact.internal_number}}</div>
             </div>
             <div class="contact-options">
-                <div class="rounded-button" v-if="transferOngoing">
+                <div class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.internal_number)">
                     <i class="icon icon-transfer" v-on:click.once="transferActivate(contact.internal_number)"></i>
                 </div>
+                <div class="rounded-button" v-if="!transferStatus && !numbersOngoing.length">
+                    <i class="icon icon-phone" v-on:click="callContact(contact)"></i>
+                </div>
+
             </div>
         </li>
         <!-- No search results -->

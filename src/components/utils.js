@@ -23,9 +23,21 @@ module.exports = function(app) {
 
     utils.sharedMethods = function() {
         return {
+            getActiveCall: function() {
+                let activeCall = null
+                const calls = this.$store.sip.calls
+                const callKeys = Object.keys(calls)
+                for (let callId of callKeys) {
+                    if (calls[callId].active) {
+                        activeCall = calls[callId]
+                    }
+                }
+                return activeCall
+            },
             transferActivate: function(number) {
-                if (!this.number) return
-                app.emit('bg:sip:transfer_activate', {callId: this.call.id, number: this.number})
+                if (!number) return
+                let activeCall = this.getActiveCall()
+                app.emit('bg:sip:transfer_activate', {callId: activeCall.id, number: number})
             },
         }
     }
@@ -49,6 +61,14 @@ module.exports = function(app) {
             minutes: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60) % 60
             },
+            numbersOngoing: function() {
+                let numbers = []
+                const calls = this.$store.sip.calls
+                for (let callId of Object.keys(calls)) {
+                    numbers.push(parseInt(calls[callId].number))
+                }
+                return numbers
+            },
             seconds: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000) % 60
             },
@@ -60,14 +80,21 @@ module.exports = function(app) {
                 formattedTime += `${this.seconds.toString()}`
                 return formattedTime
             },
-
-            transferOngoing: function() {
-                let transferOngoing = false
+            transferStatus: function() {
+                let transferStatus = false
                 const calls = this.$store.sip.calls
-                for (let callId of Object.keys(calls)) {
-                    if (calls[callId].transfer.active) transferOngoing = true
+                const callKeys = Object.keys(calls)
+                if (callKeys.length > 1) {
+                    for (let callId of callKeys) {
+                        if (calls[callId].transfer.active) {
+                            transferStatus = 'ongoing'
+                        }
+                    }
+                } else if (callKeys.length === 1 && calls[callKeys[0]].transfer.active) {
+                    transferStatus = 'select'
                 }
-                return transferOngoing
+
+                return transferStatus
             },
         }
     }

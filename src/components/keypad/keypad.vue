@@ -4,13 +4,18 @@
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
             v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
-        <i class="icon icon-transfer" @click="transferActivate" :class="{'disabled': !number}"></i>
+        <i class="icon icon-transfer" @click="transferActivate(number)" :class="{'disabled': !number}"></i>
     </div>
+
     <div class="number-input" v-else>
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
             v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
         <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
+    </div>
+
+    <div class="number-input-match" v-if="matchedContact">
+        {{matchedContact.internal_number}} - {{matchedContact.description}}
     </div>
 
     <div class="keys" v-if="!dense">

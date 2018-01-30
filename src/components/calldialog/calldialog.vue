@@ -31,7 +31,7 @@
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="keypadToggle" :class="{'active': call.keypad.active, disabled: transferOngoing}">
+            <div class="rounded-button" @click="keypadToggle" :class="{'active': call.keypad.active, disabled: transferStatus}">
                 <i class="icon icon-dialpad"></i>
             </div>
             <p>{{$t('keypad')}}</p>
