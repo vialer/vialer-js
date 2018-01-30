@@ -18,7 +18,6 @@ class CallWebRTC extends Call {
         }
 
         if (this.silent) {
-            console.log("HANDLE SILENT")
             if (this.state.status === 'invite') this._handleIncoming(callTarget)
             else this._handleOutgoing(callTarget)
             return
@@ -94,20 +93,17 @@ class CallWebRTC extends Call {
 
         // Setup some event handlers for the different stages of a call.
         this.session.on('accepted', (request) => {
-            console.log("ACCEPTED FROM INCOMING:")
             this.setState({status: 'accepted'})
             this.startTimer()
             this.ringtone.stop()
         })
 
         this.session.on('rejected', (e) => {
-            console.log("REJECTED FROM INCOMING:", e)
             this.setState({status: 'rejected'})
             this.cleanup()
         })
 
         this.session.on('bye', (e) => {
-            console.log("BYE FROM INCOMING:", e)
             this.setState({status: 'bye'})
             this.localVideo.srcObject = null
             this.cleanup()
@@ -115,7 +111,6 @@ class CallWebRTC extends Call {
 
         // Blind transfer event.
         this.session.on('refer', (target) => {
-            console.log("REFER FROM INCOMING:", target)
             this.session.bye()
         })
     }
@@ -134,7 +129,6 @@ class CallWebRTC extends Call {
         this.session.on('accepted', (data) => {
             // Always set this call to be the active call as soon a new
             // connection has been made.
-            console.log("?THIS:", this)
             this.sip.setActiveCall(this)
             this.ringbackTone.stop()
 
@@ -158,20 +152,17 @@ class CallWebRTC extends Call {
 
         // Blind transfer.
         this.session.on('refer', (target) => {
-            console.log("REFER FROM OUTGOING:", target)
             this.session.bye()
         })
 
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (e) => {
-            console.log("BYE FROM OUTGOING:", e)
             this.localVideo.srcObject = null
             this.setState({status: 'bye'})
             this.cleanup()
         })
 
         this.session.on('rejected', (e) => {
-            console.log("ACCEPTED FROM OUTGOING:", e)
             this.setState({status: 'rejected'})
             this.cleanup()
         })
@@ -208,22 +199,10 @@ class CallWebRTC extends Call {
     }
 
 
-    transferAttended(number) {
-        console.log("TRANSFER ATTENDED, E.G. CALL PARTY C")
-        this.sip.createCall(number)
-    }
-
-
-    transferBlind(number) {
-        this.session.refer(`sip:${number}@voipgrid.nl`)
-    }
-
-
     /**
     * Hangup a call.
     */
     terminate() {
-        console.log("TERMINATE STATUS:", this.state.status)
         if (this.state.status === 'invite') {
             // Decline an incoming call.
             this.session.reject()
@@ -237,6 +216,23 @@ class CallWebRTC extends Call {
             this.setState({status: 'bye'})
         }
         this.cleanup()
+    }
+
+
+    async transfer(callTarget, type) {
+        if (type === 'blind') {
+            this.session.refer(`sip:${callTarget}@voipgrid.nl`)
+        } else if (type === 'attended') {
+            // Option is a session. Refer to it and hang up.
+            if (callTarget.constructor.name === 'CallWebRTC') {
+                this.session.refer(callTarget.session)
+            } else {
+                // callTarget is a number. Create a new call and set the
+                // transfer mode to accept.
+                let call = await this.sip.createCall(callTarget)
+                call.setState({transfer: {type: 'accept'}})
+            }
+        }
     }
 
 

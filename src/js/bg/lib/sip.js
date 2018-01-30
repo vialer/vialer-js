@@ -31,6 +31,10 @@ class Sip {
         // Start with a clean state.
         this.app.setState({sip: this.app.getDefaultState().sip})
 
+        this.app.on('bg:sip:call', ({number}) => {
+            this.createCall(number, {active: true})
+        })
+
         this.app.on('bg:sip:call_answer', ({callId}) => {
             this.calls[callId].answer()
         })
@@ -45,10 +49,6 @@ class Sip {
             this.setActiveCall(this.calls[callId])
         })
 
-        this.app.on('bg:sip:call', ({number}) => {
-            this.createCall(number, {active: true})
-        })
-
         this.app.on('bg:sip:dtmf', ({callId, key}) => {
             this.calls[callId].session.dtmf(key)
         })
@@ -58,7 +58,40 @@ class Sip {
             else this.calls[callId].unhold()
         })
 
-        // Toggle hold and set the UI in transfer mode.
+        /**
+        * Activate the transfer. Calling this listener in case of a blind
+        * transfer is enough to finish the process. An attended transfer
+        * needs to call `sip:transfer_finalize` afterwards as well.
+        * @param {Object} options - Options.
+        */
+        this.app.on('bg:sip:transfer_activate', ({callId, number}) => {
+            if (this.calls[callId].state.transfer.type === 'blind') {
+                this.calls[callId].transfer(number, 'blind')
+            } else {
+                this.calls[callId].transfer(number, 'attended')
+            }
+        })
+
+
+        /**
+        *
+        * @param {String} callId - The call id of the call to transfer to.
+        */
+        this.app.on('bg:sip:transfer_finalize', ({callId}) => {
+            // Find origin.
+            let sourceCall
+            for (const _callId of Object.keys(this.calls)) {
+                if (this.calls[_callId].state.transfer.active) {
+                    sourceCall = this.calls[_callId]
+                }
+            }
+            sourceCall.transfer(this.calls[callId], 'attended')
+        })
+
+        /**
+         * Toggle hold for the call that needs to be transferred. Set
+         * transfer mode to active for this call. Set transfer_
+         */
         this.app.on('bg:sip:transfer_toggle', ({callId}) => {
             // Hold the current call.
             if (!this.calls[callId].state.transfer.active) {
@@ -67,14 +100,6 @@ class Sip {
             } else {
                 if (this.calls[callId].state.hold) this.calls[callId].unhold()
                 this.calls[callId].setState({transfer: {active: false}})
-            }
-        })
-
-        this.app.on('bg:sip:transfer', ({callId, number}) => {
-            if (this.calls[callId].state.transfer.type === 'blind') {
-                this.calls[callId].transferBlind(number)
-            } else {
-                this.calls[callId].transferAttended(number)
             }
         })
 
@@ -166,12 +191,16 @@ class Sip {
     * Switch to the calldialog and start a new call.
     * @param {Number} number - The number to call.
     * @param {Object} options - The options to pass to the call.
+    * @returns {Promise} - Call after it has access to media.
     */
     createCall(number, options) {
-        const call = new Call(this, number, options)
-        call.hasMedia.then(() => {
-            this.calls[call.state.id] = call
-            this.app.setState({ui: {layer: 'calldialog'}})
+        return new Promise((resolve, reject) => {
+            const call = new Call(this, number, options)
+            call.hasMedia.then(() => {
+                this.calls[call.state.id] = call
+                this.app.setState({ui: {layer: 'calldialog'}})
+                resolve(call)
+            })
         })
     }
 
@@ -197,21 +226,29 @@ class Sip {
     */
     setActiveCall(call) {
         // Activate the first found call when no call is given.
+        let activeCall = false
+
         if (!call) {
             let callIds = Object.keys(this.calls)
             if (callIds.length) call = this.calls[Object.keys(this.calls)[0]]
-            else return false
+            else return activeCall
         }
+
         for (const callId of Object.keys(this.calls)) {
-            if (call.state.id === callId) {
-                this.calls[callId].setState({active: true})
-                this.calls[callId].unhold()
-            } else {
-                this.calls[callId].setState({active: false})
-                this.calls[callId].hold()
+            // A call that is closing. Don't bother changing hold
+            // and active state properties.
+            if (call.state.status !== 'bye') {
+                if (call.state.id === callId) {
+                    activeCall = this.calls[callId]
+                    this.calls[callId].setState({active: true})
+                    this.calls[callId].unhold()
+                } else {
+                    this.calls[callId].setState({active: false})
+                    this.calls[callId].hold()
+                }
             }
         }
-        return call
+        return activeCall
     }
 
 

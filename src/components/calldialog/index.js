@@ -30,16 +30,19 @@ module.exports = (app) => {
                 if (!number) return
                 app.emit('bg:sip:call', {number: number})
             },
-            setTransferMode: function(type) {
-                app.setState({transfer: {type}}, {path: `sip/calls/${this.call.id}`})
-            },
-            toggleHold: function() {
+            holdToggle: function() {
                 app.emit('bg:sip:hold_toggle', {callId: this.call.id})
             },
-            toggleKeypad: function() {
+            keypadToggle: function() {
                 app.setState({keypad: {active: !this.call.keypad.active}}, {path: `sip/calls/${this.call.id}`})
             },
-            toggleTransfer: function() {
+            transferFinalize: function() {
+                app.emit('bg:sip:transfer_finalize', {callId: this.call.id})
+            },
+            transferMode: function(type) {
+                app.setState({transfer: {type}}, {path: `sip/calls/${this.call.id}`})
+            },
+            transferToggle: function() {
                 app.emit('bg:sip:transfer_toggle', {callId: this.call.id})
             },
         },

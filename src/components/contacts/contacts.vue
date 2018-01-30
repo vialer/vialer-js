@@ -2,7 +2,7 @@
 
     <div class="panel-content">
         <h1>{{$t('Contacts')}}</h1>
-        <input class="input" type="email" :placeholder="$t('Find contact') + '...'" :disabled="module.search.disabled" v-model="module.search.input">
+        <input class="input" autofocus type="email" :placeholder="$t('Find contact') + '...'" :disabled="module.search.disabled" v-model="module.search.input">
     </div>
 
     <ul class="list-items">

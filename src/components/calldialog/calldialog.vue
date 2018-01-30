@@ -9,34 +9,41 @@
 
 
     <div class="call-options" v-if="['accepted'].includes(call.status)">
-        <div class="rounded-button-with-text">
-            <div class="rounded-button"  @click="toggleTransfer" :class="{'active': call.transfer.active}">
+        <div class="rounded-button-with-text" v-if="call.transfer.type !== 'accept'">
+            <div class="rounded-button" @click="transferToggle" :class="{'active': call.transfer.active}">
+                <i class="icon icon-transfer"></i>
+            </div>
+            <p>{{$t('transfer')}}</p>
+        </div>
+        <div class="rounded-button-with-text" v-else>
+            <div class="rounded-button" @click="transferFinalize">
                 <i class="icon icon-merge_type"></i>
             </div>
-            <p>transfer</p>
+            <p>{{$t('transfer')}}</p>
         </div>
 
+
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="toggleHold" :class="{'active': call.hold}">
+            <div class="rounded-button" @click="holdToggle" :class="{'active': call.hold}">
                 <i class="icon icon-pause"></i>
             </div>
-            <p>on-hold</p>
+            <p>{{$t('on-hold')}}</p>
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="toggleKeypad" :class="{'active': call.keypad.active}">
+            <div class="rounded-button" @click="keypadToggle" :class="{'active': call.keypad.active}">
                 <i class="icon icon-dialpad"></i>
             </div>
-            <p>keypad</p>
+            <p>{{$t('keypad')}}</p>
         </div>
     </div>
 
     <div class="transfer-options" v-if="call.transfer.active">
         <div class="transfer-buttons">
-            <div class="transfer-button" :class="{'active': call.transfer.type === 'attended'}" @click="setTransferMode('attended')">
+            <div class="transfer-button" :class="{'active': call.transfer.type === 'attended'}" @click="transferMode('attended')">
                 {{$t('Attended transfer')}}
             </div>
-            <div class="transfer-button" :class="{'active': call.transfer.type === 'blind'}" @click="setTransferMode('blind')">
+            <div class="transfer-button" :class="{'active': call.transfer.type === 'blind'}" @click="transferMode('blind')">
                 {{$t('Blind transfer')}}
             </div>
         </div>
