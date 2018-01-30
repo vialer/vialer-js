@@ -1,6 +1,8 @@
-<div class="queues-component" :class="widgetState">
+<div class="queues-component no-padding" :class="widgetState">
 
-    <h1>{{$t('Queues')}}</h1>
+    <div class="panel-content">
+        <h1>{{$t('Queues')}}</h1>
+    </div>
 
     <ul class="list-items">
         <li class="list-item queue" :class="{selected: module.selectedQueue == queue.id}" v-for="queue in module.queues" v-on:click="activateQueue(queue)">

@@ -14,9 +14,8 @@
         padding: 8px;
 
         .status-icon {
-            height: auto;
             width: $spacer * 6;
-            min-width: 48px;
+            height: $spacer * 6;
             display: flex;
             justify-content: center;
             align-items: center;
