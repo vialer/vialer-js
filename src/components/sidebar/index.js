@@ -1,5 +1,7 @@
 module.exports = (app) => {
+
     return {
+        computed: app.utils.sharedComputed(),
         methods: {
             logout: app.utils.logout,
             setLayer: function(layerName) {

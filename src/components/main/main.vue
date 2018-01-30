@@ -35,7 +35,7 @@
                     <Keypad :model.sync="$store.sip.number" :number="$store.sip.number" v-if="!Object.keys($store.sip.calls).length" class="no-call"></Keypad>
                 </template>
             </div>
-            <CallSwitcher></CallSwitcher>
+            <CallSwitcher v-if="$store.ui.layer==='calldialog'"></CallSwitcher>
         </template>
     </div>
 </div>

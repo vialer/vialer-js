@@ -15,8 +15,12 @@
         line-height: $spacer * 5;
         font-size: $spacer * 3;
         padding: ($spacer / 2) 0;
-
         color: #fff;
+        transition: all 300ms ease;
+
+        &.hint {
+            background: rgba(255, 255, 255, 0.5);
+        }
 
         &.disabled {
             color: rgba(255, 255, 255, 0.5);

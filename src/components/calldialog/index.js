@@ -34,6 +34,7 @@ module.exports = (app) => {
                 app.emit('bg:sip:hold_toggle', {callId: this.call.id})
             },
             keypadToggle: function() {
+                if (this.transferOngoing) return
                 app.setState({keypad: {active: !this.call.keypad.active}}, {path: `sip/calls/${this.call.id}`})
             },
             transferFinalize: function() {

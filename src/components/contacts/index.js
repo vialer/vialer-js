@@ -1,7 +1,7 @@
 module.exports = (app) => {
 
     return {
-        computed: {
+        computed: Object.assign({
             filteredContacts: function() {
                 let searchQuery = this.module.search.input.toLowerCase()
                 return this.module.contacts.filter(function(contact) {
@@ -14,21 +14,15 @@ module.exports = (app) => {
                     return true
                 })
             },
-        },
-        methods: {
-            blindTransfer: function(number) {
-                app.emit('bg:sip:transfer_activate', {number, type: 'attended'})
-                app.setState({sip: {session: {transfer: false}}})
-            },
+        }, app.utils.sharedComputed()),
+        methods: Object.assign({
             callContact: function(contact) {
                 // Only make the call when there is currently no call going on.
                 if (!this.sip.calls.length) {
                     app.emit('bg:sip:call', {number: contact.internal_number})
                 }
-
             },
-
-        },
+        }, app.utils.sharedMethods()),
         render: templates.contacts.r,
         staticRenderFns: templates.contacts.s,
         store: {

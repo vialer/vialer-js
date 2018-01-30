@@ -129,7 +129,7 @@ class CallWebRTC extends Call {
         this.session.on('accepted', (data) => {
             // Always set this call to be the active call as soon a new
             // connection has been made.
-            this.sip.setActiveCall(this)
+            this.sip.setActiveCall(this, true)
             this.ringbackTone.stop()
 
             this.localVideo.srcObject = this.stream
@@ -228,9 +228,11 @@ class CallWebRTC extends Call {
                 this.session.refer(callTarget.session)
             } else {
                 // callTarget is a number. Create a new call and set the
-                // transfer mode to accept.
+                // new call's transfer mode to accept.
                 let call = await this.sip.createCall(callTarget)
                 call.setState({transfer: {type: 'accept'}})
+                // Activate the new call's dialog.
+                this.sip.setActiveCall(call,)
             }
         }
     }

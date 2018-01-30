@@ -55,13 +55,20 @@ class Sip {
 
         this.app.on('bg:sip:hold_toggle', ({callId}) => {
             if (!this.calls[callId].state.hold) this.calls[callId].hold()
-            else this.calls[callId].unhold()
+            else {
+                this.calls[callId].unhold()
+                // Unset transfer mode when switching of hold.
+                if (this.calls[callId].state.transfer.active) {
+                    this.calls[callId].setState({transfer: {active: false}})
+                }
+            }
         })
 
         /**
-        * Activate the transfer. Calling this listener in case of a blind
-        * transfer is enough to finish the process. An attended transfer
-        * needs to call `sip:transfer_finalize` afterwards as well.
+        * Situation: Caller A and B are connected. B is also connected to
+        * caller C. B and C will directly connect to each other in case of
+        * a blind transfer. An attended transfer needs to call
+        * the `sip:transfer_finalize` listener afterwards.
         * @param {Object} options - Options.
         */
         this.app.on('bg:sip:transfer_activate', ({callId, number}) => {
@@ -222,9 +229,10 @@ class Sip {
     * Set the active state on the target call, un-hold the call and
     * put all other calls on-hold.
     * @param {Call} [call] - A Call to activate.
+    * @param {Boolean} [unhold] - Unhold the call on activation.
     * @returns {Call|Boolean} - The Call or false.
     */
-    setActiveCall(call) {
+    setActiveCall(call, unhold = false) {
         // Activate the first found call when no call is given.
         let activeCall = false
 
@@ -241,7 +249,7 @@ class Sip {
                 if (call.state.id === callId) {
                     activeCall = this.calls[callId]
                     this.calls[callId].setState({active: true})
-                    this.calls[callId].unhold()
+                    if (unhold) this.calls[callId].unhold()
                 } else {
                     this.calls[callId].setState({active: false})
                     this.calls[callId].hold()

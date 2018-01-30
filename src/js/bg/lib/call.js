@@ -76,7 +76,7 @@ class Call {
 
         // This call is being cleaned up; move to a different call
         // when it is the active call.
-        if (this.state.active) this.sip.setActiveCall()
+        if (this.state.active) this.sip.setActiveCall(null, false)
     }
 
 

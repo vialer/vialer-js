@@ -14,7 +14,7 @@ module.exports = (app) => {
     })
 
     return {
-        methods: {
+        methods: Object.assign({
             dial: function() {
                 if (!this.number) return
                 app.emit('bg:sip:call', {number: this.number})
@@ -32,16 +32,13 @@ module.exports = (app) => {
             removeLastNumber: function() {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))
             },
-            transferNumber: function() {
-                app.emit('bg:sip:transfer_activate', {callId: this.call.id, number: this.number})
-            },
             unpressKey: function() {
                 window.setTimeout(() => {
                     keyTone.stop()
                 }, 50)
 
             },
-        },
+        }, app.utils.sharedMethods()),
         props: {
             call: {default: null},
             dense: {

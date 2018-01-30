@@ -21,6 +21,15 @@ module.exports = function(app) {
         }
     }
 
+    utils.sharedMethods = function() {
+        return {
+            transferActivate: function(number) {
+                if (!this.number) return
+                app.emit('bg:sip:transfer_activate', {callId: this.call.id, number: this.number})
+            },
+        }
+    }
+
     utils.sharedComputed = function() {
         return {
             callStatus: function() {
@@ -50,6 +59,15 @@ module.exports = function(app) {
                 if (this.seconds.toString().length <= 1) formattedTime += '0'
                 formattedTime += `${this.seconds.toString()}`
                 return formattedTime
+            },
+
+            transferOngoing: function() {
+                let transferOngoing = false
+                const calls = this.$store.sip.calls
+                for (let callId of Object.keys(calls)) {
+                    if (calls[callId].transfer.active) transferOngoing = true
+                }
+                return transferOngoing
             },
         }
     }

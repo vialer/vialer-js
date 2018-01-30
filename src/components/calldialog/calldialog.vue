@@ -7,7 +7,7 @@
         <div class="info-timer" v-if="!['invite', 'create'].includes(call.status)">{{sessionTime}}</div>
     </div>
 
-
+    <!-- Call options like transfer ops, on-hold and keypad -->
     <div class="call-options" v-if="['accepted'].includes(call.status)">
         <div class="rounded-button-with-text" v-if="call.transfer.type !== 'accept'">
             <div class="rounded-button" @click="transferToggle" :class="{'active': call.transfer.active}">
@@ -31,7 +31,7 @@
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="keypadToggle" :class="{'active': call.keypad.active}">
+            <div class="rounded-button" @click="keypadToggle" :class="{'active': call.keypad.active, disabled: transferOngoing}">
                 <i class="icon icon-dialpad"></i>
             </div>
             <p>{{$t('keypad')}}</p>

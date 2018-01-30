@@ -15,8 +15,8 @@
                 <div class="description">{{contact.internal_number}}</div>
             </div>
             <div class="contact-options">
-                <div class="rounded-button" v-if="sip.calls.length && sip.call && sip.call.transfer">
-                    <i class="icon icon-transfer"  v-on:click.once="blindTransfer(contact.internal_number)"></i>
+                <div class="rounded-button" v-if="transferOngoing">
+                    <i class="icon icon-transfer" v-on:click.once="transferActivate(contact.internal_number)"></i>
                 </div>
             </div>
         </li>
