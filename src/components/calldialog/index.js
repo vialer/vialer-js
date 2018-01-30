@@ -21,10 +21,8 @@ module.exports = (app) => {
             classes: function(block) {
                 let classes = {}
                 if (block === 'component') {
-                    if (block === 'component') {
-                        if (this.call.status) classes['call-active'] = true
-                        else classes['no-call'] = true
-                    }
+                    if (this.call.status) classes['call-active'] = true
+                    else classes['no-call'] = true
                 }
                 return classes
             },
@@ -36,15 +34,13 @@ module.exports = (app) => {
                 app.setState({transfer: {type}}, {path: `sip/calls/${this.call.id}`})
             },
             toggleHold: function() {
-                app.emit('bg:sip:toggle_hold', {callId: this.call.id})
+                app.emit('bg:sip:hold_toggle', {callId: this.call.id})
             },
             toggleKeypad: function() {
-                this.keypad = !this.keypad
-                app.emit('bg:sip:toggle_keypad', {callId: this.call.id})
+                app.setState({keypad: {active: !this.call.keypad.active}}, {path: `sip/calls/${this.call.id}`})
             },
             toggleTransfer: function() {
-                // Toggle hold and set the UI in transfer mode.
-                app.emit('bg:sip:toggle_transfer', {callId: this.call.id})
+                app.emit('bg:sip:transfer_toggle', {callId: this.call.id})
             },
         },
         props: {

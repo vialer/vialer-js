@@ -3,19 +3,21 @@
 */
 class Call {
 
-    constructor(sip, numberOrSession) {
+    constructor(sip, callTarget, {active, silent} = {}) {
         this.sip = sip
         this.app = this.sip.app
         this.ua = this.sip.ua
+        this.silent = silent
 
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringbackTone = new this.app.sounds.RingbackTone(350, 440)
-        // We can only match a call when the initial state already
-        // includes it's id. This flag is used to inficate when
-        // the foreground call state can be updated.
+        // The call state can be tracked between fg and bg after the
+        // call's session id is known. This flag is used to indicate
+        // when the state can be synced in `setState`.
         this._trackState = false
 
         this.state = {
+            active: active,
             displayName: null,
             hold: false,
             id: null,
@@ -24,6 +26,7 @@ class Call {
                 number: '',
             },
             number: '',
+            silent: this.silent,
             status: null,
             timer: {
                 current: null,
@@ -46,7 +49,7 @@ class Call {
     * what happened in between.
     * @param {Number} timeout - Postpones resetting of the call state.
     */
-    cleanup(timeout = 3000) {
+    cleanup(timeout = 1500) {
         // Stop all sounds.
         this.ringbackTone.stop()
         this.ringtone.stop()
@@ -64,11 +67,16 @@ class Call {
             }
             // Propagate to the foreground.
             this.app.setState({sip: newSipState})
-            delete this.sip.calls[this.session.id]
             this.app.emit('fg:set_state', {action: 'delete', path: `sip/calls/${this.session.id}`})
             delete this.app.state.sip.calls[this.session.id]
+            // Delete the Call object from the sip handler.
+            delete this.app.sip.calls[this.session.id]
             this.app.setState({sip: {calls: this.app.state.sip.calls}})
         }, timeout)
+
+        // This call is being cleaned up; move to a different call
+        // when it is the active call.
+        if (this.state.active) this.sip.setActiveCall()
     }
 
 
@@ -81,9 +89,11 @@ class Call {
     setState(state) {
         // This merges to the call's local state; not the app's state!
         this.app.mergeDeep(this.state, state)
+        if (this.silent) return
 
-        if (this._trackState) this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: this.state})
-        else if (this.state.id) {
+        if (this._trackState) {
+            this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: this.state})
+        } else if (this.state.id) {
             Vue.set(this.app.state.sip.calls, this.state.id, this.state)
             this.app.emit('fg:set_state', {action: 'insert', path: `sip/calls/${this.state.id}`, state: this.state})
             this._trackState = true

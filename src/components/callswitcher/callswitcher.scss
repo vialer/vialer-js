@@ -1,0 +1,24 @@
+@import "../../scss/lib/variables";
+
+// The most upper box containing account info and
+// icon-links to several locations.
+.callswitcher-component {
+    position: absolute;
+    width: 40px;
+    right: 0;
+    top: $spacer * 4;
+
+    i {
+        color: #fff;
+        width: $spacer * 5;
+        line-height: $spacer * 5;
+        height: $spacer * 5;
+
+        &:hover,
+        &.active {
+            color: $brand-variation-color;
+            background: #fff;
+            cursor: pointer;
+        }
+    }
+}

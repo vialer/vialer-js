@@ -84,11 +84,8 @@ class App extends Skeleton {
                 },
             },
             sip: {
-                call: {
-                    active: null,
-                    number: '',
-                }, // The active/selected call.
                 calls: {}, // Maps to SipJS session ids.
+                number: '',
                 ua: {
                     state: null,
                 },
@@ -175,7 +172,7 @@ class App extends Skeleton {
                 this.mergeDeep(reference, state)
             } else if (action === 'delete') {
                 let {keysRight, reference} = this.queryReference(this.state, path, 1)
-                delete reference[keysRight[0]]
+                Vue.delete(reference, keysRight[0])
             }
         } else {
             this.mergeDeep(this.state, state)

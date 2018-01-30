@@ -7,18 +7,30 @@ const Call = require('./call')
 */
 class CallWebRTC extends Call {
 
-    constructor(sip, numberOrSession) {
-        super(sip, numberOrSession)
+    constructor(sip, callTarget, options) {
+        super(sip, callTarget, options)
 
+        if (callTarget.hasOwnProperty('acceptAndTerminate')) {
+            Object.assign(this.state, {status: 'invite', type: 'incoming'})
+            this.session = callTarget
+        } else {
+            Object.assign(this.state, {status: 'create', type: 'outgoing'})
+        }
+
+        if (this.silent) {
+            console.log("HANDLE SILENT")
+            if (this.state.status === 'invite') this._handleIncoming(callTarget)
+            else this._handleOutgoing(callTarget)
+            return
+        }
         // Query media and assign the stream. The actual permission must be
         // already granted from a foreground script running in a tab.
         this.hasMedia = this._initMedia().then((stream) => {
             this._sessionOptions.media.stream = stream
             this.stream = stream
 
-            if (numberOrSession.hasOwnProperty('acceptAndTerminate')) {
-                this._handleIncoming(numberOrSession)
-            } else this._handleOutgoing(numberOrSession)
+            if (this.state.status === 'invite') this._handleIncoming(callTarget)
+            else this._handleOutgoing(callTarget)
         })
     }
 
@@ -64,17 +76,12 @@ class CallWebRTC extends Call {
 
     /**
     * An invite; incoming call.
-    * @param {Session} session - A SipJS session.
     */
-    _handleIncoming(session) {
-        this.session = session
-
+    _handleIncoming() {
         this.setState({
             displayName: this.session.remoteIdentity.displayName,
             id: this.session.id,
             number: this.session.remoteIdentity.uri.user,
-            status: 'invite',
-            type: 'incoming',
         })
 
         this.app.setState({ui: {layer: 'calldialog'}})
@@ -83,7 +90,7 @@ class CallWebRTC extends Call {
             `${this.app.$t('From')}: ${this.state.displayName}`,
             `${this.app.$t('Incoming call')}: ${this.state.number}`, false, 'warning')
 
-        this.ringtone.play()
+        if (!this.silent) this.ringtone.play()
 
         // Setup some event handlers for the different stages of a call.
         this.session.on('accepted', (request) => {
@@ -120,13 +127,16 @@ class CallWebRTC extends Call {
     */
     _handleOutgoing(number) {
         this.session = this.ua.invite(`sip:${number}@voipgrid.nl`, this._sessionOptions)
-        this.setState({id: this.session.id, number: number, status: 'create', type: 'outgoing'})
+        this.setState({id: this.session.id, number: number})
         // Notify user about the new call being setup.
         this.ringbackTone.play()
 
         this.session.on('accepted', (data) => {
+            // Always set this call to be the active call as soon a new
+            // connection has been made.
+            console.log("?THIS:", this)
+            this.sip.setActiveCall(this)
             this.ringbackTone.stop()
-            this.displayName = this.session.remoteIdentity.displayName
 
             this.localVideo.srcObject = this.stream
             this.localVideo.play()
@@ -141,7 +151,7 @@ class CallWebRTC extends Call {
                 this.remoteVideo.play()
             })
 
-            this.setState({displayName: this.displayName, status: 'accepted'})
+            this.setState({displayName: this.session.remoteIdentity.displayName, status: 'accepted'})
             this.startTimer()
         })
 
@@ -199,7 +209,8 @@ class CallWebRTC extends Call {
 
 
     transferAttended(number) {
-        this.session_transfer = ''
+        console.log("TRANSFER ATTENDED, E.G. CALL PARTY C")
+        this.sip.createCall(number)
     }
 
 
@@ -212,6 +223,7 @@ class CallWebRTC extends Call {
     * Hangup a call.
     */
     terminate() {
+        console.log("TERMINATE STATUS:", this.state.status)
         if (this.state.status === 'invite') {
             // Decline an incoming call.
             this.session.reject()
@@ -224,6 +236,7 @@ class CallWebRTC extends Call {
             // The bye event on the session is not triggered.
             this.setState({status: 'bye'})
         }
+        this.cleanup()
     }
 
 

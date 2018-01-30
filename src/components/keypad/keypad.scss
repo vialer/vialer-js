@@ -35,6 +35,10 @@
             border: 1px solid #fff;
             border-top-right-radius: $spacer / 2;
             border-bottom-right-radius: $spacer / 2;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
 
     }

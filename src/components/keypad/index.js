@@ -33,7 +33,7 @@ module.exports = (app) => {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))
             },
             transferNumber: function() {
-                console.log("TRANSFER NUMBER", this.number)
+                app.emit('bg:sip:transfer', {callId: this.call.id, number: this.number})
             },
             unpressKey: function() {
                 window.setTimeout(() => {

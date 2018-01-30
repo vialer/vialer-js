@@ -7,7 +7,6 @@ const Presence = require('./presence')
 * Currently this is used to check the presence of contacts.
 */
 class Sip {
-
     /**
     * @param {ClickToDialApp} app - The application object.
     */
@@ -17,7 +16,6 @@ class Sip {
 
         // Keeps track of calls. Keys match Sip.js session keys.
         this.calls = {}
-
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
         this.reconnect = true
@@ -43,28 +41,25 @@ class Sip {
             this.calls[callId].terminate()
         })
 
+        this.app.on('bg:sip:call_activate', ({callId}) => {
+            this.setActiveCall(this.calls[callId])
+        })
+
         this.app.on('bg:sip:call', ({number}) => {
-            this.createCall(number)
+            this.createCall(number, {active: true})
         })
 
         this.app.on('bg:sip:dtmf', ({callId, key}) => {
             this.calls[callId].session.dtmf(key)
         })
 
-        this.app.on('bg:sip:toggle_hold', ({callId}) => {
+        this.app.on('bg:sip:hold_toggle', ({callId}) => {
             if (!this.calls[callId].state.hold) this.calls[callId].hold()
             else this.calls[callId].unhold()
         })
 
-        this.app.on('bg:sip:toggle_keypad', ({callId}) => {
-            if (!this.calls[callId].state.keypad.active) {
-                this.calls[callId].setState({keypad: {active: true}})
-            } else {
-                this.calls[callId].setState({keypad: {active: false}})
-            }
-        })
-
-        this.app.on('bg:sip:toggle_transfer', ({callId}) => {
+        // Toggle hold and set the UI in transfer mode.
+        this.app.on('bg:sip:transfer_toggle', ({callId}) => {
             // Hold the current call.
             if (!this.calls[callId].state.transfer.active) {
                 if (!this.calls[callId].state.hold) this.calls[callId].hold()
@@ -75,11 +70,11 @@ class Sip {
             }
         })
 
-        this.app.on('bg:sip:transfer', ({number, type}) => {
-            if (type === 'blind') {
-                this.call.transferBlind(number)
+        this.app.on('bg:sip:transfer', ({callId, number}) => {
+            if (this.calls[callId].state.transfer.type === 'blind') {
+                this.calls[callId].transferBlind(number)
             } else {
-                this.call.transferAttended(number)
+                this.calls[callId].transferAttended(number)
             }
         })
 
@@ -90,8 +85,6 @@ class Sip {
         this.app.on('bg:sip:disconnect', ({reconnect}) => {
             this.disconnect(reconnect)
         })
-
-
 
         this.connect()
     }
@@ -122,11 +115,18 @@ class Sip {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            const call = new Call(this, session)
-            call.hasMedia.then(() => {
-                this.calls[call.state.id] = call
-                if (Object.keys(this.calls).length === 1) this.app.setState({sip: {call: {active: call.state.id}}})
-            })
+            // For now, we don't support call-waiting. A new call that is
+            // made when a call is already active will be silently dropped.
+            if (Object.keys(this.calls).length > 0) {
+                const call = new Call(this, session, {active: false, silent: true})
+                call.terminate()
+            } else {
+                const call = new Call(this, session, {active: true})
+                call.hasMedia.then(() => {
+
+                    this.calls[call.state.id] = call
+                })
+            }
         })
 
         this.ua.on('registered', () => {
@@ -165,15 +165,13 @@ class Sip {
     /**
     * Switch to the calldialog and start a new call.
     * @param {Number} number - The number to call.
+    * @param {Object} options - The options to pass to the call.
     */
-    createCall(number) {
-        const call = new Call(this, number)
+    createCall(number, options) {
+        const call = new Call(this, number, options)
         call.hasMedia.then(() => {
-            this.calls[call.session.id] = call
-            this.app.setState({
-                sip: {call: {active: call.state.id}},
-                ui: {layer: 'calldialog'},
-            })
+            this.calls[call.state.id] = call
+            this.app.setState({ui: {layer: 'calldialog'}})
         })
     }
 
@@ -189,6 +187,38 @@ class Sip {
             this.app.logger.debug(`${this}disconnected ua`)
         }
     }
+
+
+    /**
+    * Set the active state on the target call, un-hold the call and
+    * put all other calls on-hold.
+    * @param {Call} [call] - A Call to activate.
+    * @returns {Call|Boolean} - The Call or false.
+    */
+    setActiveCall(call) {
+        // Activate the first found call when no call is given.
+        if (!call) {
+            let callIds = Object.keys(this.calls)
+            if (callIds.length) call = this.calls[Object.keys(this.calls)[0]]
+            else return false
+        }
+        for (const callId of Object.keys(this.calls)) {
+            if (call.state.id === callId) {
+                this.calls[callId].setState({active: true})
+                this.calls[callId].unhold()
+            } else {
+                this.calls[callId].setState({active: false})
+                this.calls[callId].hold()
+            }
+        }
+        return call
+    }
+
+
+    toString() {
+        return `${this.app}[sip] `
+    }
+
 
     uaOptions() {
         const settings = this.app.state.settings
@@ -223,11 +253,6 @@ class Sip {
         }
 
         return uaOptions
-    }
-
-
-    toString() {
-        return `${this.app}[sip] `
     }
 }
 
