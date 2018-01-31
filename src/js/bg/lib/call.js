@@ -65,7 +65,11 @@ class Call {
                     newSipState[key] = defaultState[key]
                 }
             }
-            // Propagate to the foreground.
+
+            // This call is being cleaned up; move to a different call
+            // when it is the active call.
+            if (this.state.active) this.sip.setActiveCall(null, false)
+
             this.app.setState({sip: newSipState})
             this.app.emit('fg:set_state', {action: 'delete', path: `sip/calls/${this.session.id}`})
             delete this.app.state.sip.calls[this.session.id]
@@ -73,10 +77,6 @@ class Call {
             delete this.app.sip.calls[this.session.id]
             this.app.setState({sip: {calls: this.app.state.sip.calls}})
         }, timeout)
-
-        // This call is being cleaned up; move to a different call
-        // when it is the active call.
-        if (this.state.active) this.sip.setActiveCall(null, false)
     }
 
 

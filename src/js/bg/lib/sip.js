@@ -57,16 +57,18 @@ class Sip {
             if (!this.calls[callId].state.hold) this.calls[callId].hold()
             else {
                 this.calls[callId].unhold()
-                // Unset transfer mode when switching of hold.
+                // If this call has an active transfer, then we need
+                // to modify other call states as well.
                 if (this.calls[callId].state.transfer.active) {
                     this.calls[callId].setState({transfer: {active: false}})
-                }
 
-                // If we unhold this call, then all other calls
-                // should be put on hold.
-                for (let _callId of Object.keys(this.calls)) {
-                    if (_callId !== callId) {
-                        this.calls[_callId].hold()
+                    // All other calls should be put on hold and have
+                    // their transfer state reset.
+                    for (let _callId of Object.keys(this.calls)) {
+                        if (_callId !== callId) {
+                            this.calls[_callId].hold()
+                            this.calls[_callId].setState({transfer: {active: false, type: null}})
+                        }
                     }
                 }
             }
@@ -80,11 +82,7 @@ class Sip {
         * @param {Object} options - Options.
         */
         this.app.on('bg:sip:transfer_activate', ({callId, number}) => {
-            if (this.calls[callId].state.transfer.type === 'blind') {
-                this.calls[callId].transfer(number, 'blind')
-            } else {
-                this.calls[callId].transfer(number, 'attended')
-            }
+            this.calls[callId].transfer(number, this.calls[callId].state.transfer.type)
         })
 
 
@@ -112,8 +110,9 @@ class Sip {
             if (!this.calls[callId].state.transfer.active) {
                 // Start by holding the current call when switching on transfer.
                 if (!this.calls[callId].state.hold) this.calls[callId].hold()
-                // Mark the transfer state as active and disable any open keypad.
-                this.calls[callId].setState({keypad: {active: false}, transfer: {active: true}})
+                // Mark the call as active/attended to start with
+                // and disable any open keypad.
+                this.calls[callId].setState({keypad: {active: false}, transfer: {active: true, type: 'attended'}})
 
                 // all other calls are set to transfer type the source call
                 // is set to transfer.
@@ -266,7 +265,8 @@ class Sip {
 
         if (!call) {
             for (const callId of callIds) {
-                if (this.calls[callId].state.status !== 'bye') {
+                // Don't select a call that is already closing.
+                if (!['bye', 'rejected'].includes(this.calls[callId].state.status)) {
                     call = this.calls[callId]
                 }
             }
@@ -276,7 +276,7 @@ class Sip {
         for (const callId of Object.keys(this.calls)) {
             // A call that is closing. Don't bother changing hold
             // and active state properties.
-            if (call.state.status !== 'bye') {
+            if (!['bye', 'rejected'].includes(call.state.status)) {
                 if (call.state.id === callId) {
                     activeCall = this.calls[callId]
                     this.calls[callId].setState({active: true})

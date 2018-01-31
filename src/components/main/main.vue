@@ -32,7 +32,7 @@
                 <template v-else-if="$store.ui.layer==='calldialog'">
                     <CallDialog v-if="call.active" :call="call" v-for="call in $store.sip.calls" :key="call.id"/>
                     <!-- Keypad for dialing out is only visible when no calls are active yet -->
-                    <Keypad :model.sync="$store.sip.number" :number="$store.sip.number" v-if="!Object.keys($store.sip.calls).length" class="no-call"></Keypad>
+                    <Keypad :model.sync="$store.sip.number" :search="true" :number="$store.sip.number" v-if="!Object.keys($store.sip.calls).length" class="no-call"></Keypad>
                 </template>
             </div>
             <CallSwitcher v-if="$store.ui.layer==='calldialog'"/>

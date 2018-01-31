@@ -48,6 +48,7 @@ module.exports = (app) => {
                 app.emit('bg:sip:transfer_finalize', {callId: this.call.id})
             },
             transferMode: function(type) {
+                if (this.transferStatus !== 'select') return
                 app.setState({transfer: {type}}, {path: `sip/calls/${this.call.id}`})
             },
             transferToggle: function() {

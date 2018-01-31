@@ -152,11 +152,26 @@
                 padding: 0 $spacer;
                 text-align: center;
 
-                &:hover,
-                &.active {
+                &.active,
+                &:hover {
                     background: #fff;
                     color: $brand-color;
                     cursor: pointer;
+                }
+
+                &.active {
+                    cursor: default;
+                }
+
+
+                &.disabled {
+                    opacity: 0.5;
+
+                    &:hover {
+                        color: #fff;
+                        background: none;
+                        cursor: not-allowed;
+                    }
                 }
             }
         }

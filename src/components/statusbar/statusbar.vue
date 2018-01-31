@@ -23,7 +23,7 @@
         </div>
 
         <div class="option" v-if="env.isExtension && !env.isPopout" @click="openPopoutView">
-            <i class="icon-full-screen" :title="$t('Open in separate tab')"></i>
+            <i class="icon-ext-tab" :title="$t('Open in separate tab')"></i>
         </div>
 
         <div class="option" :class="{active: layer === 'settings'}" @click="setLayer('settings')">
@@ -35,7 +35,7 @@
         </div>
 
         <div class="option">
-            <i class="icon-support" data-link="help" :title="$t('Help')" @click="openHelp"></i>
+            <i class="icon-help" data-link="help" :title="$t('Help')" @click="openHelp"></i>
         </div>
     </div>
 </div>

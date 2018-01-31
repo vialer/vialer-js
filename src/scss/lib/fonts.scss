@@ -83,127 +83,162 @@ $icon-checkbox-unchecked: "\f096";
     100% {color: $red-color;}
 }
 
-.icon-phone-hang-up:before {
-    content: "\e915";
-}
-
-.icon-dialpad:before {
-    content: "\e914";
-}
-
-// The vialer-js font icons.
-.icon-entity:before {
-    content: "\e913";
-}
-
-.icon-availability:before {
+.icon-o-arrow:before {
     content: "\e900";
 }
 
-.icon-check:before {
-    content: $icon-check;
+.icon-o-availability:before {
+    content: "\e901";
 }
 
-.icon-close:before {
+.icon-o-contacts:before {
     content: "\e902";
 }
 
-.icon-colleagues:before {
+.icon-o-correct:before {
     content: "\e903";
 }
 
-.icon-cross:before {
+.icon-o-dialpad:before {
     content: "\e904";
 }
 
-.icon-full-screen:before {
+.icon-o-ext-tab:before {
     content: "\e905";
 }
 
-.icon-logout:before {
+.icon-o-hang-up:before {
     content: "\e906";
 }
 
-.icon-phone:before {
+.icon-o-help:before {
     content: "\e907";
 }
 
-.icon-queue:before {
+.icon-o-logout:before {
     content: "\e908";
 }
 
-.icon-refresh:before {
+.icon-o-phone:before {
     content: "\e909";
 }
 
-.icon-search:before {
+.icon-o-queues:before {
     content: "\e90a";
 }
 
-.icon-settings:before {
+.icon-o-refresh:before {
     content: "\e90b";
 }
 
-.icon-support:before {
+.icon-o-settings:before {
     content: "\e90c";
 }
 
-.icon-toggle-down:before {
-    content: $icon-toggle-down;
+.icon-o-unavailable:before {
+    content: "\e90d";
 }
 
-.icon-toggle-left:before {
+.icon-o-vialer-icon:before {
     content: "\e90e";
 }
 
-.icon-toggle-right:before {
+.icon-arrow:before {
     content: "\e90f";
 }
 
-.icon-toggle-up:before {
-    content: $icon-toggle-up;
+.icon-availability:before {
+    content: "\e910";
 }
 
-.icon-warning:before {
+.icon-check:before {
     content: "\e911";
 }
 
-.icon-lost-connection:before {
+.icon-close:before {
     content: "\e912";
 }
 
-.icon-cloud-download:before {
-    content: "\f0ed";
+.icon-contacts:before {
+    content: "\e913";
 }
 
-.icon-bars:before {
-    content: "\f0c9";
-}
-
-.icon-check-square-o:before {
-    content: $icon-checkbox-checked;
-}
-
-.icon-square-o:before {
-    content: $icon-checkbox-unchecked;
-}
-
-.icon-transfer:before {
+.icon-correct:before {
     content: "\e914";
 }
 
 .icon-dialpad:before {
-    content: "\e0bc";
+    content: "\e915";
 }
 
-.icon-pause:before {
-    content: "\e034";
+.icon-disconnected:before {
+    content: "\e916";
 }
 
-.icon-merge_type:before {
-    content: "\e252";
+.icon-ext-tab:before {
+    content: "\e917";
 }
 
-.icon-hold:before {
-    content: "\e034";
+.icon-hang-up:before {
+    content: "\e918";
+}
+
+.icon-help:before {
+    content: "\e919";
+}
+
+.icon-info:before {
+    content: "\e91a";
+}
+
+.icon-logout:before {
+    content: "\e91b";
+}
+
+.icon-merge:before {
+    content: "\e91c";
+}
+
+.icon-mute:before {
+    content: "\e91d";
+}
+
+.icon-on-hold:before {
+    content: "\e91e";
+}
+
+.icon-phone:before {
+    content: "\e91f";
+}
+
+.icon-queues:before {
+    content: "\e920";
+}
+
+.icon-refresh:before {
+    content: "\e921";
+}
+
+.icon-settings:before {
+    content: "\e922";
+}
+
+.icon-switch-calls:before {
+    content: "\e923";
+}
+
+.icon-transfer:before {
+    content: "\e924";
+}
+
+.icon-unavailable:before {
+    content: "\e925";
+}
+
+.icon-vialer-icon:before {
+    content: "\e926";
+}
+
+.icon-warning:before {
+    content: "\e927";
 }

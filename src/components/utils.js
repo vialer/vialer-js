@@ -80,6 +80,10 @@ module.exports = function(app) {
                 formattedTime += `${this.seconds.toString()}`
                 return formattedTime
             },
+            /**
+            * Returns non-call specific transfer status for components to use.
+            * @returns {Boolean|String} - The transfer status: false, 'ongoing' or 'select'.
+            */
             transferStatus: function() {
                 let transferStatus = false
                 const calls = this.$store.sip.calls

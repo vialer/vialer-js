@@ -7,7 +7,7 @@ module.exports = (app) => {
                 let classes = {}
                 if (block === 'icon') {
                     classes.active = call.active
-                    if (call.hold) classes['icon-hold'] = true
+                    if (call.hold) classes['icon-on-hold'] = true
                     else classes['icon-phone'] = true
                 }
                 return classes

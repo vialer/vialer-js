@@ -226,17 +226,17 @@ class CallWebRTC extends Call {
     }
 
 
-    async transfer(callTarget, type) {
+    async transfer(targetCall, type) {
         if (type === 'blind') {
-            this.session.refer(`sip:${callTarget}@voipgrid.nl`)
+            this.session.refer(`sip:${targetCall}@voipgrid.nl`)
         } else if (type === 'attended') {
             // Option is a session. Refer to it and hang up.
-            if (callTarget.constructor.name === 'CallWebRTC') {
-                this.session.refer(callTarget.session)
+            if (targetCall.constructor.name === 'CallWebRTC') {
+                this.session.refer(targetCall.session)
             } else {
-                // callTarget is a number. Create a new call and set the
+                // targetCall is a number. Create a new call and set the
                 // new call's transfer mode to accept.
-                let call = await this.sip.createCall(callTarget, {active: true})
+                let call = await this.sip.createCall(targetCall, {active: true})
                 call.setState({transfer: {type: 'accept'}})
                 // Activate the new call's dialog.
                 this.sip.setActiveCall(call, false)

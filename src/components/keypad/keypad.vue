@@ -14,7 +14,7 @@
         <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
     </div>
 
-    <div class="number-input-match">
+    <div class="number-input-match" v-if="search">
         <span v-if="matchedContact">
             {{matchedContact.internal_number}} - {{matchedContact.description}}
         </span>

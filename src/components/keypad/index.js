@@ -80,6 +80,10 @@ module.exports = (app) => {
                 default: '',
                 type: String,
             },
+            search: {
+                default: true,
+                type: Boolean,
+            },
         },
         render: templates.keypad.r,
         staticRenderFns: templates.keypad.s,
