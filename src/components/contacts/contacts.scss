@@ -34,26 +34,6 @@
         &:not(.disabled):hover {
             cursor: pointer;
         }
-
-        .rounded-button {
-            background: #fff;
-            padding: 0;
-            width: $spacer * 4;
-            height: $spacer * 4;
-            text-align: center;
-            line-height: 32px;
-            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
-
-            &:hover {
-                color: $brand-color;
-                cursor: pointer;
-            }
-
-            i {
-                font-size: $spacer * 1.5;
-                padding: 0;
-            }
-        }
     }
 
 }

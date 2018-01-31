@@ -1,6 +1,16 @@
 module.exports = (app) => {
     const keyTone = new app.sounds.DtmfTone(350, 440)
-    const allowedKeys = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, '*', '#']
+    const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#']
+
+    /**
+    * Clear a number of special characters.
+    * @param {String} number - Number to clean.
+    * @returns {String} - The cleaned number.
+    */
+    function sanitizeNumber(number) {
+        number = String(number).replace(/[^\d|!+|!*|!#]/g, '')
+        return number
+    }
 
     // we detect the mouseup event on the window tag as opposed to the li
     // tag because otherwise if we release the mouse when not over a button,
@@ -39,11 +49,12 @@ module.exports = (app) => {
                 this.$emit('update:model', newVal)
             },
             pressKey: function(key) {
-                if (!allowedKeys.includes(parseInt(key))) {
+                if (!allowedKeys.includes(key)) {
                     return
                 }
                 keyTone.play(key)
-                this.$emit('update:model', `${this.number}${key}`)
+                let newVal = sanitizeNumber(`${this.number}${key}`)
+                if (newVal) this.$emit('update:model', newVal)
                 if (this.call) app.emit('bg:sip:dtmf', {callId: this.call.id, key})
             },
             removeLastNumber: function() {
@@ -67,6 +78,7 @@ module.exports = (app) => {
             },
             number: {
                 default: '',
+                type: String,
             },
         },
         render: templates.keypad.r,
@@ -76,9 +88,8 @@ module.exports = (app) => {
         },
         watch: {
             number: function(newVal, oldVal) {
-                if (isNaN(newVal)) {
-                    this.$emit('update:model', oldVal)
-                }
+                let cleanedNumber = sanitizeNumber(newVal)
+                this.$emit('update:model', cleanedNumber)
             },
         },
     }

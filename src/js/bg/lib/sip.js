@@ -105,17 +105,19 @@ class Sip {
 
         /**
          * Toggle hold for the call that needs to be transferred. Set
-         * transfer mode to active for this call. Set transfer_
+         * transfer mode to active for this call.
          */
         this.app.on('bg:sip:transfer_toggle', ({callId}) => {
-            // Hold the current call.
+            const callIds = Object.keys(this.calls)
             if (!this.calls[callId].state.transfer.active) {
+                // Start by holding the current call when switching on transfer.
                 if (!this.calls[callId].state.hold) this.calls[callId].hold()
-                this.calls[callId].setState({transfer: {active: true}})
+                // Mark the transfer state as active and disable any open keypad.
+                this.calls[callId].setState({keypad: {active: false}, transfer: {active: true}})
 
-                // If we unhold this call, then all other calls
-                // should be put on hold.
-                for (let _callId of Object.keys(this.calls)) {
+                // all other calls are set to transfer type the source call
+                // is set to transfer.
+                for (let _callId of callIds) {
                     if (_callId !== callId) {
                         this.calls[_callId].setState({transfer: {active: false, type: 'accept'}})
                     }
@@ -126,7 +128,7 @@ class Sip {
 
                 // If we unhold this call, then all other calls
                 // should be put on hold.
-                for (let _callId of Object.keys(this.calls)) {
+                for (let _callId of callIds) {
                     if (_callId !== callId) {
                         this.calls[_callId].hold()
                         this.calls[_callId].setState({transfer: {active: false, type: 'attended'}})

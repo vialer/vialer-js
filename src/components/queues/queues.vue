@@ -15,6 +15,9 @@
             </div>
 
             <div class="queues-options">
+                <div class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(queue.internal_number)">
+                    <i class="icon icon-transfer" v-on:click.once="transferActivate(queue.internal_number)"></i>
+                </div>
             </div>
         </li>
 

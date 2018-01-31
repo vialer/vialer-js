@@ -1,4 +1,4 @@
-<div class="keypad-component">
+<div class="keypad-component" tabindex="-1" v-on:keyup.enter="createCall">
 
     <div class="dense-number-input" v-if="dense">
         <input type="text" ref="input" autofocus placeholder="..."
@@ -22,24 +22,24 @@
 
     <div class="keys" v-if="!dense">
         <div class="row">
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(1)">1</button>
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(2)">2<div class="sub">ABC</div></button>
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(3)">3<div class="sub">DEF</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('1')">1</button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('2')">2<div class="sub">ABC</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('3')">3<div class="sub">DEF</div></button>
         </div>
         <div class="row">
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(4)">4<div class="sub">GHI</div></button>
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(5)">5<div class="sub">JKL</div></button>
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(6)">6<div class="sub">MNO</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('4')">4<div class="sub">GHI</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('5')">5<div class="sub">JKL</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('6')">6<div class="sub">MNO</div></button>
         </div>
         <div class="row">
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(7)">7<div class="sub">PQRS</div></button>
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(8)">8<div class="sub">TUV</div></button>
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(9)">9<div class="sub">WXYZ</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('7')">7<div class="sub">PQRS</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('8')">8<div class="sub">TUV</div></button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('9')">9<div class="sub">WXYZ</div></button>
         </div>
         <div class="row">
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('*')">*</button>
+            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('0')">0<div class="sub">+</div></button>
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('#')">#</button>
-            <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey(0)">0<div class="sub">+</div></button>
-            <button class="rounded-button key" @mouseup="stopDunpressKeytmf()" @mousedown="pressKey('*')">*</button>
         </div>
     </div>
     <!-- Dial actions when not used in combination with a call. -->
