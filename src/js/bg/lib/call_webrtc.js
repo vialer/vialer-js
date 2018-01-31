@@ -125,7 +125,6 @@ class CallWebRTC extends Call {
         this.session = this.ua.invite(`sip:${number}@voipgrid.nl`, this._sessionOptions)
         this.setState({id: this.session.id, number: number})
         // Notify user about the new call being setup.
-        this.ringbackTone.play()
 
         this.session.on('accepted', (data) => {
             // Always set this call to be the active call as soon a new
@@ -148,6 +147,13 @@ class CallWebRTC extends Call {
 
             this.setState({displayName: this.session.remoteIdentity.displayName, status: 'accepted'})
             this.startTimer()
+        })
+
+        this.session.on('progress', (e) => {
+            // Ringing, start ringing.
+            if (e.status_code === 180) {
+                this.ringbackTone.play()
+            }
         })
 
 
@@ -230,7 +236,7 @@ class CallWebRTC extends Call {
             } else {
                 // callTarget is a number. Create a new call and set the
                 // new call's transfer mode to accept.
-                let call = await this.sip.createCall(callTarget)
+                let call = await this.sip.createCall(callTarget, {active: true})
                 call.setState({transfer: {type: 'accept'}})
                 // Activate the new call's dialog.
                 this.sip.setActiveCall(call, false)

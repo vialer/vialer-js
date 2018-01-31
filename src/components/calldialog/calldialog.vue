@@ -48,12 +48,12 @@
             </div>
         </div>
         <div class="transfer-text">{{$t('To transfer select a contact or input a number.')}}</div>
+        <!-- Dense keypad when the user is in transfer mode. -->
         <Keypad :model.sync="call.keypad.number" :call="call" :dense="true" :number="call.keypad.number" class="transfer-keypad call-active"/>
     </div>
 
-    <!-- For now, we use a dense keypad for transfer mode and a full keypad otherwise -->
-    <Keypad v-if="call.keypad.active" :model.sync="call.keypad.number"
-        :call="call" :number="call.keypad.number" :dtmf="true" class="call-active"/>
+    <!-- Full keypad when explicitly selecting the keypad. Does not co-exist with transfer mode. -->
+    <Keypad v-if="call.keypad.active" :model.sync="call.keypad.number" :call="call" :number="call.keypad.number" :dtmf="true" class="call-active"/>
 
     <div class="call-actions">
         <div class="rounded-button action decline" v-if="!transferActive && ['accepted', 'create', 'invite'].includes(call.status) && !call.keypad.active" @click="callTerminate(call)">

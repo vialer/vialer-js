@@ -44,7 +44,7 @@
     </div>
     <!-- Dial actions when not used in combination with a call. -->
     <div class="call-actions" v-if="!call">
-        <div class="rounded-button action dial" @click="dial" :class="{'disabled': !number}">
+        <div class="rounded-button action dial" @click="createCall" :class="{'disabled': !number}">
             <i class="icon icon-phone"></i>
         </div>
     </div>

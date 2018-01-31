@@ -26,6 +26,8 @@
         .panel-content-container {
             margin-left: $spacer * 5;
             margin-top: $spacer * 4;
+            // Limits the scollbar to the content area.
+            max-height: 568px;
 
             width: 100%;
             overflow: auto;

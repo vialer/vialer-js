@@ -28,10 +28,10 @@ module.exports = (app) => {
                     })
                 }
                 return matchedContact
-            }
+            },
         },
         methods: Object.assign({
-            dial: function() {
+            createCall: function() {
                 if (!this.number) return
                 app.emit('bg:sip:call', {number: this.number})
             },
@@ -39,9 +39,11 @@ module.exports = (app) => {
                 this.$emit('update:model', newVal)
             },
             pressKey: function(key) {
-                if (!allowedKeys.includes(key)) return
+                if (!allowedKeys.includes(parseInt(key))) {
+                    return
+                }
+                console.log("PRESS new val", `${this.number}${key}`)
                 keyTone.play(key)
-                // this.number = `${this.number}${key}`
                 this.$emit('update:model', `${this.number}${key}`)
                 if (this.call) app.emit('bg:sip:dtmf', {callId: this.call.id, key})
             },
@@ -64,7 +66,9 @@ module.exports = (app) => {
                 default: false,
                 type: Boolean,
             },
-            number: {default: ''},
+            number: {
+                default: '',
+            },
         },
         render: templates.keypad.r,
         staticRenderFns: templates.keypad.s,
