@@ -42,7 +42,6 @@ module.exports = (app) => {
                 if (!allowedKeys.includes(parseInt(key))) {
                     return
                 }
-                console.log("PRESS new val", `${this.number}${key}`)
                 keyTone.play(key)
                 this.$emit('update:model', `${this.number}${key}`)
                 if (this.call) app.emit('bg:sip:dtmf', {callId: this.call.id, key})

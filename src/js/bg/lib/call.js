@@ -92,9 +92,10 @@ class Call {
         if (this.silent) return
 
         if (this._trackState) {
-            this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: this.state})
+            this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: state})
         } else if (this.state.id) {
             Vue.set(this.app.state.sip.calls, this.state.id, this.state)
+            // Send a complete state representation down the wire once.
             this.app.emit('fg:set_state', {action: 'insert', path: `sip/calls/${this.state.id}`, state: this.state})
             this._trackState = true
         }
