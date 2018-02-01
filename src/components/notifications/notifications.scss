@@ -1,16 +1,18 @@
 @import "../../scss/lib/variables";
 
 .notifications-component {
-    position: absolute;
+    position: fixed;
     top: $spacer * 5;
     left: 0;
     width: 100%;
+    max-width: $max-popup-width;
 
     z-index: 100000;
 
     &.with-sidebar {
         left: $spacer * 5;
         width: calc(100% - #{$spacer * 5});
+        max-width: $max-popup-width - ($spacer * 5);
     }
 
     .notification {
