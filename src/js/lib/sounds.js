@@ -27,8 +27,16 @@ class DtmfTone {
 
 
     start() {
-        this.freq1 = 350
-        this.freq2 = 440
+
+    }
+
+
+    play(key) {
+        if (this.started) return
+
+        const frequencyPair = this.frequencies[key]
+        this.freq1 = frequencyPair.f1
+        this.freq2 = frequencyPair.f2
 
         this.osc1 = context.createOscillator()
         this.osc2 = context.createOscillator()
@@ -37,30 +45,17 @@ class DtmfTone {
 
         let gainNode = context.createGain()
         gainNode.gain.setValueAtTime(0.25, context.currentTime)
-
         let filter = context.createBiquadFilter()
         filter.type = 'lowpass'
 
         this.osc1.connect(gainNode)
         this.osc2.connect(gainNode)
-
         gainNode.connect(filter)
         filter.connect(context.destination)
 
         this.osc1.start(0)
         this.osc2.start(0)
         this.started = true
-    }
-
-
-    play(key) {
-        const frequencyPair = this.frequencies[key]
-        this.freq1 = frequencyPair.f1
-        this.freq2 = frequencyPair.f2
-
-        if (!this.started) {
-            this.start()
-        }
     }
 
 
