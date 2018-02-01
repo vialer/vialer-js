@@ -24,17 +24,11 @@ class Api {
     setupClient(username, password) {
         let clientOptions = {
             baseURL: this.app.state.settings.platform.url,
+            password: password,
             timeout: 15000,
+            username: username,
         }
-        if (username && password) {
-            this.app.logger.info(`${this}Set api client with basic auth for user ${username}`)
-            clientOptions.auth = {
-                password: password,
-                username: username,
-            }
-        } else {
-            this.app.logger.info(`${this}Set unauthenticated api client`)
-        }
+
         this.client = axios.create(clientOptions)
         this.client.interceptors.response.use(function(response) {
             return response

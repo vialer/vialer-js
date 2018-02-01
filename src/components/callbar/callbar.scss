@@ -8,7 +8,7 @@
     justify-content: space-between;
     min-height: $spacer * 5;
     background: $green-color;
-    color: #fff;
+    color: $white;
     font-size: 0.8rem;
     font-weight: 500;
     position: fixed;
@@ -59,7 +59,7 @@
             &.active,
             &:hover {
                 cursor: pointer;
-                background: #fff;
+                background: $white;
 
                 i {
                     color: $brand-color;
@@ -69,7 +69,7 @@
             i {
                 line-height: $spacer * 4;
                 font-size: $spacer * 2;
-                color: #fff;
+                color: $white;
             }
         }
     }

@@ -9,7 +9,7 @@
     right: 0;
 
     i {
-        color: #fff;
+        color: $white;
         width: $spacer * 5;
         line-height: $spacer * 5;
         height: $spacer * 5;
@@ -17,7 +17,7 @@
         &:hover,
         &.active {
             color: $brand-variation-color;
-            background: #fff;
+            background: $white;
             cursor: pointer;
         }
     }

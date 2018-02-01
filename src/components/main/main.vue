@@ -1,40 +1,31 @@
 <div class="main-component" id="app">
-    <Notifications/>
+
     <StatusBar v-if="!Object.keys($store.sip.calls).length"/>
     <CallBar v-if="call.active" :call="call" v-for="call in $store.sip.calls"/>
 
     <div class="panel">
-        <div class="panel-content-unauthenticated" v-if="!$store.user.authenticated">
-            <Login v-if="$store.ui.layer==='login'"/>
-            <Settings v-if="$store.ui.layer==='settings'"/>
+        <div class="panel-content-container" v-if="!$store.user.authenticated">
+            <Notifications/>
+            <Login v-if="$store.ui.layer==='login'" class="panel-content"/>
+            <Settings v-if="$store.ui.layer==='settings'" class="panel-content"/>
         </div>
 
         <template v-if="$store.user.authenticated">
             <SideBar class="panel-sidebar"/>
 
-            <div class="panel-content-container">
-                <template v-if="$store.ui.layer==='availability'">
-                    <Availability/>
-                </template>
-
-                <template v-else-if="$store.ui.layer==='contacts'">
-                    <Contacts/>
-                </template>
-
-                <template v-else-if="$store.ui.layer==='queues'">
-                    <Queues/>
-                </template>
-
-                <template v-else-if="$store.ui.layer==='settings'">
-                    <Settings/>
-                </template>
-
+            <div class="panel-content-container with-sidebar">
+                <Notifications class="with-sidebar"/>
+                <Availability v-if="$store.ui.layer==='availability'"/>
+                <Contacts v-else-if="$store.ui.layer==='contacts'"/>
+                <Queues v-else-if="$store.ui.layer==='queues'"/>
+                <Settings v-else-if="$store.ui.layer==='settings'" class="panel-content"/>
                 <template v-else-if="$store.ui.layer==='calldialog'">
-                    <CallDialog v-if="call.active" :call="call" v-for="call in $store.sip.calls" :key="call.id"/>
+                    <CallDialog v-if="call.active" :call="call" v-for="call in $store.sip.calls" :key="call.id" class="panel-content"/>
                     <!-- Keypad for dialing out is only visible when no calls are active yet -->
-                    <Keypad :model.sync="$store.sip.number" :search="true" :number="$store.sip.number" v-if="!Object.keys($store.sip.calls).length" class="no-call"></Keypad>
+                    <Keypad :model.sync="$store.sip.number" :search="true" :number="$store.sip.number" v-if="!Object.keys($store.sip.calls).length" class="panel-content no-call"/>
                 </template>
             </div>
+
             <CallSwitcher v-if="$store.ui.layer==='calldialog'"/>
         </template>
     </div>

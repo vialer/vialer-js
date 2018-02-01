@@ -6,7 +6,7 @@
     flex-direction: column;
     text-align: center;
     top: $spacer * 5;
-    height: calc(100% - 32px);
+    height: calc(100% - 40px);
     position: fixed;
     background: $brand-color;
     width: $spacer * 5;
@@ -16,7 +16,7 @@
         line-height: $spacer * 5;
         font-size: $spacer * 3;
         padding: ($spacer / 2) 0;
-        color: #fff;
+        color: $white;
         transition: all 300ms ease;
 
         &.hint {
@@ -36,7 +36,7 @@
         &.active,
         &:hover {
             cursor: pointer;
-            background: #fff;
+            background: $white;
             color: $brand-color;
         }
     }

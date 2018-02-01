@@ -56,7 +56,7 @@ video {
 
 ::selection {
     background: $brand-color;
-    color: #fff;
+    color: $white;
 }
 
 .hide {display: none;}
@@ -108,7 +108,7 @@ video {
         }
 
         .rounded-button {
-            background: #fff;
+            background: $white;
             padding: 0;
             width: $spacer * 4;
             height: $spacer * 4;
@@ -141,7 +141,7 @@ video {
         box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);
 
         &.decline {
-            color: #fff;
+            color: $white;
             background: $red-color;
 
             &.disabled {
@@ -154,13 +154,13 @@ video {
         }
 
         &.accept {
-            color: #fff;
+            color: $white;
             background: $green-color;
             &:hover {background: darken($green-color, 3%);}
         }
 
         &.dial {
-            color: #fff;
+            color: $white;
             background: $green-color;
             &:hover {background: darken($green-color, 3%);}
         }

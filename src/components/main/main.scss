@@ -11,23 +11,17 @@
         overflow: auto;
         display: flex;
         position: relative;
-
         min-height: 224px;
 
-        .panel-content-unauthenticated {
-            width: 100%;
-            padding: $spacer;
-            margin-top: $spacer * 4;
-        }
-
         .panel-content-container {
-            margin-left: $spacer * 5;
-            margin-top: $spacer * 5;
-            // Limits the scollbar to the content area.
-            max-height: 568px;
-
             width: 100%;
+            margin-top: $spacer * 5;
             overflow: auto;
+            max-height: calc(100% - 140px);
+
+            &.with-sidebar {
+                margin-left: $spacer * 5;
+            }
 
             .panel-content {
                 padding: $spacer * 3;
@@ -41,14 +35,14 @@
                 font-size: 1rem;
             }
 
-            // Deefault panel content container.
-            > div {
-                padding: $spacer * 3;
-            }
-
-            > div.no-padding {
-                padding: 0;
-            }
+            // Default panel content container.
+            // .panel-content {
+            //     padding: $spacer * 3;
+            //
+            //     &.no-padding {
+            //         padding: 0;
+            //     }
+            // }
         }
     }
 }

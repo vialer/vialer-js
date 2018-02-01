@@ -7,6 +7,7 @@ class UserModule {
         this.app = app
 
         this.app.on('bg:user:login', (data) => {
+            console.log("LOGIN:", data)
             Object.assign(this.app.state.user, {
                 password: data.password,
                 username: data.username,
@@ -31,6 +32,8 @@ class UserModule {
     async login(email, password) {
         this.app.api.setupClient(email, password)
         const res = await this.app.api.client.get('api/permission/systemuser/profile/')
+
+        console.log(res)
 
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             this.app.emit('fg:notify', {icon: 'warning', message: this.app.$t('Invalid credentials'), type: 'warning'})

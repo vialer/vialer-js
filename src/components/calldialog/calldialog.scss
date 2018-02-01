@@ -3,7 +3,7 @@
 .calldialog-component {
     display: flex;
     flex-direction: column;
-    color: #fff;
+    color: $white;
     min-height: 250px;
 
     &.with-keypad {
@@ -14,7 +14,7 @@
 
     // Keypad styling for when making a new call.
     &.no-call {
-        background: #fff;
+        background: $white;
     }
 
     // Keypad styling for when in a call.
@@ -24,7 +24,7 @@
         .keypad-component {
             .number-input {
                 input {
-                    color: #fff;
+                    color: $white;
                 }
             }
         }
@@ -71,12 +71,12 @@
             text-align: center;
 
             .rounded-button {
-                border: 2px solid #fff;
+                border: 2px solid $white;
                 margin-bottom: $spacer;
 
                 &:hover,
                 &.active {
-                    background: #fff;
+                    background: $white;
                     color: $brand-color;
                 }
 
@@ -104,7 +104,7 @@
 
             &.active {
                 .icon {
-                    background: #fff;
+                    background: $white;
 
                     i {
                         color: $brand-color;
@@ -115,7 +115,7 @@
             .icon {
                 height: 60px;
                 width: 60px;
-                border: 2px solid #fff;
+                border: 2px solid $white;
                 border-radius: 100%;
                 line-height: 60px;
                 text-align: center;
@@ -144,7 +144,7 @@
             .transfer-button {
                 width: 130px;
                 margin: 0 ($spacer * 2);
-                border: 2px solid #fff;
+                border: 2px solid $white;
                 border-radius: $spacer / 2;
                 font-weight: bold;
                 font-size: 0.7rem;
@@ -154,7 +154,7 @@
 
                 &.active,
                 &:hover {
-                    background: #fff;
+                    background: $white;
                     color: $brand-color;
                     cursor: pointer;
                 }
@@ -168,7 +168,7 @@
                     opacity: 0.5;
 
                     &:hover {
-                        color: #fff;
+                        color: $white;
                         background: none;
                         cursor: not-allowed;
                     }

@@ -31,14 +31,17 @@ class Sip {
 
         // Start with a clean state.
         this.app.setState({sip: this.app.getDefaultState().sip})
+        this.connect()
 
         this.app.on('bg:sip:call', ({number}) => {
             this.createCall(number, {active: true})
         })
 
+
         this.app.on('bg:sip:call_answer', ({callId}) => {
             this.calls[callId].answer()
         })
+
 
         // Self-initiated request to stop the session during one of
         // the phases of a call.
@@ -46,13 +49,16 @@ class Sip {
             this.calls[callId].terminate()
         })
 
+
         this.app.on('bg:sip:call_activate', ({callId, holdInactive, unholdActive}) => {
             this.setActiveCall(this.calls[callId], holdInactive, unholdActive)
         })
 
+
         this.app.on('bg:sip:dtmf', ({callId, key}) => {
             this.calls[callId].session.dtmf(key)
         })
+
 
         this.app.on('bg:sip:hold_toggle', ({callId}) => {
             if (!this.calls[callId].state.hold) this.calls[callId].hold()
@@ -74,6 +80,7 @@ class Sip {
                 }
             }
         })
+
 
         /**
         * Situation: Caller A and B are connected. B is also connected to
@@ -101,6 +108,7 @@ class Sip {
             }
             sourceCall.transfer(this.calls[callId], 'attended')
         })
+
 
         /**
          * Toggle hold for the call that needs to be transferred. Set
@@ -137,24 +145,24 @@ class Sip {
             }
         })
 
+
         this.app.on('bg:sip:connect', () => {
             this.connect()
         })
 
+
         this.app.on('bg:sip:disconnect', ({reconnect}) => {
             this.disconnect(reconnect)
         })
-
-        this.connect()
     }
 
 
     _formatSdp(sessionDescription) {
         let allowedCodecs = ['G722', 'telephone-event', 'opus']
-        var sdpObj = transform.parse(sessionDescription.sdp);
+        let sdpObj = transform.parse(sessionDescription.sdp);
         let rtp = {media: []}
-        var payloads = []
-        var fmtps = []
+        let payloads = []
+        let fmtps = []
         for (let codec of sdpObj.media[0].rtp) {
             if (allowedCodecs.includes(codec.codec)) {
                 rtp.media.push(codec)
@@ -198,6 +206,7 @@ class Sip {
         this.ua = new this.lib.UA(uaOptions)
         this.presence = new Presence(this)
 
+
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
             // For now, we don't support call-waiting. A new call that is
@@ -213,20 +222,24 @@ class Sip {
             }
         })
 
+
         this.ua.on('registered', () => {
             this.app.setState({sip: {ua: {state: 'registered'}}})
             this.app.logger.info(`${this}SIP stack registered`)
             this.presence.update()
         })
 
+
         this.ua.on('unregistered', () => {
             this.app.setState({sip: {ua: {state: 'unregistered'}}})
             this.app.logger.info(`${this}SIP stack unregistered`)
         })
 
+
         this.ua.on('connected', () => {
             this.app.setState({sip: {ua: {state: 'connected'}}})
             this.app.logger.info(`${this}SIP stack started`)
+            this.presence.update()
         })
 
 
@@ -239,6 +252,7 @@ class Sip {
                 this.connect()
             }
         })
+
 
         this.ua.on('registrationFailed', (reason) => {
             this.app.setState({sip: {ua: {state: 'registration_failed'}}})

@@ -1,4 +1,4 @@
-<div class="contacts-component no-padding" :class="widgetState">
+<div class="contacts-component" :class="widgetState">
 
     <div class="panel-content">
         <h1>{{$t('Contacts')}}</h1>

@@ -57,7 +57,7 @@ class ContactsModule {
         }
 
         this.app.setState({contacts: {contacts: contacts}}, {persist: true})
-        if (contacts.length) this.app.sip.presence.update()
+        // if (contacts.length) this.app.sip.presence.update()
     }
 
 

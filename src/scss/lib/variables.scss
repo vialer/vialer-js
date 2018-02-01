@@ -21,3 +21,15 @@ $grey-color-darker: darken($grey-color, 10%);
 $grey-color-light: lighten($grey-color, 20%);
 $grey-color-lighter: lighten($grey-color, 35%);
 $grey-color-lightest: lighten($grey-color, 38%);
+
+// Shared (Bulma)
+$white: #fff;
+$success: $green-color;
+$danger: $red-color;
+$warning: $orange-color;
+$primary: $brand-color;
+$link: $brand-color;
+$family-primary: "Roboto";
+
+$fa-font-path: $font-path;
+$text: $primary-color;

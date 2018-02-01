@@ -17,28 +17,28 @@
         margin-bottom: $spacer * 2;
 
         input {
-            border: 1px solid #fff;
+            border: 1px solid $white;
             border-top-left-radius: $spacer / 2;
             border-bottom-left-radius: $spacer / 2;
             background: none;
             font-size: 1.5rem;
-            color: #fff;
+            color: $white;
             text-align: right;
             height: 40px;
             width: 200px;
             padding-right: $spacer;
 
             &::placeholder {
-                color: #fff;
+                color: $white;
             }
         }
 
         i {
-            background: #fff;
+            background: $white;
             color: $brand-variation-color;
             height: 40px;
             width: 40px;
-            border: 1px solid #fff;
+            border: 1px solid $white;
             border-left: 0;
             border-top-right-radius: $spacer / 2;
             border-bottom-right-radius: $spacer / 2;
@@ -57,7 +57,7 @@
         }
 
         & + .number-input-match {
-            color: #fff;
+            color: $white;
             height: $spacer * 3;
             line-height: $spacer * 3;
         }
@@ -132,13 +132,13 @@
                 font-size: 1rem;
                 font-weight: bold;
                 border: 2px solid $brand-color;
-                background: #fff;
+                background: $white;
                 color: $brand-color;
 
                 &:hover {
                     cursor: pointer;
                     background: $brand-color;
-                    color: #fff;
+                    color: $white;
                 }
 
                 .sub {
@@ -168,11 +168,11 @@
             .row {
                 .key {
                     background: none;
-                    color: #fff;
-                    border: 2px solid #fff;
+                    color: $white;
+                    border: 2px solid $white;
 
                     &:hover {
-                        background: #fff;
+                        background: $white;
                         color: $brand-color;
                     }
 

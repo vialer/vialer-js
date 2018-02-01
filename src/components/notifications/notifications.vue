@@ -1,14 +1,12 @@
 <div class="notifications-component">
-    <div v-for="notification in notifications" class="notification" :class="classes('notification', notification)">
+    <span v-for="item in notifications" v-bind:key="notifications.indexOf(item)" class="notification" :class="classes('notification', item)">
         <div class="icon">
-            <i class="fa" :class="classes('icon', notification)" v-if="notification.icon"></i>
+            <i class="fa" :class="classes('icon', item)" v-if="item.icon"></i>
         </div>
         <div class="message" v-if="html" v-html="message"></div>
-        <div class="message" v-else>
-            {{ notification.message }}
-        </div>
+        <div class="message" v-else>{{item.message}}</div>
         <div class="actions">
-            <button class="delete" @click="close(notification)"></button>
+            <button class="delete" @click="close(item)"></button>
         </div>
-    </div>
+    </span>
 </div>
