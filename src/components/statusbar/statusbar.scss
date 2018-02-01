@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: $spacer * 4;
+    min-height: $spacer * 5;
     background: $brand-variation-color;
     color: #fff;
     font-size: 0.8rem;
@@ -38,13 +38,26 @@
             width: $spacer * 5;
 
             i {
+                background: $brand-variation-color;
                 width: $spacer * 5;
+                height: $spacer * 5;
                 margin: 0;
                 line-height: $spacer * 4;
                 font-size: 1.2rem;
                 vertical-align: middle;
                 text-align: center;
+                transition: all 1300ms ease;
+                color: #fff;
             }
+
+            .disconnected {background: $red-color;}
+            .connected {background: $green-color;}
+            .registered {background: $green-color;}
+            .registration-failed {background: $orange-color;}
+        }
+
+        .username {
+            margin-left: $spacer;
         }
 
     }
@@ -56,8 +69,8 @@
         vertical-align: middle;
 
         .option {
-            line-height: $spacer * 4;
-            height: $spacer * 4;
+            line-height: $spacer * 5;
+            height: $spacer * 5;
             padding: 0 $spacer;
 
             &.active,
@@ -71,7 +84,7 @@
             }
 
             i {
-                line-height: $spacer * 4;
+                line-height: $spacer * 5;
                 font-size: $spacer * 2;
                 color: #fff;
             }

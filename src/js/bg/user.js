@@ -49,7 +49,7 @@ class UserModule {
             return
         }
 
-        this.app.modules.availability.getApiData()
+        this.app.getModuleApiData()
 
         this.app.setState({
             ui: {layer: 'contacts'},

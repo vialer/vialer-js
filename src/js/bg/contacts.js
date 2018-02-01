@@ -31,6 +31,8 @@ class ContactsModule {
             return (c.sipreginfo && (c.account_id !== ownAccountId))
         })
 
+        console.log("CONTACTS:", contacts)
+
         this.app.logger.debug(`${this}updating contacts list(${contacts.length})`)
 
         const contactsLookup = new Map(contacts.map((c) => [c.account_id, c]))

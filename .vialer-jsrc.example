@@ -18,6 +18,7 @@
                 "grey-color": "#999",
                 "primary-color": "#3c3c50",
                 "green-color": "#5cb85c",
+                "orange-color": "#f98644",
                 "red-color": "#d9534f"
             },
             "store": {

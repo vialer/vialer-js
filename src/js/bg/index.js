@@ -49,7 +49,7 @@ class VialerBg extends App {
 
         // Continue last session if credentials are available.
         if (this.state.user.authenticated) {
-            this.logger.info(`${this}reusing existing session from existing credentials`)
+            this.logger.info(`${this}assume authentication with existing credentials`)
             this.getModuleApiData()
 
             if (this.env.isExtension) {

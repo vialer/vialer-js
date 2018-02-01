@@ -16,6 +16,7 @@
             i {
                 color: $grey-color;
             }
+
             &.busy i {color: $red-color;}
             &.available i {color: $green-color;}
 
@@ -25,15 +26,5 @@
                 animation: ringing 1.5s linear infinite;
             }
         }
-
-        // In a call.
-        &.disabled {
-            cursor: not-allowed;
-        }
-
-        &:not(.disabled):hover {
-            cursor: pointer;
-        }
     }
-
 }

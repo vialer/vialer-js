@@ -1,5 +1,5 @@
 module.exports = (app) => {
-    const keyTone = new app.sounds.DtmfTone(350, 440)
+    const keyTone = new app.sounds.DtmfTone()
     const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#']
 
     /**

@@ -2,10 +2,10 @@
 
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator">
-            <i v-if="sip.ua.state === 'disconnected'" class="fa fa-plug" :title="$t('Status:') + ' ' + $t('disconnected')"></i>
-            <i v-if="sip.ua.state === 'connected'" class="fa fa-chain" :title="$t('Status:') + ' ' +  $t('connected')"></i>
-            <i v-if="sip.ua.state === 'registered'" class="fa fa-exchange" :title="$t('Status:') + ' ' + $t('registered')"></i>
-            <i v-if="sip.ua.state === 'registration_failed'" class="fa fa-chain-broken" :title="$t('Status:') + ' ' + $t('registration failed')"></i>
+            <i v-if="sip.ua.state === 'disconnected'" class="icon icon-disconnected disconnected" :title="$t('Status:') + ' ' + $t('disconnected')"></i>
+            <i v-if="sip.ua.state === 'connected'" class="icon icon-o-vialer-icon connected" :title="$t('Status:') + ' ' +  $t('connected')"></i>
+            <i v-if="sip.ua.state === 'registered'" class="icon icon-vialer-icon registered" :title="$t('Status:') + ' ' + $t('registered')"></i>
+            <i v-if="sip.ua.state === 'registration_failed'" class="icon icon-disconnected registration-failed" :title="$t('Status:') + ' ' + $t('registration failed')"></i>
         </span>
         <span class="username">{{user.username}}</span>
         <div class="options">

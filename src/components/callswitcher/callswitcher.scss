@@ -4,9 +4,9 @@
 // icon-links to several locations.
 .callswitcher-component {
     position: absolute;
-    width: 40px;
+    width: $spacer * 5;
+    top: $spacer * 5;
     right: 0;
-    top: $spacer * 4;
 
     i {
         color: #fff;

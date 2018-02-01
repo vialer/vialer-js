@@ -16,7 +16,6 @@ $green-color: #5cb85c !default;
 $red-color: #d9534f !default;
 
 // Colors: Derivate colors from the base color palette.
-$brand-tint-color: saturate(adjust-hue($brand-color, 10%), 10%);
 $grey-color-darkest: darken($grey-color, 30%);
 $grey-color-darker: darken($grey-color, 10%);
 $grey-color-light: lighten($grey-color, 20%);

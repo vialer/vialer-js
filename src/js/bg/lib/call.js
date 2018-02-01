@@ -10,7 +10,7 @@ class Call {
         this.silent = silent
 
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
-        this.ringbackTone = new this.app.sounds.RingbackTone(350, 440)
+        this.ringbackTone = new this.app.sounds.RingbackTone()
         // The call state can be tracked between fg and bg after the
         // call's session id is known. This flag is used to indicate
         // when the state can be synced in `setState`.

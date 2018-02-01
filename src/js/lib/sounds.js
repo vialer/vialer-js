@@ -1,20 +1,13 @@
 /**
-* DTMF audio tone generator.
-* Source: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
+* Phone tone generators; based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 */
 const context = new AudioContext()
-const audio = document.createElement('audio')
-document.body.prepend(audio)
 
-var source = context.createMediaElementSource(audio)
 
 class DtmfTone {
 
-    constructor(freq1, freq2) {
-        this.context = context
+    constructor() {
         this.started = false
-        this.freq1 = freq1
-        this.freq2 = freq2
 
         this.frequencies = {
             '#': {f1: 941, f2: 1477},
@@ -30,30 +23,29 @@ class DtmfTone {
             8: {f1: 852, f2: 1336},
             9: {f1: 852, f2: 1477},
         }
-
-        this.osc1 = this.context.createOscillator()
-        this.osc2 = this.context.createOscillator()
     }
 
 
     start() {
-        this.osc1 = this.context.createOscillator()
-        this.osc2 = this.context.createOscillator()
+        this.freq1 = 350
+        this.freq2 = 440
 
-        this.osc1.frequency.setValueAtTime(this.freq1, this.context.currentTime)
-        this.osc2.frequency.setValueAtTime(this.freq2, this.context.currentTime)
+        this.osc1 = context.createOscillator()
+        this.osc2 = context.createOscillator()
+        this.osc1.frequency.setValueAtTime(this.freq1, context.currentTime)
+        this.osc2.frequency.setValueAtTime(this.freq2, context.currentTime)
 
-        this.gainNode = this.context.createGain()
-        this.gainNode.gain.setValueAtTime(0.25, this.context.currentTime)
+        let gainNode = context.createGain()
+        gainNode.gain.setValueAtTime(0.25, context.currentTime)
 
-        this.filter = this.context.createBiquadFilter()
-        this.filter.type = 'lowpass'
+        let filter = context.createBiquadFilter()
+        filter.type = 'lowpass'
 
-        this.osc1.connect(this.gainNode)
-        this.osc2.connect(this.gainNode)
+        this.osc1.connect(gainNode)
+        this.osc2.connect(gainNode)
 
-        this.gainNode.connect(this.filter)
-        this.filter.connect(this.context.destination)
+        gainNode.connect(filter)
+        filter.connect(context.destination)
 
         this.osc1.start(0)
         this.osc2.start(0)
@@ -82,73 +74,87 @@ class DtmfTone {
 }
 
 /**
-* Ring-back tone generator.
-* Source: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
+* Ring-back tone generator for UK and Europe regions.
 */
 class RingbackTone {
 
-    constructor(freq1, freq2) {
-        this.context = context
-        this.status = 0
-        this.freq1 = 400
-        this.freq2 = 450
+    constructor(region = 'europe') {
+        this.region = region
         this.started = false
     }
 
 
     createRingerLFO() {
-        // Create an empty 3 second mono buffer at the
-        // sample rate of the AudioContext.
-        var channels = 1
-        var sampleRate = this.context.sampleRate
-        var frameCount = sampleRate * 3
-        var myArrayBuffer = this.context.createBuffer(channels, frameCount, sampleRate)
+        // Create an empty 3 second mono buffer at the sample rate of the AudioContext.
+        let channels = 1
+        let frameCount
+        let sampleRate = context.sampleRate
+        if (this.region === 'uk') frameCount = sampleRate * 3
+        else if (this.region === 'europe') frameCount = sampleRate * 5
+        var arrayBuffer = context.createBuffer(channels, frameCount, sampleRate)
 
         // getChannelData allows us to access and edit
         // the buffer data and change.
-        var bufferData = myArrayBuffer.getChannelData(0)
-        for (var i = 0; i < frameCount; i++) {
-            // if the sample lies between 0 and 0.4 seconds, or 0.6 and 1
-            // second, we want it to be on.
-            if ((i / sampleRate > 0 && i / sampleRate < 0.4) || (i / sampleRate > 0.6 && i / sampleRate < 1.0)) {
-                bufferData[i] = 0.25
+        let bufferData = arrayBuffer.getChannelData(0)
+        for (let i = 0; i < frameCount; i++) {
+            // We want it to be on if the sample lies between 0 and 0.4 seconds,
+            // or 0.6 and 1 second.
+            if (this.region === 'europe') {
+                if ((i / sampleRate > 0 && i / sampleRate < 1)) {
+                    bufferData[i] = 1
+                }
+            } else if (this.region === 'uk') {
+                if ((i / sampleRate > 0 && i / sampleRate < 0.4) || (i / sampleRate > 0.6 && i / sampleRate < 1.0)) {
+                    bufferData[i] = 0.25
+                }
             }
         }
 
-        this.ringerLFOBuffer = myArrayBuffer
+        return arrayBuffer
     }
 
 
     play() {
-        this.osc1 = this.context.createOscillator()
-        this.osc2 = this.context.createOscillator()
-        this.osc1.frequency.setValueAtTime(this.freq1, this.context.currentTime)
-        this.osc2.frequency.setValueAtTime(this.freq2, this.context.currentTime)
+        let analyser, distortion, filter, freq1, freq2
 
-        this.gainNode = this.context.createGain()
-        this.gainNode.gain.setValueAtTime(0.25, this.context.currentTime)
+        this.osc1 = context.createOscillator()
+        let gainNode = context.createGain()
+        this.osc1.connect(gainNode)
 
-        this.filter = this.context.createBiquadFilter()
-        this.filter.type = 'lowpass'
+        if (this.region === 'europe') {
+            freq1 = 425
+            analyser = context.createAnalyser()
+            distortion = context.createWaveShaper()
+            this.osc1.connect(distortion)
+            this.osc1.type = 'sine'
+            analyser.connect(gainNode)
+            gainNode.connect(context.destination)
+        } else if (this.region === 'uk') {
+            freq1 = 400
+            freq2 = 450
 
-        this.osc1.connect(this.gainNode)
-        this.osc2.connect(this.gainNode)
-        this.gainNode.connect(this.filter)
-        this.filter.connect(this.context.destination)
+            this.osc2 = context.createOscillator()
+            this.osc2.frequency.setValueAtTime(freq2, context.currentTime)
+            this.osc2.connect(gainNode)
 
+            filter = context.createBiquadFilter()
+            filter.type = 'lowpass'
+            filter.connect(context.destination)
+            gainNode.connect(filter)
+            this.osc2.start(0)
+        }
+
+        this.osc1.frequency.setValueAtTime(freq1, context.currentTime)
         this.osc1.start(0)
-        this.osc2.start(0)
-        this.status = 1
-        // set our gain node to 0, because the LFO is callibrated to this level
-        this.gainNode.gain.setValueAtTime(0, this.context.currentTime)
-        this.status = 1
-        this.createRingerLFO()
 
-        this.ringerLFOSource = this.context.createBufferSource()
-        this.ringerLFOSource.buffer = this.ringerLFOBuffer
+        // set our gain node to 0, because the LFO is callibrated to this level
+        gainNode.gain.setValueAtTime(0, context.currentTime)
+
+        this.ringerLFOSource = context.createBufferSource()
+        this.ringerLFOSource.buffer = this.createRingerLFO()
         this.ringerLFOSource.loop = true
         // Connect the ringerLFOSource to the gain Node audio param.
-        this.ringerLFOSource.connect(this.gainNode.gain)
+        this.ringerLFOSource.connect(gainNode.gain)
         this.ringerLFOSource.start(0)
         this.started = true
     }
@@ -157,9 +163,9 @@ class RingbackTone {
     stop() {
         if (!this.started) return
         this.osc1.stop(0)
-        this.osc2.stop(0)
-        this.status = 0
+        if (this.region === 'uk') this.osc2.stop(0)
         this.ringerLFOSource.stop(0)
+        this.started = false
     }
 }
 

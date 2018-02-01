@@ -4,6 +4,7 @@
     display: flex;
     flex-direction: column;
     max-width: $max-popup-width;
+    position: relative;
 
     .panel {
         flex: 1 1 auto;
@@ -13,10 +14,6 @@
 
         min-height: 224px;
 
-        .panel-sidebar {
-            width: $spacer * 5;
-        }
-
         .panel-content-unauthenticated {
             width: 100%;
             padding: $spacer;
@@ -25,7 +22,7 @@
 
         .panel-content-container {
             margin-left: $spacer * 5;
-            margin-top: $spacer * 4;
+            margin-top: $spacer * 5;
             // Limits the scollbar to the content area.
             max-height: 568px;
 
