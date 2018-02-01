@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <div class="transfer-options" v-if="call.transfer.active">
+    <div class="transfer-options" v-if="call.transfer.active && ['accepted'].includes(call.status)">
         <div class="transfer-buttons">
             <div class="transfer-button" :class="{active: call.transfer.type === 'attended'}" @click="transferMode('attended')">
                 {{$t('Attended transfer')}}

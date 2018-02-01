@@ -23,7 +23,7 @@ module.exports = (app) => {
         render: templates.callswitcher.r,
         staticRenderFns: templates.callswitcher.s,
         store: {
-            calls: 'sip.calls',
+            calls: 'calls.calls',
         },
     }
 }

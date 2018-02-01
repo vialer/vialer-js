@@ -5,12 +5,11 @@ let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.fg = true
 
 
-class VialerFg extends App {
+class ForegroundApp extends App {
 
     constructor(options) {
         options.environment = env
         super(options)
-
         this.env = env
 
         this.on('fg:notify', (message) => {
@@ -21,12 +20,8 @@ class VialerFg extends App {
         * Syncs state from the background to the foreground
         * while keeping Vue's reactivity system happy.
         */
-        this.on('fg:set_state', this.mergeState.bind(this))
-    }
+        this.on('fg:set_state', this.__mergeState.bind(this))
 
-
-    _init() {
-        super._init()
         this.utils = require('../../components/utils')(this)
 
         Vue.component('Availability', require('../../components/availability')(this))
@@ -57,10 +52,7 @@ class VialerFg extends App {
                 // state object from the background. Extensions also
                 // serialize data between scripts, so this is done in
                 // webview mode as well for consistency's sake.
-                if (this.env.isExtension) this.state = state
-                else {
-                    this.state = JSON.parse(JSON.stringify(state))
-                }
+                this.state = JSON.parse(JSON.stringify(state))
 
                 // Extension has a popout mode, where the plugin is opened
                 // in a tab. Set a flag if this is the case.
@@ -68,7 +60,7 @@ class VialerFg extends App {
                 if (searchParams.popout) this.state.env.isPopout = true
                 else this.state.env.isPopout = false
 
-                this.initVm()
+                this.initViewModel()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
             },
         })
@@ -78,13 +70,15 @@ class VialerFg extends App {
 
 function initApp(initParams) {
     initParams.modules = []
-    const app = new VialerFg(initParams)
+    const app = new ForegroundApp(initParams)
 
     if (app.env.isChrome) $('html').addClass('chrome')
     if (app.env.isEdge) $('html').addClass('edge')
     if (app.env.isFirefox) $('html').addClass('firefox')
 
     if (app.env.isOsx) {
+        // Forces height recalculation of the popup in Chrome OSX.
+        // See: https://bugs.chromium.org/p/chromium/issues/detail?id=307912
         setTimeout(() => {
             const style = document.querySelector('#app').style
             style.display = 'flex'

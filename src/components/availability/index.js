@@ -7,7 +7,6 @@ module.exports = (app, actions) => {
             available: 'availability.available',
             destination: 'availability.destination',
             destinations: 'availability.destinations',
-            module: 'availability',
         },
         watch: {
             available: function(newVal, oldVal) {

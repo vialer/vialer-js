@@ -1,4 +1,4 @@
-const Call = require('./call')
+const Call = require('./index')
 
 /**
 * Call flow wrapper around SipJS which enables incoming and outgoing
@@ -6,8 +6,8 @@ const Call = require('./call')
 */
 class CallWebRTC extends Call {
 
-    constructor(sip, callTarget, options) {
-        super(sip, callTarget, options)
+    constructor(module, callTarget, options) {
+        super(module, callTarget, options)
 
         if (callTarget.hasOwnProperty('acceptAndTerminate')) {
             Object.assign(this.state, {status: 'invite', type: 'incoming'})
@@ -80,8 +80,7 @@ class CallWebRTC extends Call {
         if (!this.silent) {
             this.app.setState({ui: {layer: 'calldialog'}})
             this.app.logger.notification(
-                `${this.app.$t('From')}: ${this.state.displayName}`,
-                `${this.app.$t('Incoming call')}: ${this.state.number}`, false, 'warning')
+                this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
             this.ringtone.play()
         }
 
@@ -116,13 +115,23 @@ class CallWebRTC extends Call {
     */
     _handleOutgoing(number) {
         this.session = this.ua.invite(`sip:${number}@voipgrid.nl`, this._sessionOptions)
-        this.setState({id: this.session.id, number: number})
+
+        let stateUpdate = {id: this.session.id, number: number}
+        // The ua's displayName is empty for outgoing calls. Try to match it from contacts.
+        const contacts = this.app.state.contacts.contacts
+        for (const id of Object.keys(contacts)) {
+            if (contacts[id].number === parseInt(number)) {
+                stateUpdate.displayName = contacts[id].name
+            }
+        }
+
+        this.setState(stateUpdate)
         // Notify user about the new call being setup.
 
         this.session.on('accepted', (data) => {
             // Always set this call to be the active call as soon a new
             // connection has been made.
-            this.sip.setActiveCall(this, true)
+            this.module.setActiveCall(this, true)
             this.ringbackTone.stop()
 
             this.localVideo.srcObject = this.stream
@@ -138,7 +147,7 @@ class CallWebRTC extends Call {
                 this.remoteVideo.play()
             })
 
-            this.setState({displayName: this.session.remoteIdentity.displayName, status: 'accepted'})
+            this.setState({status: 'accepted'})
             this.startTimer()
         })
 
@@ -229,10 +238,10 @@ class CallWebRTC extends Call {
             } else {
                 // targetCall is a number. Create a new call and set the
                 // new call's transfer mode to accept.
-                let call = await this.sip.createCall(targetCall, {active: true})
+                let call = await this.module.createCall(targetCall, {active: true})
                 call.setState({transfer: {type: 'accept'}})
                 // Activate the new call's dialog.
-                this.sip.setActiveCall(call, false)
+                this.module.setActiveCall(call, false)
             }
         }
     }

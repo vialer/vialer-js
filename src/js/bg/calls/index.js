@@ -1,37 +1,34 @@
-const Call = require('./call_webrtc')
-const Presence = require('./presence')
+const Call = require('./call/sip')
 const transform = require('sdp-transform')
+const Module = require('../lib/module')
 
 
 /**
-* The SIP class takes care of all SIP communication in the background.
-* Currently this is used to check the presence of contacts.
+* The call module takes care of the plumbing involved with setting up
+* and breaking down calls.
 */
-class Sip {
+class CallsModule extends Module {
     /**
-    * @param {ClickToDialApp} app - The application object.
+    * @param {App} app - The application object.
     */
-    constructor(app) {
-        this.app = app
-        this.lib = require('sip.js')
+    constructor(...args) {
+        super(...args)
 
+        this.lib = require('sip.js')
         // Keeps track of calls. Keys match Sip.js session keys.
         this.calls = {}
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
         this.reconnect = true
-        this.state = this.app.state.sip
-        // TODO: Don't persist this at all.
-        this.state.calls = {}
+        // this.state = this.app.state.sip
 
         // The default connection timeout to start with.
         this.retryDefault = {interval: 2500, limit: 9000000}
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
 
-        // Start with a clean state.
-        this.app.setState({sip: this.app.getDefaultState().sip})
-        this.connect()
+        // // Start with a clean state.
+        this.app.setState({calls: this._defaultState()})
 
         this.app.on('bg:sip:call', ({number}) => {
             this.createCall(number, {active: true})
@@ -157,6 +154,22 @@ class Sip {
     }
 
 
+    _initialState() {
+        return {
+            calls: {},
+            number: '',
+            ua: {
+                state: null,
+            },
+        }
+    }
+
+
+    _restoreState(moduleStore) {
+        moduleStore.calls = {}
+    }
+
+
     _formatSdp(sessionDescription) {
         let allowedCodecs = ['G722', 'telephone-event', 'opus']
         let sdpObj = transform.parse(sessionDescription.sdp);
@@ -194,17 +207,16 @@ class Sip {
             return
         }
 
-        // Login with the WebRTC account and register.
+        // Login with the WebRTC account or platform account.
         let uaOptions = this.uaOptions()
         if (!uaOptions.authorizationUser || !uaOptions.password) {
             this.app.logger.warn(`${this}cannot connect without username and password`)
             return
         }
 
-        this.app.setState({sip: {ua: {state: 'disconnected'}}})
+        this.app.setState({calls: {ua: {state: 'disconnected'}}})
 
         this.ua = new this.lib.UA(uaOptions)
-        this.presence = new Presence(this)
 
 
         // An incoming call. Set the session object and set state to call.
@@ -224,28 +236,26 @@ class Sip {
 
 
         this.ua.on('registered', () => {
-            this.app.setState({sip: {ua: {state: 'registered'}}})
-            this.app.logger.info(`${this}SIP stack registered`)
-            this.presence.update()
+            this.app.setState({calls: {ua: {state: 'registered'}}})
+            this.app.logger.info(`${this}ua registered`)
         })
 
 
         this.ua.on('unregistered', () => {
-            this.app.setState({sip: {ua: {state: 'unregistered'}}})
-            this.app.logger.info(`${this}SIP stack unregistered`)
+            this.app.setState({calls: {ua: {state: 'unregistered'}}})
+            this.app.logger.info(`${this}ua unregistered`)
         })
 
 
         this.ua.on('connected', () => {
-            this.app.setState({sip: {ua: {state: 'connected'}}})
-            this.app.logger.info(`${this}SIP stack started`)
-            this.presence.update()
+            this.app.setState({calls: {ua: {state: 'connected'}}})
+            this.app.logger.info(`${this}ua connected`)
         })
 
 
         this.ua.on('disconnected', () => {
-            this.app.setState({sip: {ua: {state: 'disconnected'}}})
-            this.app.logger.info(`${this}SIP stack stopped`)
+            this.app.setState({calls: {ua: {state: 'disconnected'}}})
+            this.app.logger.info(`${this}ua disconnected`)
 
             if (this.reconnect) {
                 this.app.logger.debug(`${this}reconnecting ua`)
@@ -255,7 +265,7 @@ class Sip {
 
 
         this.ua.on('registrationFailed', (reason) => {
-            this.app.setState({sip: {ua: {state: 'registration_failed'}}})
+            this.app.setState({calls: {ua: {state: 'registration_failed'}}})
         })
     }
 
@@ -332,17 +342,12 @@ class Sip {
     }
 
 
-    toString() {
-        return `${this.app}[sip] `
-    }
-
-
     uaOptions() {
         const settings = this.app.state.settings
         // For webrtc this is a voipaccount, otherwise an email address.
         let uaOptions = {
             log: {
-                builtinEnabled: false,
+                builtinEnabled: true,
                 level: 'error',
             },
             sessionDescriptionHandlerFactoryOptions: {
@@ -370,14 +375,21 @@ class Sip {
             uaOptions.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
         } else {
             // Login with platform email without SIP register.
-            uaOptions.authorizationUser = this.app.state.user.email
-            uaOptions.password = this.app.state.user.password
+            uaOptions.authorizationUser = this.app.state.user.username
+            // Use the platform user token when logging in; not the password.
+            uaOptions.password = this.app.state.user.token
             uaOptions.register = false
-            uaOptions.uri = `sip:${this.app.state.user.email}`
+            uaOptions.uri = `sip:${this.app.state.user.username}`
         }
 
         return uaOptions
     }
+
+
+    toString() {
+        return `${this.app}[calls] `
+    }
+
 }
 
-module.exports = Sip
+module.exports = CallsModule

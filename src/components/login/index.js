@@ -4,7 +4,7 @@ module.exports = (app) => {
             login: function() {
                 app.emit('bg:user:login', {
                     password: this.user.password,
-                    username: this.user.email,
+                    username: this.user.username,
                 })
             },
         },

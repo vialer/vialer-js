@@ -16,7 +16,7 @@
 
     <div class="number-input-match" v-if="search">
         <span v-if="matchedContact">
-            {{matchedContact.internal_number}} - {{matchedContact.description}}
+            {{matchedContact.number}} - {{matchedContact.name}}
         </span>
     </div>
 

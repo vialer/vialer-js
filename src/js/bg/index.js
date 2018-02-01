@@ -1,5 +1,4 @@
 const Api = require('./lib/api')
-const Sip = require('./lib/sip')
 const App = require('../lib/app')
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
@@ -8,26 +7,12 @@ let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.bg = true
 
 
-
-const _modules = [
-    {Module: require('./availability'), name: 'availability'},
-    {Module: require('./contacts'), name: 'contacts'},
-    {Module: require('./user'), name: 'user'},
-    {Module: require('./queues'), name: 'queues'},
-]
-
-
-class VialerBg extends App {
+class BackgroundApp extends App {
 
     constructor(options) {
         options.environment = env
         super(options)
-
-        // Clears localstorage if the schema changed after a plugin update.
-        if (!this.store.validSchema()) {
-            this.modules.user.logout()
-            return
-        }
+        this.api = new Api(this)
 
         // A state object that can be mutated across instances
         // using {app_name}:set_state and {app_name}:get_state emitters.
@@ -40,14 +25,23 @@ class VialerBg extends App {
         * Syncs state from the foreground to the background
         * while keeping Vue's reactivity system happy.
         */
-        this.on('bg:set_state', this.mergeState.bind(this))
+        this.on('bg:set_state', this.__mergeState.bind(this))
 
         this.on('bg:refresh_api_data', (data) => {
             this.getModuleApiData()
         })
 
+        this.initStore()
+
+        // Clears localstorage if the schema changed after a plugin update.
+        if (!this.store.validSchema()) {
+            this.modules.user.logout()
+            return
+        }
 
         // Continue last session if credentials are available.
+        this.api.setupClient(this.state.user.username, this.state.user.password)
+
         if (this.state.user.authenticated) {
             this.logger.info(`${this}assume authentication with existing credentials`)
             this.getModuleApiData()
@@ -57,13 +51,9 @@ class VialerBg extends App {
                     path: 'img/icon-menubar-active.png',
                 })
             }
+            this.modules.calls.connect()
         }
-    }
 
-
-    _init() {
-        super._init()
-        this.initStore()
     }
 
 
@@ -96,16 +86,21 @@ class VialerBg extends App {
         }
 
         if (stateObj) {
-            Object.assign(stateObj, this.state)
-            this.state = stateObj
-        } else Object.assign(this.state, this.getDefaultState())
+            Object.assign(this.state, stateObj)
+            for (let module in this.modules) {
+                // Use 'load' instead of 'restore' to refresh the data on
+                // browser restart.
+                if (this.modules[module]._restoreState) {
+                    this.modules[module]._restoreState(this.state[module])
+                }
+            }
+        } else Object.assign(this.state, this._initialState())
 
-        this.initVm()
+        this.initViewModel()
 
         this.timer = new Timer(this)
         this.telemetry = new Telemetry(this)
-        this.api = new Api(this)
-        this.sip = new Sip(this)
+
     }
 
 
@@ -121,14 +116,18 @@ class VialerBg extends App {
 }
 
 
-function initApp(initParams) {
-    initParams.modules = _modules
-    return new VialerBg(initParams)
+function startApp(options) {
+    options.modules = [
+        {Module: require('./availability'), name: 'availability'},
+        {Module: require('./contacts'), name: 'contacts'},
+        {Module: require('./user'), name: 'user'},
+        {Module: require('./queues'), name: 'queues'},
+        {Module: require('./calls'), name: 'calls'},
+    ]
+    return new BackgroundApp(options)
 }
 
 // For extensions, this is an executable endpoint.
-if (env.isExtension) {
-    global.app = initApp({name: 'bg'})
-}
+if (env.isExtension) global.app = startApp({name: 'bg'})
 
-module.exports = initApp
+module.exports = startApp

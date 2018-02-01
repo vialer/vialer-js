@@ -50,7 +50,7 @@ class Logger {
     }
 
 
-    notification(message, title = 'Vialer', stack = false, type = 'info') {
+    notification(title, message, stack = false) {
         // Edge doesn't support webextension Notifications yet.
         if (this.app.env.isEdge) return
         const options = {
@@ -58,8 +58,7 @@ class Logger {
             title: title,
             type: 'basic',
         }
-        if (type === 'warning') options.iconUrl = 'img/icon-notification-warning.png'
-        else options.iconUrl = 'img/icon-notification-info.png'
+        options.iconUrl = 'img/icon-notification.png'
 
         if (this.app.env.isExtension) {
             options.iconUrl = browser.runtime.getURL(options.iconUrl)

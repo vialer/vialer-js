@@ -30,12 +30,13 @@ module.exports = (app) => {
                 let matchedContact = null
 
                 if (_number.length > 1) {
-                    matchedContact = this.contacts.find((contact) => {
-                        if (String(contact.internal_number).includes(_number)) {
-                            return true
+                    for (const id of Object.keys(this.contacts)) {
+                        const contact = this.contacts[id]
+                        const number = String(contact.number)
+                        if (number.includes(_number)) {
+                            matchedContact = contact
                         }
-                        return false
-                    })
+                    }
                 }
                 return matchedContact
             },

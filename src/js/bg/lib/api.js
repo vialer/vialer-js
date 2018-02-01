@@ -13,7 +13,6 @@ class Api {
         this.OK_STATUS = [200, 201, 202, 204]
         this.NOTOK_STATUS = [400, 401, 403, 404, 'Network Error']
         this.UNAUTHORIZED_STATUS = [401]
-        this.setupClient(this.app.state.user.username, this.app.state.user.password)
     }
 
     /**
@@ -23,13 +22,16 @@ class Api {
     */
     setupClient(username, password) {
         let clientOptions = {
+            auth: {
+                password: password,
+                username: username,
+            },
             baseURL: this.app.state.settings.platform.url,
-            password: password,
             timeout: 15000,
-            username: username,
         }
 
         this.client = axios.create(clientOptions)
+        this.app.logger.info(`${this}setup axios api client`)
         this.client.interceptors.response.use(function(response) {
             return response
         }, (err) => {

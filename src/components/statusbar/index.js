@@ -27,7 +27,7 @@ module.exports = (app) => {
         store: {
             env: 'env',
             layer: 'ui.layer',
-            sip: 'sip',
+            ua: 'calls.ua',
             user: 'user',
         },
     }

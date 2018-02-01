@@ -25,7 +25,7 @@ module.exports = function(app) {
         return {
             getActiveCall: function() {
                 let activeCall = null
-                const calls = this.$store.sip.calls
+                const calls = this.$store.calls.calls
                 const callKeys = Object.keys(calls)
                 for (let callId of callKeys) {
                     if (calls[callId].active) {
@@ -63,7 +63,7 @@ module.exports = function(app) {
             },
             numbersOngoing: function() {
                 let numbers = []
-                const calls = this.$store.sip.calls
+                const calls = this.$store.calls.calls
                 for (let callId of Object.keys(calls)) {
                     numbers.push(parseInt(calls[callId].number))
                 }
@@ -86,7 +86,7 @@ module.exports = function(app) {
             */
             transferStatus: function() {
                 let transferStatus = false
-                const calls = this.$store.sip.calls
+                const calls = this.$store.calls.calls
                 const callKeys = Object.keys(calls)
                 if (callKeys.length > 1) {
                     for (let callId of callKeys) {

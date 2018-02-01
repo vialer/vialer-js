@@ -7,14 +7,76 @@ const Skeleton = require('./skeleton')
 * be used for the background and the foreground(popup) script.
 */
 class App extends Skeleton {
+
     constructor(options) {
         super(options)
-    }
 
-    _init() {
+        this.modules = {}
         this.sounds = require('./sounds')
+
         if (this.env.role.bg) this._emitTarget = 'fg'
         else if (this.env.role.fg) this._emitTarget = 'bg'
+
+        // Init these modules.
+        for (let module of options.modules) {
+            this.modules[module.name] = new module.Module(this)
+        }
+    }
+
+
+    __isObject(item) {
+        return (item && typeof item === 'object' && !Array.isArray(item))
+    }
+
+
+    __mergeDeep(target, ...sources) {
+        if (!sources.length) return target
+        const source = sources.shift()
+
+        if (this.__isObject(target) && this.__isObject(source)) {
+            for (const key in source) {
+                if (this.__isObject(source[key])) {
+                    if (!target[key]) Object.assign(target, { [key]: {} })
+                    this.__mergeDeep(target[key], source[key])
+                } else {
+                    Object.assign(target, { [key]: source[key] })
+                }
+            }
+        }
+
+        return this.__mergeDeep(target, ...sources)
+    }
+
+
+    __mergeState({action, path, persist, state}) {
+        if (path) {
+            path = path.split('/')
+            if (action === 'insert') {
+                this.__setFromPath(this.state, path, state)
+            } else if (action === 'merge') {
+                const _ref = path.reduce((o, i)=>o[i], this.state)
+                this.__mergeDeep(_ref, state)
+            } else if (action === 'delete') {
+                const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
+                Vue.delete(_ref, path[path.length - 1])
+            }
+        } else {
+            this.__mergeDeep(this.state, state)
+        }
+
+        if (persist) this.store.set('state', this.state)
+    }
+
+
+    __setFromPath(obj, is, value) {
+        if (is.length === 1) {
+            if (!obj[is[0]]) Vue.set(obj, is[0], value)
+            return obj[is[0]]
+        } else if (is.length === 0) {
+            return obj
+        } else {
+            return this.__setFromPath(obj[is[0]], is.slice(1), value)
+        }
     }
 
 
@@ -23,8 +85,15 @@ class App extends Skeleton {
     * available from localstorage.
     * @returns {Object} - The initial Vue-stash structure.
     */
-    getDefaultState() {
-        let defaultState = {
+    _initialState() {
+        let state = {}
+        for (let moduleName of Object.keys(this.modules)) {
+            if (this.modules[moduleName]._initialState) {
+                state[moduleName] = this.modules[moduleName]._initialState()
+            }
+        }
+
+        Object.assign(state, {
             availability: {
                 available: 'yes',
                 destination: {
@@ -33,16 +102,6 @@ class App extends Skeleton {
                 },
                 destinations: [],
                 sud_id: null,
-            },
-            contacts: {
-                contacts: [],
-                search: {
-                    disabled: false,
-                    input: '',
-                },
-                sip: {
-                    state: 'disconnected',
-                },
             },
             dialpad: {
                 dialNumber: '',
@@ -83,25 +142,42 @@ class App extends Skeleton {
                     username: '',
                 },
             },
-            sip: {
-                calls: {}, // Maps to SipJS session ids.
-                number: '',
-                ua: {
-                    state: null,
-                },
-            },
             ui: {
                 layer: 'login',
             },
             user: {
                 authenticated: false,
-                email: '',
                 language: 'nl',
                 password: '',
+                token: null,
+                username: null,
             },
-        }
+        })
 
-        return defaultState
+        return state
+    }
+
+
+    /**
+    * Set the state to default non-logged in but keep
+    * some settings and preferences.
+    * @returns {Object} Stripped state.
+    */
+    _resetState() {
+        let _state = this._defaultState()
+        Object.assign(_state, {
+            availability: _state.availability,
+            contacts: _state.contacts,
+            queues: _state.queues,
+            settings: {
+                webrtc: _state.settings.webrtc,
+            },
+            sip: _state.sip,
+            ui: {layer: 'login'},
+            user: _state.user,
+        })
+
+        return _state
     }
 
 
@@ -141,7 +217,7 @@ class App extends Skeleton {
     }
 
 
-    initVm() {
+    initViewModel() {
         this.initI18n()
         this.vm = new Vue({
             data: {
@@ -162,26 +238,6 @@ class App extends Skeleton {
     }
 
 
-    mergeState({action, path, persist, state}) {
-        if (path) {
-            if (action === 'insert') {
-                let {keysRight, reference} = this.queryReference(this.state, path, 1)
-                Vue.set(reference, keysRight[0], state)
-            } else if (action === 'merge') {
-                let {reference} = this.queryReference(this.state, path)
-                this.mergeDeep(reference, state)
-            } else if (action === 'delete') {
-                let {keysRight, reference} = this.queryReference(this.state, path, 1)
-                Vue.delete(reference, keysRight[0])
-            }
-        } else {
-            this.mergeDeep(this.state, state)
-        }
-
-        if (persist) this.store.set('state', this.state)
-    }
-
-
     /**
     * Set the background state and propagate it to the other end.
     * @param {Object} state - The state to update.
@@ -189,7 +245,7 @@ class App extends Skeleton {
     */
     setState(state, {action, path, persist} = {}) {
         if (!action) action = 'merge'
-        this.mergeState({
+        this.__mergeState({
             action: action,
             path: path,
             persist: persist,
@@ -202,29 +258,6 @@ class App extends Skeleton {
             persist: persist,
             state: this.env.isExtension ? state : JSON.parse(JSON.stringify(state)),
         })
-    }
-
-
-    /**
-    * Find and return a (sub)object by reference.
-    * @param {Object} queryObject - The object to find a (sub)reference for.
-    * @param {String} path - The path to the sub-reference.
-    * @param {Number} fromEnd - Splits the path into reference and right keys.
-    * @returns {Object} - The (sub)reference and the right keys.
-    */
-    queryReference(queryObject, path, fromEnd = 0) {
-        let reference
-        const paths = path.split('/')
-        const slicePoint = (paths.length) - fromEnd
-        let keysLeft = paths.slice(0, slicePoint)
-        let keysRight = paths.slice(slicePoint)
-
-        for (const key of keysLeft) {
-            if (!reference) reference = queryObject[key]
-            else if (reference[key]) reference = reference[key]
-        }
-
-        return {keysRight, reference}
     }
 }
 

@@ -2,15 +2,15 @@
 
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator">
-            <i v-if="sip.ua.state === 'disconnected'" class="icon icon-disconnected disconnected" :title="$t('Status:') + ' ' + $t('disconnected')"></i>
-            <i v-if="sip.ua.state === 'connected'" class="icon icon-o-vialer-icon connected" :title="$t('Status:') + ' ' +  $t('connected')"></i>
-            <i v-if="sip.ua.state === 'registered'" class="icon icon-vialer-icon registered" :title="$t('Status:') + ' ' + $t('registered')"></i>
-            <i v-if="sip.ua.state === 'registration_failed'" class="icon icon-disconnected registration-failed" :title="$t('Status:') + ' ' + $t('registration failed')"></i>
+            <i v-if="ua.state === 'disconnected'" class="icon icon-disconnected disconnected" :title="$t('Status:') + ' ' + $t('disconnected')"></i>
+            <i v-if="ua.state === 'connected'" class="icon icon-o-vialer-icon connected" :title="$t('Status:') + ' ' +  $t('connected')"></i>
+            <i v-if="ua.state === 'registered'" class="icon icon-vialer-icon registered" :title="$t('Status:') + ' ' + $t('registered')"></i>
+            <i v-if="ua.state === 'registration_failed'" class="icon icon-disconnected registration-failed" :title="$t('Status:') + ' ' + $t('registration failed')"></i>
         </span>
         <span class="username">{{user.username}}</span>
         <div class="options">
-            <div class="option">
-                <i class="icon-logout" :title="$t('Log out')" @click="logout()"></i>
+            <div class="option" @click=logout>
+                <i class="icon-logout" :title="$t('Log out')"></i>
             </div>
         </div>
     </div>
@@ -34,8 +34,8 @@
             <i class="icon-refresh" :title="$t('Refresh your data')"></i>
         </div>
 
-        <div class="option">
-            <i class="icon-help" data-link="help" :title="$t('Help')" @click="openHelp"></i>
+        <div class="option" @click="openHelp">
+            <i class="icon-help" data-link="help" :title="$t('Help')"></i>
         </div>
     </div>
 </div>

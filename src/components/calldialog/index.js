@@ -42,7 +42,7 @@ module.exports = (app) => {
             },
             keypadToggle: function() {
                 if (this.transferActive) return
-                app.setState({keypad: {active: !this.call.keypad.active}}, {path: `sip/calls/${this.call.id}`})
+                app.setState({keypad: {active: !this.call.keypad.active}}, {path: `calls/calls/${this.call.id}`})
             },
             transferFinalize: function() {
                 app.emit('bg:sip:transfer_finalize', {callId: this.call.id})
@@ -61,19 +61,7 @@ module.exports = (app) => {
         render: templates.calldialog.r,
         staticRenderFns: templates.calldialog.s,
         store: {
-            calls: 'sip.calls',
-            sip: 'sip',
-        },
-        watch: {
-            'sip.session.state': function(newVal, oldVal) {
-                // Remote party hangs up. Stop the timer.
-                if (['bye', 'rejected'].includes(newVal)) {
-                    // Stop timer on hangup.
-                    if (this.keypad) {
-                        this.keypad = false
-                    }
-                }
-            },
+            calls: 'calls.calls',
         },
     }
 }

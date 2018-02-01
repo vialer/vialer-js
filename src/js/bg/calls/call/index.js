@@ -3,10 +3,10 @@
 */
 class Call {
 
-    constructor(sip, callTarget, {active, silent} = {}) {
-        this.sip = sip
-        this.app = this.sip.app
-        this.ua = this.sip.ua
+    constructor(module, callTarget, {active, silent} = {}) {
+        this.module = module
+        this.app = this.module.app
+        this.ua = this.module.ua
         this.silent = silent
 
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
@@ -57,25 +57,12 @@ class Call {
         this.setState({keypad: {active: false}})
 
         window.setTimeout(() => {
-            const defaultState = this.app.getDefaultState().sip
-            let newSipState = {}
-            for (const key of Object.keys(this.app.state.sip)) {
-                // We keep these state properties.
-                if (!['ua'].includes(key)) {
-                    newSipState[key] = defaultState[key]
-                }
-            }
-
+            delete this.app.state.calls.calls[this.session.id]
+            delete this.app.modules.calls.calls[this.session.id]
             // This call is being cleaned up; move to a different call
-            // when it is the active call.
-            if (this.state.active) this.sip.setActiveCall(null, false)
-
-            this.app.setState({sip: newSipState})
-            this.app.emit('fg:set_state', {action: 'delete', path: `sip/calls/${this.session.id}`})
-            delete this.app.state.sip.calls[this.session.id]
-            // Delete the Call object from the sip handler.
-            delete this.app.sip.calls[this.session.id]
-            this.app.setState({sip: {calls: this.app.state.sip.calls}})
+            // when this call was the active call.
+            if (this.state.active) this.module.setActiveCall(null, false)
+            this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${this.session.id}`})
         }, timeout)
     }
 
@@ -88,15 +75,15 @@ class Call {
     */
     setState(state) {
         // This merges to the call's local state; not the app's state!
-        this.app.mergeDeep(this.state, state)
+        this.app.__mergeDeep(this.state, state)
         if (this.silent) return
 
         if (this._trackState) {
-            this.app.emit('fg:set_state', {action: 'merge', path: `sip/calls/${this.state.id}`, state: state})
+            this.app.emit('fg:set_state', {action: 'merge', path: `calls/calls/${this.state.id}`, state: state})
         } else if (this.state.id) {
-            Vue.set(this.app.state.sip.calls, this.state.id, this.state)
+            Vue.set(this.app.state.calls.calls, this.state.id, this.state)
             // Send a complete state representation down the wire once.
-            this.app.emit('fg:set_state', {action: 'insert', path: `sip/calls/${this.state.id}`, state: this.state})
+            this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${this.state.id}`, state: this.state})
             this._trackState = true
         }
     }
