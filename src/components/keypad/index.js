@@ -43,7 +43,11 @@ module.exports = (app) => {
         methods: Object.assign({
             createCall: function() {
                 if (!this.number) return
-                app.emit('bg:sip:call', {number: this.number})
+                // Only create a new call when the keypad is used without
+                // existing call; otherwise we initiate a transfer.
+                if (!this.call) app.emit('bg:sip:call', {number: this.number})
+                else this.transferActivate(this.number)
+
             },
             inputChange: function(newVal) {
                 this.$emit('update:model', newVal)

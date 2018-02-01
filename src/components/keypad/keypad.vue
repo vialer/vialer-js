@@ -1,16 +1,16 @@
-<div class="keypad-component" tabindex="-1" v-on:keyup.enter="createCall">
+<div class="keypad-component" tabindex="-1">
 
     <div class="dense-number-input" v-if="dense">
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
-            v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
-        <i class="icon icon-transfer" @click="transferActivate(number)" :class="{'disabled': !number}"></i>
+            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="createCall(number)"/>
+        <i class="icon icon-transfer" v-on:keyup.enter="keypadAction" @click="createCall(number)" :class="{'disabled': !number}"></i>
     </div>
 
     <div class="number-input" v-else>
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
-            v-bind:value="number" v-on:input="inputChange($event.target.value)"/>
+            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="createCall(number)"/>
         <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
     </div>
 
@@ -20,7 +20,7 @@
         </span>
     </div>
 
-    <div class="keys" v-if="!dense">
+    <div class="keys" v-if="!dense" v-on:keyup.enter="createCall(number)">
         <div class="row">
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('1')">1</button>
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('2')">2<div class="sub">ABC</div></button>
@@ -44,7 +44,7 @@
     </div>
     <!-- Dial actions when not used in combination with a call. -->
     <div class="call-actions" v-if="!call">
-        <div class="rounded-button action dial" @click="createCall" :class="{'disabled': !number}">
+        <div class="rounded-button action dial" @click="createCall(number)" :class="{'disabled': !number}">
             <i class="icon icon-phone"></i>
         </div>
     </div>
