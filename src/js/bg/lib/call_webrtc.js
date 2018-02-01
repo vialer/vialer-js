@@ -1,6 +1,5 @@
 const Call = require('./call')
 
-
 /**
 * Call flow wrapper around SipJS which enables incoming and outgoing
 * calls using WebRTC.
@@ -37,12 +36,6 @@ class CallWebRTC extends Call {
     async _initMedia() {
         this._sessionOptions = {
             media: {},
-            sessionDescriptionHandlerOptions: {
-                constraints: {
-                    audio: true,
-                    video: false,
-                },
-            },
         }
 
         // Append the AV-elements in the background DOM, so the audio

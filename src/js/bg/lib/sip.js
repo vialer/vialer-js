@@ -1,5 +1,6 @@
 const Call = require('./call_webrtc')
 const Presence = require('./presence')
+const transform = require('sdp-transform')
 
 
 /**
@@ -145,6 +146,32 @@ class Sip {
         })
 
         this.connect()
+    }
+
+
+    _formatSdp(sessionDescription) {
+        let allowedCodecs = ['G722', 'telephone-event', 'opus']
+        var sdpObj = transform.parse(sessionDescription.sdp);
+        let rtp = {media: []}
+        var payloads = []
+        var fmtps = []
+        for (let codec of sdpObj.media[0].rtp) {
+            if (allowedCodecs.includes(codec.codec)) {
+                rtp.media.push(codec)
+                payloads.push(codec.payload)
+            }
+        }
+
+        for (let fmtp of sdpObj.media[0].fmtp) {
+            if (payloads.includes(fmtp.payload)) {
+                fmtps.push(fmtp)
+            }
+        }
+        sdpObj.media[0].rtp = rtp.media
+        sdpObj.media[0].payloads = payloads.join(' ')
+        sdpObj.media[0].fmtp = fmtps
+        sessionDescription.sdp = transform.write(sdpObj)
+        return Promise.resolve(sessionDescription)
     }
 
 
@@ -302,7 +329,14 @@ class Sip {
         let uaOptions = {
             log: {
                 builtinEnabled: false,
-                debug: 'error',
+                level: 'error',
+            },
+            sessionDescriptionHandlerFactoryOptions: {
+                constraints: {
+                    audio: true,
+                    video: false,
+                },
+                modifiers: [this._formatSdp],
             },
             stunServers: [
                 'stun.voipgrid.nl',
