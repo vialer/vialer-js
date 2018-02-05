@@ -1,6 +1,7 @@
 const Skeleton = require('./skeleton')
 
 
+
 /**
 * The App class is a less light-weight version of the Skeleton.
 * It is extended with UI-specific libraries and should only
@@ -11,16 +12,12 @@ class App extends Skeleton {
     constructor(options) {
         super(options)
 
+        this._modules = options.modules
         this.modules = {}
         this.sounds = require('./sounds')
 
         if (this.env.role.bg) this._emitTarget = 'fg'
         else if (this.env.role.fg) this._emitTarget = 'bg'
-
-        // Init these modules.
-        for (let module of options.modules) {
-            this.modules[module.name] = new module.Module(this)
-        }
     }
 
 
@@ -63,7 +60,6 @@ class App extends Skeleton {
         } else {
             this.__mergeDeep(this.state, state)
         }
-
         if (persist) this.store.set('state', this.state)
     }
 
@@ -144,6 +140,7 @@ class App extends Skeleton {
             },
             ui: {
                 layer: 'login',
+                visible: false,
             },
             user: {
                 authenticated: false,
@@ -212,7 +209,6 @@ class App extends Skeleton {
     initStore() {
         this.state = {
             env: this.env,
-            notifications: [],
         }
     }
 
@@ -235,6 +231,17 @@ class App extends Skeleton {
             },
             render: h => h(require('../../components/main')(this)),
         })
+    }
+
+
+    /**
+    * Load all modules.
+    */
+    loadModules() {
+        // Init these modules.
+        for (let module of this._modules) {
+            this.modules[module.name] = new module.Module(this)
+        }
     }
 
 

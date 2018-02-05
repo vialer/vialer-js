@@ -5,7 +5,7 @@
     </div>
 
     <ul class="list-items">
-        <li class="list-item queue" :class="{selected: module.selectedQueue == queue.id}" v-for="queue in module.queues" v-on:click="activateQueue(queue)">
+        <li class="list-item queue" :class="{selected: selected.id == queue.id}" v-for="queue in queues" v-on:click="toggleActiveQueue(queue)">
             <div class="status-icon">
                 <i class="indicator">{{queue.queue_size}}</i>
             </div>
@@ -21,7 +21,7 @@
             </div>
         </li>
 
-        <li class="list-item queue" v-if="!module.queues.length">
+        <li class="list-item queue" v-if="!queues.length">
             <div class="icon"><i class="indicator"></i></div>
             <div class="info">
                 <div class="name">{{$t('No queues available')}}</div>

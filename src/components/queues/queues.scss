@@ -3,6 +3,23 @@
 .queues-component {
 
     .queue {
+        &:hover {
+            cursor: pointer;
+        }
+        &.selected {
+            // border: 1px solid $brand-variation-color;
+            &::after {
+                position: absolute;
+                right: 0;
+                line-height: $spacer * 4;
+                margin-right: $spacer * 2;
+                color: $green-color;
+                font-size: $spacer * 3;
+                font-family: "vialer-js";
+                content: "\e901";
+            }
+        }
+
         .status-icon {
             vertical-align: center;
             text-align: center;

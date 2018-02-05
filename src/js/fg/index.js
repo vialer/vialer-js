@@ -62,6 +62,12 @@ class ForegroundApp extends App {
 
                 this.initViewModel()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
+                this.setState({ui: {visible: true}})
+                if (this.env.isExtension) {
+                    // Kkeep track of the popup's visibility status by
+                    // opening a long-lived connection to the background.
+                    chrome.runtime.connect({name: 'vialer-js'})
+                }
             },
         })
     }

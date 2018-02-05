@@ -23,20 +23,21 @@
                 </div>
             </div>
         </li>
+
+        <li class="list-item contact" v-if="state === 'loading'">
+            <div class="icon status-icon"><i class="fa fa-spinner fa-spin"></i></div>
+            <div class="info"><div class="name">{{$t('Loading...')}}</div></div>
+        </li>
         <!-- No search results -->
-        <li class="list-item contact" v-if="!Object.keys(filteredContacts).length">
+        <li class="list-item contact" v-else-if="!Object.keys(filteredContacts).length">
             <div class="icon status-icon"><i class="icon-availability"></i></div>
-            <div class="info">
-                <div class="name">{{$t('No contacts')}}</div>
-            </div>
+            <div class="info"><div class="name">{{$t('No contacts')}}</div></div>
         </li>
 
         <!-- No contacts -->
         <li class="list-item contact" v-else-if="!Object.keys(contacts).length">
             <div class="icon status-icon"><i class="icon-availability"></i></div>
-            <div class="info">
-                <div class="name">{{$t('No contacts')}}</div>
-            </div>
+            <div class="info"><div class="name">{{$t('No contacts')}}</div></div>
         </li>
     </ul>
 </div>

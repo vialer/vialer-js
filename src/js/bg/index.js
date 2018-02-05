@@ -3,6 +3,7 @@ const App = require('../lib/app')
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
 
+
 let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.bg = true
 
@@ -13,6 +14,7 @@ class BackgroundApp extends App {
         options.environment = env
         super(options)
         this.api = new Api(this)
+        this.timer = new Timer(this)
 
         // A state object that can be mutated across instances
         // using {app_name}:set_state and {app_name}:get_state emitters.
@@ -31,16 +33,17 @@ class BackgroundApp extends App {
             this.getModuleApiData()
         })
 
+        this.loadModules()
         this.initStore()
+        // Continue last session if credentials are available.
+        this.api.setupClient(this.state.user.username, this.state.user.password)
+
 
         // Clears localstorage if the schema changed after a plugin update.
         if (!this.store.validSchema()) {
             this.modules.user.logout()
             return
         }
-
-        // Continue last session if credentials are available.
-        this.api.setupClient(this.state.user.username, this.state.user.password)
 
         if (this.state.user.authenticated) {
             this.logger.info(`${this}assume authentication with existing credentials`)
@@ -54,6 +57,28 @@ class BackgroundApp extends App {
             this.modules.calls.connect()
         }
 
+        if (this.env.isExtension) {
+            // Fired when the popup opens..
+            browser.runtime.onConnect.addListener((port) => {
+                for (let moduleName of Object.keys(this.modules)) {
+                    if (this.modules[moduleName].onPopupAction) {
+                        this.modules[moduleName].onPopupAction('open')
+                    }
+                }
+
+                // Fired when the popup closes.
+                port.onDisconnect.addListener((msg) => {
+                    this.setState({ui: {visible: false}})
+                    for (let moduleName of Object.keys(this.modules)) {
+                        if (this.modules[moduleName].onPopupAction) {
+                            this.modules[moduleName].onPopupAction('close')
+                        }
+                    }
+                })
+            })
+        }
+
+        this.emit('bg:popup-opened')
     }
 
 
@@ -87,9 +112,7 @@ class BackgroundApp extends App {
 
         if (stateObj) {
             Object.assign(this.state, stateObj)
-            for (let module in this.modules) {
-                // Use 'load' instead of 'restore' to refresh the data on
-                // browser restart.
+            for (let module of Object.keys(this.modules)) {
                 if (this.modules[module]._restoreState) {
                     this.modules[module]._restoreState(this.state[module])
                 }
@@ -97,8 +120,6 @@ class BackgroundApp extends App {
         } else Object.assign(this.state, this._initialState())
 
         this.initViewModel()
-
-        this.timer = new Timer(this)
         this.telemetry = new Telemetry(this)
 
     }
