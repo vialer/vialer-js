@@ -50,9 +50,7 @@ class BackgroundApp extends App {
             this.getModuleApiData()
 
             if (this.env.isExtension) {
-                browser.browserAction.setIcon({
-                    path: 'img/icon-menubar-active.png',
-                })
+                browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
             }
             this.modules.calls.connect()
         }
@@ -121,7 +119,6 @@ class BackgroundApp extends App {
 
         this.initViewModel()
         this.telemetry = new Telemetry(this)
-
     }
 
 

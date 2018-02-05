@@ -5,9 +5,9 @@ module.exports = (app) => {
         methods: Object.assign({
             toggleActiveQueue: function(queue) {
                 if (app.state.queues.selected.id !== queue.id) {
-                    app.setState({queues: {selected: {id: queue.id}}}, {persist: true})
+                    app.emit('bg:queues:selected', {queue: queue})
                 } else {
-                    app.setState({queues: {selected: {id: null}}}, {persist: true})
+                    app.emit('bg:queues:selected', {queue: null})
                 }
             },
         }, app.utils.sharedMethods()),

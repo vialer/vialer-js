@@ -9,6 +9,18 @@ class QueuesModule {
     constructor(app) {
         this.app = app
         this.app.timer.registerTimer('bg:queues:size', this.getApiData.bind(this))
+
+        this.app.on('bg:queues:selected', ({queue}) => {
+            app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
+
+            if (this.app.env.isExtension) {
+                if (queue) {
+                    browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                } else {
+                    browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
+                }
+            }
+        })
         // this.setQueueSizesTimer()
     }
 
@@ -35,7 +47,7 @@ class QueuesModule {
                 // queues widget is open.
                 if (this.app.state.ui.visible) timeout = 5000
             }
-            this.app.logger.info(`${this}set queue timer to ${timeout} ms`)
+            this.app.logger.debug(`${this}set queue timer to ${timeout} ms`)
             return timeout
         }, true)
 
