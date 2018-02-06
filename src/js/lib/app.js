@@ -84,8 +84,8 @@ class App extends Skeleton {
 
 
     /**
-    * Provide the initial application state, when there is no state
-    * available from localstorage.
+    * Provide the initial application state when no state is
+    * available in localstorage.
     * @returns {Object} - The initial Vue-stash structure.
     */
     _initialState() {
@@ -108,6 +108,16 @@ class App extends Skeleton {
         })
 
         return state
+    }
+
+
+    /**
+    * Make sure that these values in the state are
+    * set fresh when reviving the state.
+    * @param {Store} store - The Stash store.
+    */
+    _restoreState(store) {
+        store.notifications = []
     }
 
 

@@ -92,6 +92,8 @@ class BackgroundApp extends App {
         let stateObj = this.store.get('state')
         if (stateObj) {
             Object.assign(this.state, stateObj)
+            this._restoreState(this.state)
+
             for (let module of Object.keys(this.modules)) {
                 if (this.modules[module]._restoreState) {
                     this.modules[module]._restoreState(this.state[module])

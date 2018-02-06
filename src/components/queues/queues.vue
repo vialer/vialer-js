@@ -24,7 +24,7 @@
 
         <li class="list-item queue" v-if="state === 'loading'">
             <div class="icon status-icon"><i class="fa fa-spinner fa-spin"></i></div>
-            <div class="info"><div class="name">{{$t('Loading...')}}</div></div>
+            <div class="info"><div class="name">{{$t('Loading')}}...</div></div>
         </li>
         <li class="list-item queue" v-else-if="!queues.length">
             <div class="status-icon">

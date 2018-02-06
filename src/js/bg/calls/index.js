@@ -219,7 +219,6 @@ class CallsModule extends Module {
 
 
         this.ua.on('connected', () => {
-            console.log("CONNECTED")
             this.app.setState({calls: {ua: {state: 'connected'}}})
             this.app.logger.info(`${this}ua connected`)
         })
@@ -336,8 +335,6 @@ class CallsModule extends Module {
             userAgentString: process.env.PLUGIN_NAME,
             wsServers: [`wss://${settings.sipEndpoint}`],
         }
-
-        console.log(uaOptions)
 
         // Log in with the WebRTC voipaccount when it is enabled.
         // The voipaccount should be from the same client as the logged-in

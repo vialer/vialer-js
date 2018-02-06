@@ -1,21 +1,31 @@
+const Module = require('./lib/module')
+
 /**
 * @module Availability
 */
-class AvailabilityModule {
+class AvailabilityModule extends Module {
 
     /**
     * @param {ClickToDialApp} app - The application object.
     */
-    constructor(app) {
-        this.app = app
-        this.app.modules.availability = this
+    constructor(...args) {
+        super(...args)
 
         /**
         * Notify the VoIPGRID API about the availability change and set
         * the background state to the new situation.
         */
-        this.app.on('bg:update-availability', async({selected, destinations}) => {
-            this.app.setState({availability: {destinations, selected}}, {persist: true})
+        this.app.on('bg:availability:update', async({selected, destinations}) => {
+            console.log("UPDATE AVAILABILITY:", selected, destinations)
+            // Set an icon depending on whether the user is available.
+            let icon = 'img/icon-menubar-unavailable.png'
+            let available = 'no'
+            if (selected.id) {
+                icon = 'img/icon-menubar-active.png'
+                available = 'yes'
+            }
+            console.log("SELECTED FROM UPDATE:", available, selected)
+            this.app.setState({availability: {available, destinations, selected}}, {persist: true})
 
             const res = await this.app.api.client.put(`api/selecteduserdestination/${this.app.state.availability.sud}/`, {
                 fixeddestination: selected.type === 'fixeddestination' ? selected.id : null,
@@ -26,14 +36,6 @@ class AvailabilityModule {
                 this.app.logger.warn(`${this}unauthorized availability request`)
                 return
             }
-
-
-            // Set an icon depending on whether the user is available.
-            let icon = 'img/icon-menubar-unavailable.png'
-            if (selected.id) {
-                icon = 'img/icon-menubar-active.png'
-            }
-            this.app.state.availability.icon = icon
 
             if (this.app.env.isExtension) {
                 if (!this.app.state.queues.selectedQueue) {
@@ -51,10 +53,12 @@ class AvailabilityModule {
             placeholder: {
                 id: null,
                 name: null,
+                type: null,
             },
             selected: {
                 id: null,
                 name: null,
+                type: null,
             },
             sud: null, // This is a fixed id used to build the API endpoint for selected userdestination.
         }
@@ -87,10 +91,12 @@ class AvailabilityModule {
         destinations = [...fixed, ...voip]
 
         const sud = userdestination.selecteduserdestination
+        console.log("SUD:", sud)
         if (sud.fixeddestination) selected = destinations.find((d) => d.id === sud.fixeddestination)
         else if (sud.phoneaccount) selected = destinations.find((d) => d.id === sud.phoneaccount)
 
         let available = selected.id ? 'yes' : 'no'
+        console.log("SET AVAILABLE ON LOAD:", available)
         this.app.setState({availability: {available, destinations, selected, sud: sud.id}}, true)
 
         // Set an icon depending on whether the user is available.
@@ -103,10 +109,6 @@ class AvailabilityModule {
                 browser.browserAction.setIcon({path: icon})
             }
         }
-
-        // Save icon in storage, so we can restore the icon state without
-        // getting API data.
-        this.app.state.availability.icon = icon
     }
 
     toString() {

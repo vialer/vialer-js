@@ -29,6 +29,7 @@ global.translations.nl = {
     'Help us improving this software by sending anonimized usage data.': 'Help ons deze software te verbeteren door geanonimiseerde gebruiksstatistieken te versturen.',
     'Incoming call': 'Inkomend gesprek',
     'Input device': 'Invoerapparaat',
+    'Loading': 'Bezig',
     'Log in': 'Inloggen',
     'Log out': 'Uitloggen',
     'No': 'Nee',

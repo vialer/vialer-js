@@ -13,19 +13,22 @@ module.exports = (app, actions) => {
         },
         watch: {
             available: function(newVal, oldVal) {
+                // Sending an empty object like this will unset the
+                // user's availability.
                 let newDestination = {id: null, name: null, type: null}
-                if (newVal === 'yes') {
-                    newDestination = this.placeholder
+                if (newVal === 'yes') newDestination = this.placeholder
+                // Only re-enable when there is a cached version of the
+                // previous choice available.
+                if (this.placeholder.id) {
+                    app.emit('bg:availability:update', {
+                        destinations: this.destinations,
+                        selected: newDestination,
+                    })
                 }
-                app.emit('bg:update-availability', {
-                    destinations: this.destinations,
-                    selected: newDestination,
-                })
-
             },
             selected: function(newVal, oldVal) {
-                this.placeholder = {id: this.selected.id, name: this.selected.name}
-                app.emit('bg:update-availability', {
+                this.placeholder = {id: this.selected.id, name: this.selected.name, type: this.selected.type}
+                app.emit('bg:availability:update', {
                     destinations: this.destinations,
                     selected: this.selected,
                 })
