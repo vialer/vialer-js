@@ -65,6 +65,15 @@ class BackgroundApp extends App {
                     }
                 })
             })
+        } else {
+            // There is no concept of a popup without an extension.
+            // Nevertheless we still trigger the event to start timers
+            // and such that rely on the event.
+            for (let moduleName of Object.keys(this.modules)) {
+                if (this.modules[moduleName]._onPopupAction) {
+                    this.modules[moduleName]._onPopupAction('open')
+                }
+            }
         }
     }
 

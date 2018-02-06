@@ -16,7 +16,6 @@ class AvailabilityModule extends Module {
         * the background state to the new situation.
         */
         this.app.on('bg:availability:update', async({selected, destinations}) => {
-            console.log("UPDATE AVAILABILITY:", selected, destinations)
             // Set an icon depending on whether the user is available.
             let icon = 'img/icon-menubar-unavailable.png'
             let available = 'no'
@@ -24,7 +23,6 @@ class AvailabilityModule extends Module {
                 icon = 'img/icon-menubar-active.png'
                 available = 'yes'
             }
-            console.log("SELECTED FROM UPDATE:", available, selected)
             this.app.setState({availability: {available, destinations, selected}}, {persist: true})
 
             const res = await this.app.api.client.put(`api/selecteduserdestination/${this.app.state.availability.sud}/`, {
@@ -91,12 +89,10 @@ class AvailabilityModule extends Module {
         destinations = [...fixed, ...voip]
 
         const sud = userdestination.selecteduserdestination
-        console.log("SUD:", sud)
         if (sud.fixeddestination) selected = destinations.find((d) => d.id === sud.fixeddestination)
         else if (sud.phoneaccount) selected = destinations.find((d) => d.id === sud.phoneaccount)
 
         let available = selected.id ? 'yes' : 'no'
-        console.log("SET AVAILABLE ON LOAD:", available)
         this.app.setState({availability: {available, destinations, selected, sud: sud.id}}, true)
 
         // Set an icon depending on whether the user is available.

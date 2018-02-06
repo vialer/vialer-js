@@ -12,7 +12,7 @@ class QueuesModule extends Module {
     constructor(...args) {
         super(...args)
 
-        this.app.timer.registerTimer('bg:queues:size', this._platformData.bind(this))
+        this.app.timer.registerTimer('bg:queues:size', () => {this._platformData(true)})
         this.app.on('bg:queues:selected', ({queue}) => {
             this.app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
 
@@ -38,8 +38,9 @@ class QueuesModule extends Module {
     }
 
 
-    async _platformData() {
-        this.app.setState({queues: {queues: [], state: 'loading'}})
+    async _platformData(silent = false) {
+        if (!silent) this.app.setState({queues: {queues: [], state: 'loading'}})
+
         const res = await this.app.api.client.get('api/queuecallgroup/')
         let queues = res.data.objects
 

@@ -33,7 +33,6 @@ class UserModule extends Module {
     async _platformData() {
         const res = await this.app.api.client.get('api/autologin/token/')
         this.app.setState({user: {platform: {tokens: {portal: res.data.token}}}})
-        console.log('TOKEN:', res.data.token)
     }
 
 
