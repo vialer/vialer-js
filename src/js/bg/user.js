@@ -1,23 +1,39 @@
+const Module = require('./lib/module')
+
+
 /**
 * @module User
 */
-class UserModule {
+class UserModule extends Module {
 
-    constructor(app) {
-        this.app = app
+    constructor(...args) {
+        super(...args)
 
-        this.app.on('bg:user:login', (data) => {
-            Object.assign(this.app.state.user, {
-                password: data.password,
-                username: data.username,
-            })
+        this.app.on('bg:user:login', ({username, password}) => this.login(username, password))
+        this.app.on('bg:user:logout', this.logout.bind(this))
+    }
 
-            this.login(data.username, data.password)
-        })
 
-        this.app.on('bg:user:logout', () => {
-            this.logout()
-        })
+    _initialState() {
+        return {
+            authenticated: false,
+            language: 'nl',
+            password: '',
+            platform: {
+                tokens: {
+                    portal: null,
+                    sip: null,
+                },
+            },
+            username: null,
+        }
+    }
+
+
+    async _platformData() {
+        const res = await this.app.api.client.get('api/autologin/token/')
+        this.app.setState({user: {platform: {tokens: {portal: res.data.token}}}})
+        console.log('TOKEN:', res.data.token)
     }
 
 
@@ -29,6 +45,7 @@ class UserModule {
     * @param {String} password - Password to login with.
     */
     async login(username, password) {
+        this.app.setState({user: {password, username}})
         this.app.api.setupClient(username, password)
         const res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
@@ -51,14 +68,18 @@ class UserModule {
             user: {
                 authenticated: true,
                 client_id: user.client.replace(/[^\d.]/g, ''),
+                id: user.id,
                 password: password,
-                token: user.token,
+                platform: {
+                    tokens: {
+                        sip: user.token,
+                    },
+                },
                 username: username,
             },
         }, {persist: true})
 
-        this.app.getModuleApiData()
-
+        this.app._platformData()
         this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Logged in succesfully'), type: 'success'})
         // Connect to the sip service on succesful login.
         this.app.modules.calls.connect()

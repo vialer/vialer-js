@@ -188,3 +188,41 @@
 
     }
 }
+
+
+.call-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-self: flex-start;
+
+    .action {
+        margin: $spacer;
+        box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);
+
+        &.decline {
+            color: $white;
+            background: $red-color;
+
+            &.disabled {
+                background: $grey-color;
+
+                &:hover {
+                    cursor: not-allowed;
+                }
+            }
+        }
+
+        &.accept {
+            color: $white;
+            background: $green-color;
+            &:hover {background: darken($green-color, 3%);}
+        }
+
+        &.dial {
+            color: $white;
+            background: $green-color;
+            &:hover {background: darken($green-color, 3%);}
+        }
+    }
+}

@@ -14,9 +14,9 @@
                 <div class="name">{{contact.name}}</div>
                 <div class="description">{{contact.number}}</div>
             </div>
-            <div class="contact-options">
-                <div class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.internal_number)">
-                    <i class="icon icon-transfer" v-on:click.once="transferActivate(contact.internal_number)"></i>
+            <div class="contact-options list-item-options">
+                <div class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.number)">
+                    <i class="icon icon-transfer" v-on:click.once="transferActivate(contact.number)"></i>
                 </div>
                 <div class="rounded-button" v-if="!transferStatus && !numbersOngoing.length">
                     <i class="icon icon-phone" v-on:click="callContact(contact)"></i>
@@ -31,7 +31,7 @@
         <!-- No search results -->
         <li class="list-item contact" v-else-if="!Object.keys(filteredContacts).length">
             <div class="icon status-icon"><i class="icon-availability"></i></div>
-            <div class="info"><div class="name">{{$t('No contacts')}}</div></div>
+            <div class="info"><div class="name">{{$t('No {target} found', {target: $t('contacts')})}}...</div></div>
         </li>
 
         <!-- No contacts -->

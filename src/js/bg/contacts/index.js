@@ -28,16 +28,12 @@ class ContactsModule extends Module {
     }
 
 
-    _restoreState(moduleStore) {
-        moduleStore.contacts = {}
-    }
-
-
     /**
     * Retrieve all contacts frm the VoIPGRID platform API.
     * @param {Boolean} refresh - True when the plugin is forced to refresh.
     */
-    async getApiData() {
+    async _platformData() {
+        this.app.setState({}, {action: 'replace', path: 'contacts/contacts'})
         this.app.setState({contacts: {contacts: {}, state: 'loading'}})
         const res = await this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
@@ -60,6 +56,11 @@ class ContactsModule extends Module {
         for (let contactData of contacts) {
             this.contacts[contactData.account_id] = new ContactSip(this.app, contactData)
         }
+    }
+
+
+    _restoreState(moduleStore) {
+        moduleStore.contacts = {}
     }
 
 

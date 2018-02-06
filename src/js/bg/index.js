@@ -25,7 +25,7 @@ class BackgroundApp extends App {
 
         // Send this script's state back to the requesting script.
         this.on('bg:get_state', (data) => data.callback(this.state))
-        this.on('bg:refresh_api_data', this.getModuleApiData.bind(this))
+        this.on('bg:refresh_api_data', this._platformData.bind(this))
         this.on('bg:set_state', this.__mergeState.bind(this))
 
         this.loadModules()
@@ -38,7 +38,7 @@ class BackgroundApp extends App {
         // Continue last session if credentials are available.
         if (this.state.user.authenticated) {
             this.logger.info(`${this}assume authentication with existing credentials`)
-            this.getModuleApiData()
+            this._platformData()
 
             if (this.env.isExtension) {
                 browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
@@ -50,8 +50,8 @@ class BackgroundApp extends App {
             // Fired when the popup opens..
             browser.runtime.onConnect.addListener((port) => {
                 for (let moduleName of Object.keys(this.modules)) {
-                    if (this.modules[moduleName].onPopupAction) {
-                        this.modules[moduleName].onPopupAction('open')
+                    if (this.modules[moduleName]._onPopupAction) {
+                        this.modules[moduleName]._onPopupAction('open')
                     }
                 }
 
@@ -59,8 +59,8 @@ class BackgroundApp extends App {
                 port.onDisconnect.addListener((msg) => {
                     this.setState({ui: {visible: false}})
                     for (let moduleName of Object.keys(this.modules)) {
-                        if (this.modules[moduleName].onPopupAction) {
-                            this.modules[moduleName].onPopupAction('close')
+                        if (this.modules[moduleName]._onPopupAction) {
+                            this.modules[moduleName]._onPopupAction('close')
                         }
                     }
                 })
@@ -72,13 +72,13 @@ class BackgroundApp extends App {
     /**
     * Refreshes data from the API for each module.
     */
-    getModuleApiData() {
+    _platformData() {
         for (let module in this.modules) {
             // Use 'load' instead of 'restore' to refresh the data on
             // browser restart.
-            if (this.modules[module].getApiData) {
+            if (this.modules[module]._platformData) {
                 this.logger.debug(`${this}(re)refreshing api data for module ${module}`)
-                this.modules[module].getApiData()
+                this.modules[module]._platformData()
             }
         }
     }
@@ -121,6 +121,7 @@ function startApp(options) {
         {Module: require('./contacts'), name: 'contacts'},
         {Module: require('./user'), name: 'user'},
         {Module: require('./queues'), name: 'queues'},
+        {Module: require('./settings'), name: 'settings'},
         {Module: require('./calls'), name: 'calls'},
     ]
     return new BackgroundApp(options)

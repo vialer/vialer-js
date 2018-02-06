@@ -20,7 +20,8 @@ $red-color: #d9534f !default;
 // Colors: Derivate colors from the base color palette.
 $grey-color-darkest: darken($grey-color, 30%);
 $grey-color-darker: darken($grey-color, 10%);
-$grey-color-light: lighten($grey-color, 20%);
+$grey-color-dark: darken($grey-color, 5%);
+$grey-color-light: lighten($grey-color, 25%);
 $grey-color-lighter: lighten($grey-color, 35%);
 $grey-color-lightest: lighten($grey-color, 38%);
 

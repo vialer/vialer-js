@@ -1,6 +1,7 @@
 module.exports = (app, actions) => {
 
     return {
+        methods: app.utils.sharedMethods(),
         render: templates.availability.r,
         staticRenderFns: templates.availability.s,
         store: {
@@ -8,6 +9,7 @@ module.exports = (app, actions) => {
             destinations: 'availability.destinations',
             placeholder: 'availability.placeholder',
             selected: 'availability.selected',
+            user: 'user',
         },
         watch: {
             available: function(newVal, oldVal) {

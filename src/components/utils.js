@@ -34,10 +34,18 @@ module.exports = function(app) {
                 }
                 return activeCall
             },
+            openPlatformUrl: function(path = '') {
+                const token = this.user.platform.tokens.portal
+                path = `client/${this.user.client_id}/${path}`
+                path = `user/autologin/?token=${token}&username=${this.user.username}&next=/${path}`
+                let url = `${app.state.settings.platform.url}${path}`
+                if (app.env.isExtension) browser.tabs.create({url: url})
+                else window.open(url, '_blank')
+            },
             transferActivate: function(number) {
                 if (!number) return
                 let activeCall = this.getActiveCall()
-                app.emit('bg:sip:transfer_activate', {callId: activeCall.id, number: number})
+                app.emit('bg:calls:transfer_activate', {callId: activeCall.id, number: number})
             },
         }
     }

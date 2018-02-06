@@ -1,6 +1,6 @@
 <div class="availability-component">
     <div class="panel-content">
-        <h1>{{$t('Availability')}}</h1>
+        <h1>{{$t('Availability')}} {{$t('of')}} {{$t('user')}}</h1>
 
         <span>{{$t('Are you available?')}}</span><br/>
         <div class="field">
@@ -14,7 +14,10 @@
                     {{$t('No')}}
                 </label>
             </div>
-            <em class="help">{{$t('Setting your availability only has effect when your platform user is part of the phonenumber\'s involved dialplan.')}}</em>
+            <em class="help">
+                {{$t('Changing your availability only has effect when your platform user is part of the called number\'s dialplan.')}}
+                {{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Callgroups')}}</a> {{$t('to manage {target}', {target: $t('dialplans')})}}.
+            </em>
         </div>
 
         <Field name="owner" type="select" v-if="available !== 'no'"

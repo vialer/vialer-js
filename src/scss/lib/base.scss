@@ -62,6 +62,7 @@ video {
 .hide {display: none;}
 
 .list-items {
+    background: lighten($grey-color-lighter, 1%);
 
     .list-item {
         display: flex;
@@ -89,22 +90,17 @@ video {
             }
         }
 
+        &:nth-child(even) {background: $grey-color-lightest;}
+        &:nth-child(odd) {background: $grey-color-lighter;}
+
         &:hover {
             &:nth-child(even) {background: lighten($grey-color-lightest, 1%);}
             &:nth-child(odd) {background: lighten($grey-color-lighter, 1%);}
         }
 
-        &:nth-child(even) {background: $grey-color-lightest;}
-        &:nth-child(odd) {background: $grey-color-lighter;}
-
-        .icon i {color: $grey-color;}
-        .icon.busy i {color: $red-color;}
-        .icon.available i {color: $green-color;}
-
-        // Ringing state is a css keyframe animation.
-        .icon.ringing i {
-            transition-timing-function: ease;
-            animation: ringing 1.5s linear infinite;
+        .list-item-options {
+            display: flex;
+            align-items: center;
         }
 
         .rounded-button {
@@ -114,10 +110,11 @@ video {
             height: $spacer * 4;
             text-align: center;
             line-height: 32px;
-            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
 
             &:hover {
-                color: $brand-color;
+                background: $brand-color;
+                color: #fff;
                 cursor: pointer;
             }
 
@@ -129,42 +126,11 @@ video {
     }
 }
 
-
-.call-actions {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-self: flex-start;
-
-    .action {
-        margin: $spacer;
-        box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);
-
-        &.decline {
-            color: $white;
-            background: $red-color;
-
-            &.disabled {
-                background: $grey-color;
-
-                &:hover {
-                    cursor: not-allowed;
-                }
-            }
+.decorated-list {
+    li {
+        &::before {
+            content: "• ";
+            color: $brand-color;
         }
-
-        &.accept {
-            color: $white;
-            background: $green-color;
-            &:hover {background: darken($green-color, 3%);}
-        }
-
-        &.dial {
-            color: $white;
-            background: $green-color;
-            &:hover {background: darken($green-color, 3%);}
-        }
-
-
     }
 }

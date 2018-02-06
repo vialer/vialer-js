@@ -45,6 +45,9 @@ class App extends Skeleton {
     }
 
 
+    /**
+    * Vue-friendly object operations.
+    */
     __mergeState({action, path, persist, state}) {
         if (path) {
             path = path.split('/')
@@ -56,7 +59,11 @@ class App extends Skeleton {
             } else if (action === 'delete') {
                 const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
                 Vue.delete(_ref, path[path.length - 1])
+            } else if (action === 'replace') {
+                const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
+                Vue.set(_ref, path[path.length - 1], state)
             }
+
         } else {
             this.__mergeDeep(this.state, state)
         }
@@ -90,68 +97,13 @@ class App extends Skeleton {
         }
 
         Object.assign(state, {
-            availability: {
-                available: 'yes',
-                destinations: [],
-                placeholder: {
-                    id: null,
-                    name: null,
-                },
-                selected: {
-                    id: null,
-                    name: null,
-                },
-                sud: null, // This is a fixed id used to build the API endpoint for selected userdestination.
-            },
             dialpad: {
                 dialNumber: '',
             },
             notifications: [],
-            queues: {
-                queues: [],
-                selected: {id: null},
-            },
-            settings: {
-                click2dial: {
-                    blacklist: [],
-                    enabled: true,
-                },
-                platform: {
-                    enabled: true,
-                    url: process.env.PLATFORM_URL,
-                },
-                ringtones: {
-                    options: [
-                        {id: 1, name: 'default.ogg'},
-                    ],
-                    selected: {id: 1, name: 'default.ogg'},
-                },
-                sipEndpoint: process.env.SIP_ENDPOINT,
-                telemetry: {
-                    analyticsId: process.env.ANALYTICS_ID,
-                    clientId: null,
-                    enabled: false,
-                },
-                webrtc: {
-                    enabled: false,
-                    password: '',
-                    sinks: {
-                        input: {id: '', name: ''},
-                        output: {id: '', name: ''},
-                    },
-                    username: '',
-                },
-            },
             ui: {
                 layer: 'login',
                 visible: false,
-            },
-            user: {
-                authenticated: false,
-                language: 'nl',
-                password: '',
-                token: null,
-                username: null,
             },
         })
 
@@ -168,12 +120,12 @@ class App extends Skeleton {
         let _state = this._initialState()
         Object.assign(_state, {
             availability: _state.availability,
+            calls: _state.calls,
             contacts: _state.contacts,
             queues: _state.queues,
             settings: {
                 webrtc: _state.settings.webrtc,
             },
-            sip: _state.sip,
             ui: {layer: 'login'},
             user: _state.user,
         })

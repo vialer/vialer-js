@@ -25,7 +25,7 @@ module.exports = (app) => {
             callContact: function(contact) {
                 // Only make the call when there is currently no call going on.
                 if (!this.calls.length) {
-                    app.emit('bg:sip:call', {number: contact.number})
+                    app.emit('bg:calls:call', {number: contact.number})
                 }
             },
         }, app.utils.sharedMethods()),

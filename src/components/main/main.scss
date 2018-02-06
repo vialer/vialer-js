@@ -34,5 +34,20 @@
                 font-size: 1rem;
             }
         }
+
+        .platform-hint {
+            background: $grey-color-lightest;
+            color: $primary-color;
+            position: relative;
+            padding: $spacer $spacer * 3;
+            font-size: 0.9rem;
+
+            &::before {
+                // Change me when changing ``.icon-info`.
+                content: "\e91a";
+                font-family: 'vialer-js';
+                color: $brand-color;
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ module.exports = (app) => {
                 return classes
             },
             setActiveCall: function(call) {
-                app.emit('bg:sip:call_activate', {
+                app.emit('bg:calls:call_activate', {
                     callId: call.id,
                     holdInactive: false,
                     unholdActive: false,

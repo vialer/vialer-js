@@ -44,12 +44,28 @@ class AvailabilityModule {
     }
 
 
+    _initialState() {
+        return {
+            available: 'yes',
+            destinations: [],
+            placeholder: {
+                id: null,
+                name: null,
+            },
+            selected: {
+                id: null,
+                name: null,
+            },
+            sud: null, // This is a fixed id used to build the API endpoint for selected userdestination.
+        }
+    }
+
 
     /**
     * Do an API request to get an update of the available userdestination
     * options when the module is loaded in the background.
     */
-    async getApiData() {
+    async _platformData() {
         const res = await this.app.api.client.get('api/userdestination/')
 
         if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {

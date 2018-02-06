@@ -18,11 +18,11 @@ module.exports = (app) => {
         },
         methods: {
             callAnswer: function(call) {
-                app.emit('bg:sip:call_answer', {callId: call.id})
+                app.emit('bg:calls:call_answer', {callId: call.id})
             },
             callTerminate: function(call) {
                 if (this.transferActive) return
-                app.emit('bg:sip:call_terminate', {callId: call.id})
+                app.emit('bg:calls:call_terminate', {callId: call.id})
             },
             classes: function(block) {
                 let classes = {}
@@ -35,24 +35,24 @@ module.exports = (app) => {
             },
             dial: function(number) {
                 if (!number) return
-                app.emit('bg:sip:call', {number: number})
+                app.emit('bg:calls:call', {number: number})
             },
             holdToggle: function() {
-                app.emit('bg:sip:hold_toggle', {callId: this.call.id})
+                app.emit('bg:calls:hold_toggle', {callId: this.call.id})
             },
             keypadToggle: function() {
                 if (this.transferActive) return
                 app.setState({keypad: {active: !this.call.keypad.active}}, {path: `calls/calls/${this.call.id}`})
             },
             transferFinalize: function() {
-                app.emit('bg:sip:transfer_finalize', {callId: this.call.id})
+                app.emit('bg:calls:transfer_finalize', {callId: this.call.id})
             },
             transferMode: function(type) {
                 if (this.transferStatus !== 'select') return
-                app.setState({transfer: {type}}, {path: `sip/calls/${this.call.id}`})
+                app.setState({transfer: {type}}, {path: `calls/calls/${this.call.id}`})
             },
             transferToggle: function() {
-                app.emit('bg:sip:transfer_toggle', {callId: this.call.id})
+                app.emit('bg:calls:transfer_toggle', {callId: this.call.id})
             },
         },
         props: {

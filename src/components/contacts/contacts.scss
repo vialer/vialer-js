@@ -26,5 +26,11 @@
                 animation: ringing 1.5s linear infinite;
             }
         }
+
+        // Ringing state is a css keyframe animation.
+        .icon.ringing i {
+            transition-timing-function: ease;
+            animation: ringing 1.5s linear infinite;
+        }
     }
 }

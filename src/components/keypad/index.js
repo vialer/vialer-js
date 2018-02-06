@@ -46,7 +46,7 @@ module.exports = (app) => {
                 if (!this.number) return
                 // Only create a new call when the keypad is used without
                 // existing call; otherwise we initiate a transfer.
-                if (!this.call) app.emit('bg:sip:call', {number: this.number})
+                if (!this.call) app.emit('bg:calls:call', {number: this.number})
                 else this.transferActivate(this.number)
 
             },
@@ -60,7 +60,7 @@ module.exports = (app) => {
                 keyTone.play(key)
                 let newVal = sanitizeNumber(`${this.number}${key}`)
                 if (newVal) this.$emit('update:model', newVal)
-                if (this.call) app.emit('bg:sip:dtmf', {callId: this.call.id, key})
+                if (this.call) app.emit('bg:calls:dtmf', {callId: this.call.id, key})
             },
             removeLastNumber: function() {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))

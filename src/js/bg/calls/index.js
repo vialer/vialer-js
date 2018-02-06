@@ -30,34 +30,17 @@ class CallsModule extends Module {
         // // Start with a clean state.
         this.app.setState({calls: this._defaultState()})
 
-        this.app.on('bg:sip:call', ({number}) => {
-            this.createCall(number, {active: true})
-        })
-
-
-        this.app.on('bg:sip:call_answer', ({callId}) => {
-            this.calls[callId].answer()
-        })
-
-
-        // Self-initiated request to stop the session during one of
-        // the phases of a call.
-        this.app.on('bg:sip:call_terminate', ({callId}) => {
-            this.calls[callId].terminate()
-        })
-
-
-        this.app.on('bg:sip:call_activate', ({callId, holdInactive, unholdActive}) => {
+        this.app.on('bg:calls:connect', () => this.connect())
+        this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
+        this.app.on('bg:calls:call', ({number}) => this.createCall(number, {active: true}))
+        this.app.on('bg:calls:call_answer', ({callId}) => this.calls[callId].answer())
+        this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
+        this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
             this.setActiveCall(this.calls[callId], holdInactive, unholdActive)
         })
 
-
-        this.app.on('bg:sip:dtmf', ({callId, key}) => {
-            this.calls[callId].session.dtmf(key)
-        })
-
-
-        this.app.on('bg:sip:hold_toggle', ({callId}) => {
+        this.app.on('bg:calls:dtmf', ({callId, key}) => this.calls[callId].session.dtmf(key))
+        this.app.on('bg:calls:hold_toggle', ({callId}) => {
             if (!this.calls[callId].state.hold) this.calls[callId].hold()
             else {
                 this.calls[callId].unhold()
@@ -83,10 +66,10 @@ class CallsModule extends Module {
         * Situation: Caller A and B are connected. B is also connected to
         * caller C. B and C will directly connect to each other in case of
         * a blind transfer. An attended transfer needs to call
-        * the `sip:transfer_finalize` listener afterwards.
+        * the `calls:transfer_finalize` listener afterwards.
         * @param {Object} options - Options.
         */
-        this.app.on('bg:sip:transfer_activate', ({callId, number}) => {
+        this.app.on('bg:calls:transfer_activate', ({callId, number}) => {
             this.calls[callId].transfer(number, this.calls[callId].state.transfer.type)
         })
 
@@ -95,7 +78,7 @@ class CallsModule extends Module {
         *
         * @param {String} callId - The call id of the call to transfer to.
         */
-        this.app.on('bg:sip:transfer_finalize', ({callId}) => {
+        this.app.on('bg:calls:transfer_finalize', ({callId}) => {
             // Find origin.
             let sourceCall
             for (const _callId of Object.keys(this.calls)) {
@@ -111,7 +94,7 @@ class CallsModule extends Module {
          * Toggle hold for the call that needs to be transferred. Set
          * transfer mode to active for this call.
          */
-        this.app.on('bg:sip:transfer_toggle', ({callId}) => {
+        this.app.on('bg:calls:transfer_toggle', ({callId}) => {
             const callIds = Object.keys(this.calls)
             if (!this.calls[callId].state.transfer.active) {
                 // Start by holding the current call when switching on transfer.
@@ -140,16 +123,6 @@ class CallsModule extends Module {
                     }
                 }
             }
-        })
-
-
-        this.app.on('bg:sip:connect', () => {
-            this.connect()
-        })
-
-
-        this.app.on('bg:sip:disconnect', ({reconnect}) => {
-            this.disconnect(reconnect)
         })
     }
 
@@ -215,9 +188,7 @@ class CallsModule extends Module {
         }
 
         this.app.setState({calls: {ua: {state: 'disconnected'}}})
-
         this.ua = new this.lib.UA(uaOptions)
-
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
@@ -248,6 +219,7 @@ class CallsModule extends Module {
 
 
         this.ua.on('connected', () => {
+            console.log("CONNECTED")
             this.app.setState({calls: {ua: {state: 'connected'}}})
             this.app.logger.info(`${this}ua connected`)
         })
@@ -365,6 +337,8 @@ class CallsModule extends Module {
             wsServers: [`wss://${settings.sipEndpoint}`],
         }
 
+        console.log(uaOptions)
+
         // Log in with the WebRTC voipaccount when it is enabled.
         // The voipaccount should be from the same client as the logged-in
         // user, or subscribe information won't work.
@@ -377,7 +351,7 @@ class CallsModule extends Module {
             // Login with platform email without SIP register.
             uaOptions.authorizationUser = this.app.state.user.username
             // Use the platform user token when logging in; not the password.
-            uaOptions.password = this.app.state.user.token
+            uaOptions.password = this.app.state.user.platform.tokens.sip
             uaOptions.register = false
             uaOptions.uri = `sip:${this.app.state.user.username}`
         }
