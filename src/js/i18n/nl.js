@@ -40,6 +40,7 @@ global.translations.nl = {
     'Select a ringtone': 'Selecteer een beltoon',
     'Select an input device': 'Selecteer een invoerapparaat',
     'Select an output device': 'Selecteer een uitvoerapparaat',
+    'Setting your availability only has effect when your platform user is part of the phonenumber\'s involved dialplan.': 'Je beschikbaarheid aanpassen heeft alleen effect wanneer je platform gebruiker onderdeel is van het gebelde nummer\'s belplan.',
     'Settings': 'Instellingen',
     'Settings stored': 'Instellingen opgeslagen',
     'SIP Server': 'SIP Server',

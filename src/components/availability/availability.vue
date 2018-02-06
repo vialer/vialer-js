@@ -1,5 +1,4 @@
 <div class="availability-component">
-
     <div class="panel-content">
         <h1>{{$t('Availability')}}</h1>
 
@@ -15,6 +14,7 @@
                     {{$t('No')}}
                 </label>
             </div>
+            <em class="help">{{$t('Setting your availability only has effect when your platform user is part of the phonenumber\'s involved dialplan.')}}</em>
         </div>
 
         <Field name="owner" type="select" v-if="available !== 'no'"
@@ -27,5 +27,4 @@
             :options="destinations"
             :placeholder="$t('Select a destination')"/>
     </div>
-
 </div>

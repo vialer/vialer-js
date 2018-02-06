@@ -5,19 +5,18 @@
     flex-direction: column;
     max-width: $max-popup-width;
     position: relative;
+    min-height: 260px;
 
     .panel {
         flex: 1 1 auto;
         overflow: auto;
         display: flex;
         position: relative;
-        min-height: 224px;
 
         .panel-content-container {
             width: 100%;
             margin-top: $spacer * 5;
             overflow: auto;
-            max-height: calc(100% - 140px);
 
             &.with-sidebar {
                 margin-left: $spacer * 5;

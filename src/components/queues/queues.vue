@@ -1,4 +1,4 @@
-<div class="queues-component no-padding" :class="widgetState">
+<div class="queues-component no-padding">
 
     <div class="panel-content">
         <h1>{{$t('Queues')}}</h1>
@@ -7,7 +7,7 @@
     <ul class="list-items">
         <li class="list-item queue" :class="{selected: selected.id == queue.id}" v-for="queue in queues" v-on:click="toggleActiveQueue(queue)">
             <div class="status-icon">
-                <i class="indicator">{{queue.queue_size}}</i>
+                <i class="indicator" :class="classesQueue(queue)">{{queue.queue_size}}</i>
             </div>
             <div class="info">
                 <div class="name">{{queue.description}}</div>

@@ -1,3 +1,5 @@
+@import "bulma/sass/utilities/initial-variables";
+
 // Paths.
 $font-path: "../fonts";
 
@@ -23,10 +25,13 @@ $grey-color-lighter: lighten($grey-color, 35%);
 $grey-color-lightest: lighten($grey-color, 38%);
 
 // Shared (Bulma)
+$warning: $orange-color;
+$yellow-color: $yellow;
+
 $white: #fff;
 $success: $green-color;
 $danger: $red-color;
-$warning: $orange-color;
+
 $primary: $brand-color;
 $link: $brand-color;
 $family-primary: "Roboto";

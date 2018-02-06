@@ -6,8 +6,8 @@
         &:hover {
             cursor: pointer;
         }
+
         &.selected {
-            // border: 1px solid $brand-variation-color;
             &::after {
                 position: absolute;
                 right: 0;
@@ -31,7 +31,6 @@
                 display: inline-block;
                 width: $spacer * 3;
                 height: $spacer * 3;
-                background: $red-color;
                 line-height: $spacer * 3;
                 letter-spacing: 0;
                 // Centers the icon in the middle of the background.
@@ -40,6 +39,11 @@
                 font-weight: 500;
                 border-radius: 100%;
                 color: $white;
+
+                &.quiet {background: $green-color;}
+                &.moderate {background: $yellow-color;}
+                &.busy {background: $orange-color;}
+                &.hectic {background: $red-color;}
             }
         }
     }

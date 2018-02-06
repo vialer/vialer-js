@@ -14,14 +14,10 @@ class QueuesModule {
             app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
 
             if (this.app.env.isExtension) {
-                if (queue) {
-                    browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
-                } else {
-                    browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
-                }
+                if (queue) browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
+                else browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
             }
         })
-        // this.setQueueSizesTimer()
     }
 
 
