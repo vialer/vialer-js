@@ -13,38 +13,29 @@ class BackgroundApp extends App {
     constructor(options) {
         options.environment = env
         super(options)
-        this.api = new Api(this)
+
+        // Clear all state if the schema changed after a plugin update.
+        if (!this.store.validSchema()) {
+            this.store.remove('state')
+            // Do a hard reload; nothing to save from there.
+            location.reload()
+        }
+
         this.timer = new Timer(this)
 
-        // A state object that can be mutated across instances
-        // using {app_name}:set_state and {app_name}:get_state emitters.
-        this.on('bg:get_state', (data) => {
-            // Send this script's state back to the requesting script.
-            data.callback(this.state)
-        })
-
-        /**
-        * Syncs state from the foreground to the background
-        * while keeping Vue's reactivity system happy.
-        */
+        // Send this script's state back to the requesting script.
+        this.on('bg:get_state', (data) => data.callback(this.state))
+        this.on('bg:refresh_api_data', this.getModuleApiData.bind(this))
         this.on('bg:set_state', this.__mergeState.bind(this))
-
-        this.on('bg:refresh_api_data', (data) => {
-            this.getModuleApiData()
-        })
 
         this.loadModules()
         this.initStore()
-        // Continue last session if credentials are available.
+
+        this.api = new Api(this)
+        this.telemetry = new Telemetry(this)
+
         this.api.setupClient(this.state.user.username, this.state.user.password)
-
-
-        // Clears localstorage if the schema changed after a plugin update.
-        if (!this.store.validSchema()) {
-            this.modules.user.logout()
-            return
-        }
-
+        // Continue last session if credentials are available.
         if (this.state.user.authenticated) {
             this.logger.info(`${this}assume authentication with existing credentials`)
             this.getModuleApiData()
@@ -75,8 +66,6 @@ class BackgroundApp extends App {
                 })
             })
         }
-
-        this.emit('bg:popup-opened')
     }
 
 
@@ -101,13 +90,6 @@ class BackgroundApp extends App {
     initStore() {
         super.initStore()
         let stateObj = this.store.get('state')
-
-        // Clear localstorage if the data schema changed.
-        if (!this.store.validSchema() && stateObj) {
-            this.modules.user.logout()
-            return
-        }
-
         if (stateObj) {
             Object.assign(this.state, stateObj)
             for (let module of Object.keys(this.modules)) {
@@ -118,7 +100,6 @@ class BackgroundApp extends App {
         } else Object.assign(this.state, this._initialState())
 
         this.initViewModel()
-        this.telemetry = new Telemetry(this)
     }
 
 

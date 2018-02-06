@@ -14,10 +14,12 @@ class AvailabilityModule {
         * Notify the VoIPGRID API about the availability change and set
         * the background state to the new situation.
         */
-        this.app.on('bg:update-availability', async({destination, destinations}) => {
-            const res = await this.app.api.client.put(`api/selecteduserdestination/${this.app.state.availability.sud.id}/`, {
-                fixeddestination: destination.type === 'fixeddestination' ? destination.id : null,
-                phoneaccount: destination.type === 'phoneaccount' ? destination.id : null,
+        this.app.on('bg:update-availability', async({selected, destinations}) => {
+            this.app.setState({availability: {destinations, selected}}, {persist: true})
+
+            const res = await this.app.api.client.put(`api/selecteduserdestination/${this.app.state.availability.sud}/`, {
+                fixeddestination: selected.type === 'fixeddestination' ? selected.id : null,
+                phoneaccount: selected.type === 'phoneaccount' ? selected.id : null,
             })
 
             if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
@@ -28,7 +30,7 @@ class AvailabilityModule {
 
             // Set an icon depending on whether the user is available.
             let icon = 'img/icon-menubar-unavailable.png'
-            if (destination.id) {
+            if (selected.id) {
                 icon = 'img/icon-menubar-active.png'
             }
             this.app.state.availability.icon = icon
@@ -38,8 +40,6 @@ class AvailabilityModule {
                     browser.browserAction.setIcon({path: icon})
                 }
             }
-
-            this.app.setState({availability: {destination, destinations}}, {persist: true})
         })
     }
 
@@ -58,38 +58,28 @@ class AvailabilityModule {
         }
 
         // Lets format the data in a select-friendly way.
-        let userdestination = res.data.objects[0]
-        let sud = userdestination.selecteduserdestination
+        const userdestination = res.data.objects[0]
 
-        let fixeddestinations = userdestination.fixeddestinations
-        let phoneaccounts = userdestination.phoneaccounts
-        fixeddestinations = fixeddestinations.map(fd => ({id: parseInt(fd.id), name: `${fd.phonenumber} - ${fd.description}`, type: 'fixeddestination'}))
-        phoneaccounts = phoneaccounts.map(fd => ({id: parseInt(fd.id), name: `${fd.internal_number} - ${fd.description}`, type: 'phoneaccount'}))
+        let fixed = userdestination.fixeddestinations
+        let voip = userdestination.phoneaccounts
+        fixed = fixed.map(fd => ({id: parseInt(fd.id), name: `${fd.phonenumber} - ${fd.description}`, type: 'fixeddestination'}))
+        voip = voip.map(fd => ({id: parseInt(fd.id), name: `${fd.internal_number} - ${fd.description}`, type: 'phoneaccount'}))
 
         // The actual form data.
-        let destination = {id: null, name: null, type: null}
+        let selected = {id: null, name: null, type: null}
         let destinations = []
-        destinations = [...fixeddestinations, ...phoneaccounts]
+        destinations = [...fixed, ...voip]
 
-        if (sud.fixeddestination) {
-            destination = destinations.find((d) => d.id === sud.fixeddestination)
-        } else if (sud.phoneaccount) {
-            destination = destinations.find((d) => d.id === sud.phoneaccount)
-        }
+        const sud = userdestination.selecteduserdestination
+        if (sud.fixeddestination) selected = destinations.find((d) => d.id === sud.fixeddestination)
+        else if (sud.phoneaccount) selected = destinations.find((d) => d.id === sud.phoneaccount)
 
-        this.app.setState({
-            availability: {
-                destination,
-                destinations,
-                sud: {
-                    id: sud.id,
-                },
-            },
-        }, true)
+        let available = selected.id ? 'yes' : 'no'
+        this.app.setState({availability: {available, destinations, selected, sud: sud.id}}, true)
 
         // Set an icon depending on whether the user is available.
         let icon = 'img/icon-menubar-unavailable.png'
-        if (destination) icon = 'img/icon-menubar-active.png'
+        if (selected.id) icon = 'img/icon-menubar-active.png'
 
         if (this.app.env.isExtension) {
             this.app.logger.info(`${this}setting icon ${icon}`)

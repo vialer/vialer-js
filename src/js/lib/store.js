@@ -5,7 +5,7 @@ class Store {
 
     constructor(app) {
         this.app = app
-        this.dbSchema = '1.0'
+        this.dbSchema = '3.0'
     }
 
 

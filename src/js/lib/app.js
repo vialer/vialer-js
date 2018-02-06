@@ -92,12 +92,16 @@ class App extends Skeleton {
         Object.assign(state, {
             availability: {
                 available: 'yes',
-                destination: {
+                destinations: [],
+                placeholder: {
                     id: null,
                     name: null,
                 },
-                destinations: [],
-                sud_id: null,
+                selected: {
+                    id: null,
+                    name: null,
+                },
+                sud: null, // This is a fixed id used to build the API endpoint for selected userdestination.
             },
             dialpad: {
                 dialNumber: '',
@@ -161,7 +165,7 @@ class App extends Skeleton {
     * @returns {Object} Stripped state.
     */
     _resetState() {
-        let _state = this._defaultState()
+        let _state = this._initialState()
         Object.assign(_state, {
             availability: _state.availability,
             contacts: _state.contacts,

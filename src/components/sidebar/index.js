@@ -17,6 +17,7 @@ module.exports = (app) => {
         render: templates.sidebar.r,
         staticRenderFns: templates.sidebar.s,
         store: {
+            calls: 'calls.calls',
             layer: 'ui.layer',
             user: 'user',
         },

@@ -87,7 +87,7 @@ module.exports = (app) => {
                     // We sync an object as vmodel.
                     if (options) {
                         for (const option of options) {
-                            if (option.id === value) {
+                            if (String(option.id) === String(value)) {
                                 this.$emit('update:model', option)
                             }
                         }

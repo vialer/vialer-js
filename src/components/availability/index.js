@@ -5,24 +5,27 @@ module.exports = (app, actions) => {
         staticRenderFns: templates.availability.s,
         store: {
             available: 'availability.available',
-            destination: 'availability.destination',
             destinations: 'availability.destinations',
+            placeholder: 'availability.placeholder',
+            selected: 'availability.selected',
         },
         watch: {
             available: function(newVal, oldVal) {
                 let newDestination = {id: null, name: null, type: null}
-                if (newVal === 'yes') newDestination = this.destination
-
-                this.destination = newDestination
+                if (newVal === 'yes') {
+                    newDestination = this.placeholder
+                }
                 app.emit('bg:update-availability', {
-                    destination: newDestination,
                     destinations: this.destinations,
+                    selected: newDestination,
                 })
+
             },
-            destination: function(newVal, oldVal) {
+            selected: function(newVal, oldVal) {
+                this.placeholder = {id: this.selected.id, name: this.selected.name}
                 app.emit('bg:update-availability', {
-                    destination: this.destination,
                     destinations: this.destinations,
+                    selected: this.selected,
                 })
             },
         },
