@@ -11,7 +11,7 @@ class QueuesModule extends Module {
     */
     constructor(...args) {
         super(...args)
-
+        
         this.app.timer.registerTimer('bg:queues:size', () => {this._platformData(true)})
         this.app.on('bg:queues:selected', ({queue}) => {
             this.app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
@@ -20,6 +20,7 @@ class QueuesModule extends Module {
                 if (queue) browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
                 else browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
             }
+            this.setQueueSizesTimer()
         })
     }
 
@@ -59,6 +60,7 @@ class QueuesModule extends Module {
         }
 
         this.app.setState({queues: {queues: queues, state: null}}, {persist: true})
+        this.setQueueSizesTimer()
     }
 
 
@@ -74,10 +76,12 @@ class QueuesModule extends Module {
             if (this.app.state.user.authenticated) {
                 // Check every 20s when a queue is selected, no matter
                 // if the popup is opened or closed.
-                if (this.app.state.queues.selected.id) timeout = 20000
-                // Check more regularly when the popup is open and the
-                // queues widget is open.
-                if (this.app.state.ui.visible) timeout = 5000
+                if (this.app.state.queues.selected.id) {
+                    timeout = 20000
+                    // Check more regularly when the popup is open and the
+                    // queues widget is open.
+                    if (this.app.state.ui.visible) timeout = 5000
+                }
             }
             this.app.logger.debug(`${this}set queue timer to ${timeout} ms`)
             return timeout

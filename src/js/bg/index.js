@@ -47,8 +47,11 @@ class BackgroundApp extends App {
         }
 
         if (this.env.isExtension) {
+            this.setState({ui: {visible: false}})
+
             // Fired when the popup opens..
             browser.runtime.onConnect.addListener((port) => {
+                this.setState({ui: {visible: true}})
                 for (let moduleName of Object.keys(this.modules)) {
                     if (this.modules[moduleName]._onPopupAction) {
                         this.modules[moduleName]._onPopupAction('open')
@@ -69,6 +72,7 @@ class BackgroundApp extends App {
             // There is no concept of a popup without an extension.
             // Nevertheless we still trigger the event to start timers
             // and such that rely on the event.
+            this.setState({ui: {visible: true}})
             for (let moduleName of Object.keys(this.modules)) {
                 if (this.modules[moduleName]._onPopupAction) {
                     this.modules[moduleName]._onPopupAction('open')
