@@ -40,6 +40,8 @@ class QueuesModule extends Module {
 
 
     async _platformData(silent = false) {
+        // Only when authenticated.
+        if (!this.app.state.user.authenticated) return
         if (!silent) this.app.setState({queues: {queues: [], state: 'loading'}})
 
         const res = await this.app.api.client.get('api/queuecallgroup/')

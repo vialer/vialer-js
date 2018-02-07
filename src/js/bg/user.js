@@ -93,6 +93,9 @@ class UserModule extends Module {
         // Disconnect without reconnect attempt.
         this.app.modules.calls.disconnect(false)
         this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('You are logged out'), type: 'success'})
+        if (this.app.env.isExtension) {
+            browser.browserAction.setIcon({path: '/img/icon-menubar-inactive.png'})
+        }
     }
 
 
