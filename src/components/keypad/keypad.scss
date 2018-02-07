@@ -5,62 +5,10 @@
     width: 100%;
     margin-bottom: $spacer * 2;
 
-    .number-input-match {
+    .contacts-match {
         font-weight: 500;
         text-align: center;
-    }
-
-    .dense-number-input {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        margin-bottom: $spacer * 2;
-
-        input {
-            border: 1px solid $white;
-            border-top-left-radius: $spacer / 2;
-            border-bottom-left-radius: $spacer / 2;
-            background: none;
-            font-size: 1.5rem;
-            color: $white;
-            text-align: right;
-            height: 40px;
-            width: 200px;
-            padding-right: $spacer;
-
-            &::placeholder {
-                color: $white;
-            }
-        }
-
-        i {
-            background: $white;
-            color: $brand-variation-color;
-            height: 40px;
-            width: 40px;
-            border: 1px solid $white;
-            border-left: 0;
-            border-top-right-radius: $spacer / 2;
-            border-bottom-right-radius: $spacer / 2;
-            transition: all 300ms ease;
-
-            &:hover {
-                cursor: pointer;
-            }
-
-            &.disabled {
-                color: $grey-color-lighter;
-                background: $brand-variation-color;
-                cursor: not-allowed;
-                border: 1px solid $brand-variation-color;
-            }
-        }
-
-        & + .number-input-match {
-            color: $white;
-            height: $spacer * 3;
-            line-height: $spacer * 3;
-        }
+        height: $spacer * 3;
     }
 
     .number-input {
@@ -70,41 +18,91 @@
         align-items: center;
         position: relative;
 
-        input {
-            @include no-outline;
-            border: 0;
-            width: 100%;
-            height: $spacer * 6;
-            font-size: 1.8rem;
-            font-weight: 500;
-            text-align: center;
-            padding: 0 40px;
-            background: transparent;
-            color: $brand-color;
-        }
+        &.dense {
+            flex-direction: row;
+            margin-bottom: $spacer;
 
-        i {
-            font-size: 1.8rem;
-            height: 60px;
-            line-height: 55px;
-            vertical-align: center;
-            position: absolute;
-            right: 10px;
+            input {
+                border: 1px solid $white;
+                border-top-left-radius: $spacer / 2;
+                border-bottom-left-radius: $spacer / 2;
+                background: none;
+                font-size: 1.5rem;
+                color: $white;
+                text-align: right;
+                height: 40px;
+                width: 200px;
+                padding-right: $spacer;
 
-            &:hover {
-                cursor: pointer;
+                &::placeholder {
+                    color: $white;
+                }
+            }
+
+            i {
+                background: $white;
+                color: $brand-variation-color;
+                height: 40px;
+                width: 40px;
+                border: 1px solid $white;
+                border-left: 0;
+                border-top-right-radius: $spacer / 2;
+                border-bottom-right-radius: $spacer / 2;
+                transition: all 300ms ease;
+
+                &:hover {
+                    cursor: pointer;
+                }
+
+                &.disabled {
+                    color: $grey-color-lighter;
+                    background: $brand-variation-color;
+                    cursor: not-allowed;
+                    border: 1px solid $brand-variation-color;
+                }
+            }
+
+            & + .number-input-match {
+                color: $white;
+                height: $spacer * 3;
+                line-height: $spacer * 3;
             }
         }
 
-        & + .number-input-match {
-            color: $grey-color-darker;
-            height: $spacer * 5;
-            line-height: $spacer * 5;
+        &.touch {
+            input {
+                @include no-outline;
+                border: 0;
+                width: 100%;
+                height: $spacer * 6;
+                font-size: 1.8rem;
+                font-weight: 500;
+                text-align: center;
+                padding: 0 40px;
+                background: transparent;
+                color: $brand-color;
+            }
+
+            i {
+                font-size: 1.8rem;
+                height: 60px;
+                line-height: 55px;
+                vertical-align: center;
+                position: absolute;
+                right: 10px;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
+            & + .number-input-match {
+                color: $grey-color-darker;
+                height: $spacer * 5;
+                line-height: $spacer * 5;
+            }
         }
     }
-
-
-
 
     .keys {
         display: flex;
@@ -113,6 +111,7 @@
         flex-wrap: wrap;
         align-content: center;
         width: 100%;
+        margin-top: $spacer;
 
         .row {
             display: flex;

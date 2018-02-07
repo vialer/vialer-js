@@ -4,32 +4,19 @@ const Call = require('./index')
 * Call flow wrapper around SipJS which enables incoming and outgoing
 * calls using WebRTC.
 */
-class CallWebRTC extends Call {
+class CallSip extends Call {
 
     constructor(module, callTarget, options) {
         super(module, callTarget, options)
-
-        if (callTarget.hasOwnProperty('acceptAndTerminate')) {
+        // Handle three cases: incoming call; outgoing call (instant start) and
+        // delayed outgoing call.
+        if (!callTarget) Object.assign(this.state, {status: 'new', type: 'outgoing'})
+        else if (['string', 'number'].includes(typeof callTarget)) {
+            Object.assign(this.state, {number: callTarget, status: 'create', type: 'outgoing'})
+        } else {
             Object.assign(this.state, {status: 'invite', type: 'incoming'})
             this.session = callTarget
-        } else {
-            Object.assign(this.state, {status: 'create', type: 'outgoing'})
         }
-
-        if (this.silent) {
-            if (this.state.status === 'invite') this._handleIncoming(callTarget)
-            else this._handleOutgoing(callTarget)
-            return
-        }
-        // Query media and assign the stream. The actual permission must be
-        // already granted from a foreground script running in a tab.
-        this.hasMedia = this._initMedia().then((stream) => {
-            this._sessionOptions.media.stream = stream
-            this.stream = stream
-
-            if (this.state.status === 'invite') this._handleIncoming(callTarget)
-            else this._handleOutgoing(callTarget)
-        })
     }
 
 
@@ -72,7 +59,6 @@ class CallWebRTC extends Call {
     _handleIncoming() {
         this.setState({
             displayName: this.session.remoteIdentity.displayName,
-            id: this.session.id,
             number: this.session.remoteIdentity.uri.user,
         })
 
@@ -117,25 +103,25 @@ class CallWebRTC extends Call {
     * Setup an outgoing call.
     * @param {(Number|String)} number - The number to call.
     */
-    _handleOutgoing(number) {
-        this.session = this.ua.invite(`sip:${number}@voipgrid.nl`, this._sessionOptions)
-
-        let stateUpdate = {id: this.session.id, number: number}
-        // The ua's displayName is empty for outgoing calls. Try to match it from contacts.
-        const contacts = this.app.state.contacts.contacts
-        for (const id of Object.keys(contacts)) {
-            if (contacts[id].number === parseInt(number)) {
-                stateUpdate.displayName = contacts[id].name
-            }
-        }
-
-        this.setState(stateUpdate)
-        // Notify user about the new call being setup.
-
-        this.session.on('accepted', (data) => {
+    _handleOutgoing() {
+        this.session = this.ua.invite(`sip:${this.state.number}@voipgrid.nl`, this._sessionOptions)
+        if (!this.silent) {
             // Always set this call to be the active call as soon a new
             // connection has been made.
             this.module.setActiveCall(this, true)
+        }
+
+
+        // The ua's displayName is empty for outgoing calls. Try to match it from contacts.
+        const contacts = this.app.state.contacts.contacts
+        for (const id of Object.keys(contacts)) {
+            if (contacts[id].number === parseInt(this.number)) {
+                this.setState({displayName: contacts[id].name})
+            }
+        }
+
+        // Notify user about the new call being setup.
+        this.session.on('accepted', (data) => {
             this.ringbackTone.stop()
 
             this.localVideo.srcObject = this.stream
@@ -164,9 +150,7 @@ class CallWebRTC extends Call {
 
 
         // Blind transfer.
-        this.session.on('refer', (target) => {
-            this.session.bye()
-        })
+        this.session.on('refer', (target) => this.session.bye())
 
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (e) => {
@@ -212,6 +196,23 @@ class CallWebRTC extends Call {
     }
 
 
+    start() {
+        if (this.silent) {
+            if (this.state.status === 'invite') this._handleIncoming()
+            else this._handleOutgoing()
+        } else {
+            // Query media and assign the stream. The actual permission must be
+            // already granted from a foreground script running in a tab.
+            this.hasMedia = this._initMedia().then((stream) => {
+                this._sessionOptions.media.stream = stream
+                this.stream = stream
+                if (this.state.status === 'invite') this._handleIncoming()
+                else this._handleOutgoing()
+            })
+        }
+    }
+
+
     /**
     * Hangup a call.
     */
@@ -237,14 +238,14 @@ class CallWebRTC extends Call {
             this.session.refer(`sip:${targetCall}@voipgrid.nl`)
         } else if (type === 'attended') {
             // Option is a session. Refer to it and hang up.
-            if (targetCall.constructor.name === 'CallWebRTC') {
+            if (targetCall.constructor.name === 'CallSip') {
                 this.session.refer(targetCall.session)
             } else {
                 // targetCall is a number. Create a new call and set the
                 // new call's transfer mode to accept.
-                let call = await this.module.createCall(targetCall, {active: true})
+                let call = this.module.startCall(null, targetCall, {active: true})
                 call.setState({transfer: {type: 'accept'}})
-                // Activate the new call's dialog.
+                // Activate the new call's dialog. Don't hold inactive.
                 this.module.setActiveCall(call, false)
             }
         }
@@ -257,4 +258,4 @@ class CallWebRTC extends Call {
     }
 }
 
-module.exports = CallWebRTC
+module.exports = CallSip

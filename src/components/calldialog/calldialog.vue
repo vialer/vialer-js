@@ -1,6 +1,6 @@
 <div class="calldialog-component" :class="classes('component')">
-    <!-- Call information during a call -->
-    <div class="call-info" v-if="!call.keypad.active">
+    <!-- Call information during a call. Hide when the keypad takes too muchs space. -->
+    <div class="call-info" v-if="(!call.keypad.active || call.keypad.display === 'dense') && !['new'].includes(call.status)">
         <div class="info-status">{{callStatus}}</div>
         <div class="info-number">{{call.number}}</div>
         <div class="info-name" v-if="call.displayName">{{call.displayName}}</div>
@@ -31,29 +31,38 @@
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="keypadToggle" :class="{active: call.keypad.active, disabled: transferActive}">
+            <div class="rounded-button" @click="keypadToggle" :class="classes('dialpad-button')">
                 <i class="icon icon-dialpad"></i>
             </div>
             <p>{{$t('keypad')}}</p>
         </div>
     </div>
 
-    <div class="transfer-options" v-if="call.transfer.active && ['accepted'].includes(call.status)">
+    <!-- Show attended/blind transfer option and a dense keypad when transfer is active and the call is still active -->
+    <div class="new-call" v-if="call.status === 'new'">
+        <Keypad :model.sync="call.keypad.number" :display="call.keypad.display" mode="call" :call="call"
+            :number="call.keypad.number" class="call-active"/>
+    </div>
+    <!-- Show only when transfer is active and the call is still active -->
+    <div class="transfer-options" v-else-if="call.transfer.active && ['accepted'].includes(call.status)">
         <div class="transfer-buttons">
-            <div class="transfer-button" :class="{active: call.transfer.type === 'attended'}" @click="transferMode('attended')">
+            <div class="transfer-button" :class="classes('attended-button')" @click="transferMode('attended')">
                 {{$t('Attended transfer')}}
             </div>
-            <div class="transfer-button" :class="{active: call.transfer.type === 'blind', disabled: transferStatus !== 'select'}" @click="transferMode('blind')">
+            <div class="transfer-button" :class="classes('blind-button')" @click="transferMode('blind')">
                 {{$t('Blind transfer')}}
             </div>
         </div>
         <div class="transfer-text">{{$t('To transfer select a contact or input a number.')}}</div>
-        <!-- Dense keypad when the user is in transfer mode. -->
-        <Keypad :model.sync="call.keypad.number" :search="true" :call="call" :dense="true" :number="call.keypad.number" class="transfer-keypad call-active"/>
+        <Keypad :model.sync="call.keypad.number" display="dense" :call="call" mode="call"
+            :number="call.keypad.number" class="call-active"/>
+    </div>
+    <!-- This keypad is used when creating a new call and when using dtmf on an existing call -->
+    <div class="new-call-options" v-else-if="call.keypad.active">
+        <Keypad :model.sync="call.keypad.number" :display="call.keypad.display" :mode="call.keypad.mode" :call="call"
+            :number="call.keypad.number" class="call-active"/>
     </div>
 
-    <!-- Full keypad when explicitly selecting the keypad. Does not co-exist with transfer mode. -->
-    <Keypad v-if="call.keypad.active" :search="false" :model.sync="call.keypad.number" :call="call" :number="call.keypad.number" :dtmf="true" class="call-active"/>
 
     <div class="call-actions">
         <div class="rounded-button action decline" v-if="!transferActive && ['accepted', 'create', 'invite'].includes(call.status) && !call.keypad.active" @click="callTerminate(call)">

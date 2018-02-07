@@ -10,7 +10,7 @@
          <i class="icon-queues"></i>
     </div>
 
-    <div class="option" :class="{active: layer === 'calldialog', hint: Object.keys(calls).length > 0}" @click="setLayer('calldialog')">
+    <div class="option" :class="{active: layer === 'calls', hint: Object.keys(calls).length > 0}" @click="setLayer('calls')">
          <i class="icon icon-dialpad"></i>
     </div>
 </div>

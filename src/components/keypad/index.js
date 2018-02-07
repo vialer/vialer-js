@@ -42,13 +42,13 @@ module.exports = (app) => {
             },
         },
         methods: Object.assign({
-            createCall: function() {
-                if (!this.number) return
-                // Only create a new call when the keypad is used without
-                // existing call; otherwise we initiate a transfer.
-                if (!this.call) app.emit('bg:calls:call', {number: this.number})
-                else this.transferActivate(this.number)
-
+            classes: function(block) {
+                let classes = {}
+                if (block === 'number-input') {
+                    classes['number-input'] = true
+                    classes[this.display] = true
+                }
+                return classes
             },
             inputChange: function(newVal) {
                 this.$emit('update:model', newVal)
@@ -60,10 +60,18 @@ module.exports = (app) => {
                 keyTone.play(key)
                 let newVal = sanitizeNumber(`${this.number}${key}`)
                 if (newVal) this.$emit('update:model', newVal)
-                if (this.call) app.emit('bg:calls:dtmf', {callId: this.call.id, key})
+                if (this.mode === 'dtmf') app.emit('bg:calls:dtmf', {callId: this.call.id, key})
             },
             removeLastNumber: function() {
                 this.$emit('update:model', this.number.substring(0, this.number.length - 1))
+            },
+            startCall: function() {
+                if (!this.number) return
+                // Only create a new call when the keypad is used without
+                // existing call; otherwise we initiate a transfer.
+                if (!this.call) app.emit('bg:calls:call', {number: this.number})
+                else this.transferActivate(this.number)
+
             },
             unpressKey: function() {
                 window.setTimeout(() => {
@@ -73,13 +81,17 @@ module.exports = (app) => {
         }, app.utils.sharedMethods()),
         props: {
             call: {default: null},
-            dense: {
-                default: false,
-                type: Boolean,
+            display: {
+                default: 'expanded',
+                type: String,
             },
             dtmf: {
                 default: false,
                 type: Boolean,
+            },
+            mode: {
+                default: 'call',
+                type: String,
             },
             number: {
                 default: '',

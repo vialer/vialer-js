@@ -53,7 +53,7 @@ class DialerTab extends Skeleton {
 
         this.frame = $('<iframe>', {
             scrolling: false,
-            src: browser.runtime.getURL(`webext_callstatus.html?bNumber=${bNumber}&status=${status}`),
+            src: browser.runtime.getURL(`index.html?bNumber=${bNumber}&status=${status}`),
             style: (function() {
                 // Can't set !important with
                 // .css("property", "value !important"),

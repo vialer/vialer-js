@@ -1,26 +1,19 @@
 <div class="keypad-component" tabindex="-1">
 
-    <div class="dense-number-input" v-if="dense">
+    <div :class="classes('number-input')">
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
-            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="createCall(number)"/>
-        <i class="icon icon-transfer" v-on:keyup.enter="keypadAction" @click="createCall(number)" :class="{'disabled': !number}"></i>
+            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="startCall(number)"/>
+        <i class="icon icon-transfer" :class="{'disabled': !number}" v-if="display ==='dense' && mode === 'call'"
+            v-on:keyup.enter="keypadAction" @click="startCall(number, true)"/>
+        <i class="fa fa-angle-double-left" @click="removeLastNumber" v-if="display === 'touch' && mode === 'call'"/>
     </div>
 
-    <div class="number-input" v-else>
-        <input type="text" ref="input" autofocus placeholder="..."
-            @keyup="unpressKey()" @keydown="pressKey($event.key)"
-            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="createCall(number)"/>
-        <i class="fa fa-angle-double-left" @click="removeLastNumber"></i>
+    <div class="contacts-match" v-if="mode === 'call'">
+        <span v-if="matchedContact">{{matchedContact.number}} - {{matchedContact.name}}</span>
     </div>
 
-    <div class="number-input-match" v-if="search">
-        <span v-if="matchedContact">
-            {{matchedContact.number}} - {{matchedContact.name}}
-        </span>
-    </div>
-
-    <div class="keys" v-if="!dense" v-on:keyup.enter="createCall(number)">
+    <div class="keys" v-if="display === 'touch'" v-on:keyup.enter="startCall(number)">
         <div class="row">
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('1')">1</button>
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('2')">2<div class="sub">ABC</div></button>
@@ -43,8 +36,8 @@
         </div>
     </div>
     <!-- Dial actions when not used in combination with a call. -->
-    <div class="call-actions" v-if="!call">
-        <div class="rounded-button action dial" @click="createCall(number)" :class="{'disabled': !number}">
+    <div class="call-actions" v-if="mode === 'call' && display === 'touch'">
+        <div class="rounded-button action dial" @click="startCall(number)" :class="{'disabled': !number}">
             <i class="icon icon-phone"></i>
         </div>
     </div>

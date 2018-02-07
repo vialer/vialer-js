@@ -12,21 +12,12 @@
 
         <template v-if="$store.user.authenticated">
             <SideBar class="panel-sidebar"/>
-
-            <div class="panel-content-container with-sidebar">
-                <Notifications class="with-sidebar"/>
-                <Availability v-if="$store.ui.layer==='availability'"/>
-                <Contacts v-else-if="$store.ui.layer==='contacts'"/>
-                <Queues v-else-if="$store.ui.layer==='queues'"/>
-                <Settings v-else-if="$store.ui.layer==='settings'" class="panel-content"/>
-                <template v-else-if="$store.ui.layer==='calldialog'">
-                    <CallDialog v-if="call.active" :call="call" v-for="call in $store.calls.calls" :key="call.id" class="panel-content"/>
-                    <!-- Keypad for dialing out is only visible when no calls are active yet -->
-                    <Keypad :model.sync="$store.calls.number" :search="true" :number="$store.calls.number" v-if="!Object.keys($store.calls.calls).length" class="panel-content no-call"/>
-                </template>
-            </div>
-
-            <CallSwitcher v-if="$store.ui.layer==='calldialog'"/>
+            <Notifications class="with-sidebar"/>
+            <Availability v-if="$store.ui.layer==='availability'" class="panel-content-container with-sidebar"/>
+            <Contacts v-else-if="$store.ui.layer==='contacts'" class="panel-content-container with-sidebar"/>
+            <Queues v-else-if="$store.ui.layer==='queues'" class="panel-content-container with-sidebar"/>
+            <Settings v-else-if="$store.ui.layer==='settings'" class="panel-content-container with-sidebar"/>
+            <Calls v-else-if="$store.ui.layer==='calls'" :calls="$store.calls.calls" class="panel-content-container with-sidebar"/>
         </template>
     </div>
 </div>

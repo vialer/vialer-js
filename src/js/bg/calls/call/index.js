@@ -15,17 +15,20 @@ class Call {
         // call's session id is known. This flag is used to indicate
         // when the state can be synced in `setState`.
         this._trackState = false
+        this.id = this.generateUUID()
 
         this.state = {
-            active: active,
+            active: false,
             displayName: null,
             hold: false,
-            id: null,
+            id: this.id,
             keypad: {
                 active: false,
-                number: '',
+                display: 'touch', // 'dense' or 'touch'
+                mode: 'dtmf', // 'call' or 'dtmf'
+                number: null,
             },
-            number: '',
+            number: null,
             silent: this.silent,
             status: null,
             timer: {
@@ -37,6 +40,11 @@ class Call {
                 type: 'attended',
             },
             type: null, // incoming or outgoing
+        }
+
+        if (!this.silent) {
+            Vue.set(this.app.state.calls.calls, this.id, this.state)
+            this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${this.id}`, state: this.state})
         }
     }
 
@@ -57,13 +65,24 @@ class Call {
         this.setState({keypad: {active: false}})
 
         window.setTimeout(() => {
-            delete this.app.state.calls.calls[this.session.id]
-            delete this.app.modules.calls.calls[this.session.id]
+            delete this.app.state.calls.calls[this.id]
+            delete this.app.modules.calls.calls[this.id]
             // This call is being cleaned up; move to a different call
             // when this call was the active call.
             if (this.state.active) this.module.setActiveCall(null, false)
-            this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${this.session.id}`})
+            this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${this.id}`})
         }, timeout)
+    }
+
+
+    generateUUID() {
+        var d = new Date().getTime()
+        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = (d + Math.random() * 16) % 16 | 0
+            d = Math.floor(d / 16)
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
+        })
+        return uuid
     }
 
 
@@ -76,16 +95,10 @@ class Call {
     setState(state) {
         // This merges to the call's local state; not the app's state!
         this.app.__mergeDeep(this.state, state)
+        // Allows calls to come in without troubling the UI.
         if (this.silent) return
 
-        if (this._trackState) {
-            this.app.emit('fg:set_state', {action: 'merge', path: `calls/calls/${this.state.id}`, state: state})
-        } else if (this.state.id) {
-            Vue.set(this.app.state.calls.calls, this.state.id, this.state)
-            // Send a complete state representation down the wire once.
-            this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${this.state.id}`, state: this.state})
-            this._trackState = true
-        }
+        this.app.emit('fg:set_state', {action: 'merge', path: `calls/calls/${this.id}`, state: state})
     }
 
 

@@ -28,9 +28,17 @@ module.exports = (app) => {
                 let classes = {}
                 if (block === 'component') {
                     if (this.call.status) classes['call-active'] = true
-                    if (this.call.keypad.active) classes['with-keypad'] = true
                     else classes['no-call'] = true
+                } else if (block === 'dialpad-button') {
+                    classes.active = this.call.keypad.active && this.call.keypad.mode === 'dtmf'
+                    classes.disabled = this.transferActive
+                } else if (block === 'attended-button') {
+                    classes.active = (this.call.transfer.type === 'attended')
+                } else if (block === 'blind-button') {
+                    classes.active = (this.call.transfer.type === 'blind')
+                    classes.disabled = (this.transferStatus !== 'select')
                 }
+
                 return classes
             },
             dial: function(number) {
@@ -41,8 +49,12 @@ module.exports = (app) => {
                 app.emit('bg:calls:hold_toggle', {callId: this.call.id})
             },
             keypadToggle: function() {
+                // Keypad cannot be active during transfer.
                 if (this.transferActive) return
-                app.setState({keypad: {active: !this.call.keypad.active}}, {path: `calls/calls/${this.call.id}`})
+                const keypadOn = (!this.call.keypad.active || this.call.keypad.mode !== 'dtmf')
+                app.setState(
+                    {keypad: {active: keypadOn, display: 'touch', mode: 'dtmf'}},
+                    {path: `calls/calls/${this.call.id}`})
             },
             transferFinalize: function() {
                 app.emit('bg:calls:transfer_finalize', {callId: this.call.id})

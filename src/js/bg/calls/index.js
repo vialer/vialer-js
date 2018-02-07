@@ -5,7 +5,9 @@ const Module = require('../lib/module')
 
 /**
 * The call module takes care of the plumbing involved with setting up
-* and breaking down calls.
+* and breaking down calls. The user interface mostly emits events,
+* because the state logic involved depends on the calls and their
+* state.
 */
 class CallsModule extends Module {
     /**
@@ -32,7 +34,15 @@ class CallsModule extends Module {
 
         this.app.on('bg:calls:connect', () => this.connect())
         this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
-        this.app.on('bg:calls:call', ({number}) => this.createCall(number, {active: true}))
+        this.app.on('bg:calls:call', ({callId, number}) => this.startCall(callId, number))
+        this.app.on('bg:calls:call_create', ({callId}) => {
+            // Hold the active call.
+            // this.calls[callId].setState({keypad: {active: true, display: 'dense', mode: 'call'}})
+            // Create a new empty call.
+            const call = new Call(this, null)
+            this.calls[call.id] = call
+            this.setActiveCall(call)
+        })
         this.app.on('bg:calls:call_answer', ({callId}) => this.calls[callId].answer())
         this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
         this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
@@ -40,6 +50,9 @@ class CallsModule extends Module {
         })
 
         this.app.on('bg:calls:dtmf', ({callId, key}) => this.calls[callId].session.dtmf(key))
+
+
+
         this.app.on('bg:calls:hold_toggle', ({callId}) => {
             if (!this.calls[callId].state.hold) this.calls[callId].hold()
             else {
@@ -195,13 +208,13 @@ class CallsModule extends Module {
             // For now, we don't support call-waiting. A new call that is
             // made when a call is already active will be silently dropped.
             if (Object.keys(this.calls).length > 0) {
-                const call = new Call(this, session, {active: false, silent: true})
+                const call = new Call(this, session, {silent: true})
+                call.start()
                 call.terminate()
             } else {
-                const call = new Call(this, session, {active: true})
-                call.hasMedia.then(() => {
-                    this.calls[call.state.id] = call
-                })
+                const call = new Call(this, session)
+                this.calls[call.id] = call
+                call.start()
             }
         })
 
@@ -243,19 +256,19 @@ class CallsModule extends Module {
 
     /**
     * Switch to the calldialog and start a new call.
-    * @param {Number} number - The number to call.
+    * @param {String} [callId] - The call id to start.
+    * @param {Number} [number] - The number to call.
     * @param {Object} options - The options to pass to the call.
     * @returns {Promise} - Call after it has access to media.
     */
-    createCall(number, options) {
-        return new Promise((resolve, reject) => {
+    startCall(callId, number, options) {
+        if (!callId) {
             const call = new Call(this, number, options)
-            call.hasMedia.then(() => {
-                this.calls[call.state.id] = call
-                this.app.setState({ui: {layer: 'calldialog'}})
-                resolve(call)
-            })
-        })
+            callId = call.id
+            this.calls[call.id] = call
+        }
+        this.calls[callId].start()
+        this.app.setState({ui: {layer: 'calldialog'}})
     }
 
 
@@ -294,18 +307,23 @@ class CallsModule extends Module {
             }
             if (!call) return false
         }
-
         for (const callId of Object.keys(this.calls)) {
             // A call that is closing. Don't bother changing hold
             // and active state properties.
             if (!['bye', 'rejected'].includes(call.state.status)) {
-                if (call.state.id === callId) {
+                if (call.id === callId) {
                     activeCall = this.calls[callId]
                     this.calls[callId].setState({active: true})
-                    if (unholdActive) this.calls[callId].unhold()
+                    // New calls don't have a session yet. Nothing to unhold.
+                    if (unholdActive && this.calls[callId].state.status !== 'new') {
+                        this.calls[callId].unhold()
+                    }
                 } else {
                     this.calls[callId].setState({active: false})
-                    if (holdInactive) this.calls[callId].hold()
+                    // New calls don't have a session yet. Nothing to hold.
+                    if (holdInactive && this.calls[callId].state.status !== 'new') {
+                        this.calls[callId].hold()
+                    }
                 }
             }
         }

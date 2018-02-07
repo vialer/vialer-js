@@ -6,12 +6,6 @@
     color: $white;
     min-height: 250px;
 
-    &.with-keypad {
-        .rounded-button i {
-            font-size: $spacer * 3;
-        }
-    }
-
     // Keypad styling for when making a new call.
     &.no-call {
         background: $white;
@@ -139,7 +133,7 @@
             display: flex;
             justify-content: center;
             flex-direction: row;
-            margin-bottom: $spacer * 4;
+            margin-bottom: $spacer * 3;
 
             .transfer-button {
                 width: 130px;
@@ -177,7 +171,7 @@
         }
 
         .transfer-text {
-            margin-bottom: $spacer * 4;
+            margin-bottom: $spacer * 3;
             text-align: center;
             font-size: 1.1rem;
         }
