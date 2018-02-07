@@ -63,9 +63,7 @@ class Walker {
     * @returns {Boolean} - Whether the element is blocked or not.
     */
     isBlockedElement(element) {
-        if (element.tagName in this.blockedTagNames) {
-            return true
-        }
+        if (element.tagName in this.blockedTagNames) return true
 
         // Check for attributes on *element*.
         if ($(element).is('[contenteditable="true"]') ||

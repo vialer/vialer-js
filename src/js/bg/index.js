@@ -1,5 +1,6 @@
 const Api = require('./lib/api')
 const App = require('../lib/app')
+const Tabs = require('./lib/tabs')
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
 
@@ -68,6 +69,11 @@ class BackgroundApp extends App {
                     }
                 })
             })
+
+            this.tabs = new Tabs(this)
+
+
+
         } else {
             // There is no concept of a popup without an extension.
             // Nevertheless we still trigger the event to start timers

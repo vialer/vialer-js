@@ -22,9 +22,7 @@ class Skeleton extends EventEmitter {
         // A webview build passes the separate apps, so they can be reached
         // by the EventEmitter.
         if (options.apps) this.apps = options.apps
-
         this._listeners = 0
-
         this.utils = require('./utils')
 
         this.name = options.name
@@ -74,10 +72,7 @@ class Skeleton extends EventEmitter {
     */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
         if (this.env.isExtension && (!noIpc || noIpc === 'both')) {
-            let payloadData = {
-                data: data,
-                event: event,
-            }
+            let payloadData = {data: data, event: event}
 
             if (tabId) {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
