@@ -97,6 +97,10 @@ class CallWebRTC extends Call {
         })
 
         this.session.on('bye', (e) => {
+            if (e.getHeader('X-Asterisk-Hangupcausecode') === '58') {
+                this.app.emit('fg:notify', {icon: 'warning', message: this.app.$t('Your softphone account requires AVP and encryption'), type: 'warning'})
+            }
+
             this.setState({status: 'bye'})
             this.localVideo.srcObject = null
             this.cleanup()

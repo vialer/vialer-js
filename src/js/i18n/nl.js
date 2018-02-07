@@ -71,4 +71,5 @@ global.translations.nl = {
     'You are not authorized to monitor any queues you might have.': 'Je hebt niet de rechten om wachtrijen te bekijken.',
     'You are not authorized to monitor your colleagues\' presence.': 'Je hebt niet de rechten om de beschikbaarheid van je collega\'s te bekijken.',
     'You have {count} queue callgroup configured. ::: You have {count} queue callgroups configured.': 'Je hebt {count} wachtrij belgroep ingesteld. ::: Je hebt {count} wachtrij belgroepen ingesteld.',
+    'Your softphone account requires AVP and encryption': 'Je softphone account moet AVFP en encryptie hebben',
 }
