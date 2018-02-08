@@ -39,10 +39,24 @@ class CallsModule extends Module {
             this.startCall(this.calls[callState.id])
         })
 
-        this.app.on('bg:calls:call_create', ({number}) => {
-            const call = new Call(this, number)
+        this.app.on('bg:calls:call_create', ({number, start}) => {
+            // First check if there is a `new` call ready to be used first.
+            let call
+            for (const callId of Object.keys(this.calls)) {
+                if (this.calls[callId].state.status === 'new') {
+                    call = this.calls[callId]
+                    break
+                }
+            }
+
+            if (!call) call = new Call(this, null)
+            // This will create an empty call if `number` is falsish.
             this.calls[call.id] = call
             this.setActiveCall(call, true, true)
+            // Sync the state back to the foreground.
+            if (number) this.calls[call.id].state.number = number
+            this.calls[call.id].setState(this.calls[call.id].state)
+            if (start) call.start()
         })
 
         this.app.on('bg:calls:call_answer', ({callId}) => this.calls[callId].answer())

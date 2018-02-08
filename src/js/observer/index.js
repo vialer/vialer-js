@@ -99,7 +99,7 @@ class ObserverFrame extends Skeleton {
                 e.stopImmediatePropagation()
 
                 const number = $(e.currentTarget).attr('data-number')
-                this.emit('bg:calls:call', {number: number})
+                this.emit('bg:calls:call_create', {number: number, start: true})
             }
         })
 
