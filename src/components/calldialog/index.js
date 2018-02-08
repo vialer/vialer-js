@@ -27,8 +27,9 @@ module.exports = (app) => {
             classes: function(block) {
                 let classes = {}
                 if (block === 'component') {
-                    if (this.call.status) classes['call-active'] = true
-                    else classes['no-call'] = true
+                    if (!this.callsActive) {
+                        classes.inactive = true
+                    }
                 } else if (block === 'dialpad-button') {
                     classes.active = this.call.keypad.active && this.call.keypad.mode === 'dtmf'
                     classes.disabled = this.transferActive

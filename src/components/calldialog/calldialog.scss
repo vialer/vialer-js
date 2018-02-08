@@ -6,22 +6,8 @@
     color: $white;
     min-height: 250px;
 
-    // Keypad styling for when making a new call.
-    &.no-call {
-        background: $white;
-    }
-
-    // Keypad styling for when in a call.
-    &.call-active {
-        background: linear-gradient(180deg, $brand-color, $brand-variation-color);
-
-        .keypad-component {
-            .number-input {
-                input {
-                    color: $white;
-                }
-            }
-        }
+    > * {
+        position: relative;
     }
 
     .call-info {
@@ -179,7 +165,30 @@
         .transfer-keypad {
             text-align: center;
         }
+    }
 
+
+    &.inactive {
+        .keypad-component {
+            .number-input {
+                input {
+                    color: $brand-color;
+                }
+            }
+
+            .keys .row {
+                .key {
+                    border: 2px solid $brand-color;
+                    background: $white;
+                    color: $brand-color;
+
+                    &:hover {
+                        background: $brand-color;
+                        color: $white;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -197,14 +206,6 @@
         &.decline {
             color: $white;
             background: $red-color;
-
-            &.disabled {
-                background: $grey-color;
-
-                &:hover {
-                    cursor: not-allowed;
-                }
-            }
         }
 
         &.accept {
@@ -217,6 +218,15 @@
             color: $white;
             background: $green-color;
             &:hover {background: darken($green-color, 3%);}
+        }
+
+        &.disabled {
+            background: $grey-color;
+
+            &:hover {
+                background: $grey-color;
+                cursor: not-allowed;
+            }
         }
     }
 }

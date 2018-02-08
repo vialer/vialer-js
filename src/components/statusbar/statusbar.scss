@@ -12,7 +12,7 @@
     font-size: 0.8rem;
     font-weight: 500;
     position: fixed;
-    z-index: 1000;
+    z-index: 100000;
     width: 100%;
     max-width: $max-popup-width;
     top: 0;
@@ -51,7 +51,7 @@
             }
 
             .disconnected {background: $red-color;}
-            .connected {background: $green-color;}
+            .connected {background: $yellow-color;}
             .registered {background: $green-color;}
             .registration-failed {background: $orange-color;}
         }

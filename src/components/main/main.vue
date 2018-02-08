@@ -1,7 +1,6 @@
 <div class="main-component" id="app">
-
-    <StatusBar v-if="!Object.keys($store.calls.calls).length"/>
-    <CallBar v-if="call.active" :call="call" v-for="call in $store.calls.calls"/>
+    <StatusBar v-if="!callsActive" />
+    <CallBar v-if="callsActive && call.active" :call="call" v-for="call in $store.calls.calls"/>
 
     <div class="panel">
         <div class="panel-content-container" v-if="!$store.user.authenticated">

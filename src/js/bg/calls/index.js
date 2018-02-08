@@ -31,18 +31,20 @@ class CallsModule extends Module {
 
         // // Start with a clean state.
         this.app.setState({calls: this._defaultState()})
-
         this.app.on('bg:calls:connect', () => this.connect())
         this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
-        this.app.on('bg:calls:call', ({callId, number}) => this.startCall(callId, number))
-        this.app.on('bg:calls:call_create', ({callId}) => {
-            // Hold the active call.
-            // this.calls[callId].setState({keypad: {active: true, display: 'dense', mode: 'call'}})
-            // Create a new empty call.
-            const call = new Call(this, null)
-            this.calls[call.id] = call
-            this.setActiveCall(call)
+
+        this.app.on('bg:calls:call_start', (callState) => {
+            this.calls[callState.id].setState(callState)
+            this.startCall(this.calls[callState.id])
         })
+
+        this.app.on('bg:calls:call_create', ({number}) => {
+            const call = new Call(this, number)
+            this.calls[call.id] = call
+            this.setActiveCall(call, true, true)
+        })
+
         this.app.on('bg:calls:call_answer', ({callId}) => this.calls[callId].answer())
         this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
         this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
@@ -51,26 +53,17 @@ class CallsModule extends Module {
 
         this.app.on('bg:calls:dtmf', ({callId, key}) => this.calls[callId].session.dtmf(key))
 
-
-
         this.app.on('bg:calls:hold_toggle', ({callId}) => {
-            if (!this.calls[callId].state.hold) this.calls[callId].hold()
-            else {
-                this.calls[callId].unhold()
-                // If this call has an active transfer, then we need
-                // to modify other call states as well.
+            if (!this.calls[callId].state.hold) {
+                // Not on hold yet. Set the call on hold.
+                this.calls[callId].hold()
+            } else {
+                // Unset the transfer state when it was active during
+                // an unhold.
                 if (this.calls[callId].state.transfer.active) {
                     this.calls[callId].setState({transfer: {active: false}})
-
-                    // All other calls should be put on hold and have
-                    // their transfer state reset.
-                    for (let _callId of Object.keys(this.calls)) {
-                        if (_callId !== callId) {
-                            this.calls[_callId].hold()
-                            this.calls[_callId].setState({transfer: {active: false, type: null}})
-                        }
-                    }
                 }
+                this.setActiveCall(this.calls[callId], true, true)
             }
         })
 
@@ -116,7 +109,7 @@ class CallsModule extends Module {
                 // and disable any open keypad.
                 this.calls[callId].setState({keypad: {active: false}, transfer: {active: true, type: 'attended'}})
 
-                // all other calls are set to transfer type the source call
+                // All other calls are set to transfer type the source call
                 // is set to transfer.
                 for (let _callId of callIds) {
                     if (_callId !== callId) {
@@ -126,12 +119,11 @@ class CallsModule extends Module {
             } else {
                 if (this.calls[callId].state.hold) this.calls[callId].unhold()
                 this.calls[callId].setState({transfer: {active: false}})
+                this.setActiveCall(this.calls[callId], true, true)
 
-                // If we unhold this call, then all other calls
-                // should be put on hold.
+                // Set attended status.
                 for (let _callId of callIds) {
                     if (_callId !== callId) {
-                        this.calls[_callId].hold()
                         this.calls[_callId].setState({transfer: {active: false, type: 'attended'}})
                     }
                 }
@@ -256,19 +248,12 @@ class CallsModule extends Module {
 
     /**
     * Switch to the calldialog and start a new call.
-    * @param {String} [callId] - The call id to start.
-    * @param {Number} [number] - The number to call.
+    * @param {Call} [call] - The call to start.
     * @param {Object} options - The options to pass to the call.
-    * @returns {Promise} - Call after it has access to media.
     */
-    startCall(callId, number, options) {
-        if (!callId) {
-            const call = new Call(this, number, options)
-            callId = call.id
-            this.calls[call.id] = call
-        }
-        this.calls[callId].start()
-        this.app.setState({ui: {layer: 'calldialog'}})
+    startCall(call, options) {
+        call.start()
+        this.app.setState({ui: {layer: 'calls'}})
     }
 
 
@@ -296,6 +281,7 @@ class CallsModule extends Module {
     setActiveCall(call, holdInactive = true, unholdActive = false) {
         // Activate the first found call when no call is given.
         let activeCall = false
+        let activeTransferCall = false
         const callIds = Object.keys(this.calls)
 
         if (!call) {
@@ -315,15 +301,28 @@ class CallsModule extends Module {
                     activeCall = this.calls[callId]
                     this.calls[callId].setState({active: true})
                     // New calls don't have a session yet. Nothing to unhold.
-                    if (unholdActive && this.calls[callId].state.status !== 'new') {
+                    if (unholdActive && !['new', 'create'].includes(this.calls[callId].state.status)) {
                         this.calls[callId].unhold()
                     }
                 } else {
                     this.calls[callId].setState({active: false})
                     // New calls don't have a session yet. Nothing to hold.
-                    if (holdInactive && this.calls[callId].state.status !== 'new') {
+                    if (holdInactive && !['new', 'create'].includes(this.calls[callId].state.status)) {
                         this.calls[callId].hold()
                     }
+                }
+
+                // Detect an ongoing transfer and mark all other calls as accept later.
+                if (this.calls[callId].state.transfer.active && this.calls[callId].state.transfer.type === 'attended') {
+                    activeTransferCall = this.calls[callId]
+                }
+            }
+        }
+
+        if (activeTransferCall) {
+            for (let callId of callIds) {
+                if (this.calls[callId] !== activeTransferCall) {
+                    this.calls[callId].setState({transfer: {active: false, type: activeTransferCall ? 'accept' : null}})
                 }
             }
         }

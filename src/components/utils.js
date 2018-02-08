@@ -52,6 +52,15 @@ module.exports = function(app) {
 
     utils.sharedComputed = function() {
         return {
+            callsActive: function() {
+                const calls = this.$store.calls.calls
+                const callIds = Object.keys(this.$store.calls.calls)
+                // Calls component haven't been activated.
+                if (!callIds.length) return false
+                // User wants to create its first call.
+                if (callIds.length === 1 && calls[callIds[0]].status === 'new') return false
+                return true
+            },
             callStatus: function() {
                 const translations = utils.getTranslations()
                 if (this.call.status === 'accepted') {

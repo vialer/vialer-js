@@ -69,7 +69,18 @@ class Call {
             delete this.app.modules.calls.calls[this.id]
             // This call is being cleaned up; move to a different call
             // when this call was the active call.
-            if (this.state.active) this.module.setActiveCall(null, false)
+            let activeCall
+            for (const callId of Object.keys(this.module.calls)) {
+                // Don't select a call that is already closing.
+                if (!['bye', 'rejected'].includes(this.module.calls[callId].state.status)) {
+                    activeCall = this.module.calls[callId]
+                    break
+                }
+            }
+
+            if (this.state.active && activeCall) {
+                this.module.setActiveCall(null, true, false)
+            }
             this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${this.id}`})
         }, timeout)
     }

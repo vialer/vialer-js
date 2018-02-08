@@ -5,8 +5,9 @@
 .callswitcher-component {
     position: absolute;
     width: $spacer * 5;
-    top: $spacer * 5;
+    top: 0;
     right: 0;
+    z-index: 100000;
 
     i {
         color: $white;
@@ -21,5 +22,12 @@
             background: $white;
             cursor: pointer;
         }
+    }
+
+    // Just hide the ongoing call for now until we get a better idea.
+    &.inactive i {
+        background: $white;
+        color: $white;
+        cursor: default;
     }
 }

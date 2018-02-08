@@ -16,6 +16,20 @@ module.exports = (app) => {
                 }
                 return classes
             },
+            /**
+            * A new call can only be created when there are no other
+            * calls with the `new` status.
+            * @returns {Boolean} - Whether it should be possible to create a new call.
+            */
+            newCallAvailable: function() {
+                let available = true
+                for (let callId of Object.keys(this.calls)) {
+                    if (['new', 'create', 'invite'].includes(this.calls[callId].status)) {
+                        available = false
+                    }
+                }
+                return available
+            },
             setActiveCall: function(call) {
                 app.emit('bg:calls:call_activate', {
                     callId: call.id,

@@ -42,6 +42,17 @@ module.exports = (app) => {
             },
         },
         methods: Object.assign({
+            callStart: function(createCall = false) {
+                if (!this.number) return
+                // Only create a new call when the keypad is used without
+                // existing call; otherwise we initiate a transfer.
+                // Sync the call's state to the background first.
+                if (createCall) app.emit('bg:calls:call_create', {number: this.number})
+                else {
+                    let transferState = JSON.parse(JSON.stringify(this.call))
+                    app.emit('bg:calls:call_start', transferState)
+                }
+            },
             classes: function(block) {
                 let classes = {}
                 if (block === 'number-input') {
@@ -63,15 +74,7 @@ module.exports = (app) => {
                 if (this.mode === 'dtmf') app.emit('bg:calls:dtmf', {callId: this.call.id, key})
             },
             removeLastNumber: function() {
-                this.$emit('update:model', this.number.substring(0, this.number.length - 1))
-            },
-            startCall: function() {
-                if (!this.number) return
-                // Only create a new call when the keypad is used without
-                // existing call; otherwise we initiate a transfer.
-                if (!this.call) app.emit('bg:calls:call', {number: this.number})
-                else this.transferActivate(this.number)
-
+                if (this.number) this.$emit('update:model', this.number.substring(0, this.number.length - 1))
             },
             unpressKey: function() {
                 window.setTimeout(() => {

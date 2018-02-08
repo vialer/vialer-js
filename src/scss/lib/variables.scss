@@ -7,7 +7,7 @@ $font-path: "../fonts";
 $spacer: 8px;
 
 // Dimensions: The boundaries of the popup.
-$max-popup-width: 800px;
+$max-popup-width: 500px;
 $max-popup-height: 600px;
 
 // Colors: Base variable color palette; overriden by vialer-jsrc colors object.
@@ -19,7 +19,7 @@ $red-color: #d9534f !default;
 
 // Colors: Derivate colors from the base color palette.
 $grey-color-darkest: darken($grey-color, 30%);
-$grey-color-darker: darken($grey-color, 10%);
+$grey-color-darker: darken($grey-color, 15%);
 $grey-color-dark: darken($grey-color, 5%);
 $grey-color-light: lighten($grey-color, 25%);
 $grey-color-lighter: lighten($grey-color, 35%);

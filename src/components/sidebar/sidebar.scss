@@ -10,6 +10,7 @@
     position: fixed;
     background: $brand-color;
     width: $spacer * 5;
+    z-index: 100000;
 
     .option {
         float: left;

@@ -21,9 +21,7 @@ class CallSip extends Call {
 
 
     async _initMedia() {
-        this._sessionOptions = {
-            media: {},
-        }
+        this._sessionOptions = {media: {}}
 
         // Append the AV-elements in the background DOM, so the audio
         // can continue to play when the popup closes.
@@ -64,7 +62,7 @@ class CallSip extends Call {
 
         // Signal the user about the incoming call.
         if (!this.silent) {
-            this.app.setState({ui: {layer: 'calldialog'}})
+            this.app.setState({ui: {layer: 'calls'}})
             this.app.logger.notification(
                 this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
             this.ringtone.play()
@@ -114,11 +112,14 @@ class CallSip extends Call {
 
         // The ua's displayName is empty for outgoing calls. Try to match it from contacts.
         const contacts = this.app.state.contacts.contacts
+        let displayName = ''
         for (const id of Object.keys(contacts)) {
             if (contacts[id].number === parseInt(this.number)) {
-                this.setState({displayName: contacts[id].name})
+                displayName = contacts[id].name
             }
         }
+        // Status may still be `new` when the call is still empty.
+        this.setState({displayName: displayName, status: 'create'})
 
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {

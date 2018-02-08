@@ -12,10 +12,16 @@
     font-size: 0.8rem;
     font-weight: 500;
     position: fixed;
-    z-index: 1000;
+    z-index: 100000;
     width: 100%;
     max-width: $max-popup-width;
     top: 0;
+
+    // Another call that isn't started yet.
+    &.inactive {
+        background: $brand-variation-color;
+        color: #fff;
+    }
 
 
     [class^="icon-"], [class*=" icon-"]:hover {

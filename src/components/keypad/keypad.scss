@@ -2,8 +2,11 @@
 @import "../../scss/lib/mixins";
 
 .keypad-component {
+    z-index: 10000000;
     width: 100%;
-    margin-bottom: $spacer * 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
     .contacts-match {
         font-weight: 500;
@@ -12,11 +15,19 @@
     }
 
     .number-input {
-        color: $brand-color;
+        color: #fff;
         display: flex;
         justify-content: center;
         align-items: center;
         position: relative;
+        max-width: 300px;
+
+
+        input {
+            &::placeholder {
+                color: lighten($brand-color, 20%);
+            }
+        }
 
         &.dense {
             flex-direction: row;
@@ -35,10 +46,11 @@
                 padding-right: $spacer;
 
                 &::placeholder {
-                    color: $white;
+                    color: lighten($brand-color, 20%);
                 }
             }
 
+            // Transfer button next to input.
             i {
                 background: $white;
                 color: $brand-variation-color;
@@ -50,9 +62,7 @@
                 border-bottom-right-radius: $spacer / 2;
                 transition: all 300ms ease;
 
-                &:hover {
-                    cursor: pointer;
-                }
+                &:hover {cursor: pointer;}
 
                 &.disabled {
                     color: $grey-color-lighter;
@@ -80,7 +90,7 @@
                 text-align: center;
                 padding: 0 40px;
                 background: transparent;
-                color: $brand-color;
+                color: #fff;
             }
 
             i {
@@ -124,20 +134,19 @@
                 margin: 0 $spacer;
                 height: 65px;
                 width: 65px;
+                background: none;
+                border: 2px solid $white;
+                color: $white;
+                font-size: 1rem;
+                font-weight: bold;
 
                 border-radius: 100%;
                 break-inside: avoid;
 
-                font-size: 1rem;
-                font-weight: bold;
-                border: 2px solid $brand-color;
-                background: $white;
-                color: $brand-color;
-
                 &:hover {
                     cursor: pointer;
-                    background: $brand-color;
-                    color: $white;
+                    background: $white;
+                    color: $brand-color;
                 }
 
                 .sub {
@@ -147,36 +156,7 @@
         }
     }
 
-    &.no-call {
-        .number-input {
-            input::placeholder {
-                color: $grey-color-light;
-            }
-        }
-    }
-
-    // Override defaults when in call.
-    &.call-active {
-        .number-input {
-            input::placeholder {
-                color: lighten($brand-color, 20%);
-            }
-        }
-
-        .keys {
-            .row {
-                .key {
-                    background: none;
-                    color: $white;
-                    border: 2px solid $white;
-
-                    &:hover {
-                        background: $white;
-                        color: $brand-color;
-                    }
-
-                }
-            }
-        }
+    .call-actions {
+        margin-top: $spacer * 3;
     }
 }
