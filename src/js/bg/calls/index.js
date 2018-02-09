@@ -60,7 +60,6 @@ class CallsModule extends Module {
         })
 
         this.app.on('bg:calls:call_remove', ({callId}) => {
-            console.log("REMOVE CALL", callId)
             this.removeCall(this.calls[callId])
         })
 

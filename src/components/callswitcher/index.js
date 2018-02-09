@@ -6,9 +6,8 @@ module.exports = (app) => {
             classes: function(call, block) {
                 let classes = {}
                 if (block === 'call-button') {
-                    classes.active = call.active
-                    if (call.hold) classes['icon-on-hold'] = true
                     if (call.status === 'new') {
+                        classes.active = call.active
                         classes['new-call'] = true
                         // Show the close icon.
                         if (call.active) {
@@ -19,14 +18,18 @@ module.exports = (app) => {
                             classes['icon-phone'] = true
                         }
                     } else {
-                        classes['icon-phone'] = true
+                        classes.active = call.active
+                        if (!call.active && this.transferStatus === 'select') {
+                            classes.hint = true
+                        }
+                        if (call.hold) classes['icon-on-hold'] = true
+                        else classes['icon-phone'] = true
                     }
                 } else if (block === 'call-button-add') {
                     if (!call) call = this.getActiveCall()
                     if (!call) return classes
                     classes.active = (call.keypad.active && call.keypad.mode === 'call')
                 }
-                console.log('CLASSES:', classes)
                 return classes
             },
             /**

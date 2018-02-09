@@ -20,6 +20,10 @@
         color: $white;
         transition: all 600ms ease;
 
+        &.calls.calls-active {
+            color: $green-color;
+        }
+
         &.hint {
             background: rgba(255, 255, 255, 0.5);
         }

@@ -30,6 +30,10 @@
             }
         }
 
+        &.hint {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
         &:hover,
         &.active {
             color: $brand-variation-color;

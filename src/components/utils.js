@@ -108,11 +108,9 @@ module.exports = function(app) {
                 if (callKeys.length > 1) {
                     for (let callId of callKeys) {
                         if (calls[callId].transfer.active) {
-                            transferStatus = 'ongoing'
+                            transferStatus = 'select'
                         }
                     }
-                } else if (callKeys.length === 1 && calls[callKeys[0]].transfer.active) {
-                    transferStatus = 'select'
                 }
                 return transferStatus
             },
