@@ -20,6 +20,14 @@
         color: $white;
         transition: all 600ms ease;
 
+        &.availability.available {
+            color: $green-color;
+        }
+
+        &.availability.unavailable {
+            color: $red-color;
+        }
+
         &.calls.calls-active {
             color: $green-color;
         }

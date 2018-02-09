@@ -217,14 +217,18 @@ class CallsModule extends Module {
         this.ua.on('invite', (session) => {
             // For now, we don't support call-waiting. A new call that is
             // made when a call is already active will be silently dropped.
-            if (Object.keys(this.calls).length > 0) {
-                const call = new Call(this, session, {silent: true})
-                call.start()
-                call.terminate()
-            } else {
+            const callIds = Object.keys(this.calls)
+            // Only accept an incoming call when no other call is
+            // active at the moment.
+            if (callIds.length === 0 || (callIds.length === 1 && this.calls[callIds[0]].state.status === 'new')) {
                 const call = new Call(this, session)
                 this.calls[call.id] = call
                 call.start()
+            } else {
+                // Just handle the call as a silenced call and terminate it.
+                const call = new Call(this, session, {silent: true})
+                call.start()
+                call.terminate()
             }
         })
 

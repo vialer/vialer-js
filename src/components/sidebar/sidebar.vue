@@ -1,16 +1,16 @@
 <div class="sidebar-component">
-    <div class="option availability" :class="{active: layer === 'availability'}" @click="setLayer('availability')">
-         <i class="icon-availability"></i>
+    <div class="option availability" :class="classes('availability')" @click="setLayer('availability')">
+         <i class="icon-availability" :class="{}"></i>
     </div>
 
-    <div class="option contacts" :class="{active: layer === 'contacts', hint: transferStatus === 'select'}" @click="setLayer('contacts')">
+    <div class="option contacts" :class="classes('contacts')" @click="setLayer('contacts')">
          <i class="icon icon-contacts"></i>
     </div>
-    <div class="option queues" :class="{active: layer === 'queues', hint: transferStatus === 'select'}" @click="setLayer('queues')">
+    <div class="option queues" :class="classes('queues')" @click="setLayer('queues')">
          <i class="icon-queues"></i>
     </div>
 
-    <div class="option calls" :class="{active: layer === 'calls', 'calls-active': this.callsActive}" @click="setLayer('calls')">
+    <div class="option calls" :class="classes('calls')" @click="setLayer('calls')">
          <i class="icon icon-dialpad"></i>
     </div>
 </div>

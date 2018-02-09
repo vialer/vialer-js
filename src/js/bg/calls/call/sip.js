@@ -67,6 +67,7 @@ class CallSip extends Call {
             this.app.logger.notification(
                 this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
             this.ringtone.play()
+            this.module.setActiveCall(this, true)
         }
 
         // Setup some event handlers for the different stages of a call.
