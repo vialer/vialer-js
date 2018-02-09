@@ -17,6 +17,10 @@
     width: 100%;
     z-index: 100000;
 
+    &.dnd {
+        background: $orange-color;
+    }
+
     &.call-active {
         background: $green-color;
     }

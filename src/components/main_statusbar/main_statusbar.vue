@@ -1,4 +1,4 @@
-<div class="main-statusbar-component">
+<div class="main-statusbar-component" :class="{dnd}">
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator">
             <i v-if="ua.state === 'disconnected'" class="icon icon-disconnected disconnected" :title="$t('Status:') + ' ' + $t('disconnected')"></i>
@@ -15,7 +15,6 @@
     </div>
     <!-- Empty container is here to push .options to the right. -->
     <div v-else></div>
-
     <div class="options">
         <div class="option" v-if="!user.authenticated" :class="{active: layer === 'login'}" @click="setLayer('login')">
             <i class="icon-logout" :title="$t('Login page')"></i>

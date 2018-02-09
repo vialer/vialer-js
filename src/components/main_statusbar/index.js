@@ -25,6 +25,7 @@ module.exports = (app) => {
         render: templates.main_statusbar.r,
         staticRenderFns: templates.main_statusbar.s,
         store: {
+            dnd: 'availability.dnd',
             env: 'env',
             layer: 'ui.layer',
             ua: 'calls.ua',
