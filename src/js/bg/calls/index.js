@@ -220,7 +220,9 @@ class CallsModule extends Module {
             const callIds = Object.keys(this.calls)
             // Only accept an incoming call when no other call is
             // active at the moment.
-            if (callIds.length === 0 || (callIds.length === 1 && this.calls[callIds[0]].state.status === 'new')) {
+            if (!this.app.state.availability.dnd &&
+                (callIds.length === 0 || (callIds.length === 1 && this.calls[callIds[0]].state.status === 'new'))
+            ) {
                 const call = new Call(this, session)
                 this.calls[call.id] = call
                 call.start()

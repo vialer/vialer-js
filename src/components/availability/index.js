@@ -7,28 +7,35 @@ module.exports = (app, actions) => {
         store: {
             available: 'availability.available',
             destinations: 'availability.destinations',
+            dnd: 'availability.dnd',
             placeholder: 'availability.placeholder',
             selected: 'availability.selected',
             user: 'user',
+            webrtc: 'settings.webrtc',
         },
         watch: {
             available: function(newVal, oldVal) {
                 // Sending an empty object like this will unset the
                 // user's availability.
-                let newDestination = {id: null, name: null, type: null}
-                if (newVal === 'yes') newDestination = this.placeholder
-                // Only re-enable when there is a cached version of the
-                // previous choice available.
-                if (this.placeholder.id) {
-                    app.emit('bg:availability:update', {
-                        destinations: this.destinations,
-                        selected: newDestination,
-                    })
-                }
+                let selected
+
+                if (!this.placeholder.id) selected = {id: null, name: null, type: null}
+                else selected = this.placeholder
+
+                app.emit('bg:availability:update', {
+                    available: newVal,
+                    destinations: this.destinations,
+                    selected: selected,
+                })
+            },
+            dnd: function(newVal, oldVal) {
+                app.setState({availability: {dnd: newVal}})
             },
             selected: function(newVal, oldVal) {
-                this.placeholder = {id: this.selected.id, name: this.selected.name, type: this.selected.type}
+                // Save the user's last choice.
+                // this.placeholder = {id: this.selected.id, name: this.selected.name, type: this.selected.type}
                 app.emit('bg:availability:update', {
+                    available: this.available,
                     destinations: this.destinations,
                     selected: this.selected,
                 })

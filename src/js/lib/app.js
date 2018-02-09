@@ -105,6 +105,7 @@ class App extends Skeleton {
                 layer: 'login',
                 visible: false,
             },
+            vendor: process.env.VENDOR,
         })
 
         return state
