@@ -10,11 +10,12 @@ class CallSip extends Call {
         super(module, callTarget, options)
         // Handle three cases: incoming call; outgoing call (instant start) and
         // delayed outgoing call.
-        if (!callTarget) Object.assign(this.state, {status: 'new', type: 'outgoing'})
-        else if (['string', 'number'].includes(typeof callTarget)) {
-            Object.assign(this.state, {number: callTarget, status: 'create', type: 'outgoing'})
+        if (!callTarget) {
+            module.app.__mergeDeep(this.state, {keypad: {mode: 'call'}, status: 'new', type: 'outgoing'})
+        } else if (['string', 'number'].includes(typeof callTarget)) {
+            module.app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, number: callTarget, status: 'create', type: 'outgoing'})
         } else {
-            Object.assign(this.state, {status: 'invite', type: 'incoming'})
+            module.app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, status: 'invite', type: 'incoming'})
             this.session = callTarget
         }
     }
@@ -82,7 +83,11 @@ class CallSip extends Call {
 
         this.session.on('bye', (e) => {
             if (e.getHeader('X-Asterisk-Hangupcausecode') === '58') {
-                this.app.emit('fg:notify', {icon: 'warning', message: this.app.$t('Your softphone account requires AVP and encryption'), type: 'warning'})
+                this.app.emit('fg:notify', {
+                    icon: 'warning',
+                    message: this.app.$t('Your VoIP-account requires AVPF and encryption support.'),
+                    type: 'warning',
+                })
             }
 
             this.setState({status: 'bye'})

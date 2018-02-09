@@ -59,6 +59,11 @@ class CallsModule extends Module {
             if (start) call.start()
         })
 
+        this.app.on('bg:calls:call_remove', ({callId}) => {
+            console.log("REMOVE CALL", callId)
+            this.removeCall(this.calls[callId])
+        })
+
         this.app.on('bg:calls:call_answer', ({callId}) => this.calls[callId].answer())
         this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
         this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
@@ -257,6 +262,34 @@ class CallsModule extends Module {
         this.ua.on('registrationFailed', (reason) => {
             this.app.setState({calls: {ua: {state: 'registration_failed'}}})
         })
+    }
+
+
+    /**
+    * Take care of cleaning up an ending call.
+    * @param {Call} call - The call object to remove.
+    */
+    removeCall(call) {
+        delete this.app.state.calls.calls[call.id]
+        delete this.calls[call.id]
+        // This call is being cleaned up; move to a different call
+        // when this call was the active call.
+        if (call.state.active) {
+            let activeCall
+            for (const callId of Object.keys(this.calls)) {
+                // Don't select a call that is already closing.
+                if (!['bye', 'rejected'].includes(this.calls[callId].state.status)) {
+                    activeCall = this.calls[callId]
+                    break
+                }
+            }
+
+            if (activeCall) {
+                this.setActiveCall(null, true, false)
+            }
+        }
+
+        this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${call.id}`})
     }
 
 

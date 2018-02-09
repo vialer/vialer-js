@@ -16,6 +16,20 @@
         line-height: $spacer * 5;
         height: $spacer * 5;
 
+        &.new-call {
+            color: $brand-color;
+            background: rgba(255, 255, 255, 0.4);
+
+            &.active {
+                background: rgba(255, 255, 255, 0.4);
+                color: $white;
+
+                &:hover {
+                    background: $red-color;
+                }
+            }
+        }
+
         &:hover,
         &.active {
             color: $brand-variation-color;

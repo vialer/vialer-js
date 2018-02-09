@@ -52,8 +52,9 @@
         <Keypad :model.sync="call.keypad.number" display="dense" :call="call" mode="call" :number="call.keypad.number"/>
     </div>
     <!-- Show attended/blind transfer option and a dense keypad when transfer is active and the call is still active -->
-    <div class="new-call" v-if="call.status === 'new'">
-        <Keypad :model.sync="call.number" :display="call.keypad.display" mode="call" :call="call" :number="call.number"/>
+    <div class="new-call" v-if="call.status === 'new' || call.keypad.active">
+        <Keypad :model.sync="call.keypad.number" :call="call" :display="call.keypad.display"
+            :mode="call.keypad.mode" :number="call.keypad.number"/>
     </div>
 
     <div class="call-actions">

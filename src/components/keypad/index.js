@@ -44,11 +44,13 @@ module.exports = (app) => {
         methods: Object.assign({
             callStart: function(createCall = false) {
                 if (!this.number) return
-                // Only create a new call when the keypad is used without
-                // existing call; otherwise we initiate a transfer.
-                // Sync the call's state to the background first.
-                if (createCall) app.emit('bg:calls:call_create', {number: this.number})
+                // Only create a new call when the keypad is used without existing call.
+                if (createCall) app.emit('bg:calls:call_create', {number: this.number, start: true})
                 else {
+                    // Using an empty call object. The keypad number is used,
+                    // so set the call's number before sending over the call
+                    // state.
+                    this.call.number = this.number
                     let transferState = JSON.parse(JSON.stringify(this.call))
                     app.emit('bg:calls:call_start', transferState)
                 }
