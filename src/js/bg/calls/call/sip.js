@@ -56,10 +56,9 @@ class CallSip extends Call {
     * An invite; incoming call.
     */
     _handleIncoming() {
-        this.setState({
-            displayName: this.session.remoteIdentity.displayName,
-            number: this.session.remoteIdentity.uri.user,
-        })
+        this.state.displayName = this.session.remoteIdentity.displayName
+        this.state.number = this.session.remoteIdentity.uri.user
+        this.setState(this.state)
 
         // Signal the user about the incoming call.
         if (!this.silent) {
