@@ -66,8 +66,8 @@ module.exports = (app) => {
                 app.emit('bg:calls:call_create', {number: null, start: null})
             },
         }, app.utils.sharedMethods()),
-        render: templates.callswitcher.r,
-        staticRenderFns: templates.callswitcher.s,
+        render: templates.call_switch.r,
+        staticRenderFns: templates.call_switch.s,
         store: {
             calls: 'calls.calls',
         },

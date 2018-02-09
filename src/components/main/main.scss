@@ -4,19 +4,19 @@
     display: flex;
     flex-direction: column;
     max-width: $max-popup-width;
-    position: relative;
     min-height: 260px;
+    position: relative;
 
     .panel {
+        display: flex;
         flex: 1 1 auto;
         overflow: auto;
-        display: flex;
         position: relative;
 
         .panel-content-container {
-            width: 100%;
             margin-top: $spacer * 5;
             overflow: auto;
+            width: 100%;
 
             &.with-sidebar {
                 margin-left: $spacer * 5;
@@ -27,26 +27,26 @@
             }
 
             h1 {
-                text-transform: uppercase;
-                font-weight: 500;
                 color: $brand-color;
-                margin-bottom: $spacer * 2;
                 font-size: 1rem;
+                font-weight: 500;
+                margin-bottom: $spacer * 2;
+                text-transform: uppercase;
             }
         }
 
         .platform-hint {
             background: $grey-color-lightest;
             color: $primary-color;
-            position: relative;
-            padding: $spacer $spacer * 3;
             font-size: 0.9rem;
+            padding: $spacer $spacer * 3;
+            position: relative;
 
             &::before {
                 // Change me when changing ``.icon-info`.
-                content: "\e91a";
-                font-family: 'vialer-js';
                 color: $brand-color;
+                content: "\e91a";
+                font-family: "vialer-js";
             }
         }
     }

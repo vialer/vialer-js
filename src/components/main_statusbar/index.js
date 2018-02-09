@@ -22,8 +22,8 @@ module.exports = (app) => {
                 app.setState({ui: {layer: layerName}}, {persist: true})
             },
         },
-        render: templates.statusbar.r,
-        staticRenderFns: templates.statusbar.s,
+        render: templates.main_statusbar.r,
+        staticRenderFns: templates.main_statusbar.s,
         store: {
             env: 'env',
             layer: 'ui.layer',

@@ -2,56 +2,57 @@
 
 // The most upper box containing account info and
 // icon-links to several locations.
-.statusbar-component {
-    display: flex;
+.main-statusbar-component {
     align-items: center;
-    justify-content: space-between;
-    min-height: $spacer * 5;
     background: $brand-variation-color;
     color: $white;
+    display: flex;
     font-size: 0.8rem;
     font-weight: 500;
-    position: fixed;
-    z-index: 100000;
-    width: 100%;
+    justify-content: space-between;
     max-width: $max-popup-width;
+    min-height: $spacer * 5;
+    position: fixed;
     top: 0;
-
+    width: 100%;
+    z-index: 100000;
 
     &.call-active {
         background: $green-color;
     }
 
-    [class^="icon-"], [class*=" icon-"]:hover {
-        color: $brand-color;
+    [class^="icon-"] {
+        &:hover {
+            color: $brand-color;
+        }
     }
 
     .status-left {
         // Don't wrap but put dots at the end if it doesn't fit.
-        white-space: nowrap;
+        align-items: center;
         display: flex;
         flex-direction: row;
-        align-items: center;
         justify-content: space-between;
+        white-space: nowrap;
 
         .status-indicator {
             width: $spacer * 5;
 
             i {
                 background: $brand-variation-color;
-                width: $spacer * 5;
-                height: $spacer * 5;
-                margin: 0;
-                line-height: $spacer * 4;
+                color: $white;
                 font-size: 1.2rem;
-                vertical-align: middle;
+                height: $spacer * 5;
+                line-height: $spacer * 4;
+                margin: 0;
                 text-align: center;
                 transition: all 1300ms ease;
-                color: $white;
+                vertical-align: middle;
+                width: $spacer * 5;
             }
 
             .disconnected {background: $red-color;}
-            .connected {background: $yellow-color;}
+            .connected {background: $orange-color;}
             .registered {background: $green-color;}
             .registration-failed {background: $orange-color;}
         }
@@ -69,14 +70,14 @@
         vertical-align: middle;
 
         .option {
-            line-height: $spacer * 5;
             height: $spacer * 5;
+            line-height: $spacer * 5;
             padding: 0 $spacer;
 
             &.active,
             &:hover {
-                cursor: pointer;
                 background: $white;
+                cursor: pointer;
 
                 i {
                     color: $brand-color;
@@ -84,9 +85,9 @@
             }
 
             i {
-                line-height: $spacer * 5;
-                font-size: $spacer * 2;
                 color: $white;
+                font-size: $spacer * 2;
+                line-height: $spacer * 5;
             }
         }
     }

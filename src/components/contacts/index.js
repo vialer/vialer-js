@@ -23,10 +23,7 @@ module.exports = (app) => {
         }, app.utils.sharedComputed()),
         methods: Object.assign({
             callContact: function(contact) {
-                // Only make the call when there is currently no call going on.
-                if (!this.calls.length) {
-                    app.emit('bg:calls:call', {number: contact.number})
-                }
+                app.emit('bg:calls:call_create', {number: contact.number, start: true})
             },
         }, app.utils.sharedMethods()),
         render: templates.contacts.r,

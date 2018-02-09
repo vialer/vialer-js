@@ -29,7 +29,7 @@ module.exports = (app, actions) => {
                 })
             },
             dnd: function(newVal, oldVal) {
-                app.setState({availability: {dnd: newVal}})
+                app.setState({availability: {dnd: newVal}}, {persist: true})
             },
             selected: function(newVal, oldVal) {
                 // Save the user's last choice.

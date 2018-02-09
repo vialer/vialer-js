@@ -2,20 +2,20 @@
 
 // The most upper box containing account info and
 // icon-links to several locations.
-.callbar-component {
-    display: flex;
+.main-callbar-component {
     align-items: center;
-    justify-content: space-between;
-    min-height: $spacer * 5;
     background: $green-color;
     color: $white;
+    display: flex;
     font-size: 0.8rem;
     font-weight: 500;
-    position: fixed;
-    z-index: 100000;
-    width: 100%;
+    justify-content: space-between;
     max-width: $max-popup-width;
+    min-height: $spacer * 5;
+    position: fixed;
     top: 0;
+    width: 100%;
+    z-index: 100000;
 
     // Another call that isn't started yet.
     &.inactive {
@@ -24,28 +24,29 @@
     }
 
 
-    [class^="icon-"], [class*=" icon-"]:hover {
+    [class^="icon-"] {
         color: $brand-color;
+        &:hover {color: $brand-color;}
     }
 
     .status-left {
         // Don't wrap but put dots at the end if it doesn't fit.
-        white-space: nowrap;
+        align-items: center;
         display: flex;
         flex-direction: row;
-        align-items: center;
         justify-content: space-between;
+        white-space: nowrap;
 
         .status-indicator {
             width: $spacer * 5;
 
             i {
-                width: $spacer * 5;
-                margin: 0;
-                line-height: $spacer * 4;
                 font-size: 1.2rem;
-                vertical-align: middle;
+                line-height: $spacer * 4;
+                margin: 0;
                 text-align: center;
+                vertical-align: middle;
+                width: $spacer * 5;
             }
         }
 
@@ -58,14 +59,14 @@
         vertical-align: middle;
 
         .option {
-            line-height: $spacer * 4;
             height: $spacer * 4;
+            line-height: $spacer * 4;
             padding: 0 $spacer;
 
             &.active,
             &:hover {
-                cursor: pointer;
                 background: $white;
+                cursor: pointer;
 
                 i {
                     color: $brand-color;
@@ -73,9 +74,9 @@
             }
 
             i {
-                line-height: $spacer * 4;
-                font-size: $spacer * 2;
                 color: $white;
+                font-size: $spacer * 2;
+                line-height: $spacer * 4;
             }
         }
     }

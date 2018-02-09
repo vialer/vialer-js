@@ -108,9 +108,16 @@ class BackgroundApp extends App {
     */
     initStore() {
         super.initStore()
-        let stateObj = this.store.get('state')
-        if (stateObj) {
-            Object.assign(this.state, stateObj)
+        let storedState
+        try {
+            storedState = this.store.get('state')
+        } catch (err) {
+            this.store.clear()
+            storedState = null
+        }
+
+        if (storedState) {
+            Object.assign(this.state, storedState)
             this._restoreState(this.state)
 
             for (let module of Object.keys(this.modules)) {
@@ -118,7 +125,9 @@ class BackgroundApp extends App {
                     this.modules[module]._restoreState(this.state[module])
                 }
             }
-        } else Object.assign(this.state, this._initialState())
+        } else {
+            Object.assign(this.state, this._initialState())
+        }
 
         this.initViewModel()
     }

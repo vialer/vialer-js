@@ -2,26 +2,26 @@
 
 // The most upper box containing account info and
 // icon-links to several locations.
-.callswitcher-component {
+.call-switch-component {
     position: absolute;
-    width: $spacer * 5;
-    top: 0;
     right: 0;
+    top: 0;
+    width: $spacer * 5;
     z-index: 100000;
 
     i {
         color: $white;
-        width: $spacer * 5;
-        text-align: center;
-        line-height: $spacer * 5;
         height: $spacer * 5;
+        line-height: $spacer * 5;
+        text-align: center;
+        width: $spacer * 5;
 
         &.new-call {
-            color: $brand-color;
-            background: rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.2);
+            color: $white;
 
             &.active {
-                background: rgba(255, 255, 255, 0.4);
+                background: rgba(255, 255, 255, 0.2);
                 color: $white;
 
                 &:hover {
@@ -36,16 +36,18 @@
 
         &:hover,
         &.active {
-            color: $brand-variation-color;
             background: $white;
+            color: $brand-variation-color;
             cursor: pointer;
         }
     }
 
     // Just hide the ongoing call for now until we get a better idea.
-    &.inactive i {
-        background: $white;
-        color: $white;
-        cursor: default;
+    &.inactive {
+        i {
+            background: $white;
+            color: $white;
+            cursor: default;
+        }
     }
 }

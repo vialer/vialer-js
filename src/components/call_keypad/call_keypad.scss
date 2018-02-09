@@ -1,29 +1,30 @@
 @import "../../scss/lib/variables";
 @import "../../scss/lib/mixins";
 
-.keypad-component {
-    z-index: 10000000;
-    width: 100%;
+.call-keypad-component {
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    width: 100%;
+    z-index: 10000000;
 
     .contacts-match {
         font-weight: 500;
-        text-align: center;
         height: $spacer * 3;
+        text-align: center;
     }
 
     .number-input {
-        color: #fff;
+        align-items: center;
+        color: $brand-color;
         display: flex;
         justify-content: center;
-        align-items: center;
-        position: relative;
         max-width: 300px;
-
+        position: relative;
 
         input {
+            color: $brand-color;
+
             &::placeholder {
                 color: lighten($brand-color, 20%);
             }
@@ -34,16 +35,16 @@
             margin-bottom: $spacer;
 
             input {
-                border: 1px solid $white;
-                border-top-left-radius: $spacer / 2;
-                border-bottom-left-radius: $spacer / 2;
                 background: none;
+                border: 1px solid $white;
+                border-bottom-left-radius: $spacer / 2;
+                border-top-left-radius: $spacer / 2;
+                color: $brand-color;
                 font-size: 1.5rem;
-                color: $white;
-                text-align: right;
                 height: 40px;
-                width: 200px;
                 padding-right: $spacer;
+                text-align: right;
+                width: 200px;
 
                 &::placeholder {
                     color: lighten($brand-color, 20%);
@@ -53,22 +54,22 @@
             // Transfer button next to input.
             i {
                 background: $white;
-                color: $brand-variation-color;
-                height: 40px;
-                width: 40px;
                 border: 1px solid $white;
+                border-bottom-right-radius: $spacer / 2;
                 border-left: 0;
                 border-top-right-radius: $spacer / 2;
-                border-bottom-right-radius: $spacer / 2;
+                color: $brand-variation-color;
+                height: 40px;
                 transition: all 300ms ease;
+                width: 40px;
 
                 &:hover {cursor: pointer;}
 
                 &.disabled {
-                    color: $grey-color-lighter;
                     background: $brand-variation-color;
-                    cursor: not-allowed;
                     border: 1px solid $brand-variation-color;
+                    color: $grey-color-lighter;
+                    cursor: not-allowed;
                 }
             }
 
@@ -82,24 +83,23 @@
         &.touch {
             input {
                 @include no-outline;
+                background: transparent;
                 border: 0;
-                width: 100%;
-                height: $spacer * 6;
                 font-size: 1.8rem;
                 font-weight: 500;
-                text-align: center;
+                height: $spacer * 6;
                 padding: 0 40px;
-                background: transparent;
-                color: #fff;
+                text-align: center;
+                width: 100%;
             }
 
             i {
                 font-size: 1.8rem;
                 height: 60px;
                 line-height: 55px;
-                vertical-align: center;
                 position: absolute;
                 right: 10px;
+                vertical-align: center;
 
                 &:hover {
                     cursor: pointer;
@@ -115,15 +115,15 @@
     }
 
     .keys {
+        align-content: center;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
         flex-wrap: wrap;
-        align-content: center;
-        width: 100%;
+        justify-content: space-between;
         margin-top: $spacer;
+        width: 100%;
 
-        .row {
+        .key-row {
             display: flex;
             flex-grow: 1;
             justify-content: center;
@@ -131,22 +131,21 @@
 
             .key {
                 @include no-outline;
-                margin: 0 $spacer;
-                height: 65px;
-                width: 65px;
                 background: none;
-                border: 2px solid $white;
-                color: $white;
-                font-size: 1rem;
-                font-weight: bold;
-
+                border: 2px solid $brand-color;
                 border-radius: 100%;
                 break-inside: avoid;
+                color: $brand-color;
+                font-size: 1rem;
+                font-weight: bold;
+                height: 65px;
+                margin: 0 $spacer;
+                width: 65px;
 
                 &:hover {
+                    background: $brand-color;
+                    color: $white;
                     cursor: pointer;
-                    background: $white;
-                    color: $brand-color;
                 }
 
                 .sub {

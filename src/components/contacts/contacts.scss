@@ -1,36 +1,21 @@
 @import "../../scss/lib/variables";
 
 .contacts-component {
-
-    input {
-        margin-bottom: $spacer * 2;
-    }
-
     // A single contact item in the contacts list.
-    .list-item.contact {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        .status-icon {
-            i {
+    .list-item {
+        &.contact {
+            .icon-availability {
                 color: $grey-color;
+
+                &.busy {color: $red-color;}
+                &.available {color: $green-color;}
+
+                &.ringing {
+                    // Ringing state is a css keyframe animation.
+                    animation: ringing 1.5s linear infinite;
+                    transition-timing-function: ease;
+                }
             }
-
-            &.busy i {color: $red-color;}
-            &.available i {color: $green-color;}
-
-            // Ringing state is a css keyframe animation.
-            &.ringing i {
-                transition-timing-function: ease;
-                animation: ringing 1.5s linear infinite;
-            }
-        }
-
-        // Ringing state is a css keyframe animation.
-        .icon.ringing i {
-            transition-timing-function: ease;
-            animation: ringing 1.5s linear infinite;
         }
     }
 }

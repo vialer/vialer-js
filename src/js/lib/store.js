@@ -9,6 +9,11 @@ class Store {
     }
 
 
+    clear() {
+        localStorage.clear()
+    }
+
+
     get(key) {
         if (this.app.verbose) this.app.logger.debug(`${this}get value for key '${key}'`)
         var value = localStorage.getItem(key)

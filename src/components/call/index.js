@@ -27,8 +27,8 @@ module.exports = (app) => {
             classes: function(block) {
                 let classes = {}
                 if (block === 'component') {
-                    if (!this.callsActive) {
-                        classes.inactive = true
+                    if (this.callsActive) {
+                        classes['call-active'] = true
                     }
                 } else if (block === 'dialpad-button') {
                     classes.active = this.call.keypad.active && this.call.keypad.mode === 'dtmf'
@@ -71,8 +71,8 @@ module.exports = (app) => {
         props: {
             call: {default: null},
         },
-        render: templates.calldialog.r,
-        staticRenderFns: templates.calldialog.s,
+        render: templates.call.r,
+        staticRenderFns: templates.call.s,
         store: {
             calls: 'calls.calls',
         },

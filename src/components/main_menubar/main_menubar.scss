@@ -1,35 +1,32 @@
 @import "../../scss/lib/variables";
 
-.sidebar-component {
-    flex: 1 0 $spacer * 5;
+.main-menubar-component {
+    background: $brand-color;
     display: flex;
+    flex: 1 0 $spacer * 5;
     flex-direction: column;
-    text-align: center;
-    top: $spacer * 5;
     height: calc(100% - 40px);
     position: fixed;
-    background: $brand-color;
+    text-align: center;
+    top: $spacer * 5;
     width: $spacer * 5;
     z-index: 100000;
 
     .option {
-        float: left;
-        line-height: $spacer * 5;
-        font-size: $spacer * 3;
-        padding: ($spacer / 2) 0;
         color: $white;
+        float: left;
+        font-size: $spacer * 3;
+        line-height: $spacer * 5;
+        padding: ($spacer / 2) 0;
         transition: all 600ms ease;
 
-        &.availability.available {
-            color: $green-color;
+        &.availability {
+            &.available {color: $green-color;}
+            &.unavailable {color: $red-color;}
         }
 
-        &.availability.unavailable {
-            color: $red-color;
-        }
-
-        &.calls.calls-active {
-            color: $green-color;
+        &.calls {
+            &.calls-active {color: $green-color;}
         }
 
         &.hint {
@@ -40,17 +37,17 @@
             color: rgba(255, 255, 255, 0.5);
 
             &:hover {
+                background: none;
                 color: rgba(255, 255, 255, 0.5);
                 cursor: not-allowed;
-                background: none;
             }
         }
 
         &.active,
         &:hover {
-            cursor: pointer;
             background: $white;
             color: $brand-color;
+            cursor: pointer;
         }
     }
 }

@@ -239,21 +239,11 @@ class CallSip extends Call {
     }
 
 
-    async transfer(targetCall, type) {
-        if (type === 'blind') {
+    async transfer(targetCall) {
+        if (typeof targetCall === 'string') {
             this.session.refer(`sip:${targetCall}@voipgrid.nl`)
-        } else if (type === 'attended') {
-            // Option is a session. Refer to it and hang up.
-            if (targetCall.constructor.name === 'CallSip') {
-                this.session.refer(targetCall.session)
-            } else {
-                // targetCall is a number. Create a new call and set the
-                // new call's transfer mode to accept.
-                let call = this.module.startCall(null, targetCall, {active: true})
-                call.setState({transfer: {type: 'accept'}})
-                // Activate the new call's dialog. Don't hold inactive.
-                this.module.setActiveCall(call, false)
-            }
+        } else {
+            this.session.refer(targetCall.session)
         }
     }
 

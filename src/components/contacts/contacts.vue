@@ -7,8 +7,8 @@
 
     <ul class="list-items">
         <li class="list-item contact" v-for="contact in filteredContacts" :key="contact.id" :class="{'disabled': calls.length}">
-            <div class="status-icon" :class="contact.state">
-                <i class="icon icon-availability"></i>
+            <div class="status-icon">
+                <i class="icon icon-availability" :class="contact.state"></i>
             </div>
             <div class="info">
                 <div class="name">{{contact.name}}</div>
@@ -16,9 +16,9 @@
             </div>
             <div class="contact-options list-item-options">
                 <div class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.number)">
-                    <i class="icon icon-transfer" v-on:click.once="transferActivate(contact.number)"></i>
+                    <i class="icon icon-transfer" v-on:click.once="transferCallNumber(contact.number)"></i>
                 </div>
-                <div class="rounded-button" v-if="!transferStatus && !numbersOngoing.length">
+                <div class="rounded-button" v-if="callsReady && !transferStatus">
                     <i class="icon icon-phone" v-on:click="callContact(contact)"></i>
                 </div>
             </div>

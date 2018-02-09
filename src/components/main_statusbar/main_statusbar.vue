@@ -1,4 +1,4 @@
-<div class="statusbar-component">
+<div class="main-statusbar-component">
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator">
             <i v-if="ua.state === 'disconnected'" class="icon icon-disconnected disconnected" :title="$t('Status:') + ' ' + $t('disconnected')"></i>

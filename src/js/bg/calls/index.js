@@ -40,7 +40,7 @@ class CallsModule extends Module {
         })
 
         this.app.on('bg:calls:call_create', ({number, start}) => {
-            // First check if there is a `new` call ready to be used first.
+            // First check if there is a `new` call ready to be used.
             let call
             for (const callId of Object.keys(this.calls)) {
                 if (this.calls[callId].state.status === 'new') {
@@ -86,15 +86,14 @@ class CallsModule extends Module {
         })
 
 
-        /**
-        * Situation: Caller A and B are connected. B is also connected to
-        * caller C. B and C will directly connect to each other in case of
-        * a blind transfer. An attended transfer needs to call
-        * the `calls:transfer_finalize` listener afterwards.
-        * @param {Object} options - Options.
-        */
-        this.app.on('bg:calls:transfer_activate', ({callId, number}) => {
-            this.calls[callId].transfer(number, this.calls[callId].state.transfer.type)
+        this.app.on('bg:calls:transfer_call_number', ({callId, number}) => {
+            // targetCall is a number. Create a new call and set the
+            // new call's transfer mode to accept.
+            console.log("CALL", callId, number)
+            let call = new Call(this, number)
+            call.setState({transfer: {type: 'accept'}})
+            call.start()
+            this.setActiveCall(call, false )
         })
 
 
@@ -110,7 +109,7 @@ class CallsModule extends Module {
                     sourceCall = this.calls[_callId]
                 }
             }
-            sourceCall.transfer(this.calls[callId], 'attended')
+            sourceCall.transfer(this.calls[callId])
         })
 
 
@@ -123,19 +122,17 @@ class CallsModule extends Module {
             if (!this.calls[callId].state.transfer.active) {
                 // Start by holding the current call when switching on transfer.
                 if (!this.calls[callId].state.hold) this.calls[callId].hold()
-                // Mark the call as active/attended to start with
-                // and disable any open keypad.
+                // Mark transfer as active/attended and disable the keypad.
                 this.calls[callId].setState({keypad: {active: false}, transfer: {active: true, type: 'attended'}})
-
-                // All other calls are set to transfer type the source call
-                // is set to transfer.
+                // Set the correct state of all other calls; se the transfer
+                // type to accept and disable transfer modus..
                 for (let _callId of callIds) {
                     if (_callId !== callId) {
                         this.calls[_callId].setState({transfer: {active: false, type: 'accept'}})
                     }
                 }
             } else {
-                if (this.calls[callId].state.hold) this.calls[callId].unhold()
+                // Switching transfer off.
                 this.calls[callId].setState({transfer: {active: false}})
                 this.setActiveCall(this.calls[callId], true, true)
 

@@ -1,4 +1,4 @@
-<div class="calldialog-component" :class="classes('component')">
+<div class="call-component" :class="classes('component')">
     <!-- Call information during a call. Hide when the keypad takes too muchs space. -->
     <div class="call-info" v-if="(!call.keypad.active || call.keypad.display === 'dense') && !['new'].includes(call.status)">
         <div class="info-status">{{callStatus}}</div>
@@ -49,11 +49,11 @@
             </div>
         </div>
         <div class="transfer-text">{{$t('Select a recipient or enter a number to transfer.')}}</div>
-        <Keypad :model.sync="call.keypad.number" display="dense" :call="call" mode="call" :number="call.keypad.number"/>
+        <CallKeypad :model.sync="call.keypad.number" display="dense" :call="call" mode="call" :number="call.keypad.number"/>
     </div>
     <!-- Show attended/blind transfer option and a dense keypad when transfer is active and the call is still active -->
     <div class="new-call" v-if="call.status === 'new' || call.keypad.active">
-        <Keypad :model.sync="call.keypad.number" :call="call" :display="call.keypad.display"
+        <CallKeypad :model.sync="call.keypad.number" :call="call" :display="call.keypad.display"
             :mode="call.keypad.mode" :number="call.keypad.number"/>
     </div>
 

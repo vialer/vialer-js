@@ -1,4 +1,4 @@
-<div class="callbar-component" :class="{inactive: call.status === 'new'}">
+<div class="main-callbar-component" :class="{inactive: call.status === 'new'}">
     <div></div>
     <div class="in-call-info">
         <div class="caller-status" v-if="call.status === 'new'">

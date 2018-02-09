@@ -10,8 +10,8 @@ module.exports = (app) => {
                 classes.active = (this.layer === block)
 
                 if (block === 'availability') {
-                    if (this.available === 'yes') classes.available = true
-                    if (this.available === 'no') classes.unavailable = true
+                    if (this.available) classes.available = true
+                    else classes.unavailable = true
                 } else if (block === 'calls') {
                     classes['calls-active'] = this.callsActive
                 } else if (block === 'contacts') {
@@ -33,8 +33,8 @@ module.exports = (app) => {
                 })
             },
         },
-        render: templates.sidebar.r,
-        staticRenderFns: templates.sidebar.s,
+        render: templates.main_menubar.r,
+        staticRenderFns: templates.main_menubar.s,
         store: {
             available: 'availability.available',
             calls: 'calls.calls',

@@ -42,10 +42,10 @@ module.exports = function(app) {
                 if (app.env.isExtension) browser.tabs.create({url: url})
                 else window.open(url, '_blank')
             },
-            transferActivate: function(number) {
+            transferCallNumber: function(number) {
                 if (!number) return
                 let activeCall = this.getActiveCall()
-                app.emit('bg:calls:transfer_activate', {callId: activeCall.id, number: number})
+                app.emit('bg:calls:transfer_call_number', {callId: activeCall.id, number: number})
             },
         }
     }
@@ -60,6 +60,18 @@ module.exports = function(app) {
                 // User wants to create its first call.
                 if (callIds.length === 1 && calls[callIds[0]].status === 'new') return false
                 return true
+            },
+            callsReady: function() {
+                let ready = true
+                const callIds = Object.keys(this.$store.calls.calls)
+                for (let callId of callIds) {
+                    console.log(this.calls[callId].status)
+                    if (!['accepted', 'new'].includes(this.calls[callId].status)) {
+                        ready = false
+                    }
+                }
+                console.log("READY:", ready)
+                return ready
             },
             callStatus: function() {
                 const translations = utils.getTranslations()
@@ -105,11 +117,10 @@ module.exports = function(app) {
                 let transferStatus = false
                 const calls = this.$store.calls.calls
                 const callKeys = Object.keys(calls)
-                if (callKeys.length > 1) {
-                    for (let callId of callKeys) {
-                        if (calls[callId].transfer.active) {
-                            transferStatus = 'select'
-                        }
+
+                for (let callId of callKeys) {
+                    if (calls[callId].transfer.active) {
+                        transferStatus = 'select'
                     }
                 }
                 return transferStatus

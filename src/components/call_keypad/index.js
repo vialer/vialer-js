@@ -51,6 +51,8 @@ module.exports = (app) => {
                     // so set the call's number before sending over the call
                     // state.
                     this.call.number = this.number
+                    // Reset the keypad number.
+                    this.call.keypad.number = ''
                     let transferState = JSON.parse(JSON.stringify(this.call))
                     app.emit('bg:calls:call_start', transferState)
                 }
@@ -107,8 +109,8 @@ module.exports = (app) => {
                 type: Boolean,
             },
         },
-        render: templates.keypad.r,
-        staticRenderFns: templates.keypad.s,
+        render: templates.call_keypad.r,
+        staticRenderFns: templates.call_keypad.s,
         store: {
             contacts: 'contacts.contacts',
         },

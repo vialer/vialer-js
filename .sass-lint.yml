@@ -29,7 +29,7 @@ rules:
     no-empty-rulesets: 1
     no-extends: 0
     no-ids: 1
-    no-important: 0
+    no-important: 1
     no-invalid-hex: 1
     no-mergeable-selectors: 1
     no-misspelled-properties: 1
@@ -44,7 +44,7 @@ rules:
 
     # Nesting
     force-attribute-nesting: 0
-    force-element-nesting: 0
+    force-element-nesting: 1
     force-pseudo-nesting: 0
 
     # Name Formats
@@ -71,7 +71,7 @@ rules:
         - 1
         -
             max-depth: 5
-    property-sort-order: 0
+    property-sort-order: 1
     pseudo-element: 0
     quotes:
       - 1

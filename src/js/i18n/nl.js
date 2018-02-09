@@ -9,6 +9,7 @@ global.translations.nl = {
     'Availability options': 'Bereikbaarheidsvoorkeuren',
     'callgroups': 'belgroepen',
     'Callgroups': 'Belgroepen',
+    'Calling': 'Bellen',
     'Changing your availability only has effect when your platform user is part of the called number\'s dialplan.': 'Je beschikbaarheid aanpassen heeft alleen effect wanneer je platform gebruiker onderdeel is van het gebelde nummer\'s belplan.',
     'Click-to-Dial icons': 'Klik-en-bel iconen',
     'Close': 'Sluiten',

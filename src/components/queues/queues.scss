@@ -8,33 +8,35 @@
         }
 
         &.selected {
-            .queues-options .selected {
-                color: $green-color;
-                font-size: $spacer * 3;
-                line-height: $spacer * 3;
-                margin-right: $spacer;
+            .queues-options {
+                .selected {
+                    color: $green-color;
+                    font-size: $spacer * 3;
+                    line-height: $spacer * 3;
+                    margin-right: $spacer;
+                }
             }
         }
 
         .status-icon {
-            vertical-align: center;
             text-align: center;
+            vertical-align: center;
 
             // The queues icon is a somewhat deviant icons.
             // It is a background with inside text, instead
             // of a font.
             .indicator {
-                width: $spacer * 3;
-                height: $spacer * 3;
-                line-height: $spacer * 3;
-                vertical-align: center;
-                letter-spacing: 0;
-                // Centers the icon in the middle of the background.
+                border-radius: 100%;
+                color: $white;
                 font-size: 0.8rem;
                 font-style: normal;
                 font-weight: 500;
-                border-radius: 100%;
-                color: $white;
+                height: $spacer * 3;
+                letter-spacing: 0;
+                line-height: $spacer * 3;
+                vertical-align: center;
+                width: $spacer * 3;
+                // Centers the icon in the middle of the background.
 
                 &.quiet {background: $green-color;}
                 &.moderate {background: $yellow-color;}

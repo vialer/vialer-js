@@ -1,4 +1,4 @@
-<div class="sidebar-component">
+<div class="main-menubar-component">
     <div class="option availability" :class="classes('availability')" @click="setLayer('availability')">
          <i class="icon-availability" :class="{}"></i>
     </div>

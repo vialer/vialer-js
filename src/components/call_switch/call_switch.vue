@@ -1,4 +1,4 @@
-<div class="callswitcher-component" :class="{inactive: !callsActive}">
+<div class="call-switch-component" :class="{inactive: !callsActive}">
 
     <!-- First loop through all the active calls -->
     <div class="call" v-if="call.status !== 'new'" v-for="call in calls">

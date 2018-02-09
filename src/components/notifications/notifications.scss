@@ -1,30 +1,29 @@
 @import "../../scss/lib/variables";
 
 .notifications-component {
+    left: 0;
+    max-width: $max-popup-width;
     position: fixed;
     top: $spacer * 5;
-    left: 0;
     width: 100%;
-    max-width: $max-popup-width;
-
     z-index: 100000;
 
     &.with-sidebar {
         left: $spacer * 5;
-        width: calc(100% - #{$spacer * 5});
         max-width: $max-popup-width - ($spacer * 5);
+        width: calc(100% - #{$spacer * 5});
     }
 
     .notification {
-        color: #fff;
+        align-items: center;
+        border-radius: 0;
+        color: $white;
         display: flex;
         flex-direction: row;
-        align-items: center;
+        height: $spacer * 6;
         justify-content: space-between;
         margin: 0;
         padding: 0;
-        border-radius: 0;
-        height: $spacer * 6;
 
         .icon {
             height: 100%;
@@ -42,9 +41,9 @@
         }
 
         .delete {
-            vertical-align: middle;
-            margin-right: $spacer;
             margin-left: $spacer;
+            margin-right: $spacer;
+            vertical-align: middle;
         }
     }
 }
