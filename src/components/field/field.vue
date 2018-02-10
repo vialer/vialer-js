@@ -24,7 +24,7 @@
             <select multiple size=6 class="multi-select" v-on:change="vChange($event, $event.target.value)" :id="name" :name="name"
                 :options="options">
                 <option v-if="vmodel" :selected="vmodel.includes(option[idfield])" :value="option[idfield]" v-for="option in options">
-                    {{option.name}}
+                    {{$t(option.name)}}
                 </option>
             </select>
         </span>
@@ -50,7 +50,7 @@
                 :name="name" :v-bind:value="vmodel" :disabled="disabled">
                 <option value="" v-if="placeholder">{{placeholder}}</option>
                 <option :selected="option[idfield] == vmodel.id" :value="option[idfield]" v-for="option in options">
-                    {{option.name}}
+                    {{$t(option.name)}}
                 </option>
             </select>
         </div>

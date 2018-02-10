@@ -156,16 +156,11 @@ class App extends Skeleton {
     initI18n() {
         const i18nStore = new I18nStore(this.store)
         Vue.use(i18n, i18nStore)
-        if (global.translations && this.state.user.language in translations) {
-            Vue.i18n.add(this.state.user.language, translations.nl)
-            Vue.i18n.set(this.state.user.language)
-        } else {
-            // Warn about a missing language when it's a different one than
-            // the default.
-            if (this.state.user.language !== 'en') {
-                this.logger.warn(`No translations found for ${this.state.user.language}`)
-            }
+        let selectedLanguage = this.state.settings.language.selected.id
+        for (const translation of Object.keys(translations)) {
+            Vue.i18n.add(selectedLanguage, translations[translation])
         }
+        Vue.i18n.set(selectedLanguage)
         // Add a simple reference to the translation module.
         this.$t = Vue.i18n.translate
     }

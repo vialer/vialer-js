@@ -18,6 +18,17 @@
 
         <!-- User preferences -->
         <div class="tab" :class="{'is-active': tabs.active === 'general'}">
+            <Field name="language" type="select"
+                :label="$t('Language')" :model.sync="settings.language.selected"
+                :help="$t('Language to use within the app.')"
+                :options="settings.language.options"
+                :placeholder="$t('Select a language')"/>
+
+            <Field name="click2dial" type="checkbox"
+                :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
+                :help="$t('Add clickable icons next to phonenumbers in webpages.')"
+                :placeholder="$t('SIP Server')"/>
+
             <Field name="platform_enabled" type="checkbox"
                 :label="$t('Platform integration')" :model.sync="settings.platform.enabled"
                 :help="$t('Add user availability, queues status monitoring and calling without WebRTC. Requires a paid platform account.')"/>
@@ -27,11 +38,6 @@
                 :label="$t('Platform URL')" :model.sync="settings.platform.url"
                 :help="$t('This URL is used to communicate with the platform API. Don\'t change it unless you know what you\'re doing.')"
                 placeholder="https://"/>
-
-            <Field name="click2dial" type="checkbox"
-                :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
-                :help="$t('Add clickable icons next to phonenumbers in webpages.')"
-                :placeholder="$t('SIP Server')"/>
 
             <Field name="telemetry_enabled" type="checkbox"
                 :label="$t('Telemetry data')" :model.sync="settings.telemetry.enabled"

@@ -16,6 +16,13 @@ class SettingsModule extends Module {
                 blacklist: [],
                 enabled: true,
             },
+            language: {
+                options: [
+                    {id: 'nl', name: 'Dutch'},
+                    {id: 'en', name: 'English'},
+                ],
+                selected: {id: 'nl', name: 'Dutch'},
+            },
             platform: {
                 enabled: true,
                 url: process.env.PLATFORM_URL,

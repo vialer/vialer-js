@@ -61,6 +61,9 @@ module.exports = (app) => {
                     app.setState({settings: this.settings}, {persist: false})
                 },
             },
+            'settings.language.selected': function(newVal, oldVal) {
+                Vue.i18n.set(newVal.id)
+            },
         },
     }
 }

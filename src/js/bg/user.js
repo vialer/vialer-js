@@ -18,7 +18,6 @@ class UserModule extends Module {
         return {
             authenticated: false,
             developer: false, // Unlocks experimental developer-only features.
-            language: 'nl',
             password: '',
             platform: {
                 tokens: {
