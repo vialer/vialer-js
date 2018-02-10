@@ -113,10 +113,20 @@ module.exports = (app) => {
         staticRenderFns: templates.call_keypad.s,
         store: {
             contacts: 'contacts.contacts',
+            user: 'user',
         },
         watch: {
             number: function(newVal, oldVal) {
                 let cleanedNumber = sanitizeNumber(newVal)
+                // Toggle developer features with a special number.
+                if (newVal === '02*06*18') {
+                    if (!this.user.developer) {
+                        this.$notify({icon: 'rocket', message: this.$t('Developer mode activated'), type: 'danger'})
+                    } else {
+                        this.$notify({icon: 'rocket', message: this.$t('Developer mode deactivated'), type: 'danger'})
+                    }
+                    app.setState({user: {developer: !this.user.developer}}, {persist: true})
+                }
                 this.$emit('update:model', cleanedNumber)
             },
         },

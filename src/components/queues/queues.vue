@@ -40,8 +40,8 @@
     <div class="platform-hint" v-if="queues.length <= 1">
         {{$t('You have {count} queue callgroup configured. ::: You have {count} queue callgroups configured.', {count: queues.length}, queues.length)}} {{$t('To add more:')}}
         <ul class="decorated-list">
-            <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Callgroups')}}</a> {{$t('to manage {target}', {target: $t('callgroups')})}}.</li>
-            <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Queues')}}</a> {{$t('to manage {target}', {target: $t('queues')})}}.</li>
+            <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Callgroups')}}</a> {{$t('to manage your {target}', {target: $t('callgroups')})}}.</li>
+            <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Queues')}}</a> {{$t('to manage your {target}', {target: $t('queues')})}}.</li>
             <li>{{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to add the {source} to a {target}', {source: $t('queue'), target: $t('dialplan')})}}.</li>
         </ul>
     </div>

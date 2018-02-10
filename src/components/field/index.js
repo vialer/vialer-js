@@ -138,9 +138,7 @@ module.exports = (app) => {
             },
             label: String,
             model: '',
-            namefield: {
-                default: 'name',
-            },
+            name: '',
             options: Array,
             placeholder: String,
             type: String,

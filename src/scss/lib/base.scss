@@ -2,10 +2,9 @@
 html,
 body {
     height: auto;
-    padding: 0;
     margin: 0;
+    padding: 0;
     zoom: 1;
-    min-width: 500px;
 }
 
 body {
@@ -19,8 +18,8 @@ body {
 
     button {
         &.button {
-            width: 100%;
             height: $spacer * 5;
+            width: 100%;
         }
     }
 
@@ -65,17 +64,17 @@ video {
     background: lighten($grey-color-lighter, 1%);
 
     .list-item {
+        align-items: center;
         display: flex;
         justify-content: space-between;
-        align-items: center;
         padding: 8px;
 
         .status-icon {
-            width: $spacer * 6;
-            height: $spacer * 6;
-            display: flex;
-            justify-content: center;
             align-items: center;
+            display: flex;
+            height: $spacer * 6;
+            justify-content: center;
+            width: $spacer * 6;
         }
 
         .info {
@@ -99,18 +98,18 @@ video {
         }
 
         .list-item-options {
-            display: flex;
             align-items: center;
+            display: flex;
         }
 
         .rounded-button {
             background: $white;
-            padding: 0;
-            width: $spacer * 4;
-            height: $spacer * 4;
-            text-align: center;
-            line-height: 32px;
             box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+            height: $spacer * 4;
+            line-height: 32px;
+            padding: 0;
+            text-align: center;
+            width: $spacer * 4;
 
             &:hover {
                 background: $brand-color;
@@ -129,8 +128,17 @@ video {
 .decorated-list {
     li {
         &::before {
-            content: "• ";
             color: $brand-color;
+            content: "• ";
         }
+    }
+}
+
+.tab {
+    display: none;
+    margin-bottom: $spacer * 2;
+
+    &.is-active {
+        display: block;
     }
 }

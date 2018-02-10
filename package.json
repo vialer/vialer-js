@@ -77,7 +77,7 @@
   },
   "dependencies": {
     "axios": "^0.16.2",
-    "bulma": "^0.6.1",
+    "bulma": "^0.6.2",
     "bulma-switch": "^0.1.4",
     "css-element-queries": "^0.4.0",
     "eventemitter3": "^2.0.3",

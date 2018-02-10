@@ -17,6 +17,7 @@ class UserModule extends Module {
     _initialState() {
         return {
             authenticated: false,
+            developer: false, // Unlocks experimental developer-only features.
             language: 'nl',
             password: '',
             platform: {

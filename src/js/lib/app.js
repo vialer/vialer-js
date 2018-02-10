@@ -103,6 +103,11 @@ class App extends Skeleton {
             notifications: [],
             ui: {
                 layer: 'login',
+                tabs: {
+                    settings: {
+                        active: 'general',
+                    },
+                },
                 visible: false,
             },
             vendor: process.env.VENDOR,

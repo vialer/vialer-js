@@ -21,6 +21,9 @@ module.exports = (app) => {
                 app.vm.$notify({icon: 'database', message: app.$t('Settings stored'), type: 'info'})
                 app.emit('bg:calls:connect')
             },
+            setTab: function(name) {
+                app.setState({ui: {tabs: {settings: {active: name}}}}, {persist: true})
+            },
         },
         mounted: function() {
             navigator.mediaDevices.enumerateDevices().then((devices) => {
@@ -45,7 +48,9 @@ module.exports = (app) => {
         staticRenderFns: templates.settings.s,
         store: {
             settings: 'settings',
+            tabs: 'ui.tabs.settings',
             user: 'user',
+            vendor: 'vendor',
         },
         watch: {
             // Copy changes to settings to the background state when they
@@ -53,12 +58,7 @@ module.exports = (app) => {
             settings: {
                 deep: true,
                 handler: function(newVal, oldVal) {
-                    app.emit('bg:set_state', {
-                        persist: false,
-                        state: {
-                            settings: this.settings,
-                        },
-                    })
+                    app.setState({settings: this.settings}, {persist: false})
                 },
             },
         },

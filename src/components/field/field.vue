@@ -1,11 +1,8 @@
 <div class="field" v-if="type === 'checkbox'">
-    <p class="control">
-        <label :id="name" class="checkbox" :for="name">
-            <input type="checkbox" v-on:change="vChange($event, $event.target.value)" v-bind:checked="vmodel" :id="name"/>
-                {{label}}
-        </label>
-        <em class="help" v-if="help">{{help}}</em>
-    </p>
+    <input :id="name" type="checkbox" :name="name" v-on:change="vChange($event, $event.target.value)"
+        v-bind:checked="vmodel" class="switch"/>
+    <label :for="name" class="checkbox" >{{label}}</label>
+    <em class="help" v-if="help">{{help}}</em>
 </div>
 
 <div class="field" v-else-if="type === 'color'">
@@ -27,7 +24,7 @@
             <select multiple size=6 class="multi-select" v-on:change="vChange($event, $event.target.value)" :id="name" :name="name"
                 :options="options">
                 <option v-if="vmodel" :selected="vmodel.includes(option[idfield])" :value="option[idfield]" v-for="option in options">
-                    {{ option[namefield] }}
+                    {{option.name}}
                 </option>
             </select>
         </span>
@@ -53,7 +50,7 @@
                 :name="name" :v-bind:value="vmodel" :disabled="disabled">
                 <option value="" v-if="placeholder">{{placeholder}}</option>
                 <option :selected="option[idfield] == vmodel.id" :value="option[idfield]" v-for="option in options">
-                    {{ option[namefield] }}
+                    {{option.name}}
                 </option>
             </select>
         </div>

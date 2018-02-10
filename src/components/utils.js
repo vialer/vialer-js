@@ -65,12 +65,10 @@ module.exports = function(app) {
                 let ready = true
                 const callIds = Object.keys(this.$store.calls.calls)
                 for (let callId of callIds) {
-                    console.log(this.calls[callId].status)
                     if (!['accepted', 'new'].includes(this.calls[callId].status)) {
                         ready = false
                     }
                 }
-                console.log("READY:", ready)
                 return ready
             },
             callStatus: function() {
