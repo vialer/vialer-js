@@ -1,5 +1,6 @@
 /**
-* Phone tone generators; based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
+* Phone tone generators.
+* based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 */
 const context = new AudioContext()
 
@@ -23,11 +24,6 @@ class DtmfTone {
             8: {f1: 852, f2: 1336},
             9: {f1: 852, f2: 1477},
         }
-    }
-
-
-    start() {
-
     }
 
 
@@ -168,27 +164,88 @@ class RingbackTone {
 /**
 * Play an pre-delivered ogg-file as ringtone.
 */
-class RingTone {
+class RingTone extends EventEmitter {
 
-    constructor(target) {
+    constructor(target, loop = true) {
+        super()
         this.audio = new Audio(`ringtones/${target}`)
         // Loop the sound.
-        this.audio.addEventListener('ended', function() {
-            this.currentTime = 0
-            this.play()
+        this.audio.addEventListener('ended', () => {
+            this.emit('stop')
+            if (loop) {
+                this.audio.currentTime = 0
+                this.audio.play()
+            }
         }, false)
+
     }
 
     play() {
         this.audio.play()
+        this.emit('play')
     }
 
 
     stop() {
         this.audio.pause()
         this.audio.currentTime = 0
+        this.emit('stop')
     }
 }
 
 
-module.exports = {DtmfTone, RingbackTone, RingTone}
+/**
+*  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+*
+*  Use of this source code is governed by a BSD-style license
+*  that can be found in the LICENSE file in the root of the source
+*  tree.
+*
+* Meter class that generates a number correlated to audio volume.
+* The meter class itself displays nothing, but it makes the
+* instantaneous and time-decaying volumes available for inspection.
+* It also reports on the fraction of samples that were at or near
+* the top of the measurement range.
+*/
+class SoundMeter {
+
+    constructor() {
+        this.instant = 0.0
+        this.slow = 0.0
+        this.clip = 0.0
+        this.script = context.createScriptProcessor(2048, 1, 1)
+        var that = this
+        this.script.onaudioprocess = function(event) {
+            var input = event.inputBuffer.getChannelData(0)
+            var i
+            var sum = 0.0
+            var clipcount = 0
+            for (i = 0; i < input.length; ++i) {
+                sum += input[i] * input[i]
+                if (Math.abs(input[i]) > 0.99) {
+                    clipcount += 1
+                }
+            }
+            that.instant = Math.sqrt(sum / input.length)
+            that.slow = 0.95 * that.slow + 0.05 * that.instant
+            that.clip = clipcount / input.length
+        }
+    }
+
+    connectToSource(stream, callback) {
+        this.mic = context.createMediaStreamSource(stream)
+        this.mic.connect(this.script)
+        // necessary to make sample run, but should not be.
+        this.script.connect(context.destination)
+    }
+
+    stop() {
+        this.mic.disconnect()
+        this.script.disconnect()
+    }
+}
+
+
+
+
+module.exports = {DtmfTone, RingbackTone, RingTone, SoundMeter}

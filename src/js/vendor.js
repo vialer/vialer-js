@@ -1,4 +1,5 @@
 window.global = window
+global.EventEmitter = require('eventemitter3')
 if (!global.translations) global.translations = {}
 
 global.$ = require('jquery')

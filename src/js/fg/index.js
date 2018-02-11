@@ -96,10 +96,10 @@ function initApp(initParams) {
     }
 
     navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
-        this.stream = stream
+        app.localStream = stream
+        app.state.settings.webrtc.permission = true
     }).catch((err) => {
-        console.warn(err)
-        app.vm.$notify({icon: 'warning', message: `Media access failed: ${err.name}`, type: 'danger'})
+        app.state.settings.webrtc.permission = false
     })
 
     return app

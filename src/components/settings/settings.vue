@@ -6,11 +6,11 @@
                 <li :class="{'is-active': tabs.active === 'general'}" @click="setTab('general')">
                     <a><span class="icon is-small"><i class="fa fa-user"></i></span><span>{{$t('General')}}</span></a>
                 </li>
-                <li :class="{'is-active': tabs.active === 'phone'}" @click="setTab('phone')">
-                    <a><span class="icon is-small"><i class="fa fa-phone"></i></span><span>{{$t('Phone')}}</span></a>
-                </li>
                 <li :class="{'is-active': tabs.active === 'audio'}" @click="setTab('audio')">
                     <a><span class="icon is-small"><i class="fa fa-headphones"></i></span><span>Audio</span></a>
+                </li>
+                <li :class="{'is-active': tabs.active === 'phone'}" @click="setTab('phone')">
+                    <a><span class="icon is-small"><i class="fa fa-phone"></i></span><span>{{$t('Phone')}}</span></a>
                 </li>
             </ul>
         </div>
@@ -40,8 +40,57 @@
                 placeholder="https://"/>
 
             <Field name="telemetry_enabled" type="checkbox"
-                :label="$t('Telemetry data')" :model.sync="settings.telemetry.enabled"
+                :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
                 :help="$t('Help us improving this software by sending anonimized usage statistics.')"/>
+        </div>
+
+        <!-- Audio settings -->
+        <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
+            <div class="ringtone">
+                <Field class="ringtone-select" name="ringtone" type="select"
+                    :disabled="!settings.webrtc.enabled"
+                    :label="$t('Ringtone')" :model.sync="settings.ringtones.selected"
+                    :options="settings.ringtones.options"
+                    :placeholder="$t('Select a ringtone')"/>
+
+                <a class="ringtone-play button is-link" :disabled="!sound.enabled" @click="playSound()">
+                    <span class="icon is-small">
+                        <i class="fa fa-volume-control-phone"></i>
+                    </span>
+                </a>
+            </div>
+
+            <!-- Media permission switch -->
+            <div class="field">
+                <Field name="webrtc_permission" type="checkbox"
+                    :label="$t('Microphone access')" :model.sync="settings.webrtc.permission"
+                    :help="$t('The browser requires access to your microphone in order to use the WebRTC softphone.')"/>
+                <!-- Additional help to guide the user to the browser permission settings. -->
+                <em class="help" v-if="!settings.webrtc.permission">
+                    <ul class="styled-list">
+                        <li>{{$t('This permission needs to be granted from the plugin\'s tab view modus.')}}</li>
+                        <li>{{$t('Click on the camera icon in the browser navigation bar to change the permission.')}}</li>
+                    </ul>
+                </em>
+            </div>
+
+            <!-- Input volume meter check -->
+            <div class="field" v-if="settings.webrtc.permission">
+                <label for="platform_url" class="label">{{$t('Microphone level')}}</label>
+                <progress class="progress is-success" :value="sound.inputLevel" max="1"></progress>
+            </div>
+
+            <Field name="input_device" type="select" v-if="user.developer"
+                :disabled="!settings.webrtc.enabled"
+                :label="$t('Input device')" :model.sync="settings.webrtc.sinks.input"
+                :options="inputDevice.options"
+                :placeholder="$t('Select an input device')"/>
+
+            <Field name="output_device" type="select" v-if="user.developer"
+                :disabled="!settings.webrtc.enabled"
+                :label="$t('Output device')" :model.sync="settings.webrtc.sinks.output"
+                :options="outputDevice.options"
+                :placeholder="$t('Select an output device')"/>
         </div>
 
 
@@ -65,28 +114,6 @@
                 :disabled="!settings.webrtc.enabled"
                 :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.password"
                 :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
-        </div>
-
-
-        <!-- Audio settings -->
-        <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
-            <Field name="ringtone" type="select"
-                :disabled="!settings.webrtc.enabled"
-                :label="$t('Ringtone')" :model.sync="settings.ringtones.selected"
-                :options="settings.ringtones.options"
-                :placeholder="$t('Select a ringtone')"/>
-
-            <Field name="input_device" type="select" v-if="user.developer"
-                :disabled="!settings.webrtc.enabled"
-                :label="$t('Input device')" :model.sync="settings.webrtc.sinks.input"
-                :options="inputDevice.options"
-                :placeholder="$t('Select an input device')"/>
-
-            <Field name="output_device" type="select" v-if="user.developer"
-                :disabled="!settings.webrtc.enabled"
-                :label="$t('Output device')" :model.sync="settings.webrtc.sinks.output"
-                :options="outputDevice.options"
-                :placeholder="$t('Select an output device')"/>
         </div>
 
         <div class="field is-grouped">

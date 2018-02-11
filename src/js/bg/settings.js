@@ -42,6 +42,7 @@ class SettingsModule extends Module {
             webrtc: {
                 enabled: false,
                 password: '',
+                permission: false, // The microphone permission.
                 sinks: {
                     input: {id: '', name: ''},
                     output: {id: '', name: ''},

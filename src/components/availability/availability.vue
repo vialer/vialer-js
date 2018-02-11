@@ -16,7 +16,7 @@
 
                 <em class="help">
                     {{$t('Changing your availability only has effect when your platform user is part of the dialplan for the incoming call.')}}
-                    {{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Callgroups')}}</a> {{$t('to manage your {target}', {target: $t('dialplans')})}}.
+                    {{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to manage your {target}', {target: $t('dialplans')})}}.
                 </em>
             </div>
         </div>

@@ -27,7 +27,8 @@
         "Vue": true,
         "translations": true,
         "I18nStore": true,
-        "i18n": true
+        "i18n": true,
+        "EventEmitter": true
     },
     "plugins": [
         "sort-class-members"

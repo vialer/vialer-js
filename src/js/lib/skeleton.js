@@ -1,4 +1,3 @@
-const EventEmitter = require('eventemitter3')
 const Logger = require('./logger')
 const Store = require('./store')
 

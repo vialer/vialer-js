@@ -1,5 +1,3 @@
-const EventEmitter = require('eventemitter3')
-
 /**
 * Generic handling for each module.
 */
