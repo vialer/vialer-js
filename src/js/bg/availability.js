@@ -18,33 +18,24 @@ class AvailabilityModule extends Module {
         */
         this.app.on('bg:availability:update', async({available, selected, destinations}) => {
             // Set an icon depending on whether the user is available.
-            let icon = 'img/icon-menubar-unavailable.png'
             let endpoint = `api/selecteduserdestination/${this.app.state.availability.sud}/`
             let res
             this.app.setState({availability: {available, destinations, placeholder: selected, selected: selected}}, {persist: true})
 
             if (available) {
-                icon = 'img/icon-menubar-active.png'
+                this.app.state.ui.menubar.icon = 'menubar-active'
                 res = await this.app.api.client.put(endpoint, {
                     fixeddestination: selected.type === 'fixeddestination' ? selected.id : null,
                     phoneaccount: selected.type === 'phoneaccount' ? selected.id : null,
                 })
             } else {
-                icon = 'img/icon-menubar-unavailable.png'
+                this.app.state.ui.menubar.icon = 'menubar-unavailable'
                 res = await this.app.api.client.put(endpoint, {fixeddestination: null, phoneaccount: null})
             }
-
-
 
             if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                 this.app.logger.warn(`${this}unauthorized availability request`)
                 return
-            }
-
-            if (this.app.env.isExtension) {
-                if (!this.app.state.queues.selectedQueue) {
-                    browser.browserAction.setIcon({path: icon})
-                }
             }
         })
     }
@@ -103,15 +94,8 @@ class AvailabilityModule extends Module {
         this.app.setState({availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id}}, true)
 
         // Set an icon depending on whether the user is available.
-        let icon = 'img/icon-menubar-unavailable.png'
-        if (selected.id) icon = 'img/icon-menubar-active.png'
-
-        if (this.app.env.isExtension) {
-            this.app.logger.info(`${this}setting icon ${icon}`)
-            if (!this.app.state.queues.selectedQueue) {
-                browser.browserAction.setIcon({path: icon})
-            }
-        }
+        if (selected.id) this.app.state.ui.menubar.icon = 'menubar-active'
+        else this.app.state.ui.menubar.icon = 'menubar-unavailable'
     }
 
     toString() {

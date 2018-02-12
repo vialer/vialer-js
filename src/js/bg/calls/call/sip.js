@@ -8,9 +8,9 @@ class CallSip extends Call {
 
     constructor(module, callTarget, options) {
         super(module, callTarget, options)
-        // Handle three cases: incoming call; outgoing call (instant start) and
-        // delayed outgoing call.
         if (!callTarget) {
+            // An outgoing call that is delayed(new) and has to be
+            // started manually .
             module.app.__mergeDeep(this.state, {keypad: {mode: 'call'}, status: 'new', type: 'outgoing'})
         } else if (['string', 'number'].includes(typeof callTarget)) {
             module.app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, number: callTarget, status: 'create', type: 'outgoing'})
@@ -63,6 +63,7 @@ class CallSip extends Call {
         // Signal the user about the incoming call.
         if (!this.silent) {
             this.app.setState({ui: {layer: 'calls'}})
+            this.app.state.ui.menubar.icon = 'ringing'
             this.app.logger.notification(
                 this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
             this.ringtone.play()

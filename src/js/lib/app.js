@@ -95,21 +95,9 @@ class App extends Skeleton {
                 state[moduleName] = this.modules[moduleName]._initialState()
             }
         }
-
+        // Generic non-module state.
         Object.assign(state, {
-            dialpad: {
-                dialNumber: '',
-            },
             notifications: [],
-            ui: {
-                layer: 'login',
-                tabs: {
-                    settings: {
-                        active: 'general',
-                    },
-                },
-                visible: false,
-            },
             vendor: process.env.VENDOR,
         })
 
@@ -180,7 +168,7 @@ class App extends Skeleton {
     }
 
 
-    initViewModel() {
+    initViewModel(watchers) {
         this.initI18n()
         this.vm = new Vue({
             data: {
@@ -197,6 +185,7 @@ class App extends Skeleton {
                 }
             },
             render: h => h(require('../../components/main')(this)),
+            watch: watchers,
         })
     }
 

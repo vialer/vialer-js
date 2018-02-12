@@ -11,10 +11,9 @@ class Call {
 
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringbackTone = new this.app.sounds.RingbackTone()
-        // The call state can be tracked between fg and bg after the
-        // call's session id is known. This flag is used to indicate
-        // when the state can be synced in `setState`.
-        this._trackState = false
+
+        // Keep track of the previous menubar icon.
+        this._menubarIconState = this.app.state.ui.menubar.icon
         this.id = this.generateUUID()
 
         this.state = {
@@ -42,6 +41,7 @@ class Call {
             type: null, // incoming or outgoing
         }
 
+        // Sync the store's reactive properties.
         if (!this.silent) {
             Vue.set(this.app.state.calls.calls, this.id, this.state)
             this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${this.id}`, state: this.state})

@@ -89,7 +89,6 @@ class CallsModule extends Module {
         this.app.on('bg:calls:transfer_call_number', ({callId, number}) => {
             // targetCall is a number. Create a new call and set the
             // new call's transfer mode to accept.
-            console.log("CALL", callId, number)
             let call = new Call(this, number)
             call.setState({transfer: {type: 'accept'}})
             call.start()
@@ -147,22 +146,6 @@ class CallsModule extends Module {
     }
 
 
-    _initialState() {
-        return {
-            calls: {},
-            number: '',
-            ua: {
-                state: null,
-            },
-        }
-    }
-
-
-    _restoreState(moduleStore) {
-        moduleStore.calls = {}
-    }
-
-
     _formatSdp(sessionDescription) {
         let allowedCodecs = ['G722', 'telephone-event', 'opus']
         let sdpObj = transform.parse(sessionDescription.sdp);
@@ -186,6 +169,22 @@ class CallsModule extends Module {
         sdpObj.media[0].fmtp = fmtps
         sessionDescription.sdp = transform.write(sdpObj)
         return Promise.resolve(sessionDescription)
+    }
+
+
+    _initialState() {
+        return {
+            calls: {},
+            number: '',
+            ua: {
+                state: null,
+            },
+        }
+    }
+
+
+    _restoreState(moduleStore) {
+        moduleStore.calls = {}
     }
 
 

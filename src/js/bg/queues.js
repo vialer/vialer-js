@@ -11,14 +11,14 @@ class QueuesModule extends Module {
     */
     constructor(...args) {
         super(...args)
-        
+
         this.app.timer.registerTimer('bg:queues:size', () => {this._platformData(true)})
         this.app.on('bg:queues:selected', ({queue}) => {
             this.app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
 
             if (this.app.env.isExtension) {
-                if (queue) browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
-                else browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
+                if (queue) this.app.state.ui.menubar.icon = this.queueMenubarIcon(queue.queue_size)
+                else this.app.state.ui.menubar.icon = 'menubar-active'
             }
             this.setQueueSizesTimer()
         })
@@ -54,10 +54,8 @@ class QueuesModule extends Module {
             if (isNaN(queue.queue_size)) queue.queue_size = '?'
             // Update icon for toolbarbutton if this queuecallgroup
             // was selected earlier.
-            if (this.app.env.isExtension) {
-                if (queue.id === this.app.state.queues.selected.id) {
-                    browser.browserAction.setIcon({path: this.getIconForSize(queue.queue_size)})
-                }
+            if (queue.id === this.app.state.queues.selected.id) {
+                this.app.state.ui.menubar.icon = this.queueMenubarIcon(queue.queue_size)
             }
         }
 
@@ -93,21 +91,18 @@ class QueuesModule extends Module {
     }
 
 
-    getIconForSize(size) {
-        let icon = '/img/icon-queue.png'
-        if (!isNaN(size)) {
-            if (size < 10) {
-                icon = `/img/icon-queue-${size}.png`
-            } else {
-                icon = '/img/icon-queue-10.png'
-            }
-        }
-        return icon
+    toString() {
+        return `${this.app}[queues] `
     }
 
 
-    toString() {
-        return `${this.app}[queues] `
+    queueMenubarIcon(size) {
+        let queueState = 'queue'
+        if (!isNaN(size)) {
+            if (size < 10) queueState = `queue-${size}`
+            else queueState = 'queue-10'
+        }
+        return queueState
     }
 }
 

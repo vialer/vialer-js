@@ -40,11 +40,8 @@ class BackgroundApp extends App {
         if (this.state.user.authenticated) {
             this.logger.info(`${this}assume authentication with existing credentials`)
             this._platformData()
-
-            if (this.env.isExtension) {
-                browser.browserAction.setIcon({path: 'img/icon-menubar-active.png'})
-            }
             this.modules.calls.connect()
+            this.state.ui.menubar.icon = 'menubar-active'
         }
 
         if (this.env.isExtension) {
@@ -109,9 +106,11 @@ class BackgroundApp extends App {
     initStore() {
         super.initStore()
         let storedState
+        let watchers = {}
         try {
             storedState = this.store.get('state')
         } catch (err) {
+            // Remove storage and start over when it can't be parsed as JSON.
             this.store.clear()
             storedState = null
         }
@@ -121,15 +120,14 @@ class BackgroundApp extends App {
             this._restoreState(this.state)
 
             for (let module of Object.keys(this.modules)) {
-                if (this.modules[module]._restoreState) {
-                    this.modules[module]._restoreState(this.state[module])
-                }
+                if (this.modules[module]._restoreState) this.modules[module]._restoreState(this.state[module])
+                if (this.modules[module]._watchers) Object.assign(watchers, this.modules[module]._watchers())
             }
         } else {
             Object.assign(this.state, this._initialState())
         }
 
-        this.initViewModel()
+        this.initViewModel(watchers)
     }
 
 
@@ -148,11 +146,12 @@ class BackgroundApp extends App {
 function startApp(options) {
     options.modules = [
         {Module: require('./availability'), name: 'availability'},
-        {Module: require('./contacts'), name: 'contacts'},
-        {Module: require('./user'), name: 'user'},
-        {Module: require('./queues'), name: 'queues'},
-        {Module: require('./settings'), name: 'settings'},
         {Module: require('./calls'), name: 'calls'},
+        {Module: require('./contacts'), name: 'contacts'},
+        {Module: require('./settings'), name: 'settings'},
+        {Module: require('./queues'), name: 'queues'},
+        {Module: require('./ui'), name: 'ui'},
+        {Module: require('./user'), name: 'user'},
     ]
     return new BackgroundApp(options)
 }
