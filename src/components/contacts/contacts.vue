@@ -16,10 +16,10 @@
             </div>
             <div class="contact-options list-item-options">
                 <div class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.number)">
-                    <i class="icon icon-transfer" v-on:click.once="transferCallNumber(contact.number)"></i>
+                    <i class="icon icon-transfer" v-on:click.once="createCall(contact.number)"></i>
                 </div>
                 <div class="rounded-button" v-if="callsReady && !transferStatus">
-                    <i class="icon icon-phone" v-on:click="callContact(contact)"></i>
+                    <i class="icon icon-phone" v-on:click="createCall(contact.number)"></i>
                 </div>
             </div>
         </li>

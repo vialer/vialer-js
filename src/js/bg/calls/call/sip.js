@@ -8,6 +8,8 @@ class CallSip extends Call {
 
     constructor(module, callTarget, options) {
         super(module, callTarget, options)
+
+        this._sessionOptions = {media: {}}
         if (!callTarget) {
             // An outgoing call that is delayed(new) and has to be
             // started manually .
@@ -21,37 +23,6 @@ class CallSip extends Call {
     }
 
 
-    async _initMedia() {
-        this._sessionOptions = {media: {}}
-
-        // Append the AV-elements in the background DOM, so the audio
-        // can continue to play when the popup closes.
-        if (document.querySelector('.local') && document.querySelector('.remote')) {
-            // Reuse existing media elements.
-            this.localVideo = document.querySelector('.local')
-            this.remoteVideo = document.querySelector('.remote')
-        } else {
-            this.localVideo = document.createElement('video')
-            this.remoteVideo = document.createElement('video')
-            this.localVideo.classList.add('local')
-            this.remoteVideo.classList.add('remote')
-            document.body.prepend(this.localVideo)
-            document.body.prepend(this.remoteVideo)
-        }
-
-        // Set the output device from settings.
-        const sinks = this.app.state.settings.webrtc.sinks
-        try {
-            if (sinks.input.id) this.remoteVideo.setSinkId(sinks.input.id)
-            if (sinks.output.id) await this.remoteVideo.setSinkId(sinks.output.id)
-        } catch (err) {
-            this.app.emit('fg:notify', {message: 'Failed to set input or output device.', type: 'danger'})
-        }
-
-        return navigator.mediaDevices.getUserMedia({audio: true})
-    }
-
-
     /**
     * An invite; incoming call.
     */
@@ -62,24 +33,20 @@ class CallSip extends Call {
 
         // Signal the user about the incoming call.
         if (!this.silent) {
-            this.app.setState({ui: {layer: 'calls'}})
-            this.app.state.ui.menubar.icon = 'ringing'
-            this.app.logger.notification(
-                this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
+            this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
+            this.app.logger.notification(this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
             this.ringtone.play()
-            this.module.setActiveCall(this, true)
+            this.module.activateCall(this, true)
         }
 
         // Setup some event handlers for the different stages of a call.
         this.session.on('accepted', (request) => {
-            this.setState({status: 'accepted'})
-            this.startTimer()
-            this.ringtone.stop()
+            this._start()
         })
 
         this.session.on('rejected', (e) => {
             this.setState({status: 'rejected'})
-            this.cleanup()
+            this._stop()
         })
 
         this.session.on('bye', (e) => {
@@ -93,7 +60,7 @@ class CallSip extends Call {
 
             this.setState({status: 'bye'})
             this.localVideo.srcObject = null
-            this.cleanup()
+            this._stop()
         })
 
         // Blind transfer event.
@@ -112,7 +79,7 @@ class CallSip extends Call {
         if (!this.silent) {
             // Always set this call to be the active call as soon a new
             // connection has been made.
-            this.module.setActiveCall(this, true)
+            this.module.activateCall(this, true)
         }
 
 
@@ -126,11 +93,10 @@ class CallSip extends Call {
         }
         // Status may still be `new` when the call is still empty.
         this.setState({displayName: displayName, status: 'create'})
+        this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
 
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
-            this.ringbackTone.stop()
-
             this.localVideo.srcObject = this.stream
             this.localVideo.play()
             this.localVideo.muted = true
@@ -144,31 +110,34 @@ class CallSip extends Call {
                 this.remoteVideo.play()
             })
 
-            this.setState({status: 'accepted'})
-            this.startTimer()
+            this._start()
         })
 
+        /**
+        * Play a ringback tone on the following status codes:
+        * 180: Ringing
+        * 181: Call is Being Forwarded
+        * 182: Queued
+        * 183: Session in Progress
+        */
         this.session.on('progress', (e) => {
-            // Ringing, start ringing.
-            if (e.status_code === 180) {
+            if ([180, 181, 182, 183].includes(e.status_code)) {
                 this.ringbackTone.play()
             }
         })
 
-
         // Blind transfer.
         this.session.on('refer', (target) => this.session.bye())
-
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (e) => {
             this.localVideo.srcObject = null
             this.setState({status: 'bye'})
-            this.cleanup()
+            this._stop()
         })
 
         this.session.on('rejected', (e) => {
             this.setState({status: 'rejected'})
-            this.cleanup()
+            this._stop()
         })
     }
 
@@ -176,14 +145,9 @@ class CallSip extends Call {
     /**
     * Accept an incoming session.
     */
-    answer() {
-        if (!(this.state.type === 'incoming')) throw 'session must be incoming type'
+    accept() {
+        super.accept()
         this.session.accept(this._sessionOptions)
-
-        this.localVideo.srcObject = this.stream
-        this.localVideo.play()
-        this.localVideo.muted = true
-
         this.pc = this.session.sessionDescriptionHandler.peerConnection
         this.remoteStream = new MediaStream()
 
@@ -224,19 +188,21 @@ class CallSip extends Call {
     * Hangup a call.
     */
     terminate() {
-        if (this.state.status === 'invite') {
-            // Decline an incoming call.
-            this.session.reject()
-        } else if (this.state.status === 'create') {
-            // Cancel a self-initiated call.
-            this.session.terminate()
-        } else if (['accepted'].includes(this.state.status)) {
-            // Hangup a running call.
-            this.session.bye()
-            // The bye event on the session is not triggered.
-            this.setState({status: 'bye'})
+        try {
+            if (this.state.status === 'invite') this.session.reject() // Decline an incoming call.
+            else if (this.state.status === 'create') this.session.terminate() // Cancel a self-initiated call.
+            else if (['accepted'].includes(this.state.status)) {
+                // Hangup a running call.
+                this.session.bye()
+                // Set the status here manually, because the bye event on the
+                // session is not triggered.
+                this.setState({status: 'bye'})
+            }
+        } catch (err) {
+            this.app.logger.warn(`${this}unable to close the session properly.`)
         }
-        this.cleanup()
+
+        this._stop()
     }
 
 

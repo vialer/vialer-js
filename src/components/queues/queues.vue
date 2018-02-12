@@ -17,7 +17,7 @@
             <div class="queues-options list-item-options">
                 <i class="selected icon icon-availability" v-if="selected.id == queue.id"></i>
                 <i class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(queue.internal_number)">
-                    <i class="icon icon-transfer" v-on:click.once="transferCallNumber(queue.internal_number)"></i>
+                    <i class="icon icon-transfer" v-on:click.once="createCall(queue.internal_number)"></i>
                 </i>
             </div>
         </li>

@@ -23,6 +23,11 @@ module.exports = function(app) {
 
     utils.sharedMethods = function() {
         return {
+            createCall: function(number, start = true) {
+                // Still allows empty calls when number is false.
+                if (number === null) return
+                app.emit('bg:calls:call_create', {number: number, start})
+            },
             getActiveCall: function() {
                 let activeCall = null
                 const calls = this.$store.calls.calls
@@ -42,24 +47,24 @@ module.exports = function(app) {
                 if (app.env.isExtension) browser.tabs.create({url: url})
                 else window.open(url, '_blank')
             },
-            transferCallNumber: function(number) {
-                if (!number) return
-                let activeCall = this.getActiveCall()
-                app.emit('bg:calls:transfer_call_number', {callId: activeCall.id, number: number})
-            },
         }
     }
 
     utils.sharedComputed = function() {
         return {
-            callsActive: function() {
+            /**
+            * Checks whether any calls are going on.
+            * @returns {Boolean} - Whether one or more calls is active.
+            */
+            callsOngoing: function() {
                 const calls = this.$store.calls.calls
                 const callIds = Object.keys(this.$store.calls.calls)
                 // Calls component haven't been activated.
                 if (!callIds.length) return false
                 // User wants to create its first call.
-                if (callIds.length === 1 && calls[callIds[0]].status === 'new') return false
-                return true
+                if (callIds.length === 1 && calls[callIds[0]].status === 'new') {
+                    return false
+                } else return true
             },
             callsReady: function() {
                 let ready = true

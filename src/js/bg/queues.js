@@ -17,8 +17,8 @@ class QueuesModule extends Module {
             this.app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
 
             if (this.app.env.isExtension) {
-                if (queue) this.app.state.ui.menubar.icon = this.queueMenubarIcon(queue.queue_size)
-                else this.app.state.ui.menubar.icon = 'menubar-active'
+                if (queue) this.app.setState({ui: {menubar: {default: this.queueMenubarIcon(queue.queue_size)}}})
+                else this.app.setState({ui: {menubar: {default: 'active'}}})
             }
             this.setQueueSizesTimer()
         })
@@ -55,7 +55,7 @@ class QueuesModule extends Module {
             // Update icon for toolbarbutton if this queuecallgroup
             // was selected earlier.
             if (queue.id === this.app.state.queues.selected.id) {
-                this.app.state.ui.menubar.icon = this.queueMenubarIcon(queue.queue_size)
+                this.app.setState({ui: {menubar: {default: this.queueMenubarIcon(queue.queue_size)}}})
             }
         }
 

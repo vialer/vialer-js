@@ -21,11 +21,7 @@ module.exports = (app) => {
                 return _contacts
             },
         }, app.utils.sharedComputed()),
-        methods: Object.assign({
-            callContact: function(contact) {
-                app.emit('bg:calls:call_create', {number: contact.number, start: true})
-            },
-        }, app.utils.sharedMethods()),
+        methods: app.utils.sharedMethods(),
         render: templates.contacts.r,
         staticRenderFns: templates.contacts.s,
         store: {

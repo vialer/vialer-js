@@ -42,21 +42,6 @@ module.exports = (app) => {
             },
         },
         methods: Object.assign({
-            callStart: function(createCall = false) {
-                if (!this.number) return
-                // Only create a new call when the keypad is used without existing call.
-                if (createCall) app.emit('bg:calls:call_create', {number: this.number, start: true})
-                else {
-                    // Using an empty call object. The keypad number is used,
-                    // so set the call's number before sending over the call
-                    // state.
-                    this.call.number = this.number
-                    // Reset the keypad number.
-                    this.call.keypad.number = ''
-                    let transferState = JSON.parse(JSON.stringify(this.call))
-                    app.emit('bg:calls:call_start', transferState)
-                }
-            },
             classes: function(block) {
                 let classes = {}
                 if (block === 'number-input') {
@@ -88,26 +73,11 @@ module.exports = (app) => {
         }, app.utils.sharedMethods()),
         props: {
             call: {default: null},
-            display: {
-                default: 'expanded',
-                type: String,
-            },
-            dtmf: {
-                default: false,
-                type: Boolean,
-            },
-            mode: {
-                default: 'call',
-                type: String,
-            },
-            number: {
-                default: '',
-                type: String,
-            },
-            search: {
-                default: true,
-                type: Boolean,
-            },
+            display: {default: 'expanded', type: String},
+            dtmf: {default: false, type: Boolean},
+            mode: {default: 'call', type: String},
+            number: {default: '', type: String},
+            search: {default: true, type: Boolean},
         },
         render: templates.call_keypad.r,
         staticRenderFns: templates.call_keypad.s,
@@ -121,9 +91,9 @@ module.exports = (app) => {
                 // Toggle developer features with a special number.
                 if (newVal === '02*06*18') {
                     if (!this.user.developer) {
-                        this.$notify({icon: 'rocket', message: this.$t('Developer mode activated'), type: 'danger'})
+                        this.$notify({icon: 'rocket', message: this.$t('Developer mode activated'), type: 'success'})
                     } else {
-                        this.$notify({icon: 'rocket', message: this.$t('Developer mode deactivated'), type: 'danger'})
+                        this.$notify({icon: 'rocket', message: this.$t('Developer mode deactivated'), type: 'success'})
                     }
                     app.setState({user: {developer: !this.user.developer}}, {persist: true})
                 }

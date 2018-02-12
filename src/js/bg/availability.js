@@ -23,13 +23,13 @@ class AvailabilityModule extends Module {
             this.app.setState({availability: {available, destinations, placeholder: selected, selected: selected}}, {persist: true})
 
             if (available) {
-                this.app.state.ui.menubar.icon = 'menubar-active'
+                this.app.setState({ui: {menubar: {default: 'active'}}})
                 res = await this.app.api.client.put(endpoint, {
                     fixeddestination: selected.type === 'fixeddestination' ? selected.id : null,
                     phoneaccount: selected.type === 'phoneaccount' ? selected.id : null,
                 })
             } else {
-                this.app.state.ui.menubar.icon = 'menubar-unavailable'
+                this.app.setState({ui: {menubar: {default: 'unavailable'}}})
                 res = await this.app.api.client.put(endpoint, {fixeddestination: null, phoneaccount: null})
             }
 
@@ -94,8 +94,8 @@ class AvailabilityModule extends Module {
         this.app.setState({availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id}}, true)
 
         // Set an icon depending on whether the user is available.
-        if (selected.id) this.app.state.ui.menubar.icon = 'menubar-active'
-        else this.app.state.ui.menubar.icon = 'menubar-unavailable'
+        if (selected.id) this.app.setState({ui: {menubar: {default: 'active'}}})
+        else this.app.setState({ui: {menubar: {default: 'unavailable'}}})
     }
 
     toString() {

@@ -3,9 +3,9 @@
     <div :class="classes('number-input')">
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
-            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="callStart(false)"/>
+            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="createCall(number)"/>
         <i class="icon icon-transfer" :class="{'disabled': !number}" v-if="display ==='dense' && mode === 'call'"
-            v-on:keyup.enter="keypadAction" @click="callStart(true)"/>
+            v-on:keyup.enter="keypadAction" @click="createCall(number)"/>
         <i class="fa fa-angle-double-left" @click="removeLastNumber" v-if="display === 'touch' && mode === 'call'"/>
     </div>
 
@@ -13,7 +13,7 @@
         <span v-if="matchedContact">{{matchedContact.number}} - {{matchedContact.name}}</span>
     </div>
 
-    <div class="keys" v-if="display === 'touch'" v-on:keyup.enter="callStart(false)">
+    <div class="keys" v-if="display === 'touch'" v-on:keyup.enter="createCall(number)">
         <div class="key-row">
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('1')">1</button>
             <button class="rounded-button key" @mouseup="unpressKey()" @mousedown="pressKey('2')">2<div class="sub">ABC</div></button>
@@ -37,7 +37,7 @@
     </div>
     <!-- Dial actions when not used in combination with a call. -->
     <div class="call-actions touch" v-if="mode === 'call' && display === 'touch'">
-        <div class="rounded-button action dial" @click="callStart(false)" :class="{'disabled': !number}">
+        <div class="rounded-button action dial" @click="createCall(number)" :class="{'disabled': !number}">
             <i class="icon icon-phone"></i>
         </div>
     </div>

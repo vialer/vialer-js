@@ -18,7 +18,7 @@ module.exports = (app) => {
         },
         methods: {
             callAnswer: function(call) {
-                app.emit('bg:calls:call_answer', {callId: call.id})
+                app.emit('bg:calls:call_accept', {callId: call.id})
             },
             callTerminate: function(call) {
                 if (this.transferActive) return
@@ -27,7 +27,7 @@ module.exports = (app) => {
             classes: function(block) {
                 let classes = {}
                 if (block === 'component') {
-                    if (this.callsActive) {
+                    if (this.callsOngoing) {
                         classes['call-active'] = true
                     }
                 } else if (block === 'dialpad-button') {

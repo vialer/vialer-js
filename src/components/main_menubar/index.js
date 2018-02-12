@@ -13,7 +13,7 @@ module.exports = (app) => {
                     if (this.available) classes.available = true
                     else classes.unavailable = true
                 } else if (block === 'calls') {
-                    classes['calls-active'] = this.callsActive
+                    classes['calls-active'] = this.callsOngoing
                 } else if (block === 'contacts') {
                     classes.hint = (this.transferStatus === 'select')
                 } else if (block === 'queues') {

@@ -12,8 +12,6 @@ class Call {
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringbackTone = new this.app.sounds.RingbackTone()
 
-        // Keep track of the previous menubar icon.
-        this._menubarIconState = this.app.state.ui.menubar.icon
         this.id = this.generateUUID()
 
         this.state = {
@@ -49,24 +47,76 @@ class Call {
     }
 
 
+    async _initMedia() {
+        // Append the AV-elements in the background DOM, so the audio
+        // can continue to play when the popup closes.
+        if (document.querySelector('.local') && document.querySelector('.remote')) {
+            // Reuse existing media elements.
+            this.localVideo = document.querySelector('.local')
+            this.remoteVideo = document.querySelector('.remote')
+        } else {
+            this.localVideo = document.createElement('video')
+            this.remoteVideo = document.createElement('video')
+            this.localVideo.classList.add('local')
+            this.remoteVideo.classList.add('remote')
+            document.body.prepend(this.localVideo)
+            document.body.prepend(this.remoteVideo)
+        }
+
+        // Set the output device from settings.
+        const sinks = this.app.state.settings.webrtc.sinks
+        try {
+            if (sinks.input.id) this.remoteVideo.setSinkId(sinks.input.id)
+            if (sinks.output.id) await this.remoteVideo.setSinkId(sinks.output.id)
+        } catch (err) {
+            this.app.emit('fg:notify', {message: 'Failed to set input or output device.', type: 'danger'})
+        }
+
+        return navigator.mediaDevices.getUserMedia({audio: true})
+    }
+
+
+    /**
+    * Handle logic when a call is started; both incoming and outgoing.
+    */
+    _start() {
+        this.ringbackTone.stop()
+        this.ringtone.stop()
+        this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})
+        this.app.setState({ui: {menubar: {event: 'calling'}}})
+        this.timerId = window.setInterval(() => {
+            this.setState({timer: {current: new Date().getTime()}})
+        }, 1000)
+    }
+
+
     /**
     * Takes care of returning to a state before the call
     * was made. Make sure you set the final state of a call
     * before calling cleanup. The timeout is meant to postpone
     * resetting the state, in order to give the user a hint of
     * what happened in between.
-    * @param {Number} timeout - Postpones resetting of the call state.
+    * @param {Number} timeout - Postpones resetting the call state.
     */
-    cleanup(timeout = 1500) {
+    _stop(timeout = 1500) {
         // Stop all sounds.
         this.ringbackTone.stop()
         this.ringtone.stop()
         this.stopTimer()
+        this.app.setState({ui: {menubar: {event: null}}})
         this.setState({keypad: {active: false}})
 
         window.setTimeout(() => {
-            this.module.removeCall(this)
+            this.module.deleteCall(this)
         }, timeout)
+    }
+
+
+    accept() {
+        if (!(this.state.type === 'incoming')) throw 'session must be incoming type'
+        this.localVideo.srcObject = this.stream
+        this.localVideo.play()
+        this.localVideo.muted = true
     }
 
 
@@ -94,14 +144,6 @@ class Call {
         if (this.silent) return
 
         this.app.emit('fg:set_state', {action: 'merge', path: `calls/calls/${this.id}`, state: state})
-    }
-
-
-    startTimer() {
-        this.setState({timer: {current: new Date().getTime(), start: new Date().getTime()}})
-        this.timerId = window.setInterval(() => {
-            this.setState({timer: {current: new Date().getTime()}})
-        }, 1000)
     }
 
 

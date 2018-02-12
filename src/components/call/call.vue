@@ -58,7 +58,8 @@
     </div>
 
     <div class="call-actions">
-        <div class="rounded-button action decline" v-if="!transferActive && ['accepted', 'create', 'invite'].includes(call.status) && !call.keypad.active" @click="callTerminate(call)">
+        <div class="rounded-button action decline" v-if="!transferActive && ['accepted', 'create', 'invite'].includes(call.status) && !call.keypad.active"
+            @click="callTerminate(call)">
             <i class="icon icon-hang-up"></i>
         </div>
 

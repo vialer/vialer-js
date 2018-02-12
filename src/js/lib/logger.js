@@ -58,7 +58,7 @@ class Logger {
             title: title,
             type: 'basic',
         }
-        options.iconUrl = 'img/icon-notification.png'
+        options.iconUrl = 'img/notification.png'
 
         if (this.app.env.isExtension) {
             options.iconUrl = browser.runtime.getURL(options.iconUrl)

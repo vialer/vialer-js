@@ -41,7 +41,7 @@ class BackgroundApp extends App {
             this.logger.info(`${this}assume authentication with existing credentials`)
             this._platformData()
             this.modules.calls.connect()
-            this.state.ui.menubar.icon = 'menubar-active'
+            this.setState({ui: {menubar: {default: 'active', event: null}}})
         }
 
         if (this.env.isExtension) {
@@ -68,12 +68,9 @@ class BackgroundApp extends App {
             })
 
             this.tabs = new Tabs(this)
-
-
-
         } else {
             // There is no concept of a popup without an extension.
-            // Nevertheless we still trigger the event to start timers
+            // However, we still trigger the event to start timers
             // and such that rely on the event.
             this.setState({ui: {visible: true}})
             for (let moduleName of Object.keys(this.modules)) {

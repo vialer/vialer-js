@@ -22,77 +22,56 @@ class CallsModule extends Module {
         // This flag indicates whether a reconnection attempt will be
         // made when the websocket connection is gone.
         this.reconnect = true
-        // this.state = this.app.state.sip
-
         // The default connection timeout to start with.
         this.retryDefault = {interval: 2500, limit: 9000000}
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
-
         // // Start with a clean state.
         this.app.setState({calls: this._defaultState()})
-        this.app.on('bg:calls:connect', () => this.connect())
-        this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
 
-        this.app.on('bg:calls:call_start', (callState) => {
-            this.calls[callState.id].setState(callState)
-            this.startCall(this.calls[callState.id])
+        this.app.on('bg:calls:call_accept', ({callId}) => this.calls[callId].accept())
+        this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
+            this.activateCall(this.calls[callId], holdInactive, unholdActive)
         })
 
         this.app.on('bg:calls:call_create', ({number, start}) => {
-            // First check if there is a `new` call ready to be used.
-            let call
-            for (const callId of Object.keys(this.calls)) {
-                if (this.calls[callId].state.status === 'new') {
-                    call = this.calls[callId]
-                    break
-                }
-            }
-
-            if (!call) call = new Call(this, null)
             // This will create an empty call if `number` is falsish.
-            this.calls[call.id] = call
-            this.setActiveCall(call, true, true)
+            let call = this._emptyCall()
+            if (number) call.state.number = number
             // Sync the state back to the foreground.
-            if (number) this.calls[call.id].state.number = number
-            this.calls[call.id].setState(this.calls[call.id].state)
             if (start) call.start()
+            this.__setTransferState()
+            call.setState(call.state)
+            // A newly created call is always activated.
+            this.activateCall(call, true, true)
         })
 
-        this.app.on('bg:calls:call_remove', ({callId}) => {
-            this.removeCall(this.calls[callId])
+        this.app.on('bg:calls:call_delete', ({callId}) => this.deleteCall(this.calls[callId]))
+        this.app.on('bg:calls:call_start', (callState) => {
+            this.calls[callState.id].setState(callState)
+            this.calls[callState.id].start()
+            this.app.setState({ui: {layer: 'calls'}})
         })
 
-        this.app.on('bg:calls:call_answer', ({callId}) => this.calls[callId].answer())
         this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
-        this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
-            this.setActiveCall(this.calls[callId], holdInactive, unholdActive)
-        })
+        this.app.on('bg:calls:connect', () => this.connect())
+        this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
 
         this.app.on('bg:calls:dtmf', ({callId, key}) => this.calls[callId].session.dtmf(key))
-
         this.app.on('bg:calls:hold_toggle', ({callId}) => {
-            if (!this.calls[callId].state.hold) {
-                // Not on hold yet. Set the call on hold.
-                this.calls[callId].hold()
+            const call = this.calls[callId]
+            if (!call.state.hold) {
+                call.hold()
             } else {
-                // Unset the transfer state when it was active during
-                // an unhold.
-                if (this.calls[callId].state.transfer.active) {
-                    this.calls[callId].setState({transfer: {active: false}})
+                // Unhold while the call's transfer is active must also
+                // undo the previously set transfer state on this call and
+                // on others.
+                if (call.state.transfer.active) {
+                    // Unset the transfer state when it was active during an unhold.
+                    this.__setTransferState(call, !call.state.transfer.active)
                 }
-                this.setActiveCall(this.calls[callId], true, true)
+                this.activateCall(call, true, true)
             }
-        })
-
-
-        this.app.on('bg:calls:transfer_call_number', ({callId, number}) => {
-            // targetCall is a number. Create a new call and set the
-            // new call's transfer mode to accept.
-            let call = new Call(this, number)
-            call.setState({transfer: {type: 'accept'}})
-            call.start()
-            this.setActiveCall(call, false )
         })
 
 
@@ -117,32 +96,138 @@ class CallsModule extends Module {
          * transfer mode to active for this call.
          */
         this.app.on('bg:calls:transfer_toggle', ({callId}) => {
-            const callIds = Object.keys(this.calls)
-            if (!this.calls[callId].state.transfer.active) {
-                // Start by holding the current call when switching on transfer.
-                if (!this.calls[callId].state.hold) this.calls[callId].hold()
-                // Mark transfer as active/attended and disable the keypad.
-                this.calls[callId].setState({keypad: {active: false}, transfer: {active: true, type: 'attended'}})
-                // Set the correct state of all other calls; se the transfer
-                // type to accept and disable transfer modus..
-                for (let _callId of callIds) {
-                    if (_callId !== callId) {
-                        this.calls[_callId].setState({transfer: {active: false, type: 'accept'}})
-                    }
-                }
-            } else {
-                // Switching transfer off.
-                this.calls[callId].setState({transfer: {active: false}})
-                this.setActiveCall(this.calls[callId], true, true)
+            const sourceCall = this.calls[callId]
+            this.__setTransferState(sourceCall, !sourceCall.state.transfer.active)
+        })
+    }
 
-                // Set attended status.
-                for (let _callId of callIds) {
-                    if (_callId !== callId) {
-                        this.calls[_callId].setState({transfer: {active: false, type: 'attended'}})
+    /**
+    * Set the transfer state of a source call and update the transfer state of
+    * other calls. This method doesn't change the intended transfer status
+    * when no sourceCall is passed along.
+    * @param {Call} [sourceCall] - The call to update the calls status for.
+    * @param {Boolean} active - The transfer status to switch or update to.
+    */
+    __setTransferState(sourceCall = {id: null}, active) {
+        const callIds = Object.keys(this.calls)
+        // Look for an active transfer call when the source cal isn't
+        // passed as a parameter.
+        if (!sourceCall.id) {
+            for (let _callId of callIds) {
+                if (this.calls[_callId].state.transfer.active) {
+                    sourceCall = this.calls[_callId]
+                    // In this case we are not toggling the active status;
+                    // just updating the status of other calls.
+                    active = true
+                    break
+                }
+            }
+        }
+
+        // Still no sourceCall. There is no transfer active at the moment.
+        // Force all calls to deactivate transfer status.
+        if (!sourceCall.id) active = false
+
+        if (active) {
+            if (sourceCall.id) {
+                // Always disable the keypad and set the sourceCall on hold
+                // when activating transfer mode on a call.
+                sourceCall.setState({keypad: {active: false}, transfer: {active: true}})
+                sourceCall.hold()
+            }
+            // Set attended status on other calls.
+            for (let _callId of callIds) {
+                const _call = this.calls[_callId]
+                if (_callId !== sourceCall.id) {
+                    _call.setState({transfer: {active: false, type: 'accept'}})
+                    // Hold all other ongoing calls.
+                    if (!['new', 'create'].includes(_call.state.status) && !_call.state.hold) {
+                        _call.hold()
                     }
                 }
             }
-        })
+        } else {
+            // Toggle disable transfer.
+            if (sourceCall.id) {
+                sourceCall.setState({transfer: {active: false, type: 'attended'}})
+                sourceCall.unhold()
+            }
+            // Set the correct state of all other calls; se the transfer
+            // type to accept and disable transfer modus..
+            for (let _callId of callIds) {
+                const _call = this.calls[_callId]
+                if (_callId !== sourceCall.id) {
+                    this.calls[_callId].setState({transfer: {active: false, type: null}})
+                    // Make sure all other ongoing calls stay on hold.
+                    if (!['new', 'create'].includes(_call.state.status) && !_call.state.hold) {
+                        _call.hold()
+                    }
+                }
+            }
+        }
+    }
+
+
+    __uaOptions() {
+        const settings = this.app.state.settings
+        // For webrtc this is a voipaccount, otherwise an email address.
+        let options = {
+            log: {
+                builtinEnabled: true,
+                level: 'error',
+            },
+            sessionDescriptionHandlerFactoryOptions: {
+                constraints: {
+                    audio: true,
+                    video: false,
+                },
+                modifiers: [this._formatSdp],
+            },
+            stunServers: [
+                'stun.voipgrid.nl',
+            ],
+            traceSip: false,
+            userAgentString: process.env.PLUGIN_NAME,
+            wsServers: [`wss://${settings.sipEndpoint}`],
+        }
+
+        // Log in with the WebRTC voipaccount when it is enabled.
+        // The voipaccount should be from the same client as the logged-in
+        // user, or subscribe information won't work.
+        if (settings.webrtc.enabled) {
+            options.authorizationUser = settings.webrtc.username
+            options.password = settings.webrtc.password
+            options.register = true
+            options.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
+        } else {
+            // Login with platform email without SIP register.
+            options.authorizationUser = this.app.state.user.username
+            // Use the platform user token when logging in; not the password.
+            options.password = this.app.state.user.platform.tokens.sip
+            options.register = false
+            options.uri = `sip:${this.app.state.user.username}`
+        }
+
+        return options
+    }
+
+
+    /**
+    * Check if there is a `new` call ready to be used.
+    * @returns {Call} - A new Call object or an existing Call object with status `new`.
+    */
+    _emptyCall() {
+        let call
+        for (const callId of Object.keys(this.calls)) {
+            if (this.calls[callId].state.status === 'new') {
+                call = this.calls[callId]
+                break
+            }
+        }
+
+        if (!call) call = new Call(this, null)
+        this.calls[call.id] = call
+        return call
     }
 
 
@@ -189,6 +274,54 @@ class CallsModule extends Module {
 
 
     /**
+    * Set the active state on the target call, un-hold the call and
+    * put all other calls on-hold.
+    * @param {Call} [call] - A Call to activate.
+    * @param {Boolean} [holdOthers] - Unhold the call on activation.
+    * @param {Boolean} [unholdOwn] - Unhold the call on activation.
+    * @returns {Call|Boolean} - The Call or false.
+    */
+    activateCall(call, holdOthers = true, unholdOwn = false) {
+        // Activate the first found call when no call is given.
+        let activeCall = false
+        const callIds = Object.keys(this.calls)
+
+        if (!call) {
+            for (const callId of callIds) {
+                // Don't select a call that is already closing.
+                if (!['bye', 'rejected'].includes(this.calls[callId].state.status)) {
+                    call = this.calls[callId]
+                }
+            }
+            if (!call) return false
+        }
+        for (const callId of Object.keys(this.calls)) {
+            let _call = this.calls[callId]
+            // A call that is closing. Don't bother changing hold
+            // and active state properties.
+            if (!['bye', 'rejected'].includes(call.state.status)) {
+                if (call.id === callId) {
+                    activeCall = this.calls[callId]
+                    _call.setState({active: true})
+                    // New calls don't have a session yet. Nothing to unhold.
+                    if (unholdOwn && !['new', 'create'].includes(_call.state.status)) {
+                        _call.unhold()
+                    }
+                } else {
+                    _call.setState({active: false})
+                    // New calls don't have a session yet. Nothing to hold.
+                    if (holdOthers && !['new', 'create'].includes(_call.state.status)) {
+                        _call.hold()
+                    }
+                }
+            }
+        }
+
+        return activeCall
+    }
+
+
+    /**
     * Init and start a new stack, connecting
     * SipML5 to the websocket SIP backend.
     */
@@ -200,7 +333,7 @@ class CallsModule extends Module {
         }
 
         // Login with the WebRTC account or platform account.
-        let uaOptions = this.uaOptions()
+        let uaOptions = this.__uaOptions()
         if (!uaOptions.authorizationUser || !uaOptions.password) {
             this.app.logger.warn(`${this}cannot connect without username and password`)
             return
@@ -270,7 +403,7 @@ class CallsModule extends Module {
     * Take care of cleaning up an ending call.
     * @param {Call} call - The call object to remove.
     */
-    removeCall(call) {
+    deleteCall(call) {
         delete this.app.state.calls.calls[call.id]
         delete this.calls[call.id]
         // This call is being cleaned up; move to a different call
@@ -286,22 +419,11 @@ class CallsModule extends Module {
             }
 
             if (activeCall) {
-                this.setActiveCall(null, true, false)
+                this.activateCall(null, true, false)
             }
         }
 
         this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${call.id}`})
-    }
-
-
-    /**
-    * Switch to the calldialog and start a new call.
-    * @param {Call} [call] - The call to start.
-    * @param {Object} options - The options to pass to the call.
-    */
-    startCall(call, options) {
-        call.start()
-        this.app.setState({ui: {layer: 'calls'}})
     }
 
 
@@ -315,110 +437,6 @@ class CallsModule extends Module {
             this.ua.stop()
             this.app.logger.debug(`${this}disconnected ua`)
         }
-    }
-
-
-    /**
-    * Set the active state on the target call, un-hold the call and
-    * put all other calls on-hold.
-    * @param {Call} [call] - A Call to activate.
-    * @param {Boolean} [holdInactive] - Unhold the call on activation.
-    * @param {Boolean} [unholdActive] - Unhold the call on activation.
-    * @returns {Call|Boolean} - The Call or false.
-    */
-    setActiveCall(call, holdInactive = true, unholdActive = false) {
-        // Activate the first found call when no call is given.
-        let activeCall = false
-        let activeTransferCall = false
-        const callIds = Object.keys(this.calls)
-
-        if (!call) {
-            for (const callId of callIds) {
-                // Don't select a call that is already closing.
-                if (!['bye', 'rejected'].includes(this.calls[callId].state.status)) {
-                    call = this.calls[callId]
-                }
-            }
-            if (!call) return false
-        }
-        for (const callId of Object.keys(this.calls)) {
-            // A call that is closing. Don't bother changing hold
-            // and active state properties.
-            if (!['bye', 'rejected'].includes(call.state.status)) {
-                if (call.id === callId) {
-                    activeCall = this.calls[callId]
-                    this.calls[callId].setState({active: true})
-                    // New calls don't have a session yet. Nothing to unhold.
-                    if (unholdActive && !['new', 'create'].includes(this.calls[callId].state.status)) {
-                        this.calls[callId].unhold()
-                    }
-                } else {
-                    this.calls[callId].setState({active: false})
-                    // New calls don't have a session yet. Nothing to hold.
-                    if (holdInactive && !['new', 'create'].includes(this.calls[callId].state.status)) {
-                        this.calls[callId].hold()
-                    }
-                }
-
-                // Detect an ongoing transfer and mark all other calls as accept later.
-                if (this.calls[callId].state.transfer.active && this.calls[callId].state.transfer.type === 'attended') {
-                    activeTransferCall = this.calls[callId]
-                }
-            }
-        }
-
-        if (activeTransferCall) {
-            for (let callId of callIds) {
-                if (this.calls[callId] !== activeTransferCall) {
-                    this.calls[callId].setState({transfer: {active: false, type: activeTransferCall ? 'accept' : null}})
-                }
-            }
-        }
-        return activeCall
-    }
-
-
-    uaOptions() {
-        const settings = this.app.state.settings
-        // For webrtc this is a voipaccount, otherwise an email address.
-        let uaOptions = {
-            log: {
-                builtinEnabled: true,
-                level: 'error',
-            },
-            sessionDescriptionHandlerFactoryOptions: {
-                constraints: {
-                    audio: true,
-                    video: false,
-                },
-                modifiers: [this._formatSdp],
-            },
-            stunServers: [
-                'stun.voipgrid.nl',
-            ],
-            traceSip: false,
-            userAgentString: process.env.PLUGIN_NAME,
-            wsServers: [`wss://${settings.sipEndpoint}`],
-        }
-
-        // Log in with the WebRTC voipaccount when it is enabled.
-        // The voipaccount should be from the same client as the logged-in
-        // user, or subscribe information won't work.
-        if (settings.webrtc.enabled) {
-            uaOptions.authorizationUser = settings.webrtc.username
-            uaOptions.password = settings.webrtc.password
-            uaOptions.register = true
-            uaOptions.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
-        } else {
-            // Login with platform email without SIP register.
-            uaOptions.authorizationUser = this.app.state.user.username
-            // Use the platform user token when logging in; not the password.
-            uaOptions.password = this.app.state.user.platform.tokens.sip
-            uaOptions.register = false
-            uaOptions.uri = `sip:${this.app.state.user.username}`
-        }
-
-        return uaOptions
     }
 
 
