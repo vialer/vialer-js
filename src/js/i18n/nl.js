@@ -21,7 +21,7 @@ global.translations.nl = {
     'connected': 'verbonden',
     'Contacts': 'Contactpersonen',
     'Decline incoming WebRTC calls.': 'Blokkeer inkomende WebRTC gesprekken.',
-    'Declined': 'Geweigerd',
+    'Declined': 'Bezet',
     'dialplan': 'belplan',
     'dialplans': 'belplannen',
     'Dialplans': 'Belplannen',
