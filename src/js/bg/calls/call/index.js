@@ -70,7 +70,7 @@ class Call {
             if (sinks.input.id) this.remoteVideo.setSinkId(sinks.input.id)
             if (sinks.output.id) await this.remoteVideo.setSinkId(sinks.output.id)
         } catch (err) {
-            this.app.emit('fg:notify', {message: 'Failed to set input or output device.', type: 'danger'})
+            this.app.emit('fg:notify', {message: this.app.$t('Failed to set input or output device.'), type: 'danger'})
         }
 
         return navigator.mediaDevices.getUserMedia({audio: true})
@@ -104,12 +104,17 @@ class Call {
         this.ringbackTone.stop()
         this.ringtone.stop()
 
+        let callEndedText = this.state.number
+        if (this.state.displayName) callEndedText += `:${this.state.displayName}`
+        this.app.logger.notification(this.app.$t('Call ended'), callEndedText, false)
+
         this.stopTimer()
         this.app.setState({ui: {menubar: {event: null}}})
         this.setState({keypad: {active: false}})
 
         window.setTimeout(() => {
             this.busyTone.stop()
+
             this.module.deleteCall(this)
         }, timeout)
     }
