@@ -30,7 +30,8 @@
         }
 
         &.hint {
-            background: rgba(255, 255, 255, 0.5);
+            -moz-animation: hint-pulse 1.5s infinite;
+            -webkit-animation: hint-pulse 1.5s infinite;
         }
 
         &.disabled {

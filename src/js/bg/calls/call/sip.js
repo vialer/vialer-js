@@ -136,6 +136,7 @@ class CallSip extends Call {
         })
 
         this.session.on('rejected', (e) => {
+            this.busyTone.play()
             this.setState({status: 'rejected'})
             this._stop()
         })
@@ -149,7 +150,6 @@ class CallSip extends Call {
         super.accept()
         this.session.accept(this._sessionOptions)
         this.pc = this.session.sessionDescriptionHandler.peerConnection
-        this.remoteStream = new MediaStream()
 
         this.session.sessionDescriptionHandler.on('addStream', () => {
             this.pc.getReceivers().forEach((receiver) => {
@@ -185,7 +185,7 @@ class CallSip extends Call {
 
 
     /**
-    * Hangup a call.
+    * End a call based on it's current status.
     */
     terminate() {
         try {

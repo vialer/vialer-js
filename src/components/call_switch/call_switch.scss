@@ -17,8 +17,13 @@
         width: $spacer * 5;
 
         &.new-call {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
             color: $white;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: $white;
+            }
 
             &.active {
                 background: rgba(255, 255, 255, 0.2);
@@ -31,7 +36,8 @@
         }
 
         &.hint {
-            background: rgba(255, 255, 255, 0.5);
+            -moz-animation: hint-pulse 1.5s infinite;
+            -webkit-animation: hint-pulse 1.5s infinite;
         }
 
         &:hover,

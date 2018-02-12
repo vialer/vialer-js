@@ -17,11 +17,10 @@ module.exports = (app) => {
             clearInterval(this.intervalId)
         },
         methods: {
-            callAnswer: function(call) {
+            callAccept: function(call) {
                 app.emit('bg:calls:call_accept', {callId: call.id})
             },
             callTerminate: function(call) {
-                if (this.transferActive) return
                 app.emit('bg:calls:call_terminate', {callId: call.id})
             },
             classes: function(block) {
@@ -41,10 +40,6 @@ module.exports = (app) => {
                 }
 
                 return classes
-            },
-            dial: function(number) {
-                if (!number) return
-                app.emit('bg:calls:call', {number: number})
             },
             holdToggle: function() {
                 app.emit('bg:calls:hold_toggle', {callId: this.call.id})

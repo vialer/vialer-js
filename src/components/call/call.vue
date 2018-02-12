@@ -63,7 +63,7 @@
             <i class="icon icon-hang-up"></i>
         </div>
 
-        <div class="rounded-button action accept" v-if="call.status === 'invite'" @click="callAnswer(call)">
+        <div class="rounded-button action accept" v-if="call.status === 'invite'" @click="callAccept(call)">
             <i class="icon icon-phone"></i>
         </div>
     </div>

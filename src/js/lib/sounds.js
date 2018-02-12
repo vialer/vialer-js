@@ -5,6 +5,60 @@
 const context = new AudioContext()
 
 
+class BusyTone {
+
+    constructor() {
+
+    }
+
+    createRingerLFO() {
+        let channels = 1
+        let sampleRate = context.sampleRate
+        let frameCount = sampleRate * 1
+        let arrayBuffer = context.createBuffer(channels, frameCount, sampleRate)
+        let bufferData = arrayBuffer.getChannelData(0)
+        for (let i = 0; i < frameCount; i++) {
+            // Do not use the full amplitude here.
+            if ((i / sampleRate > 0 && i / sampleRate < 0.5)) bufferData[i] = 0.5
+        }
+
+        return arrayBuffer
+    }
+
+
+
+    play(key) {
+        if (this.started) return
+        const gainNode = context.createGain()
+        gainNode.connect(context.destination)
+        this.oscillator = context.createOscillator()
+        this.oscillator.connect(gainNode)
+
+        this.oscillator.type = 'sine'
+        this.oscillator.frequency.setValueAtTime(450, context.currentTime)
+        gainNode.gain.setValueAtTime(0, context.currentTime)
+
+        this.ringerLFOSource = context.createBufferSource()
+        this.ringerLFOSource.buffer = this.createRingerLFO()
+        this.ringerLFOSource.loop = true
+        this.ringerLFOSource.connect(gainNode.gain)
+        this.ringerLFOSource.start(0)
+
+        this.oscillator.start()
+        this.started = true
+    }
+
+
+    stop() {
+        if (this.started) {
+            this.oscillator.stop(0)
+            this.ringerLFOSource.stop(0)
+        }
+        this.started = false
+    }
+}
+
+
 class DtmfTone {
 
     constructor() {
@@ -82,7 +136,7 @@ class RingbackTone {
         let sampleRate = context.sampleRate
         if (this.region === 'uk') frameCount = sampleRate * 3
         else if (this.region === 'europe') frameCount = sampleRate * 5
-        var arrayBuffer = context.createBuffer(channels, frameCount, sampleRate)
+        let arrayBuffer = context.createBuffer(channels, frameCount, sampleRate)
 
         // getChannelData allows us to access and edit
         // the buffer data and change.
@@ -92,7 +146,7 @@ class RingbackTone {
             // or 0.6 and 1 second.
             if (this.region === 'europe') {
                 if ((i / sampleRate > 0 && i / sampleRate < 1)) {
-                    bufferData[i] = 1
+                    bufferData[i] = 0.5
                 }
             } else if (this.region === 'uk') {
                 if ((i / sampleRate > 0 && i / sampleRate < 0.4) || (i / sampleRate > 0.6 && i / sampleRate < 1.0)) {
@@ -106,45 +160,41 @@ class RingbackTone {
 
 
     play() {
-        let analyser, distortion, filter, freq1, freq2
+        if (this.started) return
+        let freq1, freq2
 
-        this.osc1 = context.createOscillator()
+        this.oscillator1 = context.createOscillator()
         let gainNode = context.createGain()
-        this.osc1.connect(gainNode)
+        this.oscillator1.connect(gainNode)
 
         if (this.region === 'europe') {
             freq1 = 425
-            analyser = context.createAnalyser()
-            distortion = context.createWaveShaper()
-            this.osc1.connect(distortion)
-            this.osc1.type = 'sine'
-            analyser.connect(gainNode)
+            this.oscillator1.type = 'sine'
             gainNode.connect(context.destination)
+            this.oscillator1.connect(gainNode)
+            this.oscillator1.start(0)
         } else if (this.region === 'uk') {
             freq1 = 400
             freq2 = 450
 
-            this.osc2 = context.createOscillator()
-            this.osc2.frequency.setValueAtTime(freq2, context.currentTime)
-            this.osc2.connect(gainNode)
+            this.oscillator2 = context.createOscillator()
+            this.oscillator2.frequency.setValueAtTime(freq2, context.currentTime)
+            this.oscillator2.connect(gainNode)
 
-            filter = context.createBiquadFilter()
+            let filter = context.createBiquadFilter()
             filter.type = 'lowpass'
             filter.connect(context.destination)
             gainNode.connect(filter)
-            this.osc2.start(0)
+            this.oscillator2.start(0)
         }
 
-        this.osc1.frequency.setValueAtTime(freq1, context.currentTime)
-        this.osc1.start(0)
+        this.oscillator1.frequency.setValueAtTime(freq1, context.currentTime)
 
-        // set our gain node to 0, because the LFO is callibrated to this level
         gainNode.gain.setValueAtTime(0, context.currentTime)
-
         this.ringerLFOSource = context.createBufferSource()
         this.ringerLFOSource.buffer = this.createRingerLFO()
         this.ringerLFOSource.loop = true
-        // Connect the ringerLFOSource to the gain Node audio param.
+
         this.ringerLFOSource.connect(gainNode.gain)
         this.ringerLFOSource.start(0)
         this.started = true
@@ -153,8 +203,8 @@ class RingbackTone {
 
     stop() {
         if (!this.started) return
-        this.osc1.stop(0)
-        if (this.region === 'uk') this.osc2.stop(0)
+        this.oscillator1.stop(0)
+        if (this.region === 'uk') this.oscillator2.stop(0)
         this.ringerLFOSource.stop(0)
         this.started = false
     }
@@ -177,8 +227,8 @@ class RingTone extends EventEmitter {
                 this.audio.play()
             }
         }, false)
-
     }
+
 
     play() {
         this.audio.play()
@@ -195,11 +245,8 @@ class RingTone extends EventEmitter {
 
 
 /**
-*  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
-*
-*  Use of this source code is governed by a BSD-style license
-*  that can be found in the LICENSE file in the root of the source
-*  tree.
+* Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+* LICENSE: https://github.com/webrtc/samples/blob/gh-pages/LICENSE.md
 *
 * Meter class that generates a number correlated to audio volume.
 * The meter class itself displays nothing, but it makes the
@@ -214,28 +261,24 @@ class SoundMeter {
         this.slow = 0.0
         this.clip = 0.0
         this.script = context.createScriptProcessor(2048, 1, 1)
-        var that = this
-        this.script.onaudioprocess = function(event) {
-            var input = event.inputBuffer.getChannelData(0)
-            var i
-            var sum = 0.0
-            var clipcount = 0
+        this.script.onaudioprocess = (event) => {
+            let input = event.inputBuffer.getChannelData(0)
+            let i
+            let sum = 0.0
+            let clipcount = 0
             for (i = 0; i < input.length; ++i) {
                 sum += input[i] * input[i]
-                if (Math.abs(input[i]) > 0.99) {
-                    clipcount += 1
-                }
+                if (Math.abs(input[i]) > 0.99) clipcount += 1
             }
-            that.instant = Math.sqrt(sum / input.length)
-            that.slow = 0.95 * that.slow + 0.05 * that.instant
-            that.clip = clipcount / input.length
+            this.instant = Math.sqrt(sum / input.length)
+            this.slow = 0.95 * this.slow + 0.05 * this.instant
+            this.clip = clipcount / input.length
         }
     }
 
     connectToSource(stream, callback) {
         this.mic = context.createMediaStreamSource(stream)
         this.mic.connect(this.script)
-        // necessary to make sample run, but should not be.
         this.script.connect(context.destination)
     }
 
@@ -246,6 +289,4 @@ class SoundMeter {
 }
 
 
-
-
-module.exports = {DtmfTone, RingbackTone, RingTone, SoundMeter}
+module.exports = {BusyTone, DtmfTone, RingbackTone, RingTone, SoundMeter}

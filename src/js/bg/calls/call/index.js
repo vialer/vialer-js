@@ -9,6 +9,7 @@ class Call {
         this.ua = this.module.ua
         this.silent = silent
 
+        this.busyTone = new this.app.sounds.BusyTone()
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringbackTone = new this.app.sounds.RingbackTone()
 
@@ -98,15 +99,17 @@ class Call {
     * what happened in between.
     * @param {Number} timeout - Postpones resetting the call state.
     */
-    _stop(timeout = 1500) {
+    _stop(timeout = 3000) {
         // Stop all sounds.
         this.ringbackTone.stop()
         this.ringtone.stop()
+
         this.stopTimer()
         this.app.setState({ui: {menubar: {event: null}}})
         this.setState({keypad: {active: false}})
 
         window.setTimeout(() => {
+            this.busyTone.stop()
             this.module.deleteCall(this)
         }, timeout)
     }
@@ -117,6 +120,8 @@ class Call {
         this.localVideo.srcObject = this.stream
         this.localVideo.play()
         this.localVideo.muted = true
+
+        this.remoteStream = new MediaStream()
     }
 
 

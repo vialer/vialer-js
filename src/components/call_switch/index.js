@@ -20,24 +20,25 @@ module.exports = (app) => {
             classes: function(call, block) {
                 let classes = {}
                 if (block === 'call-button') {
+                    classes.fa = true
                     if (call.status === 'new') {
                         classes.active = call.active
                         classes['new-call'] = true
                         // Show the close icon.
                         if (call.active) {
-                            classes.fa = true
                             classes['fa-times'] = true
                         } else {
-                            // Otherwise it is just a regular switch button.
-                            classes['icon-phone'] = true
+                            // Otherwise it is just a new call button.
+                            classes['fa-bookmark-o'] = true
                         }
                     } else {
                         classes.active = call.active
-                        if (!call.active && this.transferStatus === 'select') {
+                        if (!call.active && call.transfer.type === 'accept') {
                             classes.hint = true
                         }
-                        if (call.hold) classes['icon-on-hold'] = true
-                        else classes['icon-phone'] = true
+                        if (call.hold) {
+                            classes['fa-pause'] = true
+                        } else classes['icon-phone'] = true
                     }
                 } else if (block === 'call-button-add') {
                     if (!call) call = this.getActiveCall()
