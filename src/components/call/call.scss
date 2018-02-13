@@ -166,28 +166,6 @@
             text-align: center;
         }
     }
-
-    &.call-active {
-        .number-input {
-            input {
-                color: $white;
-            }
-        }
-
-        .call-keypad-component {
-            .key-row {
-                .key {
-                    border: 2px solid $white;
-                    color: $white;
-
-                    &:hover {
-                        background: $white;
-                        color: $brand-color;
-                    }
-                }
-            }
-        }
-    }
 }
 
 

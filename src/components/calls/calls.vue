@@ -1,4 +1,4 @@
-<div class="calls-component" :class="{inactive: !callsOngoing}">
+<div class="calls-component" :class="{'call-ongoing': callOngoing}">
     <Call v-if="call.active" :call="call" v-for="call in calls" :key="call.id" class="panel-content"/>
-    <CallSwitch v-if="callsOngoing" :call="call" v-for="call in calls" /> -
+    <CallSwitch v-if="callOngoing" :call="call" v-for="call in calls" /> -
 </div>

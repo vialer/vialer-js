@@ -32,18 +32,13 @@ module.exports = (app) => {
                             classes['fa-bookmark-o'] = true
                         }
                     } else {
+                        classes['ongoing-call'] = true
                         classes.active = call.active
-                        if (!call.active && call.transfer.type === 'accept') {
-                            classes.hint = true
-                        }
+                        if (call.transfer.type === 'accept') classes.hint = true
                         if (call.hold) {
                             classes['fa-pause'] = true
                         } else classes['icon-phone'] = true
                     }
-                } else if (block === 'call-button-add') {
-                    if (!call) call = this.getActiveCall()
-                    if (!call) return classes
-                    classes.active = (call.keypad.active && call.keypad.mode === 'call')
                 }
                 return classes
             },

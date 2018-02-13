@@ -1,7 +1,10 @@
 @import "../../scss/lib/variables";
 @import "../../scss/lib/mixins";
 
+// The default styling is against a white background. The
+// `call-ongoing` class is used to differentiate.
 .call-keypad-component {
+
     align-items: center;
     display: flex;
     flex-direction: column;
@@ -9,6 +12,7 @@
     z-index: 10000000;
 
     .contacts-match {
+        color: $brand-color;
         font-weight: 500;
         height: $spacer * 3;
         text-align: center;
@@ -23,11 +27,12 @@
         position: relative;
 
         input {
+            background: transparent;
             color: $brand-color;
-
-            &::placeholder {
-                color: lighten($brand-color, 20%);
-            }
+            font-size: 1.8rem;
+            font-weight: 500;
+            text-align: right;
+            &::placeholder {color: lighten($brand-color, 20%);}
         }
 
         &.dense {
@@ -35,15 +40,10 @@
             margin-bottom: $spacer;
 
             input {
-                background: none;
                 border: 1px solid $white;
-                border-bottom-left-radius: $spacer / 2;
-                border-top-left-radius: $spacer / 2;
-                color: $brand-color;
-                font-size: 1.5rem;
+                border-radius: ($spacer / 2) 0 0 ($spacer / 2);
                 height: 40px;
                 padding-right: $spacer;
-                text-align: right;
                 width: 200px;
 
                 &::placeholder {
@@ -83,10 +83,7 @@
         &.touch {
             input {
                 @include no-outline;
-                background: transparent;
                 border: 0;
-                font-size: 1.8rem;
-                font-weight: 500;
                 height: $spacer * 6;
                 padding: 0 40px;
                 text-align: center;
@@ -94,7 +91,6 @@
             }
 
             i {
-                font-size: 1.8rem;
                 height: 60px;
                 line-height: 55px;
                 position: absolute;
@@ -157,5 +153,32 @@
 
     .call-actions {
         margin-top: $spacer * 3;
+    }
+
+
+    &.call-ongoing {
+        .number-input {
+            input {
+                color: $white;
+            }
+        }
+
+        .keys {
+            .key-row {
+                .key {
+                    border: 2px solid $white;
+                    color: $white;
+
+                    &:hover {
+                        background: $white;
+                        color: $brand-color;
+                    }
+                }
+            }
+        }
+
+        .contacts-match {
+            color: $white;
+        }
     }
 }

@@ -24,7 +24,7 @@ module.exports = (app) => {
     })
 
     return {
-        computed: {
+        computed: Object.assign({
             matchedContact: function() {
                 let _number = String(this.number)
                 let matchedContact = null
@@ -40,11 +40,13 @@ module.exports = (app) => {
                 }
                 return matchedContact
             },
-        },
+        }, app.utils.sharedComputed()),
         methods: Object.assign({
             classes: function(block) {
                 let classes = {}
-                if (block === 'number-input') {
+                if (block === 'component') {
+                    classes['call-ongoing'] = true
+                } else if (block === 'number-input') {
                     classes['number-input'] = true
                     classes[this.display] = true
                 }

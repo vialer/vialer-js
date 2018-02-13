@@ -4,7 +4,7 @@
     position: relative;
 
     &::before {
-        background: linear-gradient(180deg, $brand-color, $brand-variation-color);
+        background: $white;
         content: "";
         height: 100%;
         position: absolute;
@@ -13,9 +13,9 @@
         width: 100%;
     }
 
-    &.inactive {
+    &.call-ongoing {
         &::before {
-            background: $white;
+            background: linear-gradient(180deg, $brand-color, $brand-variation-color);
         }
     }
 }

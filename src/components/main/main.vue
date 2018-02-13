@@ -1,6 +1,6 @@
 <div class="main-component" id="app">
-    <MainStatusBar v-if="!callsOngoing" />
-    <MainCallBar v-if="callsOngoing && call.active" :call="call" v-for="call in $store.calls.calls"/>
+    <MainStatusBar v-if="!callOngoing" />
+    <MainCallBar v-if="callOngoing && call.active" :call="call" v-for="call in $store.calls.calls"/>
 
     <div class="panel">
         <div class="panel-content-container" v-if="!$store.user.authenticated">

@@ -1,3 +1,4 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 // The most upper box containing account info and
@@ -9,51 +10,63 @@
     width: $spacer * 5;
     z-index: 100000;
 
-    i {
-        color: $white;
-        height: $spacer * 5;
-        line-height: $spacer * 5;
-        text-align: center;
-        width: $spacer * 5;
+    .call {
 
-        &.new-call {
-            background: rgba(255, 255, 255, 0.1);
+        i {
             color: $white;
+            height: $spacer * 5;
+            line-height: $spacer * 5;
+            text-align: center;
+            width: $spacer * 5;
 
-            &:hover {
-                background: rgba(255, 255, 255, 0.2);
-                color: $white;
+            // Create a new call. Make the button for adding a new call and
+            // a new call block less bright, so it doesn't interfere with
+            // the user's switch call flow.
+            &.add-call {
+                background: rgba(255, 255, 255, 0.1);
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                    color: $white;
+                }
             }
 
-            &.active {
-                background: rgba(255, 255, 255, 0.2);
+            &.hint:not(.active) {
+                @include animation("hint-pulse 1.5s infinite");
+            }
+
+            &.hint.active {
+                @include animation("hint-pulse-active 1.5s infinite");
+            }
+
+            // An existing call obecjt with status `new`.
+            &.new-call {
+                background: rgba(255, 255, 255, 0.1);
                 color: $white;
 
                 &:hover {
-                    background: $red-color;
+                    background: rgba(255, 255, 255, 0.2);
+                    color: $white;
+                }
+
+                &.active {
+                    background: rgba(255, 255, 255, 0.2);
+                    color: $white;
+
+                    &:hover {
+                        background: $red-color;
+                    }
                 }
             }
-        }
 
-        &.hint {
-            -moz-animation: hint-pulse 1.5s infinite;
-            -webkit-animation: hint-pulse 1.5s infinite;
-        }
 
-        &:hover,
-        &.active {
-            background: $white;
-            color: $brand-variation-color;
-            cursor: pointer;
-        }
-    }
 
-    // Just hide the ongoing call for now until we get a better idea.
-    &.inactive {
-        i {
-            background: $white;
-            color: $white;
-            cursor: default;
+            &:hover,
+            &.active {
+                background: $white;
+                color: $brand-variation-color;
+                cursor: pointer;
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 .main-menubar-component {
@@ -29,9 +30,9 @@
             &.calls-active {color: $green-color;}
         }
 
+
         &.hint {
-            -moz-animation: hint-pulse 1.5s infinite;
-            -webkit-animation: hint-pulse 1.5s infinite;
+            @include animation("hint-pulse 1.5s infinite");
         }
 
         &.disabled {

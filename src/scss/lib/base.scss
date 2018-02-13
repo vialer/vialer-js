@@ -143,18 +143,31 @@ video {
     }
 }
 
-@-webkit-keyframes hint-pulse {
-    0% {
+@include keyframes(hint-pulse) {
+    0%  {
         background-color: rgba(255, 255, 255, 0);
         color: $white;
     }
 
-    50% {
-        background-color: rgba(255, 255, 255, 0.2);
-    }
+    50% {background-color: rgba(255, 255, 255, 0.2);}
 
     100% {
         background-color: rgba(255, 255, 255, 0);
         color: $white;
+    }
+}
+
+
+@include keyframes(hint-pulse-active) {
+    0%  {
+        background-color: rgba(255, 255, 255, 0.6);
+        color: $brand-color;
+    }
+
+    50% {background-color: rgba(255, 255, 255, 1);}
+
+    100% {
+        background-color: rgba(255, 255, 255, 0.6);
+        color: $brand-color;
     }
 }

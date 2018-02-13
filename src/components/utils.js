@@ -56,7 +56,7 @@ module.exports = function(app) {
             * Checks whether any calls are going on.
             * @returns {Boolean} - Whether one or more calls is active.
             */
-            callsOngoing: function() {
+            callOngoing: function() {
                 const calls = this.$store.calls.calls
                 const callIds = Object.keys(this.$store.calls.calls)
                 // Calls component haven't been activated.

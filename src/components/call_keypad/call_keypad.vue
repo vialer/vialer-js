@@ -1,12 +1,21 @@
-<div class="call-keypad-component" tabindex="-1">
+<div class="call-keypad-component" tabindex="-1" :class="{'call-ongoing': callOngoing}">
 
-    <div :class="classes('number-input')">
+    <div :class="classes('number-input')" v-if="display === 'dense'">
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="unpressKey()" @keydown="pressKey($event.key)"
-            v-bind:value="number" v-on:input="inputChange($event.target.value)" v-on:keyup.enter="createCall(number)"/>
-        <i class="icon icon-transfer" :class="{'disabled': !number}" v-if="display ==='dense' && mode === 'call'"
+            v-bind:value="number" v-on:input="inputChange($event.target.value)"
+            v-on:keyup.enter="createCall(number)"/>
+
+        <i class="icon icon-transfer" v-if="mode === 'call'" :class="{'disabled': !number}"
             v-on:keyup.enter="keypadAction" @click="createCall(number)"/>
-        <i class="fa fa-angle-double-left" @click="removeLastNumber" v-if="display === 'touch' && mode === 'call'"/>
+    </div>
+    <div :class="classes('number-input')" v-else-if="display === 'touch'">
+        <input type="text" ref="input" autofocus placeholder="..."
+            @keyup="unpressKey()" @keydown="pressKey($event.key)"
+            v-bind:value="number" v-on:input="inputChange($event.target.value)" 
+            v-on:keyup.enter="createCall(number)"/>
+
+        <i class="fa fa-angle-double-left" @click="removeLastNumber" v-if="mode === 'call'"/>
     </div>
 
     <div class="contacts-match" v-if="mode === 'call'">
