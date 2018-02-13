@@ -79,12 +79,6 @@ class CallSip extends Call {
     */
     _handleOutgoing() {
         this.session = this.ua.invite(`sip:${this.state.number}@voipgrid.nl`, this._sessionOptions)
-        if (!this.silent) {
-            // Always set this call to be the active call as soon a new
-            // connection has been made.
-            this.module.activateCall(this, true)
-        }
-
 
         // The ua's displayName is empty for outgoing calls. Try to match it from contacts.
         const contacts = this.app.state.contacts.contacts
@@ -94,6 +88,19 @@ class CallSip extends Call {
                 displayName = contacts[id].name
             }
         }
+
+        if (!this.silent) {
+            // Always set this call to be the active call as soon a new
+            // connection has been made.
+            this.module.activateCall(this, true)
+            if (!this.app.state.ui.visible) {
+                let notificationMessage = ''
+                if (displayName) notificationMessage = `${this.state.number}: ${displayName}`
+                else notificationMessage = this.state.number
+                this.app.logger.notification(this.app.$t('Calling'), notificationMessage, false)
+            }
+        }
+
         // Status may still be `new` when the call is still empty.
         this.setState({displayName: displayName, status: 'create'})
         this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})

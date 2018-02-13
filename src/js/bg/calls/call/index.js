@@ -100,7 +100,7 @@ class Call {
     * @param {Number} timeout - Postpones resetting the call state.
     */
     _stop(timeout = 3000) {
-        // Stop all sounds.
+        // Stop all call state sounds that may still be playing.
         this.ringbackTone.stop()
         this.ringtone.stop()
 
@@ -116,7 +116,6 @@ class Call {
 
         window.setTimeout(() => {
             this.busyTone.stop()
-
             this.module.deleteCall(this)
         }, timeout)
     }
