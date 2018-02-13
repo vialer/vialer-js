@@ -51,6 +51,17 @@ class SettingsModule extends Module {
             },
         }
     }
+
+
+    _watchers() {
+        return {
+            'store.settings.click2dial.enabled': (newVal, oldVal) => {
+                if (this.app.env.isExtension) {
+                    this.app.tabs.toggleIcons(newVal)
+                }
+            },
+        }
+    }
 }
 
 module.exports = SettingsModule

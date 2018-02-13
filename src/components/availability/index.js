@@ -11,6 +11,7 @@ module.exports = (app, actions) => {
             placeholder: 'availability.placeholder',
             selected: 'availability.selected',
             user: 'user',
+            vendor: 'vendor',
             webrtc: 'settings.webrtc',
         },
         watch: {

@@ -31,7 +31,7 @@
 
             <Field name="platform_enabled" type="checkbox"
                 :label="$t('Platform integration')" :model.sync="settings.platform.enabled"
-                :help="$t('Add user availability, queues status monitoring and calling without WebRTC. Requires a paid platform account.')"/>
+                :help="$t('Add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor})"/>
 
             <Field name="platform_url" type="text" v-if="user.developer"
                 :disabled="!settings.platform.enabled"

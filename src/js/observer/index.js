@@ -9,9 +9,6 @@ const phoneElementClassName = 'vialer-phone-number'
 const phoneIconClassName = 'vialer-icon'
 
 
-const _$ = document.querySelectorAll
-
-
 /**
 * The ObserverFrame is injected in ALL browser tab frames, because it has to
 * be able to add click-to-dial icons to every phonenumber it finds.
@@ -35,8 +32,8 @@ class ObserverFrame extends Skeleton {
         * Stop listening to DOM mutations. Triggered when
         * the user logs out.
         */
-        this.on('observer:stop', (data) => {
-            this.stopObserver()
+        this.on('observer:disable', (data) => {
+            if (this.observer) this.observer.disconnect()
             // Remove icons.
             this.restorePhonenumbers()
             // Remove our stylesheet.
@@ -45,7 +42,7 @@ class ObserverFrame extends Skeleton {
 
 
         // Manually trigger to observe the current tab.
-        this.on('observer:start', (data) => {
+        this.on('observer:enable', (data) => {
             this.processPage()
         })
 
@@ -195,7 +192,7 @@ class ObserverFrame extends Skeleton {
 
     doInsert(root) {
         let pause = !!root
-        if (pause) this.stopObserver()
+        if (pause && this.observer) this.observer.disconnect()
         root = root || document.body
 
         // Walk the DOM looking for elements to parse, but block reasonably
@@ -358,16 +355,6 @@ class ObserverFrame extends Skeleton {
                 childList: true,
                 subtree: true,
             })
-        }
-    }
-
-
-    /**
-     * Observer stop: simply stop listening to DOM mutations.
-     */
-    stopObserver() {
-        if (this.observer) {
-            this.observer.disconnect()
         }
     }
 

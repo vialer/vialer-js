@@ -6,7 +6,7 @@
         <div class="field">
             <input class="switch" id="platform_availability" name="platform_availability" type="checkbox"
                 :disabled="!destinations.length" v-model="available">
-            <label for="platform_availability">{{$store.vendor}}-{{$t('user')}} {{$t('availability')}}</label>
+            <label for="platform_availability">{{$t('Availability')}} {{$store.vendor}} {{$t('user')}}</label>
 
             <div v-if="available">
                 <Field name="owner" type="select" v-if="available"
@@ -15,7 +15,7 @@
                     :placeholder="$t('Select a destination')"/>
 
                 <em class="help">
-                    {{$t('Changing your availability only has effect when your platform user is part of the dialplan for the incoming call.')}}
+                    {{$t('Changing your availability only has effect when your {vendor} user is part of the dialplan for the incoming call.', {vendor: vendor})}}
                     {{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to manage your {target}', {target: $t('dialplans')})}}.
                 </em>
             </div>
