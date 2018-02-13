@@ -1,9 +1,9 @@
 <div class="call-component" :class="classes('component')">
     <!-- Call information during a call. Hide when the keypad takes too muchs space. -->
     <div class="call-info" v-if="(!call.keypad.active || call.keypad.display === 'dense') && !['new'].includes(call.status)">
-        <div class="info-status">{{callStatus}}</div>
-        <div class="info-number">{{call.number}}</div>
         <div class="info-name" v-if="call.displayName">{{call.displayName}}</div>
+        <div class="info-number">{{call.number}}</div>
+        <div class="info-status">{{callStatus}}</div>
         <div class="info-timer" v-if="!['invite', 'create'].includes(call.status)">{{sessionTime}}</div>
     </div>
 

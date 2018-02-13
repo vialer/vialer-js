@@ -12,29 +12,21 @@
 
     .call-info {
         align-self: flex-start;
-        font-weight: 500;
+        font-weight: 400;
         margin-bottom: $spacer * 3;
         text-align: center;
         width: 100%;
 
-        .info-status {
-            font-size: 1rem;
-        }
+        .info-name {font-size: 1.2rem;}
 
         .info-number {
-            font-size: 2rem;
-        }
-
-        .info-name {
-            font-size: 1rem;
-        }
-
-        &.info-timer {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 500;
-            text-align: center;
-            width: 100%;
+            margin-bottom: $spacer;
         }
+
+        .info-status {font-size: 1.1rem;}
+        .info-timer {font-size: 1rem;}
     }
 
     .call-options {

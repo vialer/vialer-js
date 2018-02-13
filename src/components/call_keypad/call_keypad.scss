@@ -91,6 +91,7 @@
             }
 
             i {
+                font-size: 1.8rem;
                 height: 60px;
                 line-height: 55px;
                 position: absolute;
@@ -160,6 +161,10 @@
         .number-input {
             input {
                 color: $white;
+
+                &::placeholder {
+                    color: $white;
+                }
             }
         }
 

@@ -35,15 +35,23 @@ class CallsModule extends Module {
         })
 
         this.app.on('bg:calls:call_create', ({number, start}) => {
-            // This will create an empty call if `number` is falsish.
-            let call = this._emptyCall()
-            if (number) call.state.number = number
-            // Sync the state back to the foreground.
-            if (start) call.start()
-            this.__setTransferState()
-            call.setState(call.state)
-            // A newly created call is always activated.
-            this.activateCall(call, true, true)
+            let activeCall = this.activeCall()
+            if (activeCall && activeCall.state.transfer.active && activeCall.state.transfer.type === 'blind') {
+                // Directly transfer the number to the currently activated
+                // call when the active call has blind transfer mode set.
+                activeCall.transfer(number)
+            } else {
+                // Both a 'regular' new call and an attended transfer call will
+                // just create a new call and active it.
+                let call = this._emptyCall()
+                if (number) call.state.number = number
+                // Sync the state back to the foreground.
+                if (start) call.start()
+                this.__setTransferState()
+                call.setState(call.state)
+                // A newly created call is always activated.
+                this.activateCall(call, true, true)
+            }
         })
 
         this.app.on('bg:calls:call_delete', ({callId}) => this.deleteCall(this.calls[callId]))
@@ -104,13 +112,14 @@ class CallsModule extends Module {
     /**
     * Set the transfer state of a source call and update the transfer state of
     * other calls. This method doesn't change the intended transfer status
-    * when no sourceCall is passed along.
+    * when no source Call is passed along. It just update outdated call state
+    * in that case.
     * @param {Call} [sourceCall] - The call to update the calls status for.
     * @param {Boolean} active - The transfer status to switch or update to.
     */
     __setTransferState(sourceCall = {id: null}, active) {
         const callIds = Object.keys(this.calls)
-        // Look for an active transfer call when the source cal isn't
+        // Look for an active transfer call when the source call isn't
         // passed as a parameter.
         if (!sourceCall.id) {
             for (let _callId of callIds) {
@@ -125,14 +134,16 @@ class CallsModule extends Module {
         }
 
         // Still no sourceCall. There is no transfer active at the moment.
-        // Force all calls to deactivate transfer status.
+        // Force all calls to deactivate their transfer.
         if (!sourceCall.id) active = false
 
         if (active) {
+            // Enable transfer mode.
             if (sourceCall.id) {
-                // Always disable the keypad and set the sourceCall on hold
-                // when activating transfer mode on a call.
-                sourceCall.setState({keypad: {active: false}, transfer: {active: true}})
+                // Always disable the keypad, set the sourceCall on-hold and
+                // switch to the default `attended` mode when activating
+                // transfer mode on a call.
+                sourceCall.setState({keypad: {active: false}, transfer: {active: true, type: 'attended'}})
                 sourceCall.hold()
             }
             // Set attended status on other calls.
@@ -147,7 +158,7 @@ class CallsModule extends Module {
                 }
             }
         } else {
-            // Toggle disable transfer.
+            // Disable transfer mode.
             if (sourceCall.id) {
                 sourceCall.setState({transfer: {active: false, type: 'attended'}})
                 sourceCall.unhold()
@@ -270,6 +281,18 @@ class CallsModule extends Module {
 
     _restoreState(moduleStore) {
         moduleStore.calls = {}
+    }
+
+
+    /**
+    * @returns {Call|null} - the current active call or null.
+    */
+    activeCall() {
+        for (const callId of Object.keys(this.calls)) {
+            // Don't select a call that is already closing
+            if (this.calls[callId].state.active) return this.calls[callId]
+        }
+        return null
     }
 
 

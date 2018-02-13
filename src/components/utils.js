@@ -23,21 +23,10 @@ module.exports = function(app) {
 
     utils.sharedMethods = function() {
         return {
-            createCall: function(number, start = true) {
+            createCall: function(number, start = true, transfer = false) {
                 // Still allows empty calls when number is false.
                 if (number === null) return
-                app.emit('bg:calls:call_create', {number: number, start})
-            },
-            getActiveCall: function() {
-                let activeCall = null
-                const calls = this.$store.calls.calls
-                const callKeys = Object.keys(calls)
-                for (let callId of callKeys) {
-                    if (calls[callId].active) {
-                        activeCall = calls[callId]
-                    }
-                }
-                return activeCall
+                app.emit('bg:calls:call_create', {number: number, start, transfer})
             },
             openPlatformUrl: function(path = '') {
                 const token = this.user.platform.tokens.portal

@@ -31,12 +31,14 @@
                 }
             }
 
-            &.hint:not(.active) {
-                @include animation("hint-pulse 1.5s infinite");
-            }
+            &.hint {
+                &.active {
+                    @include animation("hint-pulse-active 1.5s infinite");
+                }
 
-            &.hint.active {
-                @include animation("hint-pulse-active 1.5s infinite");
+                &:not(.active) {
+                    @include animation("hint-pulse 1.5s infinite");
+                }
             }
 
             // An existing call obecjt with status `new`.

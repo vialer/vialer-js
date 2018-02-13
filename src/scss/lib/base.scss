@@ -161,13 +161,13 @@ video {
 @include keyframes(hint-pulse-active) {
     0%  {
         background-color: rgba(255, 255, 255, 0.6);
-        color: $brand-color;
+        color: $brand-variation-color;
     }
 
     50% {background-color: rgba(255, 255, 255, 1);}
 
     100% {
         background-color: rgba(255, 255, 255, 0.6);
-        color: $brand-color;
+        color: $brand-variation-color;
     }
 }
