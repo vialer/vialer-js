@@ -13,7 +13,7 @@ class Skeleton extends EventEmitter {
     constructor(options) {
         super()
 
-        this.env = options.environment
+        this.env = options.env
         // Make Chrome plugin API compatible with the standards
         // WebExtension API as (partly) supported by Firefox and Edge.
         if (this.env.isChrome) window.browser = require('webextension-polyfill')

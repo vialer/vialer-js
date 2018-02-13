@@ -34,7 +34,10 @@ class CallSip extends Call {
         // Signal the user about the incoming call.
         if (!this.silent) {
             this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
-            this.app.logger.notification(this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
+            if (!this.app.state.ui.visible) {
+                this.app.logger.notification(this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
+            }
+
             this.ringtone.play()
             this.module.activateCall(this, true)
         }

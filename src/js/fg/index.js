@@ -8,7 +8,7 @@ env.role.fg = true
 class ForegroundApp extends App {
 
     constructor(options) {
-        options.environment = env
+        options.env = env
         super(options)
         this.env = env
 

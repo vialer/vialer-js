@@ -106,7 +106,9 @@ class Call {
 
         let callEndedText = this.state.number
         if (this.state.displayName) callEndedText += `:${this.state.displayName}`
-        this.app.logger.notification(this.app.$t('Call ended'), callEndedText, false)
+        if (!this.app.state.ui.visible) {
+            this.app.logger.notification(this.app.$t('Call ended'), callEndedText, false)
+        }
 
         this.stopTimer()
         this.app.setState({ui: {menubar: {event: null}}})

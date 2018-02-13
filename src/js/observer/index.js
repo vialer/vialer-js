@@ -388,6 +388,6 @@ let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.fg = true
 
 global.app = new ObserverFrame({
-    environment: env,
+    env: env,
     name: 'observer',
 })

@@ -79,7 +79,7 @@ let env = require('../lib/env')
 env.role.tab = true
 
 global.app = new DialerTab({
-    environment: env,
+    env: env,
     i18n: {},
     name: 'tab',
 })

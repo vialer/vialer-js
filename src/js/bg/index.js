@@ -12,7 +12,7 @@ env.role.bg = true
 class BackgroundApp extends App {
 
     constructor(options) {
-        options.environment = env
+        options.env = env
         super(options)
 
         // Clear all state if the schema changed after a plugin update.
