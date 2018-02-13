@@ -78,7 +78,7 @@ class UiModule extends Module {
                         if (newVal === 'ringing') {
                             this.menubarAnimation('ringing')
                         } else if (newVal === 'calling') {
-                            browser.browserAction.setIcon({path: 'img/menubar-ringing-5.png'})
+                            browser.browserAction.setIcon({path: 'img/menubar-ringing-4.png'})
                         } else {
                             browser.browserAction.setIcon({path: `img/menubar-${newVal}.png`})
                         }
