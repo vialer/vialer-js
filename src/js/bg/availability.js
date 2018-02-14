@@ -10,8 +10,6 @@ class AvailabilityModule extends Module {
     */
     constructor(...args) {
         super(...args)
-
-
         /**
         * Notify the VoIPGRID API about the availability change and set
         * the background state to the new situation.
@@ -46,6 +44,7 @@ class AvailabilityModule extends Module {
             available: false,
             destinations: [],
             dnd: false,
+            phoneaccounts: [],
             placeholder: {
                 id: null,
                 name: null,
@@ -89,8 +88,6 @@ class AvailabilityModule extends Module {
         if (sud.fixeddestination) selected = destinations.find((d) => d.id === sud.fixeddestination)
         else if (sud.phoneaccount) selected = destinations.find((d) => d.id === sud.phoneaccount)
 
-        // The `availability` switch is potentially overriden by this
-        // check against API data.
         this.app.setState({availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id}}, true)
 
         // Set an icon depending on whether the user is available.

@@ -2,16 +2,6 @@ module.exports = (app) => {
     const keyTone = new app.sounds.DtmfTone()
     const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#']
 
-    /**
-    * Clear a number of special characters.
-    * @param {String} number - Number to clean.
-    * @returns {String} - The cleaned number.
-    */
-    function sanitizeNumber(number) {
-        number = String(number).replace(/[^\d|!+|!*|!#]/g, '')
-        return number
-    }
-
     // we detect the mouseup event on the window tag as opposed to the li
     // tag because otherwise if we release the mouse when not over a button,
     // the tone will remain playing.
@@ -60,7 +50,7 @@ module.exports = (app) => {
                     return
                 }
                 keyTone.play(key)
-                let newVal = sanitizeNumber(`${this.number}${key}`)
+                let newVal = app._.sanitizeNumber(`${this.number}${key}`)
                 if (newVal) this.$emit('update:model', newVal)
                 if (this.mode === 'dtmf') app.emit('bg:calls:dtmf', {callId: this.call.id, key})
             },
@@ -89,7 +79,7 @@ module.exports = (app) => {
         },
         watch: {
             number: function(newVal, oldVal) {
-                let cleanedNumber = sanitizeNumber(newVal)
+                let cleanedNumber = app._.sanitizeNumber(newVal)
                 // Toggle developer features with a special number.
                 if (newVal === '02*06*18') {
                     if (!this.user.developer) {
@@ -100,6 +90,8 @@ module.exports = (app) => {
                     app.setState({user: {developer: !this.user.developer}}, {persist: true})
                 }
                 this.$emit('update:model', cleanedNumber)
+                // Sync the number to the background call state.
+                app.setState({number: this.number}, {path: `calls/calls/${this.call.id}`})
             },
         },
     }

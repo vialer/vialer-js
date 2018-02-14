@@ -3,11 +3,13 @@
 */
 class Call {
 
-    constructor(module, callTarget, {active, silent} = {}) {
+    constructor(module, target, {active, silent} = {}) {
         this.module = module
         this.app = this.module.app
         this.ua = this.module.ua
         this.silent = silent
+
+        this._started = false
 
         this.busyTone = new this.app.sounds.BusyTone()
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
@@ -17,17 +19,21 @@ class Call {
 
         this.state = {
             active: false,
+            class: this.constructor.name,
             displayName: null,
-            hold: false,
+            hold: {
+                active: false,
+                disabled: false,
+            },
             id: this.id,
             keypad: {
                 active: false,
+                disabled: false,
                 display: 'touch', // 'dense' or 'touch'
                 mode: 'dtmf', // 'call' or 'dtmf'
                 number: null,
             },
             number: null,
-            silent: this.silent,
             status: null,
             timer: {
                 current: null,
@@ -35,9 +41,21 @@ class Call {
             },
             transfer: {
                 active: false,
+                disabled: false,
                 type: 'attended',
             },
             type: null, // incoming or outgoing
+        }
+
+        // The default Call status codes, which each Call implementation
+        // should map to.
+        this._statusMap = {
+            accepted: 'accepted',
+            bye: 'bye',
+            create: 'create',
+            invite: 'invite',
+            rejected_a: 'rejected_a',
+            rejected_b: 'rejected_b',
         }
 
         // Sync the store's reactive properties.
@@ -45,6 +63,33 @@ class Call {
             Vue.set(this.app.state.calls.calls, this.id, this.state)
             this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${this.id}`, state: this.state})
         }
+    }
+
+
+    _handleOutgoing() {
+        // Try to fill in the displayName from contacts.
+        const contacts = this.app.state.contacts.contacts
+        let displayName = ''
+        for (const id of Object.keys(contacts)) {
+            if (contacts[id].number === parseInt(this.number)) {
+                displayName = contacts[id].name
+            }
+        }
+
+        if (!this.silent) {
+            // Always set this call to be the active call as soon a new
+            // connection has been made.
+            this.module.activateCall(this, true)
+            if (!this.app.state.ui.visible) {
+                let notificationMessage = ''
+                if (displayName) notificationMessage = `${this.state.number}: ${displayName}`
+                else notificationMessage = this.state.number
+                this.app.logger.notification(this.app.$t('Calling'), notificationMessage, false)
+            }
+        }
+
+        this.setState({displayName: displayName, status: this._statusMap.create})
+        this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
     }
 
 
@@ -81,6 +126,7 @@ class Call {
     * Handle logic when a call is started; both incoming and outgoing.
     */
     _start() {
+        this._started = true
         this.ringbackTone.stop()
         this.ringtone.stop()
         this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})

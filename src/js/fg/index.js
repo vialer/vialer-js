@@ -23,6 +23,7 @@ class ForegroundApp extends App {
         this.on('fg:set_state', this.__mergeState.bind(this))
 
         this.utils = require('../../components/utils')(this)
+        this._ = utils
 
         Vue.component('Availability', require('../../components/availability')(this))
         Vue.component('Call', require('../../components/call')(this))

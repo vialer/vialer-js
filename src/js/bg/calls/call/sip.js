@@ -1,24 +1,21 @@
 const Call = require('./index')
 
 /**
-* Call flow wrapper around SipJS which enables incoming and outgoing
-* calls using WebRTC.
+* Call implementation for incoming and outgoing calls
+* using WebRTC and SIP.js.
 */
 class CallSip extends Call {
 
-    constructor(module, callTarget, options) {
-        super(module, callTarget, options)
+    constructor(module, target, options) {
+        super(module, target, options)
 
         this._sessionOptions = {media: {}}
-        if (!callTarget) {
-            // An outgoing call that is delayed(new) and has to be
-            // started manually .
-            module.app.__mergeDeep(this.state, {keypad: {mode: 'call'}, status: 'new', type: 'outgoing'})
-        } else if (['string', 'number'].includes(typeof callTarget)) {
-            module.app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, number: callTarget, status: 'create', type: 'outgoing'})
+        if (!target || ['string', 'number'].includes(typeof target)) {
+            module.app.__mergeDeep(this.state, {keypad: {mode: 'call'}, number: target, status: 'new', type: 'outgoing'})
         } else {
+            // Passing in a session means an outgoing call.
             module.app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, status: 'invite', type: 'incoming'})
-            this.session = callTarget
+            this.session = target
         }
     }
 
@@ -48,7 +45,7 @@ class CallSip extends Call {
         })
 
         this.session.on('rejected', (e) => {
-            this.setState({status: 'rejected'})
+            this.setState({status: 'rejected_b'})
             this._stop()
         })
 
@@ -78,32 +75,8 @@ class CallSip extends Call {
     * @param {(Number|String)} number - The number to call.
     */
     _handleOutgoing() {
+        super._handleOutgoing()
         this.session = this.ua.invite(`sip:${this.state.number}@voipgrid.nl`, this._sessionOptions)
-
-        // The ua's displayName is empty for outgoing calls. Try to match it from contacts.
-        const contacts = this.app.state.contacts.contacts
-        let displayName = ''
-        for (const id of Object.keys(contacts)) {
-            if (contacts[id].number === parseInt(this.number)) {
-                displayName = contacts[id].name
-            }
-        }
-
-        if (!this.silent) {
-            // Always set this call to be the active call as soon a new
-            // connection has been made.
-            this.module.activateCall(this, true)
-            if (!this.app.state.ui.visible) {
-                let notificationMessage = ''
-                if (displayName) notificationMessage = `${this.state.number}: ${displayName}`
-                else notificationMessage = this.state.number
-                this.app.logger.notification(this.app.$t('Calling'), notificationMessage, false)
-            }
-        }
-
-        // Status may still be `new` when the call is still empty.
-        this.setState({displayName: displayName, status: 'create'})
-        this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
 
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
@@ -147,7 +120,7 @@ class CallSip extends Call {
 
         this.session.on('rejected', (e) => {
             this.busyTone.play()
-            this.setState({status: 'rejected'})
+            this.setState({status: 'rejected_b'})
             this._stop()
         })
     }
@@ -173,7 +146,7 @@ class CallSip extends Call {
 
     hold() {
         this.session.hold()
-        this.setState({hold: true})
+        this.setState({hold: {active: true}})
     }
 
 
@@ -216,7 +189,7 @@ class CallSip extends Call {
     }
 
 
-    async transfer(targetCall) {
+    transfer(targetCall) {
         if (typeof targetCall === 'string') {
             this.session.refer(`sip:${targetCall}@voipgrid.nl`)
         } else {
@@ -227,7 +200,7 @@ class CallSip extends Call {
 
     unhold() {
         this.session.unhold()
-        this.setState({hold: false})
+        this.setState({hold: {active: false}})
     }
 }
 

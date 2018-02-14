@@ -56,6 +56,7 @@ class UserModule extends Module {
         }
 
         let user = res.data
+        console.log('USER:', user)
         // Only platform client users cannot use platform telephony features.
         if (!user.client) {
             this.logout()

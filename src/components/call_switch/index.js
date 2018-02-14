@@ -17,6 +17,14 @@ module.exports = (app) => {
                     })
                 }
             },
+            /**
+            * Add CSS classes for the callswitcher based on the Call status.
+            * (!)Don't forget to update this function when changes are made
+            * to the internal Call state data-structure.
+            * @param {Call} call - Call state to generate CSS classes for.
+            * @param {String} block - HTML element block to generate CSS classes for.
+            * @returns {Object} - The CSS classes to render.
+            */
             classes: function(call, block) {
                 let classes = {}
                 if (block === 'call-button') {
@@ -35,7 +43,7 @@ module.exports = (app) => {
                         classes['ongoing-call'] = true
                         classes.active = call.active
                         if (call.transfer.type === 'accept') classes.hint = true
-                        if (call.hold) {
+                        if (call.hold.active) {
                             classes['fa-pause'] = true
                         } else classes['icon-phone'] = true
                     }

@@ -10,7 +10,7 @@
     <!-- Call options like transfer ops, on-hold and keypad -->
     <div class="call-options" v-if="['accepted'].includes(call.status)">
         <div class="rounded-button-with-text" v-if="call.transfer.type !== 'accept'">
-            <div class="rounded-button" @click="transferToggle" :class="{'active': call.transfer.active}">
+            <div class="rounded-button" @click="transferToggle" :class="classes('transfer-button')">
                 <i class="icon icon-transfer"></i>
             </div>
             <p>{{$t('transfer')}}</p>
@@ -22,9 +22,8 @@
             <p>{{$t('transfer')}}</p>
         </div>
 
-
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="holdToggle" :class="{'active': call.hold}">
+            <div class="rounded-button" @click="holdToggle" :class="classes('hold-button')">
                 <i class="icon icon-on-hold"></i>
             </div>
             <p>{{$t('hold')}}</p>

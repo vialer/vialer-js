@@ -1,4 +1,4 @@
-const Call = require('./call/sip')
+const callFactory = require('./call/factory')
 const transform = require('sdp-transform')
 const Module = require('../lib/module')
 
@@ -42,9 +42,8 @@ class CallsModule extends Module {
                 activeCall.transfer(number)
             } else {
                 // Both a 'regular' new call and an attended transfer call will
-                // just create a new call and active it.
-                let call = this._emptyCall()
-                if (number) call.state.number = number
+                // create or get a new call and active it.
+                let call = this._emptyCall(null, number)
                 // Sync the state back to the foreground.
                 if (start) call.start()
                 this.__setTransferState()
@@ -152,7 +151,7 @@ class CallsModule extends Module {
                 if (_callId !== sourceCall.id) {
                     _call.setState({transfer: {active: false, type: 'accept'}})
                     // Hold all other ongoing calls.
-                    if (!['new', 'create'].includes(_call.state.status) && !_call.state.hold) {
+                    if (!['new', 'create', 'invite'].includes(_call.state.status) && !_call.state.hold) {
                         _call.hold()
                     }
                 }
@@ -170,7 +169,7 @@ class CallsModule extends Module {
                 if (_callId !== sourceCall.id) {
                     this.calls[_callId].setState({transfer: {active: false, type: null}})
                     // Make sure all other ongoing calls stay on hold.
-                    if (!['new', 'create'].includes(_call.state.status) && !_call.state.hold) {
+                    if (!['new', 'create', 'invite'].includes(_call.state.status) && !_call.state.hold) {
                         _call.hold()
                     }
                 }
@@ -224,19 +223,44 @@ class CallsModule extends Module {
 
 
     /**
-    * Check if there is a `new` call ready to be used.
+    * Check if there is a `new` call ready to be used. Requires some
+    * bookkeeping because of the settings that can change in the
+    * meanwhile.
+    * @param {String} type - The type of call to produce.
+    * @param {String} [number] - The number to call to.
     * @returns {Call} - A new Call object or an existing Call object with status `new`.
     */
-    _emptyCall() {
+    _emptyCall(type, number = null) {
         let call
         for (const callId of Object.keys(this.calls)) {
             if (this.calls[callId].state.status === 'new') {
-                call = this.calls[callId]
+                if (!type) {
+                    // When an empty call already exists, it must
+                    // adhere to the current WebRTC-SIP/ConnectAB settings when
+                    // the Call type is not explicitly passed.
+                    if (this.app.state.settings.webrtc.enabled) {
+                        if (this.calls[callId].constructor.name === 'CallConnectab') {
+                            this.deleteCall(this.calls[callId])
+                        } else {
+                            call = this.calls[callId]
+                        }
+                    } else {
+                        if (this.calls[callId].constructor.name === 'CallSip') {
+                            this.deleteCall(this.calls[callId])
+                        } else call = this.calls[callId]
+                    }
+                } else {
+                    // Otherwise we just check if the call matches the
+                    // expected type.
+                    if (this.calls[callId].constructor.name !== type) this.deleteCall(this.calls[callId])
+                    else call = this.calls[callId]
+                }
+
+                if (this.calls[callId]) call = this.calls[callId]
                 break
             }
         }
-
-        if (!call) call = new Call(this, null)
+        if (!call) call = callFactory(this, number, {})
         this.calls[call.id] = call
         return call
     }
@@ -312,7 +336,7 @@ class CallsModule extends Module {
         if (!call) {
             for (const callId of callIds) {
                 // Don't select a call that is already closing.
-                if (!['bye', 'rejected'].includes(this.calls[callId].state.status)) {
+                if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
                     call = this.calls[callId]
                 }
             }
@@ -322,18 +346,18 @@ class CallsModule extends Module {
             let _call = this.calls[callId]
             // A call that is closing. Don't bother changing hold
             // and active state properties.
-            if (!['bye', 'rejected'].includes(call.state.status)) {
+            if (!['bye', 'rejected_a', 'rejected_b'].includes(call.state.status)) {
                 if (call.id === callId) {
                     activeCall = this.calls[callId]
                     _call.setState({active: true})
                     // New calls don't have a session yet. Nothing to unhold.
-                    if (unholdOwn && !['new', 'create'].includes(_call.state.status)) {
+                    if (unholdOwn && !['new', 'create', 'invite'].includes(_call.state.status)) {
                         _call.unhold()
                     }
                 } else {
                     _call.setState({active: false})
                     // New calls don't have a session yet. Nothing to hold.
-                    if (holdOthers && !['new', 'create'].includes(_call.state.status)) {
+                    if (holdOthers && !['new', 'create', 'invite'].includes(_call.state.status)) {
                         _call.hold()
                     }
                 }
@@ -375,12 +399,14 @@ class CallsModule extends Module {
             if (!this.app.state.availability.dnd &&
                 (callIds.length === 0 || (callIds.length === 1 && this.calls[callIds[0]].state.status === 'new'))
             ) {
-                const call = new Call(this, session)
+                // No reason to pretend that we can switch to a different type
+                // of call(yet), because Connectab can't handle incoming calls.
+                const call = callFactory(this, session, {}, 'sip')
                 this.calls[call.id] = call
                 call.start()
             } else {
                 // Just handle the call as a silenced call and terminate it.
-                const call = new Call(this, session, {silent: true})
+                const call = callFactory(this, session, {silent: true}, 'sip')
                 call.start()
                 call.terminate()
             }
@@ -435,7 +461,7 @@ class CallsModule extends Module {
             let activeCall
             for (const callId of Object.keys(this.calls)) {
                 // Don't select a call that is already closing.
-                if (!['bye', 'rejected'].includes(this.calls[callId].state.status)) {
+                if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
                     activeCall = this.calls[callId]
                     break
                 }

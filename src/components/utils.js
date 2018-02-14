@@ -14,9 +14,12 @@ module.exports = function(app) {
                     outgoing: $t('Calling'),
                 },
                 bye: $t('Call ended'),
-                create: $t('Calling'),
+                create: $t('Setting up call'),
+                dialing_a: $t('Dialing phone A'),
+                dialing_b: $t('Dialing phone B'),
                 invite: $t('Incoming call'),
-                rejected: $t('Declined'),
+                rejected_a: $t('You disconnected'),
+                rejected_b: $t('Declined'),
             },
         }
     }
@@ -65,16 +68,19 @@ module.exports = function(app) {
                 }
                 return ready
             },
+            /**
+            * Translate a Call status string to a human-readable text.
+            * (!)Don't forget to update this function when changes are made
+            * to the internal Call state data-structure.
+            * @returns {String} - A human-readably translated Call status.
+            */
             callStatus: function() {
-                const translations = utils.getTranslations()
+                const translations = utils.getTranslations().call
                 if (this.call.status === 'accepted') {
-                    if (this.call.hold) {
-                        return translations.call.accepted.hold
-                    }
-
-                    return translations.call.accepted[this.call.type]
+                    if (this.call.hold.active) return translations.accepted.hold
+                    return translations.accepted[this.call.type]
                 }
-                return translations.call[this.call.status]
+                return translations[this.call.status]
             },
             hours: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60 / 60) % 24
