@@ -4,7 +4,7 @@ const Call = require('./index')
 * Call implementation for incoming and outgoing calls
 * using WebRTC and SIP.js.
 */
-class CallSip extends Call {
+class CallSIP extends Call {
 
     constructor(module, target, options) {
         super(module, target, options)
@@ -204,4 +204,4 @@ class CallSip extends Call {
     }
 }
 
-module.exports = CallSip
+module.exports = CallSIP

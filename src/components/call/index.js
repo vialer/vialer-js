@@ -3,8 +3,12 @@ module.exports = (app) => {
     return {
         computed: Object.assign({
             // If the current call is in transfer mode.
-            transferActive: function() {
-                return this.call.transfer.active
+            callCanTerminate: function() {
+                if (this.call.hangup.disabled) return false
+                if (this.call.transfer.active) return false
+                if (!['accepted', 'create', 'invite'].includes(this.call.status)) return false
+                if (this.call.keypad.active) return false
+                return true
             },
         }, app.utils.sharedComputed()),
         data: function() {
@@ -31,7 +35,7 @@ module.exports = (app) => {
                     }
                 } else if (block === 'dialpad-button') {
                     classes.active = this.call.keypad.active && this.call.keypad.mode === 'dtmf'
-                    classes.disabled = this.call.keypad.disabled || this.transferActive
+                    classes.disabled = this.call.keypad.disabled || this.call.transfer.active
                 } else if (block === 'attended-button') {
                     classes.active = (this.call.transfer.type === 'attended')
                 } else if (block === 'blind-button') {
@@ -52,7 +56,7 @@ module.exports = (app) => {
             },
             keypadToggle: function() {
                 // Keypad cannot be active during transfer.
-                if (this.call.keypad.disabled || this.transferActive) return
+                if (this.call.keypad.disabled || this.call.transfer.active) return
                 const keypadOn = (!this.call.keypad.active || this.call.keypad.mode !== 'dtmf')
                 app.setState(
                     {keypad: {active: keypadOn, display: 'touch', mode: 'dtmf'}},

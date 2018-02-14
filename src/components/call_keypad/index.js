@@ -90,8 +90,6 @@ module.exports = (app) => {
                     app.setState({user: {developer: !this.user.developer}}, {persist: true})
                 }
                 this.$emit('update:model', cleanedNumber)
-                // Sync the number to the background call state.
-                app.setState({number: this.number}, {path: `calls/calls/${this.call.id}`})
             },
         },
     }

@@ -15,25 +15,30 @@ const SipCall = require('./sip')
 function callFactory(module, callTarget = null, callOptions = {}, callType = null) {
     const app = module.app
     // Return a specific type of Call when requested.
+    let call = null
+
     if (callType) {
-        if (callType === 'sip') {
-            return new SipCall(module, callTarget, callOptions)
-        } else if (callType === 'connectab') {
-            return new ConnectabCall(module, callTarget, callOptions)
+        if (callType === 'CallSIP') {
+            call = new SipCall(module, callTarget, callOptions)
+        } else if (callType === 'ConnectAB') {
+            call = new ConnectabCall(module, callTarget, callOptions)
+        }
+    } else {
+        // Let application state decide.
+        if (app.state.calls.ua.state === 'registered') {
+            call = new SipCall(module, callTarget, callOptions)
+        } else if (app.state.user.authenticated) {
+            // The user at least has access to the vendor API and should
+            // be able to place a Connectab call.
+            call = new ConnectabCall(module, callTarget, callOptions)
+        } else {
+            // This shouldn't happen. Make some noise if it does.
+            throw 'Factory couldn\'t produce a valid Call target!'
         }
     }
 
-    if (app.state.calls.ua.state === 'registered') {
-        return new SipCall(module, callTarget, callOptions)
-    } else if (app.state.user.authenticated) {
-        // The user at least has access to the vendor API and should
-        // be able to place a Connectab call.
-        return new ConnectabCall(module, callTarget, callOptions)
-    } else {
-        // This shouldn't happen. Make some noise if it does.
-        throw 'Factory couldn\'t produce a valid Call target!'
-    }
-
+    if (call) this.app.logger.debug(`${this}generate ${call.constructor.name} from factory.`)
+    return call
 }
 
 module.exports = callFactory

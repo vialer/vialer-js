@@ -56,8 +56,8 @@
             :mode="call.keypad.mode" :number="call.keypad.number"/>
     </div>
 
-    <div class="call-actions">
-        <div class="rounded-button action decline" v-if="!transferActive && ['accepted', 'create', 'invite'].includes(call.status) && !call.keypad.active"
+    <div class="call-actions" v-if="!call.hangup.disabled">
+        <div class="rounded-button action decline" v-if="callCanTerminate"
             @click="callTerminate(call)">
             <i class="icon icon-hang-up"></i>
         </div>

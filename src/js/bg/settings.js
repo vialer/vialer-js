@@ -60,6 +60,9 @@ class SettingsModule extends Module {
                     this.app.tabs.toggleIcons(newVal)
                 }
             },
+            'store.settings.webrtc.enabled': (newVal, oldVal) => {
+                this.app.emit('bg:tabs:update_contextmenus', {}, true)
+            },
         }
     }
 }

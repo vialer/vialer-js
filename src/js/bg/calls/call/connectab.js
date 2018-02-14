@@ -4,13 +4,14 @@ const Call = require('./index')
 * Call flow wrapper around SipJS which enables incoming and outgoing
 * calls using WebRTC.
 */
-class CallConnectab extends Call {
+class CallConnectAB extends Call {
 
     constructor(module, target, options) {
         super(module, target, options)
 
         // ConnectAB is a remote call which doesn't have controls in the plugin.
         module.app.__mergeDeep(this.state, {
+            hangup: {disabled: true},
             hold: {disabled: true}, // No hold functionality.
             keypad: {disabled: true, mode: 'call'}, // No DTMF keypay.
             number: target,
@@ -44,10 +45,9 @@ class CallConnectab extends Call {
         const res = await this.app.api.client.get(`api/clicktodial/${this.connectabId}/`)
 
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-            this.app.emit('dialer:status.stop', {})
             // Something went wrong. Stop the timer.
-            this.app.timer.stopTimer(`dialer:status.update-${this.connectabId}`)
-            this.app.timer.unregisterTimer(`dialer:status.update-${this.connectabId}`)
+            this.app.timer.stopTimer(`call:connectab:status-${this.id}`)
+            this.app.timer.unregisterTimer(`call:connectab:status-${this.id}`)
             return
         }
 
@@ -71,6 +71,7 @@ class CallConnectab extends Call {
         }
     }
 
+
     async _handleOutgoing() {
         super._handleOutgoing()
         // Just make sure b_number is numbers only.
@@ -82,16 +83,20 @@ class CallConnectab extends Call {
             b_number: this.state.number,
         })
 
-        // Stop when an invalid http response is returned.
+        // Stop with an invalid HTTP response.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-            this._stop()
+            let notificationMessage = ''
+            if (res.data.error) notificationMessage = this.app.$t(res.data.error)
+            else if (res.data.clicktodial.b_number) notificationMessage = this.app.$t(res.data.clicktodial.b_number.join(' '))
+            this.app.logger.notification(this.app.$t('User call failed'), notificationMessage, true)
+            this._stop(true)
+        } else {
+            // A ConnectAB call id; not our Vialer-js Call id.
+            this.connectabId = res.data.callid
+            this.app.timer.registerTimer(`call:connectab:status-${this.id}`, this._callStatus.bind(this))
+            this.app.timer.setInterval(`call:connectab:status-${this.id}`, 1000)
+            this.app.timer.startTimer(`call:connectab:status-${this.id}`)
         }
-
-        // A ConnectAB call id; not our Vialer-js Call id.
-        this.connectabId = res.data.callid
-        this.app.timer.registerTimer(`call:connectab:status-${this.id}`, this._callStatus.bind(this))
-        this.app.timer.setInterval(`call:connectab:status-${this.id}`, 1000)
-        this.app.timer.startTimer(`call:connectab:status-${this.id}`)
     }
 
 
@@ -100,15 +105,16 @@ class CallConnectab extends Call {
     }
 
 
-    // We cannot hold a connectab call; just use a stub.
-    hold() {
+    /**
+    * We cannot hold a ConnectAB Call; this is just a stub.
+    */
+    hold() {}
 
-    }
 
-    // We cannot unhold a connectab call; just use a stub.
-    unhold() {
-
-    }
+    /**
+    * We cannot unhold a ConnectAB Call; this is just a stub.
+    */
+    unhold() {}
 }
 
-module.exports = CallConnectab
+module.exports = CallConnectAB

@@ -96,7 +96,12 @@ module.exports = (app) => {
         },
         watch: {
             // Copy changes to settings to the background state when they
-            // happen, but do not persist them until the user saves.
+            // happen, but do not persist them until the user saves. This
+            // may not be completely 100% foolproof, since the changed
+            // state could be saved from another setState call that DOES
+            // persist. For now let's keep it like this, because it allows
+            // the user to enter settings, close the popup, and re-edit
+            // where it left off.
             settings: {
                 deep: true,
                 handler: function(newVal, oldVal) {

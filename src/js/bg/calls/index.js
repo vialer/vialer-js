@@ -34,7 +34,17 @@ class CallsModule extends Module {
             this.activateCall(this.calls[callId], holdInactive, unholdActive)
         })
 
-        this.app.on('bg:calls:call_create', ({number, start}) => {
+        /**
+        * The main event to create a new call with from the foreground.
+        * @param {Object} callInfo - The Call data to start the call with.
+        * @param {String} callInfo.number - The number to call.
+        * @param {String} callInfo.start - Whether to start calling right away or just create a Call instance.
+        * @param {String} callInfo.type - Defines the Call implementation. Leave empty to use the one supported
+        *                                 by the application settings.
+        */
+        this.app.on('bg:calls:call_create', ({number, start, type}) => {
+            // Blind transfer when the current active call is in blind
+            // transfer mode.
             let activeCall = this.activeCall()
             if (activeCall && activeCall.state.transfer.active && activeCall.state.transfer.type === 'blind') {
                 // Directly transfer the number to the currently activated
@@ -43,12 +53,11 @@ class CallsModule extends Module {
             } else {
                 // Both a 'regular' new call and an attended transfer call will
                 // create or get a new call and active it.
-                let call = this._emptyCall(null, number)
+                let call = this._emptyCall(type, number)
                 // Sync the state back to the foreground.
                 if (start) call.start()
                 this.__setTransferState()
-                call.setState(call.state)
-                // A newly created call is always activated.
+                // // A newly created call is always activated.
                 this.activateCall(call, true, true)
             }
         })
@@ -234,34 +243,43 @@ class CallsModule extends Module {
         let call
         for (const callId of Object.keys(this.calls)) {
             if (this.calls[callId].state.status === 'new') {
-                if (!type) {
+                if (type) {
+                    // Otherwise we just check if the call matches the
+                    // expected type.
+                    if (this.calls[callId].constructor.name !== type) this.deleteCall(this.calls[callId])
+                    else call = this.calls[callId]
+                } else {
                     // When an empty call already exists, it must
                     // adhere to the current WebRTC-SIP/ConnectAB settings when
                     // the Call type is not explicitly passed.
                     if (this.app.state.settings.webrtc.enabled) {
-                        if (this.calls[callId].constructor.name === 'CallConnectab') {
+                        if (this.calls[callId].constructor.name === 'CallConnectAB') {
+                            this.app.logger.debug(`${this}recreate a new call`)
                             this.deleteCall(this.calls[callId])
                         } else {
                             call = this.calls[callId]
                         }
                     } else {
-                        if (this.calls[callId].constructor.name === 'CallSip') {
+                        if (this.calls[callId].constructor.name === 'CallSIP') {
+                            this.app.logger.debug(`${this}recreate a new call`)
                             this.deleteCall(this.calls[callId])
                         } else call = this.calls[callId]
                     }
-                } else {
-                    // Otherwise we just check if the call matches the
-                    // expected type.
-                    if (this.calls[callId].constructor.name !== type) this.deleteCall(this.calls[callId])
-                    else call = this.calls[callId]
                 }
 
                 if (this.calls[callId]) call = this.calls[callId]
                 break
             }
         }
-        if (!call) call = callFactory(this, number, {})
+        if (!call) {
+            call = callFactory(this, number, {}, type)
+        }
         this.calls[call.id] = call
+        // Set the number and propagate the call state to the foreground.
+        call.state.number = number
+        call.setState(call.state)
+        // Always set the number in the local state.
+        this.app.logger.debug(`${this}returning a ${call.constructor.name} instance with 'new' state`)
         return call
     }
 
@@ -295,7 +313,6 @@ class CallsModule extends Module {
     _initialState() {
         return {
             calls: {},
-            number: '',
             ua: {
                 state: null,
             },

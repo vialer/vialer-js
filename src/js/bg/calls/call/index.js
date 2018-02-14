@@ -21,6 +21,9 @@ class Call {
             active: false,
             class: this.constructor.name,
             displayName: null,
+            hangup: {
+                disabled: false,
+            },
             hold: {
                 active: false,
                 disabled: false,
@@ -58,7 +61,7 @@ class Call {
             rejected_b: 'rejected_b',
         }
 
-        // Sync the store's reactive properties.
+        // Sync the store's reactive properties to the foreground.
         if (!this.silent) {
             Vue.set(this.app.state.calls.calls, this.id, this.state)
             this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${this.id}`, state: this.state})
@@ -143,17 +146,18 @@ class Call {
     * before calling cleanup. The timeout is meant to postpone
     * resetting the state, in order to give the user a hint of
     * what happened in between.
+    * @param {Boolean} silent - Skip being chatty about stopping the call.
     * @param {Number} timeout - Postpones resetting the call state.
     */
-    _stop(timeout = 3000) {
+    _stop(silent = false, timeout = 3000) {
         // Stop all call state sounds that may still be playing.
         this.ringbackTone.stop()
         this.ringtone.stop()
 
         let callEndedText = this.state.number
         if (this.state.displayName) callEndedText += `:${this.state.displayName}`
-        if (!this.app.state.ui.visible) {
-            this.app.logger.notification(this.app.$t('Call ended'), callEndedText, false)
+        if (!silent && !this.app.state.ui.visible) {
+            this.app.logger.notification(this.app.$t('Call ended'), callEndedText, true)
         }
 
         this.stopTimer()

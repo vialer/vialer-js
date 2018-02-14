@@ -14,6 +14,10 @@ class Tabs {
         this.app.on('bg:tabs:observer_toggle', (data) => {
             data.callback({observe: this.tabIconsEnabled(data.sender.tab)})
         })
+        // Call this event when the updated application state needs to be
+        // reflected in the context menus. Used for instance in a settings
+        // watcher for the WebRTC enabled switch.
+        this.app.on('bg:tabs:update_contextmenus', () => this.contextMenuItems())
 
         // Start with a clean contextmenu slate.
         if (this.app.state.user.authenticated) {
@@ -31,17 +35,21 @@ class Tabs {
      */
     contextMenuItems() {
         browser.contextMenus.removeAll()
+
+        if (this.app.state.settings.webrtc.enabled) {
+            this._contextMenuItem = browser.contextMenus.create({
+                contexts: ['selection'],
+                onclick: (info, _tab) => {
+                    this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'SIP'}, true)
+                },
+                title: this.app.$t('Call %s with WebRTC'),
+            })
+        }
+
         this._contextMenuItem = browser.contextMenus.create({
             contexts: ['selection'],
             onclick: (info, _tab) => {
-                this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true}, true)
-            },
-            title: this.app.$t('Call %s with WebRTC'),
-        })
-        this._contextMenuItem = browser.contextMenus.create({
-            contexts: ['selection'],
-            onclick: (info, _tab) => {
-                this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true}, true)
+                this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'ConnectAB'}, true)
             },
             title: this.app.$t('Call %s with {vendor} user', {vendor: this.app.state.vendor}),
         })
