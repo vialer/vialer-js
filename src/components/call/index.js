@@ -10,7 +10,7 @@ module.exports = (app) => {
                 if (this.call.keypad.active) return false
                 return true
             },
-        }, app.utils.sharedComputed()),
+        }, app.helpers.sharedComputed()),
         data: function() {
             return {
                 intervalId: 0,

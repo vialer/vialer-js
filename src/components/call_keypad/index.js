@@ -30,7 +30,7 @@ module.exports = (app) => {
                 }
                 return matchedContact
             },
-        }, app.utils.sharedComputed()),
+        }, app.helpers.sharedComputed()),
         methods: Object.assign({
             classes: function(block) {
                 let classes = {}
@@ -50,7 +50,7 @@ module.exports = (app) => {
                     return
                 }
                 keyTone.play(key)
-                let newVal = app._.sanitizeNumber(`${this.number}${key}`)
+                let newVal = app.utils.sanitizeNumber(`${this.number}${key}`)
                 if (newVal) this.$emit('update:model', newVal)
                 if (this.mode === 'dtmf') app.emit('bg:calls:dtmf', {callId: this.call.id, key})
             },
@@ -62,7 +62,7 @@ module.exports = (app) => {
                     keyTone.stop()
                 }, 50)
             },
-        }, app.utils.sharedMethods()),
+        }, app.helpers.sharedMethods()),
         props: {
             call: {default: null},
             display: {default: 'expanded', type: String},
@@ -79,7 +79,7 @@ module.exports = (app) => {
         },
         watch: {
             number: function(newVal, oldVal) {
-                let cleanedNumber = app._.sanitizeNumber(newVal)
+                let cleanedNumber = app.utils.sanitizeNumber(newVal)
                 // Toggle developer features with a special number.
                 if (newVal === '02*06*18') {
                     if (!this.user.developer) {

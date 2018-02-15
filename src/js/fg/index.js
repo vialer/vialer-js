@@ -1,6 +1,7 @@
 const App = require('../lib/app')
 const utils = require('../lib/utils')
 
+
 let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.fg = true
 
@@ -22,8 +23,9 @@ class ForegroundApp extends App {
         */
         this.on('fg:set_state', this.__mergeState.bind(this))
 
-        this.utils = require('../../components/utils')(this)
-        this._ = utils
+        // Component helpers.
+        this.helpers = require('../../components/helpers')(this)
+        this.utils = require('../lib/utils')
 
         Vue.component('Availability', require('../../components/availability')(this))
         Vue.component('Call', require('../../components/call')(this))

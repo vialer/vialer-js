@@ -1,7 +1,7 @@
 module.exports = (app, actions) => {
 
     return {
-        methods: app.utils.sharedMethods(),
+        methods: app.helpers.sharedMethods(),
         render: templates.availability.r,
         staticRenderFns: templates.availability.s,
         store: {

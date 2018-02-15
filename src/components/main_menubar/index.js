@@ -1,7 +1,7 @@
 module.exports = (app) => {
 
     return {
-        computed: app.utils.sharedComputed(),
+        computed: app.helpers.sharedComputed(),
         methods: {
             classes: function(block) {
                 let classes = {}
@@ -22,7 +22,7 @@ module.exports = (app) => {
 
                 return classes
             },
-            logout: app.utils.logout,
+            logout: app.helpers.logout,
             setLayer: function(layerName) {
                 this.$store.ui.layer = layerName
                 app.emit('bg:set_state', {

@@ -43,8 +43,11 @@ class CallsModule extends Module {
         *                                 by the application settings.
         */
         this.app.on('bg:calls:call_create', ({number, start, type}) => {
+            // Always sanitize the number.
+            number = this.app.utils.sanitizeNumber(number)
             // Blind transfer when the current active call is in blind
             // transfer mode.
+
             let activeCall = this.activeCall(true)
             if (activeCall && activeCall.state.transfer.active && activeCall.state.transfer.type === 'blind') {
                 // Directly transfer the number to the currently activated
@@ -242,34 +245,34 @@ class CallsModule extends Module {
     _emptyCall(type, number = null) {
         let call
         for (const callId of Object.keys(this.calls)) {
-            if (this.calls[callId].state.status === 'new') {
-                if (type) {
-                    // Otherwise we just check if the call matches the
-                    // expected type.
-                    if (this.calls[callId].constructor.name !== type) this.deleteCall(this.calls[callId])
-                    else call = this.calls[callId]
-                } else {
-                    // When an empty call already exists, it must
-                    // adhere to the current WebRTC-SIP/ConnectAB settings when
-                    // the Call type is not explicitly passed.
-                    if (this.app.state.settings.webrtc.enabled) {
-                        if (this.calls[callId].constructor.name === 'CallConnectAB') {
-                            this.app.logger.debug(`${this}recreate a new call`)
-                            this.deleteCall(this.calls[callId])
-                        } else {
-                            call = this.calls[callId]
-                        }
-                    } else {
-                        if (this.calls[callId].constructor.name === 'CallSIP') {
-                            this.app.logger.debug(`${this}recreate a new call`)
-                            this.deleteCall(this.calls[callId])
-                        } else call = this.calls[callId]
-                    }
-                }
+            if (this.calls[callId].state.status !== 'new') continue
 
-                if (this.calls[callId]) call = this.calls[callId]
-                break
+            if (type) {
+                // Otherwise we just check if the call matches the
+                // expected type.
+                if (this.calls[callId].constructor.name !== type) this.deleteCall(this.calls[callId])
+                else call = this.calls[callId]
+            } else {
+                // When an empty call already exists, it must
+                // adhere to the current WebRTC-SIP/ConnectAB settings
+                // if the Call type is not explicitly passed.
+                if (this.app.state.settings.webrtc.enabled) {
+                    if (this.calls[callId].constructor.name === 'CallConnectAB') {
+                        this.app.logger.debug(`${this}recreate a new call`)
+                        this.deleteCall(this.calls[callId])
+                    } else {
+                        call = this.calls[callId]
+                    }
+                } else {
+                    if (this.calls[callId].constructor.name === 'CallSIP') {
+                        this.app.logger.debug(`${this}recreate a new call`)
+                        this.deleteCall(this.calls[callId])
+                    } else call = this.calls[callId]
+                }
             }
+
+            if (this.calls[callId]) call = this.calls[callId]
+            break
         }
         if (!call) {
             call = callFactory(this, number, {}, type)
@@ -332,7 +335,6 @@ class CallsModule extends Module {
     * @param {String} action - The action; `accept-new` or `decline`.
     */
     callAction(action) {
-        let activeCall = this.activeCall(true)
         let inviteCall = null
 
         for (const callId of Object.keys(this.calls)) {
@@ -342,7 +344,14 @@ class CallsModule extends Module {
 
         if (action === 'accept-new') {
             if (inviteCall) inviteCall.accept()
+            else {
+                const call = this._emptyCall()
+                this.activateCall(call, true)
+                this.app.setState({ui: {layer: 'calls'}})
+            }
         } else if (action === 'decline-hangup') {
+            // Ongoing Calls can also be terminated.
+            let activeCall = this.activeCall()
             if (inviteCall) inviteCall.terminate()
             else if (activeCall) activeCall.terminate()
         }

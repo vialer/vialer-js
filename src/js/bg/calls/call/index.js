@@ -69,7 +69,31 @@ class Call {
     }
 
 
-    _handleOutgoing() {
+    /**
+    * Generic UI and state-related logic for an outgoing call.
+    * Note: first set the number and displayName in the parent,
+    * before calling this super.
+    */
+    _incoming() {
+        this.setState(this.state)
+
+        // Signal the user about the incoming call.
+        if (!this.silent) {
+            this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
+            if (!this.app.state.ui.visible) {
+                this.app.logger.notification(this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
+            }
+
+            this.ringtone.play()
+            this.module.activateCall(this, true)
+        }
+    }
+
+
+    /**
+    * Generic UI and state-related logic for an outgoing call.
+    */
+    _outgoing() {
         // Try to fill in the displayName from contacts.
         const contacts = this.app.state.contacts.contacts
         let displayName = ''
@@ -127,12 +151,18 @@ class Call {
 
     /**
     * Handle logic when a call is started; both incoming and outgoing.
+    * @param {Boolean} forceNotify - Force a notification, even when the popup is open.
     */
-    _start() {
+    _start(forceNotify = false) {
         this._started = true
         this.ringbackTone.stop()
         this.ringtone.stop()
         this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})
+
+        if (forceNotify || (!this.silent && !this.app.state.ui.visible)) {
+            this.app.logger.notification(this.app.$t('Call accepted'), `${this.state.number}: ${this.state.displayName}`, false)
+        }
+
         this.app.setState({ui: {menubar: {event: 'calling'}}})
         this.timerId = window.setInterval(() => {
             this.setState({timer: {current: new Date().getTime()}})
@@ -146,18 +176,27 @@ class Call {
     * before calling cleanup. The timeout is meant to postpone
     * resetting the state, in order to give the user a hint of
     * what happened in between.
-    * @param {Boolean} silent - Skip being chatty about stopping the call.
     * @param {Number} timeout - Postpones resetting the call state.
+    * @param {Boolean} forceNotify - Force a notification, even when the popup is open.
+    * @param {String} reason - An optional notification text for errors.
     */
-    _stop(silent = false, timeout = 3000) {
+    _stop(timeout = 3000, forceNotify = false, reason = '') {
+        let notificationText
         // Stop all call state sounds that may still be playing.
         this.ringbackTone.stop()
         this.ringtone.stop()
+        if (reason) notificationText = reason
+        else {
+            notificationText = this.state.number
+            if (this.state.displayName) notificationText += `:${this.state.displayName}`
+        }
 
-        let callEndedText = this.state.number
-        if (this.state.displayName) callEndedText += `:${this.state.displayName}`
-        if (!silent && !this.app.state.ui.visible) {
-            this.app.logger.notification(this.app.$t('Call ended'), callEndedText, true)
+        if (forceNotify || (!this.silent && !this.app.state.ui.visible)) {
+            if (this.state.status === 'rejected_b') {
+                this.app.logger.notification(this.app.$t('Call rejected'), notificationText, false)
+            } else {
+                this.app.logger.notification(this.app.$t('Call ended'), notificationText, true)
+            }
         }
 
         this.stopTimer()

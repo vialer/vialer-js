@@ -2,9 +2,9 @@
 // state from here.
 module.exports = function(app) {
 
-    let utils = {}
+    let helpers = {}
 
-    utils.getTranslations = function() {
+    helpers.getTranslations = function() {
         const $t = app.$t
         return {
             call: {
@@ -24,7 +24,7 @@ module.exports = function(app) {
         }
     }
 
-    utils.sharedMethods = function() {
+    helpers.sharedMethods = function() {
         return {
             createCall: function(number, start = true, transfer = false) {
                 // Still allows empty calls when number is false.
@@ -42,7 +42,7 @@ module.exports = function(app) {
         }
     }
 
-    utils.sharedComputed = function() {
+    helpers.sharedComputed = function() {
         return {
             /**
             * Checks whether any calls are going on.
@@ -75,7 +75,7 @@ module.exports = function(app) {
             * @returns {String} - A human-readably translated Call status.
             */
             callStatus: function() {
-                const translations = utils.getTranslations().call
+                const translations = helpers.getTranslations().call
                 if (this.call.status === 'accepted') {
                     if (this.call.hold.active) return translations.accepted.hold
                     return translations.accepted[this.call.type]
@@ -130,9 +130,9 @@ module.exports = function(app) {
     /**
     * Set user state to unauthenticated and notify the background.
     */
-    utils.logout = function() {
+    helpers.logout = function() {
         app.emit('bg:user:logout')
     }
 
-    return utils
+    return helpers
 }

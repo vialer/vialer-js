@@ -23,13 +23,13 @@
         ]
     },
     "commands": {
-        "accept-new": {
+        "action-accept-new": {
             "suggested_key": {
                 "default": "Ctrl+Shift+A"
             },
             "description": "Accept an incoming call or head over to create a new call."
         },
-        "decline-hangup": {
+        "action-decline-hangup": {
             "suggested_key": {
                 "default": "Ctrl+Shift+Z"
             },

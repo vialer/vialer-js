@@ -1,9 +1,9 @@
 module.exports = (app) => {
 
     return {
-        computed: app.utils.sharedComputed(),
+        computed: app.helpers.sharedComputed(),
         methods: {
-            logout: app.utils.logout,
+            logout: app.helpers.logout,
             openHelp: function() {
                 if (app.env.isExtension) browser.tabs.create({url: process.env.HOMEPAGE})
                 else window.open(process.env.HOMEPAGE, '_blank')

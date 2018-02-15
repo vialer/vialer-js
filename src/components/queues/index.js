@@ -1,7 +1,7 @@
 module.exports = (app) => {
 
     return {
-        computed: app.utils.sharedComputed(),
+        computed: app.helpers.sharedComputed(),
         methods: Object.assign({
             classesQueue: function(queue) {
                 let classes = {}
@@ -18,7 +18,7 @@ module.exports = (app) => {
                     app.emit('bg:queues:selected', {queue: null})
                 }
             },
-        }, app.utils.sharedMethods()),
+        }, app.helpers.sharedMethods()),
         render: templates.queues.r,
         staticRenderFns: templates.queues.s,
         store: {

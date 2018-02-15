@@ -72,24 +72,24 @@ class CallConnectAB extends Call {
     }
 
 
-    async _handleOutgoing() {
-        super._handleOutgoing()
+    async _outgoing() {
+        super._outgoing()
         // Just make sure b_number is numbers only.
-
         // Don't send the `a_number`, because we expect the user to have
         // set the Click2dial account. Also, changing the user availability
         // only has effect when the Click2dial account value is `Sync to `
-        const res = await this.app.api.client.post('api/clicktodial/', {
-            b_number: this.state.number,
-        })
+        const res = await this.app.api.client.post('api/clicktodial/', {b_number: this.state.number})
 
-        // Stop with an invalid HTTP response.
+        // Reject the call with an invalid HTTP response.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-            let notificationMessage = ''
-            if (res.data.error) notificationMessage = this.app.$t(res.data.error)
-            else if (res.data.clicktodial.b_number) notificationMessage = this.app.$t(res.data.clicktodial.b_number.join(' '))
-            this.app.logger.notification(this.app.$t('User call failed'), notificationMessage, true)
-            this._stop(true)
+            // For now don't make a distination between rejected_a and rejected_b.
+            // Just use the latter.
+            this.setState({status: 'rejected_b'})
+            let reason = this.app.$t('An unknown error occured during call setup.')
+            // Hope we dealt with all possible failures.
+            if (res.data.error) reason = this.app.$t(res.data.error)
+            else if (res.data.clicktodial.b_number) reason = this.app.$t(res.data.clicktodial.b_number.join(' '))
+            this._stop(undefined, true, reason)
         } else {
             // A ConnectAB call id; not our Vialer-js Call id.
             this.connectabId = res.data.callid
@@ -101,7 +101,7 @@ class CallConnectAB extends Call {
 
 
     start() {
-        this._handleOutgoing()
+        this._outgoing()
     }
 
 

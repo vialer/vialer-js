@@ -1,7 +1,7 @@
 module.exports = (app) => {
 
     return {
-        computed: app.utils.sharedComputed(),
+        computed: app.helpers.sharedComputed(),
         methods: Object.assign({
             activateCall: function(call) {
                 // Remove the new call when clicking on it again while
@@ -64,7 +64,7 @@ module.exports = (app) => {
                 }
                 return available
             },
-        }, app.utils.sharedMethods()),
+        }, app.helpers.sharedMethods()),
         render: templates.call_switch.r,
         staticRenderFns: templates.call_switch.s,
         store: {

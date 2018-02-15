@@ -21,29 +21,17 @@ class CallSIP extends Call {
 
 
     /**
-    * An invite; incoming call.
+    * Handle an incoming `invite` call from.
     */
-    _handleIncoming() {
+    _incoming() {
+        // (!) First set the state before calling super.
         this.state.displayName = this.session.remoteIdentity.displayName
         this.state.number = this.session.remoteIdentity.uri.user
-        this.setState(this.state)
 
-        // Signal the user about the incoming call.
-        if (!this.silent) {
-            this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
-            if (!this.app.state.ui.visible) {
-                this.app.logger.notification(this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
-            }
-
-            this.ringtone.play()
-            this.module.activateCall(this, true)
-        }
+        super._incoming()
 
         // Setup some event handlers for the different stages of a call.
-        this.session.on('accepted', (request) => {
-            this._start()
-        })
-
+        this.session.on('accepted', (request) => this._start())
         this.session.on('rejected', (e) => {
             this.setState({status: 'rejected_b'})
             this._stop()
@@ -64,9 +52,7 @@ class CallSIP extends Call {
         })
 
         // Blind transfer event.
-        this.session.on('refer', (target) => {
-            this.session.bye()
-        })
+        this.session.on('refer', (target) => this.session.bye())
     }
 
 
@@ -74,8 +60,8 @@ class CallSIP extends Call {
     * Setup an outgoing call.
     * @param {(Number|String)} number - The number to call.
     */
-    _handleOutgoing() {
-        super._handleOutgoing()
+    _outgoing() {
+        super._outgoing()
         this.session = this.ua.invite(`sip:${this.state.number}@voipgrid.nl`, this._sessionOptions)
 
         // Notify user about the new call being setup.
@@ -152,16 +138,16 @@ class CallSIP extends Call {
 
     start() {
         if (this.silent) {
-            if (this.state.status === 'invite') this._handleIncoming()
-            else this._handleOutgoing()
+            if (this.state.status === 'invite') this._incoming()
+            else this._outgoing()
         } else {
             // Query media and assign the stream. The actual permission must be
             // already granted from a foreground script running in a tab.
             this.hasMedia = this._initMedia().then((stream) => {
                 this._sessionOptions.media.stream = stream
                 this.stream = stream
-                if (this.state.status === 'invite') this._handleIncoming()
-                else this._handleOutgoing()
+                if (this.state.status === 'invite') this._incoming()
+                else this._outgoing()
             })
         }
     }
@@ -171,6 +157,13 @@ class CallSIP extends Call {
     * End a call based on it's current status.
     */
     terminate() {
+        if (this.state.status === 'new') {
+            // Just delete the Call object without noise.
+            this.module.deleteCall(this)
+            return
+        }
+
+        // Calls with other statuses need some more work to end.
         try {
             if (this.state.status === 'invite') this.session.reject() // Decline an incoming call.
             else if (this.state.status === 'create') this.session.terminate() // Cancel a self-initiated call.
@@ -184,7 +177,6 @@ class CallSIP extends Call {
         } catch (err) {
             this.app.logger.warn(`${this}unable to close the session properly.`)
         }
-
         this._stop()
     }
 

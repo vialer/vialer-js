@@ -1,7 +1,7 @@
 module.exports = (app) => {
 
     return {
-        computed: app.utils.sharedComputed(),
+        computed: app.helpers.sharedComputed(),
         props: ['call'],
         render: templates.main_callbar.r,
         staticRenderFns: templates.main_callbar.s,

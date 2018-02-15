@@ -23,6 +23,7 @@ class BackgroundApp extends App {
         }
 
         this.timer = new Timer(this)
+        this.utils = require('../lib/utils')
 
         // Send this script's state back to the requesting script.
         this.on('bg:get_state', (data) => data.callback(this.state))

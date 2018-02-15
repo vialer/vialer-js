@@ -13,7 +13,7 @@ module.exports = (app) => {
                 }
                 return false
             },
-        }, app.utils.sharedComputed()),
+        }, app.helpers.sharedComputed()),
         render: templates.main.r,
         staticRenderFns: templates.main.s,
         store: app.state,

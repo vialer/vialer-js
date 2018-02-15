@@ -20,8 +20,8 @@ module.exports = (app) => {
 
                 return _contacts
             },
-        }, app.utils.sharedComputed()),
-        methods: app.utils.sharedMethods(),
+        }, app.helpers.sharedComputed()),
+        methods: app.helpers.sharedMethods(),
         render: templates.contacts.r,
         staticRenderFns: templates.contacts.s,
         store: {
