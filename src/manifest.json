@@ -23,22 +23,21 @@
         ]
     },
     "commands": {
-        "accept-call": {
+        "accept-new": {
             "suggested_key": {
                 "default": "Ctrl+Shift+A"
             },
-            "description": "Accept an incoming call."
+            "description": "Accept an incoming call or head over to create a new call."
         },
-        "decline-call": {
+        "decline-hangup": {
             "suggested_key": {
                 "default": "Ctrl+Shift+Z"
             },
-            "description": "Decline an incoming call."
+            "description": "Decline an incoming call or hangup an active call."
         },
         "_execute_browser_action": {
             "suggested_key": {
-                "default": "Ctrl+Shift+X",
-                "description": "Opens the popup."
+                "default": "Ctrl+Shift+X"
             }
         }
   },

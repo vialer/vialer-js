@@ -325,28 +325,39 @@ class CallsModule extends Module {
     }
 
     /**
-    * A loosely coupled invite handler. Operates on all Calls
-    * that are in the `invite` state.
-    * @param {String} action - The action; `accept` or `decline`.
+    * A loosely coupled Call action handler. Operates on all Calls.
+    * Supported actions are:
+    *   `accept-new`: Accepts an incoming call or switch to the new call dialog.
+    *   `deline-hangup`: Declines an incoming call or an active call.
+    * @param {String} action - The action; `accept-new` or `decline`.
     */
-    handleIncomingCall(action) {
+    callAction(action) {
+        let activeOngoingCall = this.activeOngoingCall()
+        let inviteCall = null
+
         for (const callId of Object.keys(this.calls)) {
             // Don't select a call that is already closing
-            if (this.calls[callId].state.status === 'invite') {
-                if (action === 'accept') this.calls[callId].accept()
-                else if (action === 'decline') this.calls[callId].terminate()
-            }
+            if (this.calls[callId].state.status === 'invite') inviteCall = this.calls[callId]
+        }
+
+        if (action === 'accept-new') {
+            if (inviteCall) inviteCall.accept()
+        } else if (action === 'decline-hangup') {
+            if (inviteCall) inviteCall.terminate()
+            else if (activeOngoingCall) activeOngoingCall.terminate()
         }
     }
 
 
     /**
-    * @returns {Call|null} - the current active call or null.
+    * @returns {Call|null} - the current active ongoing call or null.
     */
-    activeCall() {
+    activeOngoingCall() {
         for (const callId of Object.keys(this.calls)) {
             // Don't select a call that is already closing
-            if (this.calls[callId].state.active) return this.calls[callId]
+            if (this.calls[callId].state.active && !['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                return this.calls[callId]
+            }
         }
         return null
     }
@@ -361,11 +372,11 @@ class CallsModule extends Module {
     * @returns {Call|Boolean} - The Call or false.
     */
     activateCall(call, holdOthers = true, unholdOwn = false) {
-        // Activate the first found call when no call is given.
         let activeCall = false
         const callIds = Object.keys(this.calls)
 
         if (!call) {
+            // Activate the first found ongoing call when no call is given.
             for (const callId of callIds) {
                 // Don't select a call that is already closing.
                 if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {

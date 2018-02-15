@@ -19,10 +19,10 @@ class UiModule extends Module {
         }
 
         browser.commands.onCommand.addListener((command) => {
-            if (command === 'accept-call') {
-                this.app.modules.calls.handleIncomingCall('accept')
-            } else if (command === 'decline-call') {
-                this.app.modules.calls.handleIncomingCall('decline')
+            if (command === 'action-accept-new') {
+                this.app.modules.calls.callAction('accept-new')
+            } else if (command === 'action-decline-hangup') {
+                this.app.modules.calls.callAction('decline-hangup')
             }
         });
     }
