@@ -79,7 +79,7 @@ class CallsModule extends Module {
         this.app.on('bg:calls:dtmf', ({callId, key}) => this.calls[callId].session.dtmf(key))
         this.app.on('bg:calls:hold_toggle', ({callId}) => {
             const call = this.calls[callId]
-            if (!call.state.hold) {
+            if (!call.state.hold.active) {
                 call.hold()
             } else {
                 // Unhold while the call's transfer is active must also
