@@ -45,7 +45,7 @@ class CallsModule extends Module {
         this.app.on('bg:calls:call_create', ({number, start, type}) => {
             // Blind transfer when the current active call is in blind
             // transfer mode.
-            let activeCall = this.activeCall()
+            let activeCall = this.activeCall(true)
             if (activeCall && activeCall.state.transfer.active && activeCall.state.transfer.type === 'blind') {
                 // Directly transfer the number to the currently activated
                 // call when the active call has blind transfer mode set.
@@ -332,7 +332,7 @@ class CallsModule extends Module {
     * @param {String} action - The action; `accept-new` or `decline`.
     */
     callAction(action) {
-        let activeOngoingCall = this.activeOngoingCall()
+        let activeCall = this.activeCall(true)
         let inviteCall = null
 
         for (const callId of Object.keys(this.calls)) {
@@ -344,22 +344,25 @@ class CallsModule extends Module {
             if (inviteCall) inviteCall.accept()
         } else if (action === 'decline-hangup') {
             if (inviteCall) inviteCall.terminate()
-            else if (activeOngoingCall) activeOngoingCall.terminate()
+            else if (activeCall) activeCall.terminate()
         }
     }
 
 
     /**
+    * @param {Boolean} ongoing - Whether to check if the call is ongoing or not.
     * @returns {Call|null} - the current active ongoing call or null.
     */
-    activeOngoingCall() {
+    activeCall(ongoing = false) {
+        let activeCall = null
         for (const callId of Object.keys(this.calls)) {
             // Don't select a call that is already closing
-            if (this.calls[callId].state.active && !['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
-                return this.calls[callId]
+            if (this.calls[callId].state.active) {
+                if (!ongoing) activeCall = this.calls[callId]
+                else if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) activeCall = this.calls[callId]
             }
         }
-        return null
+        return activeCall
     }
 
 
