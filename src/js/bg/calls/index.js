@@ -324,6 +324,21 @@ class CallsModule extends Module {
         moduleStore.calls = {}
     }
 
+    /**
+    * A loosely coupled invite handler. Operates on all Calls
+    * that are in the `invite` state.
+    * @param {String} action - The action; `accept` or `decline`.
+    */
+    handleIncomingCall(action) {
+        for (const callId of Object.keys(this.calls)) {
+            // Don't select a call that is already closing
+            if (this.calls[callId].state.status === 'invite') {
+                if (action === 'accept') this.calls[callId].accept()
+                else if (action === 'decline') this.calls[callId].terminate()
+            }
+        }
+    }
+
 
     /**
     * @returns {Call|null} - the current active call or null.
@@ -418,12 +433,12 @@ class CallsModule extends Module {
             ) {
                 // No reason to pretend that we can switch to a different type
                 // of call(yet), because Connectab can't handle incoming calls.
-                const call = callFactory(this, session, {}, 'sip')
+                const call = callFactory(this, session, {}, 'CallSIP')
                 this.calls[call.id] = call
                 call.start()
             } else {
                 // Just handle the call as a silenced call and terminate it.
-                const call = callFactory(this, session, {silent: true}, 'sip')
+                const call = callFactory(this, session, {silent: true}, 'CallSIP')
                 call.start()
                 call.terminate()
             }

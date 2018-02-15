@@ -22,6 +22,8 @@ function callFactory(module, callTarget = null, callOptions = {}, callType = nul
             call = new SipCall(module, callTarget, callOptions)
         } else if (callType === 'ConnectAB') {
             call = new ConnectabCall(module, callTarget, callOptions)
+        } else {
+            throw 'Factory couldn\'t produce a valid Call target!'
         }
     } else {
         // Let application state decide.

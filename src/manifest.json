@@ -23,9 +23,22 @@
         ]
     },
     "commands": {
+        "accept-call": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+A"
+            },
+            "description": "Accept an incoming call."
+        },
+        "decline-call": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+Z"
+            },
+            "description": "Decline an incoming call."
+        },
         "_execute_browser_action": {
             "suggested_key": {
-                "default": "Ctrl+Shift+V"
+                "default": "Ctrl+Shift+X",
+                "description": "Opens the popup."
             }
         }
   },

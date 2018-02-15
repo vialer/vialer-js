@@ -17,6 +17,14 @@ class UiModule extends Module {
                 intervalId: null,
             },
         }
+
+        browser.commands.onCommand.addListener((command) => {
+            if (command === 'accept-call') {
+                this.app.modules.calls.handleIncomingCall('accept')
+            } else if (command === 'decline-call') {
+                this.app.modules.calls.handleIncomingCall('decline')
+            }
+        });
     }
 
     _initialState() {
