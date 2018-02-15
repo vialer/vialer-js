@@ -23,6 +23,11 @@ class UiModule extends Module {
                 this.app.modules.calls.callAction('accept-new')
             } else if (command === 'action-decline-hangup') {
                 this.app.modules.calls.callAction('decline-hangup')
+            } else if (command === 'action-dnd') {
+                // Only toggle when WebRTC calling is on.
+                if (this.app.state.settings.webrtc.enabled) {
+                    this.app.setState({availability: {dnd: !this.app.state.availability.dnd}})
+                }
             }
         });
     }

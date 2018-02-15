@@ -35,6 +35,12 @@
             },
             "description": "Decline an incoming call or hangup an active call."
         },
+        "action-dnd": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+S"
+            },
+            "description": "Toggle the dnd function for the softphone."
+        },
         "_execute_browser_action": {
             "suggested_key": {
                 "default": "Ctrl+Shift+X"
