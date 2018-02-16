@@ -1,6 +1,5 @@
 const Api = require('./lib/api')
 const App = require('../lib/app')
-const Tabs = require('./lib/tabs')
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
 
@@ -67,8 +66,6 @@ class BackgroundApp extends App {
                     }
                 })
             })
-
-            this.tabs = new Tabs(this)
         } else {
             // There is no concept of a popup without an extension.
             // However, we still trigger the event to start timers
@@ -115,28 +112,31 @@ class BackgroundApp extends App {
 
         if (storedState) {
             Object.assign(this.state, storedState)
-            this._restoreState(this.state)
+            this._hydrateState(this.state)
 
             for (let module of Object.keys(this.modules)) {
-                if (this.modules[module]._restoreState) this.modules[module]._restoreState(this.state[module])
-                if (this.modules[module]._watchers) Object.assign(watchers, this.modules[module]._watchers())
+                if (this.modules[module]._hydrateState) {
+                    this.modules[module]._hydrateState(this.state[module])
+                }
             }
         } else {
             Object.assign(this.state, this._initialState())
         }
 
+        // Each module can define watchers on store attributes, which makes
+        // it easier to centralize data-related logic.
+        for (let module of Object.keys(this.modules)) {
+            if (this.modules[module]._watchers) {
+                Object.assign(watchers, this.modules[module]._watchers())
+            }
+
+        }
+
         this.initViewModel(watchers)
-    }
 
-
-    /**
-    * Small helper that returns the version of the app.
-    * The version is inserted at buildtime from the
-    * package.json file.
-    * @returns {String} - The current app's version.
-    */
-    version() {
-        return process.env.VERSION
+        for (let module of Object.keys(this.modules)) {
+            if (this.modules[module]._ready) this.modules[module]._ready()
+        }
     }
 }
 
@@ -151,6 +151,11 @@ function startApp(options) {
         {Module: require('./ui'), name: 'ui'},
         {Module: require('./user'), name: 'user'},
     ]
+
+    // Extension-specific functionality lives in a separate module.
+    if (env.isExtension) {
+        options.modules.push({Module: require('./extension'), name: 'extension'})
+    }
     return new BackgroundApp(options)
 }
 

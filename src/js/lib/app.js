@@ -110,7 +110,7 @@ class App extends Skeleton {
     * set fresh when reviving the state.
     * @param {Store} store - The Stash store.
     */
-    _restoreState(store) {
+    _hydrateState(store) {
         store.notifications = []
     }
 
@@ -177,7 +177,7 @@ class App extends Skeleton {
             mounted: () => {
                 // Chrome OSX height calculation bug, see:
                 // https://bugs.chromium.org/p/chromium/issues/detail?id=428044
-                if (this.env.isOsx) {
+                if (this.env.isMacOS) {
                     document.body.style.display = 'none'
                     setTimeout(() => {
                         document.body.style.display = 'block'

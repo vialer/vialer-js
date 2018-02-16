@@ -1,5 +1,5 @@
 <div class="field" v-if="type === 'checkbox'">
-    <input :id="name" type="checkbox" :name="name" v-on:change="vChange($event, $event.target.value)"
+    <input :disabled="disabled" :id="name" type="checkbox" :name="name" v-on:change="vChange($event, $event.target.value)"
         v-bind:checked="vmodel" class="switch"/>
     <label :for="name" class="checkbox" >{{label}}</label>
     <em class="help" v-if="help">{{help}}</em>
@@ -64,7 +64,7 @@
     <div class="control">
         <input type="text" v-bind:class="{'is-danger': vInvalid(), 'input': true}"
             v-on:input="vChange($event, $event.target.value)" v-bind:value="vmodel"
-            :id="name" :name="name" :placeholder="placeholder" :disabled="disabled">
+            :id="name" :name="name" :placeholder="placeholder" :disabled="disabled" :autofocus="autofocus"/>
     </div>
     <em class="help" v-if="help">{{help}}</em>
     <span class="help is-danger" v-if="vInvalid()" v-html="validationMessage"></span>

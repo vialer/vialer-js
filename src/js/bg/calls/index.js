@@ -209,7 +209,7 @@ class CallsModule extends Module {
                 'stun.voipgrid.nl',
             ],
             traceSip: false,
-            userAgentString: process.env.PLUGIN_NAME,
+            userAgentString: this._userAgent(),
             wsServers: [`wss://${settings.sipEndpoint}`],
         }
 
@@ -323,8 +323,31 @@ class CallsModule extends Module {
     }
 
 
-    _restoreState(moduleStore) {
+    _hydrateState(moduleStore) {
         moduleStore.calls = {}
+    }
+
+
+    /**
+    * Build the useragent string to identify Vialer-js with.
+    * The format is `Vialer-js/<VERSION> (<OS/<ENV>) <Vendor>`
+    * @returns {String} - Useragent string.
+    */
+    _userAgent() {
+        const env = this.app.env
+        // Don't use dynamic extension state here as version.
+        // Vialer-js may run outside of an extension context.
+        let userAgent = 'Vialer-js/' + process.env.VERSION
+        if (env.isLinux) userAgent += '(Linux/'
+        else if (env.isMacOS) userAgent += '(MacOS/'
+        else if (env.isWindows) userAgent += '(Windows/'
+
+        if (env.isChrome) userAgent += 'Chrome'
+        if (env.isElectron) userAgent += 'Electron'
+        else if (env.isFirefox) userAgent += 'Firefox'
+        else if (env.isEdge) userAgent += 'Edge'
+        userAgent += `) ${this.app.state.vendor}`
+        return userAgent
     }
 
     /**

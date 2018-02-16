@@ -39,7 +39,7 @@ function callFactory(module, callTarget = null, callOptions = {}, callType = nul
         }
     }
 
-    if (call) this.app.logger.debug(`${this}generate ${call.constructor.name} from factory.`)
+    if (call) app.logger.debug(`[bg] [factory] generate ${call.constructor.name} from factory.`)
     return call
 }
 

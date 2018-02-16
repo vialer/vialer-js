@@ -86,7 +86,7 @@ function initApp(initParams) {
     if (app.env.isEdge) $('html').addClass('edge')
     if (app.env.isFirefox) $('html').addClass('firefox')
 
-    if (app.env.isOsx) {
+    if (app.env.isMacOS) {
         // Forces height recalculation of the popup in Chrome OSX.
         // See: https://bugs.chromium.org/p/chromium/issues/detail?id=307912
         setTimeout(() => {

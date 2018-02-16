@@ -56,7 +56,6 @@ class UserModule extends Module {
         }
 
         let user = res.data
-        console.log('USER:', user)
         // Only platform client users cannot use platform telephony features.
         if (!user.client) {
             this.logout()
@@ -64,7 +63,10 @@ class UserModule extends Module {
         }
 
         this.app.setState({
-            ui: {layer: 'contacts'},
+            ui: {
+                layer: 'contacts',
+                menubar: {default: 'active'},
+            },
             user: {
                 authenticated: true,
                 client_id: user.client.replace(/[^\d.]/g, ''),

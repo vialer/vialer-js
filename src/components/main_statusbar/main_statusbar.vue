@@ -20,7 +20,8 @@
             <i class="icon-logout" :title="$t('Login page')"></i>
         </div>
 
-        <div class="option" v-if="env.isExtension && !env.isPopout" @click="openPopoutView">
+        <!-- No real use in showing the popout view from an unauthenticated view -->
+        <div class="option" v-if="env.isExtension && !env.isPopout && user.authenticated" @click="openPopoutView">
             <i class="icon-ext-tab" :title="$t('Open in separate tab')"></i>
         </div>
 

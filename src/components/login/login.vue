@@ -1,7 +1,7 @@
 <div class="login-component" tabindex="-1" v-on:keyup.enter="login">
     <Field name="username" type="text"
         :label="$t('Email address')" :model.sync="user.username"
-        :placeholder="$t('Email address')"/>
+        :placeholder="$t('Email address')" :autofocus="true"/>
 
     <Field name="password" type="password"
         :label="$t('Password')" :model.sync="user.password"

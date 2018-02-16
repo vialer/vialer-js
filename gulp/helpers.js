@@ -179,9 +179,7 @@ class Helpers {
         // by adding a `beta` postfix.
         if (this.settings.DEPLOY_TARGET === 'beta') manifest.name = `${manifest.name}-beta`
 
-        if (buildType === 'chrome') {
-            manifest.options_ui.chrome_style = false
-        } else if (buildType === 'edge') {
+        if (buildType === 'edge') {
             manifest.background.persistent = true
             manifest.browser_specific_settings = {
                 edge: {
@@ -193,7 +191,6 @@ class Helpers {
             let betaId = this.settings.brands[brandName].store.firefox.gecko.id_beta
             delete this.settings.brands[brandName].store.firefox.gecko.id_beta
 
-            manifest.options_ui.browser_style = true
             manifest.applications = {
                 gecko: this.settings.brands[brandName].store.firefox.gecko,
             }

@@ -59,7 +59,7 @@ class ContactsModule extends Module {
     }
 
 
-    _restoreState(moduleStore) {
+    _hydrateState(moduleStore) {
         moduleStore.contacts = {}
     }
 

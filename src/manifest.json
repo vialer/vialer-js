@@ -1,6 +1,7 @@
 {
     "author": "Devhouse Spindle",
     "manifest_version": 2,
+    "homepage_url": "https://github.com/voipgrid/vialer-js",
     "description": "__MSG_extDescription__",
     "icons": {
         "16": "img/contextmenu.png",
@@ -46,7 +47,7 @@
                 "default": "Ctrl+Shift+X"
             }
         }
-  },
+    },
     "permissions": [
         "*://*/*",
         "contextMenus",
@@ -79,9 +80,6 @@
             "all_frames": true
         }
     ],
-    "options_ui": {
-        "page": "index.html"
-    },
     "web_accessible_resources": [
         "img/*.png",
         "css/*.css",

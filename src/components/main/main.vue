@@ -6,7 +6,7 @@
         <div class="panel-content-container" v-if="!$store.user.authenticated">
             <Notifications/>
             <Login v-if="$store.ui.layer==='login'" class="panel-content"/>
-            <Settings v-if="$store.ui.layer==='settings'" class="panel-content"/>
+            <Settings v-if="$store.ui.layer==='settings'"/>
         </div>
 
         <template v-if="$store.user.authenticated">

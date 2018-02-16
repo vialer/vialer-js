@@ -31,7 +31,7 @@ module.exports = (app) => {
         destroyed: function() {
             clearInterval(this.soundMeterInterval)
         },
-        methods: {
+        methods: Object.assign({
             playSound: function() {
                 // Don't allow the user to frenzy-click the test-audio button.
                 if (!this.sound.enabled) return
@@ -56,7 +56,7 @@ module.exports = (app) => {
             setTab: function(name) {
                 app.setState({ui: {tabs: {settings: {active: name}}}}, {persist: true})
             },
-        },
+        }, app.helpers.sharedMethods()),
         mounted: async function() {
             if (!soundMeter) soundMeter = await microphoneCheck()
             if (soundMeter) {
@@ -89,6 +89,7 @@ module.exports = (app) => {
         render: templates.settings.r,
         staticRenderFns: templates.settings.s,
         store: {
+            env: 'env',
             settings: 'settings',
             tabs: 'ui.tabs.settings',
             user: 'user',
@@ -120,7 +121,6 @@ module.exports = (app) => {
                     }, 25)
                 } else {
                     this.settings.webrtc.permission = false
-                    app.vm.$notify({icon: 'warning', message: this.$t('Browser doesn\'t allow access to the microphone.'), type: 'danger'})
                 }
             },
         },

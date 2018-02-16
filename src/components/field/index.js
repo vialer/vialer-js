@@ -68,6 +68,7 @@ module.exports = (app) => {
             * defining parent. The value is captured using `:model.sync`.
             * @param {Event} event - The original change event from the input.
             * @param {String} value - The value before the change happened.
+            * @param {Array} options - Options when its a select.
             */
             vChange: function(event, value, options) {
                 // Toggles value of a checkbox.
@@ -129,6 +130,7 @@ module.exports = (app) => {
             },
         },
         props: {
+            autofocus: Boolean,
             change: Function,
             click: Function,
             disabled: Boolean,

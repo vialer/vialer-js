@@ -1,12 +1,13 @@
 {
   "name": "vialer-js",
-  "version": "3.0.0.53",
+  "version": "3.0.0.55",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
     "node": ">=8.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -69,6 +70,7 @@
     "run-sequence": "^1.2.2",
     "serve-index": "^1.9.0",
     "serve-static": "^1.12.1",
+    "standard-version": "^4.3.0",
     "uglify-es": "^3.0.21",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",

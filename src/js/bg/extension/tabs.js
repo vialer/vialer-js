@@ -40,7 +40,9 @@ class Tabs {
             this._contextMenuItem = browser.contextMenus.create({
                 contexts: ['selection'],
                 onclick: (info, _tab) => {
+                    // The extension popup may be opened from a contextmenu action.
                     this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'SIP'}, true)
+                    browser.browserAction.openPopup((window) => {})
                 },
                 title: this.app.$t('Call %s with WebRTC'),
             })
@@ -49,6 +51,8 @@ class Tabs {
         this._contextMenuItem = browser.contextMenus.create({
             contexts: ['selection'],
             onclick: (info, _tab) => {
+                // The extension popup may be opened from a contextmenu action.
+                browser.browserAction.openPopup((window) => {})
                 this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'ConnectAB'}, true)
             },
             title: this.app.$t('Call %s with {vendor} user', {vendor: this.app.state.vendor}),

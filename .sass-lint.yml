@@ -33,7 +33,7 @@ rules:
     no-invalid-hex: 1
     no-mergeable-selectors: 1
     no-misspelled-properties: 1
-    no-qualifying-elements: 1
+    no-qualifying-elements: 0
     no-trailing-whitespace: 1
     no-trailing-zero: 1
     no-transition-all: 0
@@ -44,7 +44,7 @@ rules:
 
     # Nesting
     force-attribute-nesting: 0
-    force-element-nesting: 1
+    force-element-nesting: 0
     force-pseudo-nesting: 0
 
     # Name Formats

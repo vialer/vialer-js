@@ -134,12 +134,44 @@ video {
     }
 }
 
+.tabs {
+    height: $spacer * 6;
+    margin-bottom: 0;
+
+    a {
+        height: $spacer * 6;
+    }
+}
+
 .tab {
     display: none;
     margin-bottom: $spacer * 2;
+    padding: $spacer * 3;
+    padding-bottom: 0;
 
     &.is-active {
         display: block;
+    }
+}
+
+// A general icon popping up against a white content background.
+.content-icon {
+    color: $brand-color;
+    font-size: 12px;
+
+    &:hover {
+        color: $brand-variation-color;
+        cursor: pointer;
+    }
+}
+
+.styled-list {
+    li {
+        &::before {
+            color: $brand-color;
+            content: "• ";
+        }
+
     }
 }
 

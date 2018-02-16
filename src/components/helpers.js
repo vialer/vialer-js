@@ -39,6 +39,12 @@ module.exports = function(app) {
                 if (app.env.isExtension) browser.tabs.create({url: url})
                 else window.open(url, '_blank')
             },
+            openPopoutView: function() {
+                // This is only available in extensions.
+                if (app.env.isExtension) {
+                    browser.tabs.create({url: browser.runtime.getURL('index.html?popout=true')})
+                }
+            },
         }
     }
 

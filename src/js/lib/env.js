@@ -9,7 +9,7 @@ module.exports = (function() {
         isExtension: false,
         isFirefox: false,
         isLinux: false,
-        isOsx: false,
+        isMacOS: false,
         isPopout: false,
         isWindows: false,
         role: {
@@ -32,14 +32,14 @@ module.exports = (function() {
     }
 
     if (navigator.platform.match(/(Linux)/i)) env.isLinux = true
-    else if (navigator.platform.match(/(Mac)/i)) env.isOsx = true
+    else if (navigator.platform.match(/(Mac)/i)) env.isMacOS = true
     else if (navigator.platform.match(/(Windows)/i)) env.isWindows = true
 
     try {
         if ((chrome && chrome.extension) || (browser && browser.extension)) {
             env.isExtension = true
         }
-    } catch(e) {
+    } catch (e) {
         // Catch reference errors.
     }
 
