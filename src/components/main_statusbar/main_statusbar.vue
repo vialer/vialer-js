@@ -1,10 +1,7 @@
 <div class="main-statusbar-component" :class="{dnd}">
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator">
-            <i v-if="ua.state === 'disconnected'" class="icon icon-disconnected disconnected" :title="$t('Status:') + ' ' + $t('disconnected')"></i>
-            <i v-if="ua.state === 'connected'" class="icon icon-vialer-icon connected" :title="$t('Status:') + ' ' +  $t('connected')"></i>
-            <i v-if="ua.state === 'registered'" class="icon icon-vialer-icon registered" :title="$t('Status:') + ' ' + $t('registered')"></i>
-            <i v-if="ua.state === 'registration_failed'" class="icon icon-disconnected registration-failed" :title="$t('Status:') + ' ' + $t('registration failed')"></i>
+            <i class="icon" :class="classes('indicator')" :title="titles('indicator')"></i>
         </span>
         <span class="username">{{user.username}}</span>
         <div class="options">

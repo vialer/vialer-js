@@ -47,7 +47,7 @@
                 color: $white;
                 font-size: 1.2rem;
                 height: $spacer * 5;
-                line-height: $spacer * 4;
+                line-height: $spacer * 5;
                 margin: 0;
                 text-align: center;
                 transition: all 1300ms ease;
@@ -57,6 +57,7 @@
 
             .disconnected {background: $red-color;}
             .connected {background: $orange-color;}
+            .microphone-denied {background: $red-color;}
             .registered {background: $green-color;}
             .registration-failed {background: $orange-color;}
         }

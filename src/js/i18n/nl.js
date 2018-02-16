@@ -51,6 +51,7 @@ global.translations.nl = {
     'Microphone level': 'Microfoon geluidsniveau',
     'No': 'Nee',
     'No {target} found': 'Geen {target} gevonden',
+    'no microphone access': 'geen microfoon toegang',
     'No presence information available right now.': 'Aanwezigheidsinformatie niet beschikbaar op dit moment.',
     'of': 'van',
     'On hold': 'In de wacht',
