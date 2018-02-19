@@ -37,7 +37,7 @@ class SettingsModule extends Module {
             telemetry: {
                 analyticsId: process.env.ANALYTICS_ID,
                 clientId: null,
-                enabled: false,
+                enabled: null, // Three values; null(not decided), false(disable), true(enable)
             },
             webrtc: {
                 enabled: false,
@@ -59,6 +59,9 @@ class SettingsModule extends Module {
                 if (this.app.env.isExtension) {
                     this.app.extension.tabs.toggleIcons(newVal)
                 }
+            },
+            'store.settings.telemetry.enabled': (newVal, oldVal) => {
+                this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: newVal, eventName: 'telemetry', override: true})
             },
             'store.settings.webrtc.enabled': (newVal, oldVal) => {
                 this.app.emit('bg:tabs:update_contextmenus', {}, true)

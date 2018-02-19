@@ -40,6 +40,7 @@ class ForegroundApp extends App {
         Vue.component('MainStatusBar', require('../../components/main_statusbar')(this))
         Vue.component('Notifications', require('../../components/notifications')(this))
         Vue.component('Settings', require('../../components/settings')(this))
+        Vue.component('Telemetry', require('../../components/telemetry')(this))
         Vue.component('Queues', require('../../components/queues')(this))
 
         this.initStore()

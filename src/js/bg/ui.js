@@ -49,6 +49,10 @@ class UiModule extends Module {
                     active: 'general',
                 },
             },
+            version: {
+                current: process.env.VERSION,
+                previous: process.env.VERSION,
+            },
             visible: false,
         }
     }

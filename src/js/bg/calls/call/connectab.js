@@ -59,6 +59,7 @@ class CallConnectAB extends Call {
 
         // Start the call the first time a `connected` status is returned.
         if (!this._started && connectabStatus === 'connected') {
+            this.app.telemetry.event('call[connectab]', 'outgoing', 'accepted')
             this._start()
         }
 
@@ -82,6 +83,7 @@ class CallConnectAB extends Call {
 
         // Reject the call with an invalid HTTP response.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
+            this.app.telemetry.event('call[connectab]', 'outgoing', 'error')
             // For now don't make a distination between rejected_a and rejected_b.
             // Just use the latter.
             this.setState({status: 'rejected_b'})
@@ -91,6 +93,7 @@ class CallConnectAB extends Call {
             else if (res.data.clicktodial.b_number) reason = this.app.$t(res.data.clicktodial.b_number.join(' '))
             this._stop(undefined, true, reason)
         } else {
+            this.app.telemetry.event('call[connectab]', 'outgoing', 'create')
             // A ConnectAB call id; not our Vialer-js Call id.
             this.connectabId = res.data.callid
             this.app.timer.registerTimer(`call:connectab:status-${this.id}`, this._callStatus.bind(this))

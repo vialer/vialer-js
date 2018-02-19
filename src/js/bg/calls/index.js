@@ -52,11 +52,13 @@ class CallsModule extends Module {
             if (activeCall && activeCall.state.transfer.active && activeCall.state.transfer.type === 'blind') {
                 // Directly transfer the number to the currently activated
                 // call when the active call has blind transfer mode set.
+                this.app.telemetry.event('call[sip]', 'transfer', 'blind')
                 activeCall.transfer(number)
             } else {
                 // Both a 'regular' new call and an attended transfer call will
                 // create or get a new call and active it.
                 let call = this._emptyCall(type, number)
+
                 // Sync the state back to the foreground.
                 if (start) call.start()
                 this.__setTransferState()
@@ -106,6 +108,7 @@ class CallsModule extends Module {
                     sourceCall = this.calls[_callId]
                 }
             }
+            this.app.telemetry.event('call[sip]', 'transfer', 'attended')
             sourceCall.transfer(this.calls[callId])
         })
 

@@ -40,7 +40,7 @@
 
         <Field name="telemetry_enabled" type="checkbox"
             :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
-            :help="$t('Help us improving this software by sending anonimized usage statistics.')"/>
+            :help="$t('This is the most direct way for you to give us feedback about how to improve this software, because it gives us automated insight about generic usage patterns.')"/>
 
         <div class="settings-actions field is-grouped">
             <button class="button is-primary" @click="save">{{$t('Save')}}</button>

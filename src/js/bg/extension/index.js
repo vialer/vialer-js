@@ -20,13 +20,19 @@ class Extension extends Module {
                 this.app.setState({
                     extension: {
                         installed: true,
-                        version: {current: chrome.runtime.getManifest().version},
+                    },
+                    ui: {
+                        version: {
+                            current: chrome.runtime.getManifest().version,
+                        },
                     },
                 }, {persist: true})
             } else if (details.reason === 'update') {
                 this.app.setState({
                     extension: {
                         updated: true,
+                    },
+                    ui: {
                         version: {
                             current: chrome.runtime.getManifest().version,
                             previous: details.previousVersion,
@@ -41,10 +47,6 @@ class Extension extends Module {
         return {
             installed: false,
             updated: false,
-            version: {
-                current: process.env.VERSION,
-                previous: process.env.VERSION,
-            },
         }
     }
 

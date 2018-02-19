@@ -27,12 +27,15 @@ class CallSIP extends Call {
         // (!) First set the state before calling super.
         this.state.displayName = this.session.remoteIdentity.displayName
         this.state.number = this.session.remoteIdentity.uri.user
-
         super._incoming()
 
         // Setup some event handlers for the different stages of a call.
-        this.session.on('accepted', (request) => this._start())
+        this.session.on('accepted', (request) => {
+            this.app.telemetry.event('call[sip]', 'incoming', 'accepted')
+            this._start()
+        })
         this.session.on('rejected', (e) => {
+            this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
             this.setState({status: 'rejected_b'})
             this._stop()
         })
@@ -66,6 +69,7 @@ class CallSIP extends Call {
 
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
+            this.app.telemetry.event('call[sip]', 'outgoing', 'accepted')
             this.localVideo.srcObject = this.stream
             this.localVideo.play()
             this.localVideo.muted = true
@@ -105,6 +109,7 @@ class CallSIP extends Call {
         })
 
         this.session.on('rejected', (e) => {
+            this.app.telemetry.event('call[sip]', 'outgoing', 'rejected')
             this.busyTone.play()
             this.setState({status: 'rejected_b'})
             this._stop()

@@ -2,4 +2,25 @@
 
 .telemetry-component {
     padding: $spacer;
+
+    h1 {
+        color: $grey-color;
+        font-size: 1.5rem;
+        font-weight: bold;
+        padding: ($spacer * 2) 0;
+        text-align: center;
+    }
+
+    .telemetry-text {
+        font-size: 0.9rem;
+        font-style: italic;
+        padding: 0 ($spacer * 4);
+        text-align: center;
+    }
+
+    .telemetry-tldr {
+        text-align: center;
+        padding-bottom: $spacer * 3;
+        font-weight: 500;
+    }
 }

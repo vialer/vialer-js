@@ -15,14 +15,9 @@ class Telemetry {
 
         this.settings.clientId = this.getClientId()
         this.telemetryServer = 'https://www.google-analytics.com/r/collect'
-        // Map telemetry setting from the store to this object.
-
-        // Popup scripts sends an event to notify about the user's
-        // choice for telemetry.
-        this.app.on('telemetry', (data) => {
-            this.settings.enabled = data.enabled
-            this.event('Telemetry', 'ToggleOnOff', this.enabled ? 'on' : 'off', true)
-            this.app.logger.debug(`${this}telemetry switched ${this.enabled ? 'on' : 'off'}`)
+        // Allow sending events from the foreground.
+        this.app.on('bg:telemetry:event', ({eventName, eventAction, eventLabel, override}) => {
+            this.event(eventName, eventAction, eventLabel, override)
         })
     }
 
@@ -38,10 +33,7 @@ class Telemetry {
     * @returns {String} - A querystring of the tracking data.
     */
     event(eventName, eventAction, eventLabel, override = false) {
-        if (!override && !this.enabled) {
-            this.app.logger.debug(`${this}telemetry disabled`)
-            return
-        }
+        if (!override && !this.settings.enabled) return
 
         let telemetryData = {
             cid: this.clientId,  // An anonymous ID to identify the client with.
@@ -53,7 +45,7 @@ class Telemetry {
             v: 1,  // Version.
         }
         navigator.sendBeacon(this.telemetryServer, this.app.utils.stringifySearch(telemetryData))
-        this.app.logger.debug(`${this}sending telemetry data: "${eventName}:${eventAction}:${eventLabel}"`)
+        this.app.logger.debug(`${this}telemetry: "${eventName}:${eventAction}:${eventLabel}"`)
     }
 
 
@@ -77,7 +69,7 @@ class Telemetry {
 
 
     toString() {
-        return `${this.app}[analytics] `
+        return `${this.app}[telemetry] `
     }
 }
 
