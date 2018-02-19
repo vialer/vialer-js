@@ -40,14 +40,18 @@ class SettingsModule extends Module {
                 enabled: null, // Three values; null(not decided), false(disable), true(enable)
             },
             webrtc: {
+                account: {
+                    options: [], // Platform integration provides these choices.
+                    password: '',
+                    selected: {},
+                    username: '',
+                },
                 enabled: false,
-                password: '',
                 permission: false, // The microphone permission.
                 sinks: {
                     input: {id: '', name: ''},
                     output: {id: '', name: ''},
                 },
-                username: '',
             },
         }
     }

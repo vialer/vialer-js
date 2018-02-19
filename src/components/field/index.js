@@ -85,8 +85,13 @@ module.exports = (app) => {
                         value = selectedOptions.map((o) => parseInt(o.value))
                     }
 
-                    // We sync an object as vmodel.
-                    if (options) {
+                    if (!value) {
+                        // Handle syncing an empty option to the model.
+                        let emptyOption = {id: null, name: null}
+                        // Use the first option to determine additional keys.
+                        if (options.length) for (let key of Object.keys(options[0])) emptyOption[key] = null
+                        this.$emit('update:model', emptyOption)
+                    } else if (options) {
                         for (const option of options) {
                             if (String(option.id) === String(value)) {
                                 this.$emit('update:model', option)

@@ -131,7 +131,6 @@ class App extends Skeleton {
                 webrtc: _state.settings.webrtc,
             },
             ui: {layer: 'login'},
-            user: _state.user,
         })
 
         return _state

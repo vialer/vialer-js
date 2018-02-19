@@ -56,16 +56,29 @@ class UserModule extends Module {
         }
 
         let user = res.data
+        let realName = [user.first_name, user.preposition, user.last_name].filter((i) => i !== '').join(' ')
+
         // Only platform client users cannot use platform telephony features.
         if (!user.client) {
             this.logout()
             return
         }
 
+        let startLayer
+        if (this.app.state.ui.installed) {
+            startLayer = 'settings'
+            this.app.emit('fg:notify', {icon: 'cog', message: this.app.$t('Please review your softphone and audio settings.'), timeout: 0, type: 'warning'})
+        } else {
+            startLayer = 'contacts'
+            this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: realName}), type: 'success'})
+        }
+
         this.app.setState({
             ui: {
-                layer: 'contacts',
+                installed: false, // The `installed` flag is a onetime thing disabled after login.
+                layer: startLayer, // On install, go to the settings page.
                 menubar: {default: 'active'},
+                updated: false, // Same for the `updated` flag.
             },
             user: {
                 authenticated: true,
@@ -82,7 +95,6 @@ class UserModule extends Module {
         }, {persist: true})
 
         this.app._platformData()
-        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Logged in succesfully'), type: 'success'})
         // Connect to the sip service on succesful login.
         this.app.modules.calls.connect()
     }
@@ -90,7 +102,10 @@ class UserModule extends Module {
 
     logout() {
         this.app.logger.info(`${this}logging out and cleaning up state`)
-        this.app.setState(this.app._resetState(), {persist: true})
+        let newState = this.app._resetState()
+        // Keep the username.
+        newState.user.username = this.app.state.user.username
+        this.app.setState(newState, {persist: true})
         // Remove credentials for basic auth.
         this.app.api.setupClient()
         // Disconnect without reconnect attempt.

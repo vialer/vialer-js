@@ -175,6 +175,13 @@ video {
     }
 }
 
+.help {
+    .warning {
+        font-weight: bold;
+        color: $brand-variation-color;
+    }
+}
+
 @include keyframes(hint-pulse) {
     0%  {
         background-color: rgba(255, 255, 255, 0);

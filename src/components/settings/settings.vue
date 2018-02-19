@@ -2,45 +2,56 @@
 
     <div class="tabs">
         <ul>
-            <li :class="{'is-active': tabs.active === 'general'}" @click="setTab('general')">
-                <a><span class="icon is-small"><i class="fa fa-user"></i></span><span>{{$t('General')}}</span></a>
+            <li :class="{'is-active': tabs.active === 'phone'}" @click="setTab('phone')">
+                <a><span class="icon is-small"><i class="fa fa-phone"></i></span><span>{{$t('Phone')}}</span></a>
             </li>
             <li :class="{'is-active': tabs.active === 'audio'}" @click="setTab('audio')">
                 <a><span class="icon is-small"><i class="fa fa-headphones"></i></span><span>Audio</span></a>
             </li>
-            <li :class="{'is-active': tabs.active === 'phone'}" @click="setTab('phone')">
-                <a><span class="icon is-small"><i class="fa fa-phone"></i></span><span>{{$t('Phone')}}</span></a>
+            <li :class="{'is-active': tabs.active === 'general'}" @click="setTab('general')">
+                <a><span class="icon is-small"><i class="fa fa-user"></i></span><span>{{$t('General')}}</span></a>
             </li>
         </ul>
     </div>
 
+    <!-- Phone preferences -->
+    <div class="tab" :class="{'is-active': tabs.active === 'phone'}">
+        <Field name="sip_endpoint" type="text"
+            :label="$t('SIP server')" :model.sync="settings.sipEndpoint"
+            :help="$t('Domainname of the SIP server with websocket support.')"
+            :placeholder="$t('SIP server')"/>
 
-    <!-- User preferences -->
-    <div class="tab" :class="{'is-active': tabs.active === 'general'}">
-        <Field name="language" type="select"
-            :label="$t('Language')" :model.sync="settings.language.selected"
-            :help="$t('Language to use within the app.')"
-            :options="settings.language.options"
-            :placeholder="$t('Select a language')"/>
+        <Field name="webrtc_enabled" type="checkbox"
+            :label="$t('Use as softphone')" :model.sync="settings.webrtc.enabled"
+            :help="$t('Use WebRTC to be able to receive incoming calls with and place outgoing calls.')"/>
 
-        <Field name="click2dial" type="checkbox"
-            :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
-            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
-            :placeholder="$t('SIP Server')"/>
+        <!-- Platform integration allows the user to select a voip-account. -->
+        <Field name="webrtc_account" type="select" v-if="settings.platform.enabled"
+            :disabled="!settings.webrtc.enabled"
+            :label="$t('Softphone VoIP-account')" :model.sync="settings.webrtc.account.selected"
+            :options="settings.webrtc.account.options"
+            :placeholder="$t('Select a VoIP-account')"/>
+        <em class="help" v-if="settings.webrtc.permission">
+            <span class="warning">{{$t('Please check the VoIP-account requirements')}}:</span>
+            <ul class="styled-list">
+                <!-- Reference to the popout mode from the popup modus only-->
+                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount`)">{{$t('the account')}}</a></b> {{$t('is not in use by another device')}}.</li>
+                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b> {{$t('is set in Expert options')}}.</li>
+                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b> {{$t('is set in Expert options')}}.</li>
+            </ul>
+        </em>
 
-        <Field name="platform_enabled" type="checkbox"
-            :label="`${vendor} ${$t('platform integration')}`" :model.sync="settings.platform.enabled"
-            :help="$t('Add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor})"/>
+        <template v-else>
+        <Field name="webrtc_username" type="text"
+            :disabled="!settings.webrtc.enabled"
+            :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.account.username"
+            :placeholder="$t('VoIP account') + ' id'"/>
 
-        <Field name="platform_url" type="text" v-if="user.developer"
-            :disabled="!settings.platform.enabled"
-            :label="$t('Platform URL')" :model.sync="settings.platform.url"
-            :help="$t('This URL is used to communicate with the platform API. Don\'t change it unless you know what you\'re doing.')"
-            placeholder="https://"/>
-
-        <Field name="telemetry_enabled" type="checkbox"
-            :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
-            :help="$t('This is the most direct way for you to give us feedback about how to improve this software, because it gives us automated insight about generic usage patterns.')"/>
+        <Field name="webrtc_password" type="password"
+            :disabled="!settings.webrtc.enabled"
+            :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.account.password"
+            :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
+        </template>
 
         <div class="settings-actions field is-grouped">
             <button class="button is-primary" @click="save">{{$t('Save')}}</button>
@@ -120,30 +131,36 @@
         </div>
     </div>
 
+    <!-- User preferences -->
+    <div class="tab" :class="{'is-active': tabs.active === 'general'}">
+        <Field name="language" type="select"
+            :label="$t('Language')" :model.sync="settings.language.selected"
+            :help="$t('Language to use within the app.')"
+            :options="settings.language.options"
+            :placeholder="$t('Select a language')"/>
 
-    <!-- Phone preferences -->
-    <div class="tab" :class="{'is-active': tabs.active === 'phone'}">
-        <Field name="sip_endpoint" type="text"
-            :label="$t('SIP server')" :model.sync="settings.sipEndpoint"
-            :help="$t('Domainname of the SIP server with websocket support.')"
-            :placeholder="$t('SIP server')"/>
+        <Field name="click2dial" type="checkbox"
+            :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
+            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
+            :placeholder="$t('SIP Server')"/>
 
-        <Field name="webrtc_enabled" type="checkbox"
-            :label="$t('WebRTC softphone')" :model.sync="settings.webrtc.enabled"
-            :help="$t('Receive incoming calls and make calls using WebRTC.')"/>
+        <Field name="platform_enabled" type="checkbox"
+            :label="`${vendor} ${$t('platform integration')}`" :model.sync="settings.platform.enabled"
+            :help="$t('Add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor})"/>
 
-        <Field name="webrtc_username" type="text"
-            :disabled="!settings.webrtc.enabled"
-            :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.username"
-            :placeholder="$t('VoIP account') + ' id'"/>
+        <Field name="platform_url" type="text" v-if="user.developer"
+            :disabled="!settings.platform.enabled"
+            :label="$t('Platform URL')" :model.sync="settings.platform.url"
+            :help="$t('This URL is used to communicate with the platform API. Don\'t change it unless you know what you\'re doing.')"
+            placeholder="https://"/>
 
-        <Field name="webrtc_password" type="password"
-            :disabled="!settings.webrtc.enabled"
-            :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.password"
-            :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
+        <Field name="telemetry_enabled" type="checkbox"
+            :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
+            :help="$t('This is the most direct way for you to give us feedback about how to improve this software, because it gives us automated insight about generic usage patterns.')"/>
 
         <div class="settings-actions field is-grouped">
             <button class="button is-primary" @click="save">{{$t('Save')}}</button>
         </div>
     </div>
+
 </div>

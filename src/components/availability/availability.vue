@@ -24,9 +24,9 @@
         <div class="field">
             <input id="dnd_availability" v-model="dnd" type="checkbox" name="platform_availability" class="switch is-warning"
             :disabled="!webrtc.enabled">
-            <label for="dnd_availability">{{$t('Do not disturb')}}</label>
+            <label for="dnd_availability">{{$t('Do not disturb')}} (DnD)</label>
             <em class="help">
-                {{$t('Decline incoming WebRTC calls.')}}
+                {{$t('Decline incoming calls.')}}
             </em>
         </div>
     </div>

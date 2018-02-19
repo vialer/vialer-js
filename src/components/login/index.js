@@ -13,5 +13,10 @@ module.exports = (app) => {
         store: {
             user: 'user',
         },
+        watch: {
+            'user.username': function(newVal, oldVal) {
+                app.setState({user: {username: newVal}}, {persist: true})
+            },
+        },
     }
 }

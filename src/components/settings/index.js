@@ -112,6 +112,13 @@ module.exports = (app) => {
             'settings.language.selected': function(newVal, oldVal) {
                 Vue.i18n.set(newVal.id)
             },
+            'settings.webrtc.account.selected': function(newVal, oldVal) {
+                // The `options` and `selected` fields are just placeholders
+                // for easier account selection. The actual username/password
+                // is stored on these properties.
+                this.settings.webrtc.account.username = newVal.account_id
+                this.settings.webrtc.account.password = newVal.password
+            },
             'settings.webrtc.permission': async function(newVal, oldVal) {
                 if (!soundMeter) soundMeter = await microphoneCheck()
                 if (soundMeter) {

@@ -72,6 +72,7 @@ class AvailabilityModule extends Module {
             return
         }
 
+
         // Lets format the data in a select-friendly way.
         const userdestination = res.data.objects[0]
         let fixed = userdestination.fixeddestinations
@@ -88,11 +89,42 @@ class AvailabilityModule extends Module {
         if (sud.fixeddestination) selected = destinations.find((d) => d.id === sud.fixeddestination)
         else if (sud.phoneaccount) selected = destinations.find((d) => d.id === sud.phoneaccount)
 
-        this.app.setState({availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id}}, true)
+        // Platform users select an existing WebRTC-SIP VoIP-accoun.
+        let platformAccounts = userdestination.phoneaccounts.map((i) => ({
+            account_id: i.account_id,
+            id: i.id,
+            name: i.description,
+            password: i.password,
+        }))
+
+        this.app.setState({
+            availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id},
+            settings: {webrtc: {account: {options: platformAccounts}}},
+        }, true)
 
         // Set an icon depending on whether the user is available.
         if (selected.id) this.app.setState({ui: {menubar: {default: 'active'}}})
         else this.app.setState({ui: {menubar: {default: 'unavailable'}}})
+    }
+
+
+    _watchers() {
+        return {
+            /**
+            * Deal with all menubar icon changes for dnd.
+            * TODO: Add logic for Electron icon changes.
+            * @param {String} newVal - The new dnd icon value.
+            * @param {String} oldVal - The old dnd icon value.
+            */
+            'store.availability.dnd': (newVal, oldVal) => {
+                if (this.app.env.isExtension) {
+                    // Dnd is set. Set the menubar to inactive.
+                    if (newVal) browser.browserAction.setIcon({path: 'img/menubar-unavailable.png'})
+                    // Restore the previous value.
+                    else browser.browserAction.setIcon({path: 'img/menubar-active.png'})
+                }
+            },
+        }
     }
 
     toString() {

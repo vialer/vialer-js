@@ -44,7 +44,7 @@ class ContactsModule extends Module {
         }
 
         // Remove unregistered accounts and the user's own account.
-        const ownAccountId = parseInt(this.app.state.settings.webrtc.username)
+        const ownAccountId = parseInt(this.app.state.settings.webrtc.account.username)
         let contacts = res.data.objects.filter((c) => {
             return (c.sipreginfo && (c.account_id !== ownAccountId))
         })

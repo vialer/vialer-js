@@ -220,10 +220,10 @@ class CallsModule extends Module {
         // The voipaccount should be from the same client as the logged-in
         // user, or subscribe information won't work.
         if (settings.webrtc.enabled) {
-            options.authorizationUser = settings.webrtc.username
-            options.password = settings.webrtc.password
+            options.authorizationUser = settings.webrtc.account.username
+            options.password = settings.webrtc.account.password
             options.register = true
-            options.uri = `sip:${settings.webrtc.username}@voipgrid.nl`
+            options.uri = `sip:${settings.webrtc.account.username}@voipgrid.nl`
         } else {
             // Login with platform email without SIP register.
             options.authorizationUser = this.app.state.user.username
@@ -464,7 +464,6 @@ class CallsModule extends Module {
         let uaOptions = this.__uaOptions()
         if (!uaOptions.authorizationUser || !uaOptions.password) {
             this.app.logger.warn(`${this}cannot connect without username and password`)
-            return
         }
 
         this.app.setState({calls: {ua: {state: 'disconnected'}}})

@@ -18,10 +18,8 @@ class Extension extends Module {
             if (details.reason === 'install') {
                 this.app.state.ui.installed = true
                 this.app.setState({
-                    extension: {
-                        installed: true,
-                    },
                     ui: {
+                        installed: true,
                         version: {
                             current: chrome.runtime.getManifest().version,
                         },
@@ -29,10 +27,8 @@ class Extension extends Module {
                 }, {persist: true})
             } else if (details.reason === 'update') {
                 this.app.setState({
-                    extension: {
-                        updated: true,
-                    },
                     ui: {
+                        updated: true,
                         version: {
                             current: chrome.runtime.getManifest().version,
                             previous: details.previousVersion,
@@ -43,12 +39,6 @@ class Extension extends Module {
         })
     }
 
-    _initialState() {
-        return {
-            installed: false,
-            updated: false,
-        }
-    }
 
     _ready() {
         this.tabs = new Tabs(this.app)

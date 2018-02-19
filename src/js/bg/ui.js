@@ -28,7 +28,7 @@ class UiModule extends Module {
                     this.app.modules.calls.callAction('decline-hangup')
                 } else if (command === 'action-dnd') {
                     // Only toggle when WebRTC calling is on.
-                    if (this.app.state.settings.webrtc.enabled) {
+                    if (this.app.state.calls.ua.state === 'registered') {
                         this.app.setState({availability: {dnd: !this.app.state.availability.dnd}})
                     }
                 }
@@ -39,6 +39,7 @@ class UiModule extends Module {
 
     _initialState() {
         return {
+            installed: true,
             layer: 'login',
             menubar: {
                 default: 'inactive',
@@ -46,9 +47,10 @@ class UiModule extends Module {
             },
             tabs: {
                 settings: {
-                    active: 'general',
+                    active: 'phone',
                 },
             },
+            updated: false,
             version: {
                 current: process.env.VERSION,
                 previous: process.env.VERSION,
@@ -68,20 +70,6 @@ class UiModule extends Module {
 
     _watchers() {
         return {
-            /**
-            * Deal with all menubar icon changes for dnd.
-            * TODO: Add logic for Electron icon changes.
-            * @param {String} newVal - The new dnd icon value.
-            * @param {String} oldVal - The old dnd icon value.
-            */
-            'store.availability.dnd': (newVal, oldVal) => {
-                if (this.app.env.isExtension) {
-                    // Dnd is set. Set the menubar to inactive.
-                    if (newVal) browser.browserAction.setIcon({path: 'img/menubar-unavailable.png'})
-                    // Restore the previous value.
-                    else browser.browserAction.setIcon({path: 'img/menubar-active.png'})
-                }
-            },
             /**
             * Deal with all menubar icon changes for extensions.
             * TODO: Add logic for Electron icon changes.
