@@ -47,12 +47,10 @@ module.exports = (app) => {
                     else if (this.ua.state === 'connected') title += this.$t('connected')
                     else if (this.ua.state === 'registered') {
                         title += this.$t('registered')
-
                         if (!this.settings.webrtc.permission) {
                             title += ` (${this.$t('no microphone access')})`
                         }
-                    }
-                    else if (this.ua.state === 'registration_failed') title += this.$t('registration failed')
+                    } else if (this.ua.state === 'registration_failed') title += this.$t('registration failed')
                 }
                 return title
             },

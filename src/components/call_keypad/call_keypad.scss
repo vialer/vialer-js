@@ -120,6 +120,20 @@
         margin-top: $spacer;
         width: 100%;
 
+        &.disabled {
+            opacity: 0.5;
+
+            .key-row {
+                .key {
+                    &:hover {
+                        background: $white;
+                        color: $brand-color;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+
         .key-row {
             display: flex;
             flex-grow: 1;

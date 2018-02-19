@@ -469,12 +469,17 @@ class CallsModule extends Module {
 
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            // For now, we don't support call-waiting. A new call that is
-            // made when a call is already active will be silently dropped.
+            // Call-waiting is not supported(for now). A new incoming call
+            // on top of a call that is already active will be silently
+            // dropped.
             const callIds = Object.keys(this.calls)
-            // Only accept an incoming call when no other call is
-            // active at the moment.
-            if (!this.app.state.availability.dnd &&
+
+            if (
+                // No microphone access; don't accept any Call.
+                this.app.state.settings.webrtc.permission &&
+                // Do not disturb; skip any incoming Call.
+                !this.app.state.availability.dnd &&
+                // No ongoing Calls yet.
                 (callIds.length === 0 || (callIds.length === 1 && this.calls[callIds[0]].state.status === 'new'))
             ) {
                 // No reason to pretend that we can switch to a different type
@@ -483,7 +488,7 @@ class CallsModule extends Module {
                 this.calls[call.id] = call
                 call.start()
             } else {
-                // Just handle the call as a silenced call and terminate it.
+                // Treat the call as a silenced call and terminate it directly.
                 const call = callFactory(this, session, {silent: true}, 'CallSIP')
                 call.start()
                 call.terminate()

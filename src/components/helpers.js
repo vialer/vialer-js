@@ -28,6 +28,7 @@ module.exports = function(app) {
         return {
             createCall: function(number, start = true, transfer = false) {
                 // Still allows empty calls when number is false.
+                if (this.callingDisabled) return
                 if (number === null) return
                 app.emit('bg:calls:call_create', {number: number, start, transfer})
             },
@@ -50,6 +51,17 @@ module.exports = function(app) {
 
     helpers.sharedComputed = function() {
         return {
+            callingDisabled: function() {
+                let _disabled = false
+                if (this.webrtc.enabled) {
+                    if (!this.webrtc.permission) _disabled = true
+                    if (!this.ua.state === 'registered') _disabled = true
+                } else {
+                    // ConnectAB mode.
+                    if (!this.ua.state === 'connected') _disabled = true
+                }
+                return _disabled
+            },
             /**
             * Checks whether any calls are going on.
             * @returns {Boolean} - Whether one or more calls is active.

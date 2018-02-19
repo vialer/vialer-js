@@ -46,9 +46,7 @@ module.exports = (app) => {
                 this.$emit('update:model', newVal)
             },
             pressKey: function(key) {
-                if (!allowedKeys.includes(key)) {
-                    return
-                }
+                if (this.callingDisabled || !allowedKeys.includes(key)) return
                 keyTone.play(key)
                 let newVal = app.utils.sanitizeNumber(`${this.number}${key}`)
                 if (newVal) this.$emit('update:model', newVal)
@@ -58,9 +56,8 @@ module.exports = (app) => {
                 if (this.number) this.$emit('update:model', this.number.substring(0, this.number.length - 1))
             },
             unpressKey: function() {
-                window.setTimeout(() => {
-                    keyTone.stop()
-                }, 50)
+                if (this.callingDisabled) return
+                window.setTimeout(() => keyTone.stop(), 50)
             },
         }, app.helpers.sharedMethods()),
         props: {
@@ -75,11 +72,12 @@ module.exports = (app) => {
         staticRenderFns: templates.call_keypad.s,
         store: {
             contacts: 'contacts.contacts',
+            ua: 'calls.ua',
             user: 'user',
+            webrtc: 'settings.webrtc',
         },
         watch: {
             number: function(newVal, oldVal) {
-                let cleanedNumber = app.utils.sanitizeNumber(newVal)
                 // Toggle developer features with a special number.
                 if (newVal === '02*06*18') {
                     if (!this.user.developer) {
@@ -89,6 +87,8 @@ module.exports = (app) => {
                     }
                     app.setState({user: {developer: !this.user.developer}}, {persist: true})
                 }
+                if (this.callingDisabled) return
+                let cleanedNumber = app.utils.sanitizeNumber(newVal)
                 this.$emit('update:model', cleanedNumber)
             },
         },
