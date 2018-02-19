@@ -67,7 +67,7 @@ class UserModule extends Module {
         let startLayer
         if (this.app.state.ui.installed) {
             startLayer = 'settings'
-            this.app.emit('fg:notify', {icon: 'cog', message: this.app.$t('Please review your softphone and audio settings.'), timeout: 0, type: 'warning'})
+            this.app.emit('fg:notify', {icon: 'cog', message: this.app.$t('Review your softphone and audio settings.'), timeout: 0, type: 'warning'})
         } else {
             startLayer = 'contacts'
             this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: realName}), type: 'success'})

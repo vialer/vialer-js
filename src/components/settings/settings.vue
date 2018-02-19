@@ -26,31 +26,33 @@
             :help="$t('Use WebRTC to be able to receive incoming calls with and place outgoing calls.')"/>
 
         <!-- Platform integration allows the user to select a voip-account. -->
-        <Field name="webrtc_account" type="select" v-if="settings.platform.enabled"
-            :disabled="!settings.webrtc.enabled"
-            :label="$t('Softphone VoIP-account')" :model.sync="settings.webrtc.account.selected"
-            :options="settings.webrtc.account.options"
-            :placeholder="$t('Select a VoIP-account')"/>
-        <em class="help" v-if="settings.webrtc.permission">
-            <span class="warning">{{$t('Please check the VoIP-account requirements')}}:</span>
-            <ul class="styled-list">
-                <!-- Reference to the popout mode from the popup modus only-->
-                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount`)">{{$t('the account')}}</a></b> {{$t('is not in use by another device')}}.</li>
-                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b> {{$t('is set in Expert options')}}.</li>
-                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b> {{$t('is set in Expert options')}}.</li>
-            </ul>
-        </em>
+        <template v-if="settings.platform.enabled">
+            <Field name="webrtc_account" type="select"
+                :disabled="!settings.webrtc.enabled"
+                :label="$t('Softphone VoIP-account')" :model.sync="settings.webrtc.account.selected"
+                :options="settings.webrtc.account.options"
+                :placeholder="$t('Select a VoIP-account')"/>
 
+            <em class="help">
+                <span class="warning">{{$t('Please check the VoIP-account requirements')}}:</span>
+                <ul class="styled-list">
+                    <!-- Reference to the popout mode from the popup modus only-->
+                    <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount`)">{{$t('the account')}}</a></b> {{$t('is not in use by another device')}}.</li>
+                    <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b> {{$t('is set in Expert options')}}.</li>
+                    <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b> {{$t('is set in Expert options')}}.</li>
+                </ul>
+            </em>
+        </template>
         <template v-else>
-        <Field name="webrtc_username" type="text"
-            :disabled="!settings.webrtc.enabled"
-            :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.account.username"
-            :placeholder="$t('VoIP account') + ' id'"/>
+            <Field name="webrtc_username" type="text"
+                :disabled="!settings.webrtc.enabled"
+                :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.account.username"
+                :placeholder="$t('VoIP account') + ' id'"/>
 
-        <Field name="webrtc_password" type="password"
-            :disabled="!settings.webrtc.enabled"
-            :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.account.password"
-            :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
+            <Field name="webrtc_password" type="password"
+                :disabled="!settings.webrtc.enabled"
+                :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.account.password"
+                :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
         </template>
 
         <div class="settings-actions field is-grouped">
@@ -156,7 +158,7 @@
 
         <Field name="telemetry_enabled" type="checkbox"
             :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
-            :help="$t('This is the most direct way for you to give us feedback about how to improve this software, because it gives us automated insight about generic usage patterns.')"/>
+            :help="$t('Enabling anonymized usage statistics is the easiest way to help us improve the software.')"/>
 
         <div class="settings-actions field is-grouped">
             <button class="button is-primary" @click="save">{{$t('Save')}}</button>
