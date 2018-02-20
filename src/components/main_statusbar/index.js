@@ -49,7 +49,7 @@ module.exports = (app) => {
                         title += this.$t('registered')
                         if (!this.settings.webrtc.permission) {
                             title += ` (${this.$t('no microphone access')})`
-                        }
+                        } else if (this.dnd) title += ` (${this.$t('Do not Disturb')})`
                     } else if (this.ua.state === 'registration_failed') title += this.$t('registration failed')
                 }
                 return title
@@ -64,6 +64,7 @@ module.exports = (app) => {
             settings: 'settings',
             ua: 'calls.ua',
             user: 'user',
+            vendor: 'app.vendor',
         },
     }
 }

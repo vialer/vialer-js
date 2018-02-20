@@ -15,7 +15,27 @@
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 100000;
+    z-index: 100000000;
+
+    .vendor {
+        align-items: center;
+        display: flex;
+
+        .vendor-logo {
+            fill: $brand-color;
+            height: $spacer * 3;
+            margin-left: $spacer / 2;
+            width: $spacer * 3;
+        }
+
+        .vendor-name {
+            color: $brand-color;
+            font-size: 1rem;
+            line-height: $spacer * 5;
+            padding-left: $spacer;
+        }
+    }
+
 
     &.dnd {
         background: $red-color;
@@ -40,7 +60,17 @@
         white-space: nowrap;
 
         .status-indicator {
+            text-align: center;
             width: $spacer * 5;
+
+            svg {
+                height: $spacer * 3;
+                width: $spacer * 3;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
 
             i {
                 background: $brand-variation-color;
@@ -55,11 +85,12 @@
                 width: $spacer * 5;
             }
 
-            .disconnected {background: $red-color;}
-            .connected {background: $yellow-color;}
-            .microphone-denied {background: $red-color;}
-            .registered {background: $green-color;}
-            .registration-failed {background: $orange-color;}
+            .dnd {fill: $orange-color;}
+            .disconnected {fill: $red-color;}
+            .connected {fill: $orange-color;}
+            .microphone-denied {fill: $red-color;}
+            .registered {fill: $green-color;}
+            .registration-failed {fill: $red-color;}
         }
 
         .username {

@@ -203,3 +203,36 @@ video {
         color: $brand-variation-color;
     }
 }
+
+
+// recommended css code for vue-svgicon.
+.svg-icon {
+    color: inherit;
+    display: inline-block;
+    fill: none;
+    height: 16px;
+    stroke: currentColor;
+    vertical-align: middle;
+    width: 16px;
+}
+
+.svg-fill {
+    fill: currentColor;
+    stroke: none;
+}
+
+.svg-up {
+    transform: rotate(0deg);
+}
+
+.svg-right {
+    transform: rotate(90deg);
+}
+
+.svg-down {
+    transform: rotate(180deg);
+}
+
+.svg-left {
+    transform: rotate(-90deg);
+}

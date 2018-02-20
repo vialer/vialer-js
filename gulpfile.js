@@ -135,7 +135,6 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
         .pipe(flatten({newPath: './fonts'}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/ringtones/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
-        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/svg/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(ifElse(settings.PRODUCTION, imagemin))
         .pipe(addsrc('./LICENSE'))
         .pipe(addsrc('./README.md'))
@@ -297,6 +296,30 @@ gulp.task('html', 'Preprocess and build application HTML.', () => {
 }, {options: taskOptions.all})
 
 
+/**
+* TODO: Integrate vue-svgicon with Gulp.
+*/
+gulp.task('icons', 'Build an SVG iconset.', (done) => {
+    const srcDir = `./src/brand/${settings.BRAND_TARGET}/svg`
+    const buildDir = `./src/brand/${settings.BRAND_TARGET}/icons`
+
+    fs.stat(buildDir, (err) => {
+        if (err) {
+            let execCommand = `vsvg -s ${srcDir} -t ${buildDir}`
+            childExec(execCommand, undefined, (_err, stdout, stderr) => {
+                if (stderr) gutil.log(stderr)
+                if (stdout) gutil.log(stdout)
+                done()
+            })
+        } else {
+            done()
+        }
+
+    })
+
+}, {options: taskOptions.all})
+
+
 gulp.task('js-electron', 'Generate Electron application.', (done) => {
     runSequence([
         'js-electron-main',
@@ -321,11 +344,11 @@ gulp.task('js-webview', 'Generate generic webview application.', (done) => {
     })
 })
 
-gulp.task('js-vendor', 'Generate third-party vendor js.', (done) => {
+gulp.task('js-vendor', 'Generate third-party vendor js.', ['icons'], (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor', () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
         done()
-    })
+    }, [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`])
 }, {options: taskOptions.all})
 
 gulp.task('js-webext', 'Generate WebExtension application.', [], (done) => {

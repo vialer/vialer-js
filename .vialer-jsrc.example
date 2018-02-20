@@ -5,6 +5,7 @@
             "sip_endpoint": "websocket.voipgrid.nl",
             "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
             "name": "Vialer",
+
             "vendor": {
                 "name": "Vialer",
                 "support": "support@email",
@@ -22,9 +23,9 @@
                 "brand-variation-color": "#fb791e",
                 "grey-color": "#999",
                 "primary-color": "#3c3c50",
-                "green-color": "#5cb85c",
+                "green-color": "#28ca42",
                 "orange-color": "#f98644",
-                "red-color": "#d9534f"
+                "red-color": "#da534F"
             },
             "store": {
                 "firefox": {

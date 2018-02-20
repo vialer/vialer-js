@@ -220,7 +220,8 @@ class Helpers {
     * @param {String} bundleName - Name of the entrypoint.
     * @param {Function} cb - Callback when the task is done.
     */
-    jsEntry(brandName, buildType, target, bundleName, cb) {
+    jsEntry(brandName, buildType, target, bundleName, cb, entries = []) {
+        let finished = 1
         if (!BUNDLERS[bundleName]) {
             BUNDLERS[bundleName] = browserify({
                 cache: {},
@@ -229,6 +230,7 @@ class Helpers {
                 packageCache: {},
             })
             if (this.settings.LIVERELOAD) BUNDLERS[bundleName].plugin(watchify)
+            for (let entry of entries) BUNDLERS[bundleName].add(entry)
         }
         BUNDLERS[bundleName].ignore('process')
         // Exclude the webextension polyfill from non-webextension builds.

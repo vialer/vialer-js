@@ -1,14 +1,29 @@
-<div class="main-statusbar-component" :class="{dnd}">
+<div class="main-statusbar-component">
     <div class="status-left" v-if="user.authenticated">
-        <span class="status-indicator">
-            <i class="icon" :class="classes('indicator')" :title="titles('indicator')"></i>
+        <span class="status-indicator tooltip tooltip-right" :data-tooltip="titles('indicator')">
+
+            <svgicon class="dnd" name="dnd" v-if="dnd"/>
+            <svgicon class="disconnected" name="disconnected" v-else-if="ua.state === 'disconnected'"/>
+            <svgicon class="registration-failed" name="disconnected" v-else-if="ua.state === 'registration_failed'"/>
+            <svgicon class="connected" name="softphone" v-else-if="ua.state === 'connected'"/>
+            <template v-else-if="ua.state === 'registered'">
+                <svgicon class="registered" name="softphone" v-if="this.settings.webrtc.permission"/>
+                <svgicon class="microphone-denied" name="mute" v-else></svgicon>
+            </template>
+
         </span>
+
         <span class="username">{{user.username}}</span>
+
         <div class="options">
             <div class="option" @click=logout>
                 <i class="icon-logout" :title="$t('Log out')"></i>
             </div>
         </div>
+    </div>
+    <div v-else class="vendor">
+        <svgicon class="vendor-logo" name="logo"></svgicon>
+        <span class="vendor-name">{{vendor.name}}</span>
     </div>
     <!-- Empty container is here to push .options to the right. -->
     <div v-else></div>
