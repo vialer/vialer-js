@@ -252,6 +252,7 @@ class Helpers {
                 PLATFORM_URL: this.settings.brands[brandName].permissions,
                 SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
                 VENDOR_NAME: this.settings.brands[brandName].vendor.name,
+                VENDOR_SUPPORT: this.settings.brands[brandName].vendor.support,
                 VENDOR_TYPE: this.settings.brands[brandName].vendor.type,
                 VERBOSE: this.settings.VERBOSE,
                 VERSION: this.settings.PACKAGE.version,

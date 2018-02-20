@@ -106,6 +106,7 @@ class App extends Skeleton {
                 updated: false,
                 vendor: {
                     name: process.env.VENDOR_NAME,
+                    support: process.env.VENDOR_SUPPORT,
                     type: process.env.VENDOR_TYPE,
                 },
                 version: {

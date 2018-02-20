@@ -135,6 +135,7 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
         .pipe(flatten({newPath: './fonts'}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/ringtones/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/svg/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(ifElse(settings.PRODUCTION, imagemin))
         .pipe(addsrc('./LICENSE'))
         .pipe(addsrc('./README.md'))

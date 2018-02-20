@@ -7,6 +7,7 @@
             "name": "Vialer",
             "vendor": {
                 "name": "Vialer",
+                "support": "support@email",
                 "type": "closed"
             },
             "analytics_id": {

@@ -4,8 +4,8 @@
 // icon-links to several locations.
 .main-statusbar-component {
     align-items: center;
-    background: $brand-variation-color;
-    color: $white;
+    background: $grey-color-lighter;
+    color: $grey-color;
     display: flex;
     font-size: 0.8rem;
     font-weight: 500;
@@ -90,7 +90,6 @@
             }
 
             i {
-                color: $white;
                 font-size: $spacer * 2;
                 line-height: $spacer * 5;
             }

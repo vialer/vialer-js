@@ -13,16 +13,12 @@
     <!-- Empty container is here to push .options to the right. -->
     <div v-else></div>
     <div class="options">
-        <div class="option" v-if="!user.authenticated" :class="{active: layer === 'login'}" @click="setLayer('login')">
-            <i class="icon-logout" :title="$t('Login page')"></i>
-        </div>
-
         <!-- No real use in showing the popout view from an unauthenticated view -->
         <div class="option" v-if="env.isExtension && !env.isPopout && user.authenticated" @click="openPopoutView">
             <i class="icon-ext-tab" :title="$t('Open in separate tab')"></i>
         </div>
 
-        <div class="option" :class="{active: layer === 'settings'}" @click="setLayer('settings')">
+        <div class="option" v-if="user.authenticated" :class="{active: layer === 'settings'}" @click="setLayer('settings')">
              <i class="icon-settings"></i>
         </div>
 

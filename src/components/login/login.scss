@@ -1,5 +1,25 @@
 @import "../../scss/lib/variables";
 
 .login-component {
-    background: none;
+    header {
+        text-align: center;
+        width: 100%;
+
+        .greeting {
+            color: $brand-color;
+            font-size: 1.8rem;
+        }
+
+        .welcome-message {
+            color: $grey-color-dark;
+            padding: $spacer * 2 0;
+        }
+    }
+
+
+    .buttons {
+        // width: 200px;
+        padding: ($spacer * 2) 0;
+
+    }
 }

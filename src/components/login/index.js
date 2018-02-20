@@ -1,5 +1,13 @@
 module.exports = (app) => {
     return {
+        computed: {
+            greeting: function() {
+                let hours = new Date().getHours()
+                if (hours < 12) return this.$t('Good Morning')
+                else if (hours >= 12 && hours <= 17) return this.$t('Good Afternoon')
+                else return this.$t('Good Evening')
+            },
+        },
         methods: {
             login: function() {
                 app.emit('bg:user:login', {

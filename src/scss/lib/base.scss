@@ -16,13 +16,6 @@ body {
         font-weight: 500;
     }
 
-    button {
-        &.button {
-            height: $spacer * 5;
-            width: 100%;
-        }
-    }
-
     .rounded-button {
         border-radius: 100%;
         transition: all 300ms ease;
