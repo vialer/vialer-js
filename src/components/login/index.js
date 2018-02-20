@@ -11,7 +11,9 @@ module.exports = (app) => {
         render: templates.login.r,
         staticRenderFns: templates.login.s,
         store: {
+            app: 'app',
             user: 'user',
+            vendor: 'app.vendor',
         },
         watch: {
             'user.username': function(newVal, oldVal) {

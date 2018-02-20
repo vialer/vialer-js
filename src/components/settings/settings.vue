@@ -146,9 +146,9 @@
             :help="$t('Add clickable icons next to phonenumbers in webpages.')"
             :placeholder="$t('SIP Server')"/>
 
-        <Field name="platform_enabled" type="checkbox"
-            :label="`${vendor} ${$t('platform integration')}`" :model.sync="settings.platform.enabled"
-            :help="$t('Add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor})"/>
+        <Field name="platform_enabled" type="checkbox" v-if="vendor.type === 'open'"
+            :label="`${vendor.name} ${$t('platform integration')}`" :model.sync="settings.platform.enabled"
+            :help="$t('Add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor.name})"/>
 
         <Field name="platform_url" type="text" v-if="user.developer"
             :disabled="!settings.platform.enabled"

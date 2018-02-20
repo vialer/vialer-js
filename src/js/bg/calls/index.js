@@ -349,7 +349,7 @@ class CallsModule extends Module {
         if (env.isElectron) userAgent += 'Electron'
         else if (env.isFirefox) userAgent += 'Firefox'
         else if (env.isEdge) userAgent += 'Edge'
-        userAgent += `) ${this.app.state.vendor}`
+        userAgent += `) ${this.app.state.app.vendor.name}`
         return userAgent
     }
 

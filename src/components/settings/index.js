@@ -44,12 +44,11 @@ module.exports = (app) => {
                 this.sound.enabled = false
             },
             save: function(e) {
-                app.emit('bg:set_state', {
-                    persist: true,
-                    state: {
-                        settings: this.settings,
-                    },
-                })
+                app.setState({
+                    availability: {dnd: false}, // Disable dnd after a save to keep conditions simple.
+                    settings: this.settings,
+                }, {persist: true})
+
                 app.vm.$notify({icon: 'database', message: app.$t('Settings stored'), type: 'info'})
                 app.emit('bg:calls:connect')
             },
@@ -93,7 +92,7 @@ module.exports = (app) => {
             settings: 'settings',
             tabs: 'ui.tabs.settings',
             user: 'user',
-            vendor: 'vendor',
+            vendor: 'app.vendor',
         },
         watch: {
             // Copy changes to settings to the background state when they

@@ -5,7 +5,10 @@
             "sip_endpoint": "websocket.voipgrid.nl",
             "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
             "name": "Vialer",
-            "vendor": "Vialer",
+            "vendor": {
+                "name": "Vialer",
+                "type": "closed"
+            },
             "analytics_id": {
                 "chrome": "",
                 "edge": "",

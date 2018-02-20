@@ -17,29 +17,11 @@ class UiModule extends Module {
                 intervalId: null,
             },
         }
-
-        // Add keyboard commands for the webextension. See manifest.json
-        // for the keyboard shortcuts.
-        if (this.app.env.isExtension) {
-            browser.commands.onCommand.addListener((command) => {
-                if (command === 'action-accept-new') {
-                    this.app.modules.calls.callAction('accept-new')
-                } else if (command === 'action-decline-hangup') {
-                    this.app.modules.calls.callAction('decline-hangup')
-                } else if (command === 'action-dnd') {
-                    // Only toggle when WebRTC calling is on.
-                    if (this.app.state.calls.ua.state === 'registered') {
-                        this.app.setState({availability: {dnd: !this.app.state.availability.dnd}})
-                    }
-                }
-            })
-        }
     }
 
 
     _initialState() {
         return {
-            installed: true,
             layer: 'login',
             menubar: {
                 default: 'inactive',
@@ -49,11 +31,6 @@ class UiModule extends Module {
                 settings: {
                     active: 'phone',
                 },
-            },
-            updated: false,
-            version: {
-                current: process.env.VERSION,
-                previous: process.env.VERSION,
             },
             visible: false,
         }

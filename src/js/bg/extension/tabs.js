@@ -55,7 +55,7 @@ class Tabs {
                 browser.browserAction.openPopup((window) => {})
                 this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'ConnectAB'}, true)
             },
-            title: this.app.$t('Call %s with {vendor} user', {vendor: this.app.state.vendor}),
+            title: this.app.$t('Call %s with {vendor} user', {vendor: this.app.state.app.vendor.name}),
         })
     }
 

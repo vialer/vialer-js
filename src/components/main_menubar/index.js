@@ -24,7 +24,7 @@ module.exports = (app) => {
             },
             logout: app.helpers.logout,
             setLayer: function(layerName) {
-                this.$store.ui.layer = layerName
+                this.layer = layerName
                 app.emit('bg:set_state', {
                     persist: true,
                     state: {
@@ -37,9 +37,7 @@ module.exports = (app) => {
         staticRenderFns: templates.main_menubar.s,
         store: {
             available: 'availability.available',
-            calls: 'calls.calls',
             layer: 'ui.layer',
-            user: 'user',
         },
     }
 }

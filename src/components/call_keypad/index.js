@@ -72,9 +72,7 @@ module.exports = (app) => {
         staticRenderFns: templates.call_keypad.s,
         store: {
             contacts: 'contacts.contacts',
-            ua: 'calls.ua',
             user: 'user',
-            webrtc: 'settings.webrtc',
         },
         watch: {
             number: function(newVal, oldVal) {

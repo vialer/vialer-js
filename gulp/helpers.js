@@ -246,12 +246,13 @@ class Helpers {
             .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
             .pipe(envify({
                 ANALYTICS_ID: this.settings.brands[brandName].analytics_id[buildType],
+                APP_NAME: this.settings.brands[brandName].name,
                 HOMEPAGE: this.settings.brands[brandName].homepage_url,
                 NODE_ENV: this.settings.NODE_ENV,
                 PLATFORM_URL: this.settings.brands[brandName].permissions,
-                PLUGIN_NAME: this.distributionName(brandName),
                 SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
-                VENDOR: this.settings.brands[brandName].vendor,
+                VENDOR_NAME: this.settings.brands[brandName].vendor.name,
+                VENDOR_TYPE: this.settings.brands[brandName].vendor.type,
                 VERBOSE: this.settings.VERBOSE,
                 VERSION: this.settings.PACKAGE.version,
             }))

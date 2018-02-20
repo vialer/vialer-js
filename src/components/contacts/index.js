@@ -28,7 +28,7 @@ module.exports = (app) => {
             calls: 'calls.calls',
             contacts: 'contacts.contacts',
             search: 'contacts.search',
-            state: 'contacts.state',
+            status: 'contacts.status',
         },
     }
 }

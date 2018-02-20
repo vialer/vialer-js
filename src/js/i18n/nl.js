@@ -88,6 +88,7 @@ global.translations.nl = {
     'Select a VoIP-account': 'Selecteer een VoIP account',
     'Select an input device': 'Selecteer een invoerapparaat',
     'Select an output device': 'Selecteer een uitvoerapparaat',
+    'Setting up call': 'Gesprek opzetten',
     'Settings': 'Instellingen',
     'Settings stored': 'Instellingen opgeslagen',
     'SIP server': 'SIP server',

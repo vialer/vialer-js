@@ -10,7 +10,6 @@ module.exports = (app) => {
         props: ['calls'],
         render: templates.calls.r,
         staticRenderFns: templates.calls.s,
-        store: {},
         watch: {
             calls: {
                 deep: true,

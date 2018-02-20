@@ -1,7 +1,6 @@
 const Skeleton = require('./skeleton')
 
 
-
 /**
 * The App class is a less light-weight version of the Skeleton.
 * It is extended with UI-specific libraries and should only
@@ -11,6 +10,10 @@ class App extends Skeleton {
 
     constructor(options) {
         super(options)
+
+        // Component helpers.
+        this.helpers = require('./helpers')(this)
+        this.utils = require('./utils')
 
         this._modules = options.modules
         this.modules = {}
@@ -97,8 +100,20 @@ class App extends Skeleton {
         }
         // Generic non-module state.
         Object.assign(state, {
+            app: {
+                installed: true,
+                name: process.env.APP_NAME,
+                updated: false,
+                vendor: {
+                    name: process.env.VENDOR_NAME,
+                    type: process.env.VENDOR_TYPE,
+                },
+                version: {
+                    current: process.env.VERSION,
+                    previous: process.env.VERSION,
+                },
+            },
             notifications: [],
-            vendor: process.env.VENDOR,
         })
 
         return state

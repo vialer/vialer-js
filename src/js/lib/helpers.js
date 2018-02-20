@@ -4,6 +4,53 @@ module.exports = function(app) {
 
     let helpers = {}
 
+    /**
+    * Helper function to determine whether calling functionality
+    * should be activated or not. Used both within and outside
+    * of components.
+    * @returns {Boolean} - Whether calling options are disabled.
+    */
+    helpers.callingDisabled = function() {
+        let _disabled = false
+        if (app.state.settings.webrtc.enabled) {
+            if (!app.state.settings.webrtc.permission) _disabled = true
+            else if (!(app.state.calls.ua.state === 'registered')) _disabled = true
+        } else {
+            // ConnectAB mode.
+            if (!app.state.calls.ua.state === 'connected') _disabled = true
+        }
+        return _disabled
+    }
+
+
+    /**
+    * Checks whether any calls are going on.
+    * @returns {Boolean} - Whether one or more calls is active.
+    */
+    helpers.callOngoing = function() {
+        const calls = app.state.calls.calls
+        const callIds = Object.keys(calls)
+        // Calls component haven't been activated.
+        if (!callIds.length) return false
+        // User wants to create its first call.
+        if (callIds.length === 1 && calls[callIds[0]].status === 'new') {
+            return false
+        } else return true
+    }
+
+
+    helpers.callsReady = function() {
+        let ready = true
+        const callIds = Object.keys(app.state.calls.calls)
+        for (let callId of callIds) {
+            if (!['accepted', 'new'].includes(this.calls[callId].status)) {
+                ready = false
+            }
+        }
+        return ready
+    }
+
+
     helpers.getTranslations = function() {
         const $t = app.$t
         return {
@@ -50,41 +97,9 @@ module.exports = function(app) {
 
     helpers.sharedComputed = function() {
         return {
-            callingDisabled: function() {
-                let _disabled = false
-                if (this.webrtc.enabled) {
-                    if (!this.webrtc.permission) _disabled = true
-                    else if (!(this.ua.state === 'registered')) _disabled = true
-                } else {
-                    // ConnectAB mode.
-                    if (!this.ua.state === 'connected') _disabled = true
-                }
-                return _disabled
-            },
-            /**
-            * Checks whether any calls are going on.
-            * @returns {Boolean} - Whether one or more calls is active.
-            */
-            callOngoing: function() {
-                const calls = this.$store.calls.calls
-                const callIds = Object.keys(this.$store.calls.calls)
-                // Calls component haven't been activated.
-                if (!callIds.length) return false
-                // User wants to create its first call.
-                if (callIds.length === 1 && calls[callIds[0]].status === 'new') {
-                    return false
-                } else return true
-            },
-            callsReady: function() {
-                let ready = true
-                const callIds = Object.keys(this.$store.calls.calls)
-                for (let callId of callIds) {
-                    if (!['accepted', 'new'].includes(this.calls[callId].status)) {
-                        ready = false
-                    }
-                }
-                return ready
-            },
+            callingDisabled: helpers.callingDisabled,
+            callOngoing: helpers.callOngoing,
+            callsReady: helpers.callsReady,
             /**
             * Translate a Call status string to a human-readable text.
             * (!)Don't forget to update this function when changes are made
@@ -99,6 +114,7 @@ module.exports = function(app) {
                 }
                 return translations[this.call.status]
             },
+
             hours: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60 / 60) % 24
             },

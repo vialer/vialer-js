@@ -1,6 +1,7 @@
 module.exports = (app, actions) => {
 
     return {
+        computed: app.helpers.sharedComputed(),
         methods: app.helpers.sharedMethods(),
         render: templates.availability.r,
         staticRenderFns: templates.availability.s,
@@ -11,7 +12,7 @@ module.exports = (app, actions) => {
             placeholder: 'availability.placeholder',
             selected: 'availability.selected',
             user: 'user',
-            vendor: 'vendor',
+            vendor: 'app.vendor',
             webrtc: 'settings.webrtc',
         },
         watch: {

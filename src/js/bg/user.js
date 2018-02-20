@@ -65,7 +65,8 @@ class UserModule extends Module {
         }
 
         let startLayer
-        if (this.app.state.ui.installed) {
+        if (this.app.state.app.installed) {
+            // On install, go to the settings page.
             startLayer = 'settings'
             this.app.emit('fg:notify', {icon: 'cog', message: this.app.$t('Review your softphone and audio settings.'), timeout: 0, type: 'warning'})
         } else {
@@ -74,12 +75,9 @@ class UserModule extends Module {
         }
 
         this.app.setState({
-            ui: {
-                installed: false, // The `installed` flag is a onetime thing disabled after login.
-                layer: startLayer, // On install, go to the settings page.
-                menubar: {default: 'active'},
-                updated: false, // Same for the `updated` flag.
-            },
+            // The `installed` and `updated` flag are toggled off after login.
+            app: {installed: false, updated: false},
+            ui: {layer: startLayer, menubar: {default: 'active'}},
             user: {
                 authenticated: true,
                 client_id: user.client.replace(/[^\d.]/g, ''),

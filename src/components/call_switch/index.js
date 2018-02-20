@@ -69,8 +69,6 @@ module.exports = (app) => {
         staticRenderFns: templates.call_switch.s,
         store: {
             calls: 'calls.calls',
-            ua: 'calls.ua',
-            webrtc: 'settings.webrtc',
         },
     }
 }

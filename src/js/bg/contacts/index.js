@@ -23,7 +23,7 @@ class ContactsModule extends Module {
                 disabled: false,
                 input: '',
             },
-            state: null,
+            status: null,
         }
     }
 
@@ -34,11 +34,11 @@ class ContactsModule extends Module {
     */
     async _platformData() {
         this.app.setState({}, {action: 'replace', path: 'contacts/contacts'})
-        this.app.setState({contacts: {contacts: {}, state: 'loading'}})
+        this.app.setState({contacts: {contacts: {}, status: 'loading'}})
         const res = await this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
-                this.app.setState({contacts: {widget: {state: 'unauthorized'}}})
+                this.app.setState({contacts: {widget: {status: 'unauthorized'}}})
             }
             return
         }
@@ -49,7 +49,7 @@ class ContactsModule extends Module {
             return (c.sipreginfo && (c.account_id !== ownAccountId))
         })
 
-        this.app.setState({contacts: {state: null}})
+        this.app.setState({contacts: {status: null}})
 
         this.app.logger.debug(`${this}retrieved ${contacts.length} contacts`)
 

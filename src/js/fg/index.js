@@ -1,5 +1,4 @@
 const App = require('../lib/app')
-const utils = require('../lib/utils')
 
 
 let env = JSON.parse(JSON.stringify(require('../lib/env')))
@@ -11,21 +10,19 @@ class ForegroundApp extends App {
     constructor(options) {
         options.env = env
         super(options)
+
+        // Distinguish between the popout(tab) and popup view.
+        let searchParams = this.utils.parseSearch(location.search)
+        if (searchParams.popout) env.role.popout = true
         this.env = env
 
-        this.on('fg:notify', (message) => {
-            this.vm.$notify(message)
-        })
+        this.on('fg:notify', (message) => this.vm.$notify(message))
 
         /**
         * Syncs state from the background to the foreground
         * while keeping Vue's reactivity system happy.
         */
         this.on('fg:set_state', this.__mergeState.bind(this))
-
-        // Component helpers.
-        this.helpers = require('../../components/helpers')(this)
-        this.utils = require('../lib/utils')
 
         Vue.component('Availability', require('../../components/availability')(this))
         Vue.component('Call', require('../../components/call')(this))
@@ -61,7 +58,7 @@ class ForegroundApp extends App {
 
                 // Extension has a popout mode, where the plugin is opened
                 // in a tab. Set a flag if this is the case.
-                let searchParams = utils.parseSearch(location.search)
+                let searchParams = this.utils.parseSearch(location.search)
                 if (searchParams.popout) this.state.env.isPopout = true
                 else this.state.env.isPopout = false
 
@@ -112,11 +109,6 @@ function initApp(initParams) {
 
 // For extensions, this is an executable endpoint.
 if (env.isExtension) {
-    let searchParams = utils.parseSearch(location.search)
-    if (searchParams.popout) {
-        env.role.popout = true
-    }
-
     global.app = initApp({name: 'fg'})
 }
 
