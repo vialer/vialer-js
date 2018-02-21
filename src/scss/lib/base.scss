@@ -18,16 +18,18 @@ body {
 
     .rounded-button {
         border-radius: 100%;
+        padding: $spacer * 2;
         transition: all 300ms ease;
 
         &:hover {
             cursor: pointer;
         }
+    }
 
-        i {
-            font-size: $spacer * 4;
-            padding: $spacer * 4;
-        }
+    .button {
+        font-size: 1rem;
+        font-weight: bold;
+        line-height: none;
     }
 }
 
@@ -109,11 +111,6 @@ video {
                 color: #fff;
                 cursor: pointer;
             }
-
-            i {
-                font-size: $spacer * 1.5;
-                padding: 0;
-            }
         }
     }
 }
@@ -128,19 +125,26 @@ video {
 }
 
 .tabs {
-    height: $spacer * 6;
+    height: $spacer * 7;
     margin-bottom: 0;
 
+    ul {
+        display: flex;
+        justify-content: space-between;
+
+        li {
+            flex-grow: 1;
+        }
+    }
+
     a {
-        height: $spacer * 6;
+        height: $spacer * 7;
     }
 }
 
 .tab {
     display: none;
     margin-bottom: $spacer * 2;
-    padding: $spacer * 3;
-    padding-bottom: 0;
 
     &.is-active {
         display: block;
@@ -170,8 +174,8 @@ video {
 
 .help {
     .warning {
-        font-weight: bold;
         color: $brand-variation-color;
+        font-weight: bold;
     }
 }
 
@@ -205,15 +209,15 @@ video {
 }
 
 
-// recommended css code for vue-svgicon.
+// Recommended css code for vue-svgicon.
 .svg-icon {
     color: inherit;
     display: inline-block;
     fill: none;
-    height: 16px;
+    height: 1rem;
     stroke: currentColor;
     vertical-align: middle;
-    width: 16px;
+    width: 1rem;
 }
 
 .svg-fill {
@@ -236,3 +240,14 @@ video {
 .svg-left {
     transform: rotate(-90deg);
 }
+
+.spinner {
+    -moz-animation: spin 0.75s linear infinite;
+    animation: spin 0.75s linear infinite;
+}
+
+
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

@@ -14,7 +14,7 @@
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
             v-on:keyup.enter="createCall(number)"/>
 
-        <i class="fa fa-angle-double-left" @click="removeLastNumber" v-if="mode === 'call'"/>
+        <i class="correct" v-if="mode === 'call'" @click="removeLastNumber"><svgicon name="correct"/></i>
     </div>
 
     <div class="contacts-match" v-if="mode === 'call'">
@@ -46,7 +46,7 @@
     <!-- Dial actions when not used in combination with a call. -->
     <div class="call-actions touch" v-if="mode === 'call' && display === 'touch'">
         <div class="rounded-button action dial" @click="createCall(number)" :class="{'disabled': !number || callingDisabled}">
-            <i class="icon icon-phone"></i>
+            <svgicon name="phone"/>
         </div>
     </div>
 </div>

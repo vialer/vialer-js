@@ -72,12 +72,6 @@ $icon-checkbox-unchecked: "\f096";
     100% {transform: rotate(359deg);}
 }
 
-@keyframes ringing {
-    0% {color: $red-color;}
-    50% {color: $green-color;}
-    100% {color: $red-color;}
-}
-
 .icon-o-arrow:before {
     content: "\e900";
 }

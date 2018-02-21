@@ -46,6 +46,11 @@
                 border: 2px solid $white;
                 margin-bottom: $spacer;
 
+                svg {
+                    height: $spacer * 3;
+                    width: $spacer * 3;
+                }
+
                 &:hover,
                 &.active {
                     background: $white;
@@ -60,12 +65,6 @@
                     &:hover {
                         background: none;
                     }
-                }
-
-                i {
-                    height: auto;
-                    padding: $spacer * 2;
-                    width: auto;
                 }
             }
         }
@@ -166,6 +165,14 @@
     display: flex;
     justify-content: center;
     width: 100%;
+
+    // TODO: Cleanup rounded-button class.
+    .rounded-button {
+        svg {
+            height: $spacer * 4;
+            width: $spacer * 4;
+        }
+    }
 
     .action {
         box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);

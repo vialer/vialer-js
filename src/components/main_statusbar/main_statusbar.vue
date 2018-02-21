@@ -1,7 +1,6 @@
 <div class="main-statusbar-component">
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator tooltip tooltip-right" :data-tooltip="titles('indicator')">
-
             <svgicon class="dnd" name="dnd" v-if="dnd"/>
             <svgicon class="disconnected" name="disconnected" v-else-if="ua.state === 'disconnected'"/>
             <svgicon class="registration-failed" name="disconnected" v-else-if="ua.state === 'registration_failed'"/>
@@ -16,8 +15,8 @@
         <span class="username">{{user.username}}</span>
 
         <div class="options">
-            <div class="option" @click=logout>
-                <i class="icon-logout" :title="$t('Log out')"></i>
+            <div class="option" @click="logout">
+                <svgicon name="logout"/>
             </div>
         </div>
     </div>
@@ -30,19 +29,19 @@
     <div class="options">
         <!-- No real use in showing the popout view from an unauthenticated view -->
         <div class="option" v-if="env.isExtension && !env.isPopout && user.authenticated" @click="openPopoutView">
-            <i class="icon-ext-tab" :title="$t('Open in separate tab')"></i>
+            <svgicon class="ext-tab" name="ext-tab"/>
         </div>
 
         <div class="option" v-if="user.authenticated" :class="{active: layer === 'settings'}" @click="setLayer('settings')">
-             <i class="icon-settings"></i>
+            <svgicon class="settings" name="settings"/>
         </div>
 
         <div class="option" v-if="user.authenticated" @click="refreshApiData">
-            <i class="icon-refresh" :title="$t('Refresh your data')"></i>
+            <svgicon class="refresh" name="refresh"/>
         </div>
 
         <div class="option" @click="openHelp">
-            <i class="icon-help" data-link="help" :title="$t('Help')"></i>
+            <svgicon name="help"/>
         </div>
     </div>
 </div>

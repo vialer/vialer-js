@@ -15,16 +15,20 @@
             </div>
 
             <div class="queues-options list-item-options">
-                <i class="selected icon icon-availability" v-if="selected.id == queue.id"></i>
-                <i class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(queue.internal_number)">
-                    <i class="icon icon-transfer" v-on:click.once="createCall(queue.internal_number)"></i>
-                </i>
+                <svgicon name="check" class="icon-selected-queue" v-if="selected.id == queue.id"/>
+                <div class="rounded-button" v-on:click.once="createCall(queue.internal_number)" v-if="transferStatus === 'select' && !numbersOngoing.includes(queue.internal_number)">
+                    <svgicon name="transfer"/>
+                </div>
             </div>
         </li>
 
         <li class="list-item queue" v-if="state === 'loading'">
-            <div class="icon status-icon"><i class="fa fa-spinner fa-spin"></i></div>
-            <div class="info"><div class="name">{{$t('Loading')}}...</div></div>
+            <div class="status-icon">
+                <svgicon class="spinner" name="spinner"/>
+            </div>
+            <div class="info">
+                <div class="name">{{$t('Loading')}}...</div>
+            </div>
         </li>
         <li class="list-item queue" v-else-if="!queues.length">
             <div class="status-icon">

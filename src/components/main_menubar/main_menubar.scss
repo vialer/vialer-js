@@ -14,16 +14,32 @@
     z-index: 100000;
 
     .option {
+        align-items: center;
         color: $white;
-        float: left;
-        font-size: $spacer * 3;
-        line-height: $spacer * 5;
-        padding: ($spacer / 2) 0;
-        transition: all 600ms ease;
+        display: flex;
+        flex-direction: column;
+        height: $spacer * 7;
+        justify-content: center;
+        transition: all 250ms ease-in-out;
+
+        svg {
+            height: $spacer * 3;
+            width: $spacer * 3;
+        }
 
         &.availability {
-            &.available {color: $green-color;}
-            &.unavailable {color: $red-color;}
+            path[pid="0"] {fill: $white;}
+            path[pid="1"] {fill: $brand-color;}
+
+            &.available {
+                path[pid="0"] {fill: $green-color;}
+                path[pid="1"] {fill: $white;}
+            }
+
+            &.unavailable {
+                path[pid="0"] {fill: $red-color;}
+                path[pid="1"] {fill: $white;}
+            }
         }
 
         &.calls {
@@ -48,8 +64,12 @@
         &.active,
         &:hover {
             background: $white;
-            color: $brand-color;
             cursor: pointer;
+            // Cascading error in Chrome when using svg path selector.
+
+            svg {
+                fill: $brand-color;
+            }
         }
     }
 }

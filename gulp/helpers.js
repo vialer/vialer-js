@@ -219,9 +219,9 @@ class Helpers {
     * @param {String} target - Path to the entrypoint.
     * @param {String} bundleName - Name of the entrypoint.
     * @param {Function} cb - Callback when the task is done.
+    * @param {Function} entries - Optional extra entries.
     */
     jsEntry(brandName, buildType, target, bundleName, cb, entries = []) {
-        let finished = 1
         if (!BUNDLERS[bundleName]) {
             BUNDLERS[bundleName] = browserify({
                 cache: {},

@@ -304,17 +304,12 @@ gulp.task('icons', 'Build an SVG iconset.', (done) => {
     const buildDir = `./src/brand/${settings.BRAND_TARGET}/icons`
 
     fs.stat(buildDir, (err) => {
-        if (err) {
-            let execCommand = `vsvg -s ${srcDir} -t ${buildDir}`
-            childExec(execCommand, undefined, (_err, stdout, stderr) => {
-                if (stderr) gutil.log(stderr)
-                if (stdout) gutil.log(stdout)
-                done()
-            })
-        } else {
+        let execCommand = `vsvg -s ${srcDir} -t ${buildDir}`
+        childExec(execCommand, undefined, (_err, stdout, stderr) => {
+            if (stderr) gutil.log(stderr)
+            if (stdout) gutil.log(stdout)
             done()
-        }
-
+        })
     })
 
 }, {options: taskOptions.all})

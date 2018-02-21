@@ -13,6 +13,10 @@
         overflow: auto;
         position: relative;
 
+        .panel-content {
+            padding: $spacer * 3;
+        }
+
         .panel-content-container {
             margin-top: $spacer * 5;
             overflow: auto;
@@ -20,10 +24,6 @@
 
             &.with-sidebar {
                 margin-left: $spacer * 5;
-            }
-
-            .panel-content {
-                padding: $spacer * 3;
             }
 
             h1 {

@@ -1,11 +1,11 @@
 // Source: https://chrisbracco.com/a-simple-css-tooltip/
-$tooltip-color: hsla(0, 0%, 30%, 0.8);
+$tooltip-color: hsla(0, 0%, 30%, 0.5);
 
 .tooltip {
     cursor: pointer;
     position: relative;
+    white-space: nowrap;
 }
-
 
 .tooltip:before,
 .tooltip:after {
@@ -19,7 +19,7 @@ $tooltip-color: hsla(0, 0%, 30%, 0.8);
     visibility: hidden;
 }
 
-/* Show the entire tooltip on hover and focus */
+// Show the entire tooltip on hover and focus.
 [data-tooltip]:hover:before,
 [data-tooltip]:hover:after,
 [data-tooltip]:focus:before,
@@ -74,7 +74,7 @@ $tooltip-color: hsla(0, 0%, 30%, 0.8);
     margin-left: -6px;
 }
 
-/* Horizontally align top/bottom tooltips */
+// Horizontally align top/bottom tooltips.
 [data-tooltip]:after,
 .tooltip:after,
 .tooltip-top:after {
@@ -103,15 +103,15 @@ $tooltip-color: hsla(0, 0%, 30%, 0.8);
 .tooltip-left:after {
     bottom: 50%;
     left: auto;
-    right: 100%;
+    right: 75%;
 }
 
 .tooltip-left:before {
     border-left-color: $tooltip-color;
     border-top-color: transparent;
     margin-bottom: 0;
-    margin-left: 0;
     margin-right: -12px;
+    margin-top: 12px;
 }
 
 .tooltip-left:hover:before,
@@ -151,15 +151,15 @@ $tooltip-color: hsla(0, 0%, 30%, 0.8);
 .tooltip-right:before,
 .tooltip-right:after {
     bottom: 50%;
-    left: 100%;
+    left: 75%;
 }
 
 .tooltip-right:before {
     border-right-color: $tooltip-color;
     border-top-color: transparent;
-    margin-top: 3px;
     margin-bottom: 0;
     margin-left: -12px;
+    margin-top: 3px;
 }
 
 .tooltip-right:hover:before,

@@ -7,16 +7,13 @@
             cursor: pointer;
         }
 
-        &.selected {
-            .queues-options {
-                .selected {
-                    color: $green-color;
-                    font-size: $spacer * 3;
-                    line-height: $spacer * 3;
-                    margin-right: $spacer;
-                }
-            }
+        svg.icon-selected-queue {
+            fill: $green-color;
+            height: $spacer * 2.5;
+            width: $spacer * 2.5;
         }
+
+
 
         .status-icon {
             text-align: center;

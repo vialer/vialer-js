@@ -67,30 +67,13 @@
                 height: $spacer * 3;
                 width: $spacer * 3;
 
-                &:hover {
-                    cursor: pointer;
-                }
+                &.dnd {fill: $orange-color;}
+                &.disconnected {fill: $red-color;}
+                &.connected {fill: $orange-color;}
+                &.microphone-denied {fill: $red-color;}
+                &.registered {fill: $green-color;}
+                &.registration-failed {fill: $red-color;}
             }
-
-            i {
-                background: $brand-variation-color;
-                color: $white;
-                font-size: 1.2rem;
-                height: $spacer * 5;
-                line-height: $spacer * 5;
-                margin: 0;
-                text-align: center;
-                transition: all 1300ms ease;
-                vertical-align: middle;
-                width: $spacer * 5;
-            }
-
-            .dnd {fill: $orange-color;}
-            .disconnected {fill: $red-color;}
-            .connected {fill: $orange-color;}
-            .microphone-denied {fill: $red-color;}
-            .registered {fill: $green-color;}
-            .registration-failed {fill: $red-color;}
         }
 
         .username {
@@ -114,15 +97,6 @@
             &:hover {
                 background: $white;
                 cursor: pointer;
-
-                i {
-                    color: $brand-color;
-                }
-            }
-
-            i {
-                font-size: $spacer * 2;
-                line-height: $spacer * 5;
             }
         }
     }

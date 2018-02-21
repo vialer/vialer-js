@@ -74,7 +74,10 @@ module.exports = function(app) {
     helpers.sharedMethods = function() {
         return {
             createCall: function(number, start = true, transfer = false) {
-                // Still allows empty calls when number is false.
+                // Empty Calls are allowed (used in the call switcher), but
+                // number must specifically be set to `false`. Default Store
+                // value `null` and an empty string are not allowed.
+                if (number === null || number === '') return
                 if (this.callingDisabled) return
                 app.emit('bg:calls:call_create', {number: number, start, transfer})
             },

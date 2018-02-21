@@ -11,64 +11,78 @@
     z-index: 100000;
 
     .call {
+        align-items: center;
+        display: flex;
+        height: $spacer * 5;
+        justify-content: center;
+        width: $spacer * 5;
 
-        i {
-            color: $white;
-            height: $spacer * 5;
-            line-height: $spacer * 5;
-            text-align: center;
-            width: $spacer * 5;
+        svg {
+            fill: $white;
+        }
 
-            // Create a new call. Make the button for adding a new call and
-            // a new call block less bright, so it doesn't interfere with
-            // the user's switch call flow.
-            &.add-call {
-                background: rgba(255, 255, 255, 0.1);
 
-                &:hover {
-                    background: rgba(255, 255, 255, 0.2);
-                    color: $white;
-                }
-            }
+        // Create a new call. Make the button for adding a new call and
+        // a new call block less bright, so it doesn't interfere with
+        // the user's switch call flow.
+        &.add-call {
+            background: rgba(255, 255, 255, 0.1);
 
-            &.hint {
-                &.active {
-                    @include animation("hint-pulse-active 1.5s infinite");
-                }
-
-                &:not(.active) {
-                    @include animation("hint-pulse 1.5s infinite");
-                }
-            }
-
-            // An existing call obecjt with status `new`.
-            &.new-call {
-                background: rgba(255, 255, 255, 0.1);
+            &:hover {
+                background: rgba(255, 255, 255, 0.2);
                 color: $white;
-
-                &:hover {
-                    background: rgba(255, 255, 255, 0.2);
-                    color: $white;
-                }
-
-                &.active {
-                    background: rgba(255, 255, 255, 0.2);
-                    color: $white;
-
-                    &:hover {
-                        background: $red-color;
-                    }
-                }
-            }
-
-
-
-            &:hover,
-            &.active {
-                background: $white;
-                color: $brand-variation-color;
-                cursor: pointer;
             }
         }
+
+        &.hint {
+            &.active {
+                @include animation("hint-pulse-active 1.5s infinite");
+            }
+
+            &:not(.active) {
+                @include animation("hint-pulse 1.5s infinite");
+            }
+        }
+
+        // An existing call object with status `new`.
+        &.new-call {
+            background: rgba(255, 255, 255, 0.1);
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.2);
+
+                svg {
+                    fill: $white;
+                }
+            }
+
+            &.active {
+                background: rgba(255, 255, 255, 0.2);
+
+                svg {
+                    fill: $white;
+                }
+
+
+                &:hover {
+                    background: $red-color;
+                }
+            }
+        }
+
+
+
+        &:hover,
+        &.active {
+            background: $white;
+            color: $brand-variation-color;
+            cursor: pointer;
+
+            svg {
+                fill: $brand-variation-color;
+            }
+
+        }
+
     }
 }

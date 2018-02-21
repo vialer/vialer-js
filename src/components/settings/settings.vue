@@ -3,13 +3,13 @@
     <div class="tabs">
         <ul>
             <li :class="{'is-active': tabs.active === 'phone'}" @click="setTab('phone')">
-                <a><span class="icon is-small"><i class="fa fa-phone"></i></span><span>{{$t('Phone')}}</span></a>
+                <a><span class="icon is-small"><svgicon name="phone"/></span><span>{{$t('Phone')}}</span></a>
             </li>
             <li :class="{'is-active': tabs.active === 'audio'}" @click="setTab('audio')">
-                <a><span class="icon is-small"><i class="fa fa-headphones"></i></span><span>Audio</span></a>
+                <a><span class="icon is-small"><svgicon name="microphone"/></span><span>Audio</span></a>
             </li>
             <li :class="{'is-active': tabs.active === 'general'}" @click="setTab('general')">
-                <a><span class="icon is-small"><i class="fa fa-user"></i></span><span>{{$t('General')}}</span></a>
+                <a><span class="icon is-small"><svgicon name="user"/></span><span>{{$t('General')}}</span></a>
             </li>
         </ul>
     </div>
@@ -56,7 +56,7 @@
         </template>
 
         <div class="settings-actions field is-grouped">
-            <button class="button is-primary" @click="save">{{$t('Save')}}</button>
+            <button class="button is-primary" @click="save">{{$t('Save changes')}}</button>
         </div>
     </div>
 
@@ -71,7 +71,7 @@
 
             <a class="ringtone-play button is-link" :disabled="!sound.enabled" @click="playSound()">
                 <span class="icon is-small">
-                    <i class="fa fa-volume-control-phone"></i>
+                    <svgicon name="ring"/>
                 </span>
             </a>
         </div>
@@ -129,7 +129,7 @@
             :placeholder="$t('Select an output device')"/>
 
         <div class="settings-actions field is-grouped">
-            <button class="button is-primary" @click="save">{{$t('Save')}}</button>
+            <button class="button is-primary" @click="save">{{$t('Save changes')}}</button>
         </div>
     </div>
 
@@ -161,7 +161,7 @@
             :help="$t('Enabling anonymized usage statistics is the easiest way to help us improve the software.')"/>
 
         <div class="settings-actions field is-grouped">
-            <button class="button is-primary" @click="save">{{$t('Save')}}</button>
+            <button class="button is-primary" @click="save">{{$t('Save changes')}}</button>
         </div>
     </div>
 

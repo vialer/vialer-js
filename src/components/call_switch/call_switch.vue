@@ -1,14 +1,16 @@
 <div class="call-switch-component">
 
     <!-- First loop through all the active calls -->
-    <div class="call" v-if="call.status !== 'new'" v-for="call in calls">
-        <i class="icon" :title="call.number" :class="classes(call, 'call-button')" @click="activateCall(call)"></i>
+    <div :data-tooltip="callTitle(call)" class="call tooltip tooltip-left" :class="classes(call, 'call-button')"
+        v-if="call.status !== 'new'" v-for="call in calls" @click="activateCall(call)">
+        <svgicon :name="callIcon(call)"/>
     </div>
     <!-- New call always end up at the bottom -->
-    <div class="call" v-if="call.status === 'new'" v-for="call in calls">
-        <i class="icon" :title="call.number" :class="classes(call, 'call-button')" @click="activateCall(call)"></i>
+    <div :data-tooltip="callTitle(call)" class="call tooltip tooltip-left" :class="classes(call, 'call-button')"
+        v-if="call.status === 'new'" v-for="call in calls" @click="activateCall(call)">
+        <svgicon :name="callIcon(call)"/>
     </div>
-    <div class="call" v-if="newCallAllowed()">
-        <i class="add-call fa fa-plus" :title="$t('New call')" @click="createCall(false, false)"></i>
+    <div :data-tooltip="$t('Setup new Call')" class="call tooltip tooltip-left" v-if="newCallAllowed()" @click="createCall(false, false)">
+        <svgicon name="dialpad"/>
     </div>
 </div>

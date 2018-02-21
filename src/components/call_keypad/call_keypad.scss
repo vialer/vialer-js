@@ -90,13 +90,14 @@
                 width: 100%;
             }
 
-            i {
-                font-size: 1.8rem;
-                height: 60px;
-                line-height: 55px;
+            .correct {
                 position: absolute;
                 right: 10px;
-                vertical-align: center;
+
+                svg {
+                    height: 1.8rem;
+                    width: 1.8rem;
+                }
 
                 &:hover {
                     cursor: pointer;
@@ -163,6 +164,14 @@
                     font-size: 0.7rem;
                 }
             }
+        }
+    }
+
+    // TODO: Cleanup rounded-button class.
+    .rounded-button {
+        svg {
+            height: $spacer * 4;
+            width: $spacer * 4;
         }
     }
 

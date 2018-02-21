@@ -17,6 +17,24 @@ module.exports = (app) => {
                     })
                 }
             },
+            callIcon: function(call) {
+                if (call.status === 'new') {
+                    if (call.active) return 'close'
+                    else return 'dialpad'
+                } else {
+                    if (call.hold.active) return 'on-hold'
+                    return 'phone'
+                }
+            },
+            callTitle: function(call) {
+                if (call.status === 'new') {
+                    if (call.active) return this.$t('Close new call')
+                    else return `${this.$t('Select new Call')}`
+                } else {
+                    if (call.hold.active) return `${call.number} - ${this.$t('On hold')}`
+                    else return `${call.number} - ${this.$t('Active call')}`
+                }
+            },
             /**
             * Add CSS classes for the callswitcher based on the Call status.
             * (!)Don't forget to update this function when changes are made

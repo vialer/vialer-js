@@ -11,27 +11,27 @@
     <div class="call-options" v-if="['accepted'].includes(call.status)">
         <div class="rounded-button-with-text" v-if="call.transfer.type !== 'accept'">
             <div class="rounded-button" @click="transferToggle" :class="classes('transfer-button')">
-                <i class="icon icon-transfer"></i>
+                <svgicon name="transfer"/>
             </div>
             <p>{{$t('transfer')}}</p>
         </div>
         <div class="rounded-button-with-text" v-else>
             <div class="rounded-button" @click="transferFinalize">
-                <i class="icon icon-merge"></i>
+                <svgicon name="merge"/>
             </div>
             <p>{{$t('transfer')}}</p>
         </div>
 
         <div class="rounded-button-with-text">
             <div class="rounded-button" @click="holdToggle" :class="classes('hold-button')">
-                <i class="icon icon-on-hold"></i>
+                <svgicon name="on-hold"/>
             </div>
             <p>{{$t('hold')}}</p>
         </div>
 
         <div class="rounded-button-with-text">
             <div class="rounded-button" @click="keypadToggle" :class="classes('dialpad-button')">
-                <i class="icon icon-dialpad"></i>
+                <svgicon name="dialpad"/>
             </div>
             <p>{{$t('keypad')}}</p>
         </div>
@@ -59,11 +59,11 @@
     <div class="call-actions" v-if="!call.hangup.disabled">
         <div class="rounded-button action decline" v-if="callCanTerminate"
             @click="callTerminate(call)">
-            <i class="icon icon-hang-up"></i>
+            <svgicon name="hang-up"/>
         </div>
 
         <div class="rounded-button action accept" v-if="call.status === 'invite'" @click="callAccept(call)">
-            <i class="icon icon-phone"></i>
+            <svgicon name="phone"/>
         </div>
     </div>
 </div>

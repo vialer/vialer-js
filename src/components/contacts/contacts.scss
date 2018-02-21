@@ -1,19 +1,39 @@
 @import "../../scss/lib/variables";
 
+@keyframes ringing {
+    0% {fill: $red-color;}
+    50% {fill: $green-color;}
+    100% {fill: $red-color;}
+}
+
 .contacts-component {
     // A single contact item in the contacts list.
     .list-item {
         &.contact {
             .icon-availability {
                 color: $grey-color;
+                height: $spacer * 2.5;
+                width: $spacer * 2.5;
 
-                &.busy {color: $red-color;}
-                &.available {color: $green-color;}
+                &.busy {
+                    path[pid="0"] {fill: $red-color;}
+                    path[pid="1"] {fill: $white;}
+                }
+
+                &.available {
+                    path[pid="0"] {fill: $green-color;}
+                    path[pid="1"] {fill: $white;}
+                }
 
                 &.ringing {
-                    // Ringing state is a css keyframe animation.
-                    animation: ringing 1.5s linear infinite;
-                    transition-timing-function: ease;
+                    path[pid="0"] {
+                        animation: ringing 1.5s ease-in-out infinite;
+                        transition-timing-function: ease;
+                    }
+
+                    path[pid="1"] {
+                        fill: $white;
+                    }
                 }
             }
         }
