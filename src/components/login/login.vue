@@ -21,8 +21,8 @@
     </div>
 
     <footer>
-        <a>Forgot your password?</a>
-
-        <p>Need help? Click the icon or contact us at</p>
+        <div class="forgot-pw"><a>{{$t('Forgot your password?')}}</a></div>
+        <div class="help-message">{{$t('Need help?')}}<br/> {{$t('Click on the')}} <i @click="openHelp"><svgicon name="help"/></i>{{$t('icon')}} {{$t('or contact us at')}}</div>
+        <div class="support"><a :href="'mailto:' + vendor.support">{{vendor.support}}</a></div>
     </footer>
 </div>

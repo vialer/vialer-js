@@ -218,10 +218,10 @@ class Helpers {
     * @param {String} buildType - Target environment to produce js for.
     * @param {String} target - Path to the entrypoint.
     * @param {String} bundleName - Name of the entrypoint.
-    * @param {Function} cb - Callback when the task is done.
     * @param {Function} entries - Optional extra entries.
+    * @param {Function} cb - Callback when the task is done.
     */
-    jsEntry(brandName, buildType, target, bundleName, cb, entries = []) {
+    jsEntry(brandName, buildType, target, bundleName, entries = [], cb) {
         if (!BUNDLERS[bundleName]) {
             BUNDLERS[bundleName] = browserify({
                 cache: {},

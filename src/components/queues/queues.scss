@@ -13,8 +13,6 @@
             width: $spacer * 2.5;
         }
 
-
-
         .status-icon {
             text-align: center;
             vertical-align: center;
@@ -41,6 +39,11 @@
                 &.hectic {background: $red-color;}
             }
         }
+    }
+
+    .notification-box {
+        margin: $spacer * 3;
+        margin-top: $spacer * 3;
     }
 
 }

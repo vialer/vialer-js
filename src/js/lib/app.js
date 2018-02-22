@@ -132,12 +132,14 @@ class App extends Skeleton {
 
 
     /**
-    * Set the state to default non-logged in but keep
-    * some settings and preferences.
+    * Sets the state back to defaults without loosing some
+    * all personalized general settings and preferences.
     * @returns {Object} Stripped state.
     */
     _resetState() {
         let _state = this._initialState()
+        delete _state.app
+
         Object.assign(_state, {
             availability: _state.availability,
             calls: _state.calls,

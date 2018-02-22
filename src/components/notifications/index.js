@@ -23,7 +23,6 @@ module.exports = function(app) {
         methods: {
             classes: function(block, notification) {
                 let cssClasses = {}
-                if (block === 'icon') cssClasses[`fa-${notification.icon}`] = true
                 if (block === 'notification') cssClasses[`is-${notification.type}`] = true
                 return cssClasses
             },

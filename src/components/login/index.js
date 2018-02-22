@@ -8,14 +8,14 @@ module.exports = (app) => {
                 else return this.$t('Good Evening')
             },
         },
-        methods: {
+        methods: Object.assign({
             login: function() {
                 app.emit('bg:user:login', {
                     password: this.user.password,
                     username: this.user.username,
                 })
             },
-        },
+        }, app.helpers.sharedMethods()),
         render: templates.login.r,
         staticRenderFns: templates.login.s,
         store: {

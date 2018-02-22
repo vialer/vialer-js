@@ -24,6 +24,7 @@ const replace = require('gulp-replace')
 const rc = require('rc')
 const runSequence = require('run-sequence')
 const size = require('gulp-size')
+const svgo = require('gulp-svgo')
 const zip = require('gulp-zip')
 
 const writeFileAsync = promisify(fs.writeFile)
@@ -32,9 +33,10 @@ const writeFileAsync = promisify(fs.writeFile)
 let settings = {}
 
 settings.BRAND_TARGET = argv.brand ? argv.brand : 'vialer'
-settings.BUILD_DIR = process.env.BUILD_DIR || path.join(__dirname, 'build')
+settings.BUILD_DIR = process.env.BUILD_DIR || path.join('./', 'build')
 settings.BUILD_TARGET = argv.target ? argv.target : 'chrome'
 settings.BUILD_TARGETS = ['chrome', 'electron', 'edge', 'firefox', 'webview']
+
 // Exit when the build target is not in the allowed list.
 if (!settings.BUILD_TARGETS.includes(settings.BUILD_TARGET)) {
     gutil.log(`Invalid build target: ${settings.BUILD_TARGET}`)
@@ -50,8 +52,9 @@ if (!['production', 'beta'].includes(settings.DEPLOY_TARGET)) {
 settings.LIVERELOAD = false
 settings.NODE_PATH = path.join(__dirname, 'node_modules') || process.env.NODE_PATH
 settings.PACKAGE = require('./package')
-settings.SRC_DIR = path.join(__dirname, 'src')
+settings.SRC_DIR = path.join('./', 'src')
 settings.SIZE_OPTIONS = {showFiles: true, showTotal: true}
+settings.TEMP_DIR = path.join(settings.BUILD_DIR, '__tmp')
 settings.VERBOSE = argv.verbose ? true : false
 
 // Force production mode when running certain tasks from
@@ -130,8 +133,6 @@ gutil.log(`- VERBOSE: ${settings.VERBOSE}`)
 gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
     const robotoPath = path.join(settings.NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
     return gulp.src(path.join(robotoPath, '{Roboto-Light.woff2,Roboto-Regular.woff2,Roboto-Medium.woff2}'))
-        .pipe(addsrc(path.join(settings.SRC_DIR, 'fonts', '*'), {base: settings.SRC_DIR}))
-        .pipe(addsrc(path.join(settings.NODE_PATH, 'font-awesome', 'fonts', 'fontawesome-webfont.woff2')))
         .pipe(flatten({newPath: './fonts'}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/ringtones/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
@@ -296,20 +297,29 @@ gulp.task('html', 'Preprocess and build application HTML.', () => {
 }, {options: taskOptions.all})
 
 
+gulp.task('__tmp-icons', 'Copy default SVG icons and brand icons to a temp dir.', (done) => {
+    return gulp.src('./src/svg/*.svg', {base: 'src'})
+        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/svg/*.svg`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(gulp.dest(path.join(settings.TEMP_DIR, settings.BRAND_TARGET)))
+        .pipe(svgo())
+        .pipe(size(_extend({title: 'icons'}, settings.SIZE_OPTIONS)))
+})
+
+
 /**
+* Process all images with Vue-svgicon into Javascript Vue components,
+* which can be included as regular components.
 * TODO: Integrate vue-svgicon with Gulp.
 */
-gulp.task('icons', 'Build an SVG iconset.', (done) => {
-    const srcDir = `./src/brand/${settings.BRAND_TARGET}/svg`
-    const buildDir = `./src/brand/${settings.BRAND_TARGET}/icons`
-
-    fs.stat(buildDir, (err) => {
-        let execCommand = `vsvg -s ${srcDir} -t ${buildDir}`
-        childExec(execCommand, undefined, (_err, stdout, stderr) => {
-            if (stderr) gutil.log(stderr)
-            if (stdout) gutil.log(stdout)
-            done()
-        })
+gulp.task('icons', 'Build an SVG iconset.', ['__tmp-icons'], (done) => {
+    const srcDir = path.join(settings.TEMP_DIR, settings.BRAND_TARGET, 'svg')
+    // The icons JavaScript is added inside the source.
+    const srcBuildDir = path.join(settings.SRC_DIR, 'brand', settings.BRAND_TARGET, 'icons')
+    let execCommand = `vsvg -s ${srcDir} -t ${srcBuildDir}`
+    childExec(execCommand, undefined, (_err, stdout, stderr) => {
+        if (stderr) gutil.log(stderr)
+        if (stdout) gutil.log(stdout)
+        done()
     })
 
 }, {options: taskOptions.all})
@@ -333,17 +343,21 @@ gulp.task('js-electron-main', 'Copy Electron main thread js to build.', ['js-web
 
 
 gulp.task('js-webview', 'Generate generic webview application.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'app', () => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'app', [], () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
         done()
     })
 })
 
 gulp.task('js-vendor', 'Generate third-party vendor js.', ['icons'], (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor', () => {
-        if (settings.LIVERELOAD) livereload.changed('web.js')
-        done()
-    }, [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`])
+    helpers.jsEntry(
+        settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor',
+        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`],
+        () => {
+            if (settings.LIVERELOAD) livereload.changed('web.js')
+            done()
+        }
+    )
 }, {options: taskOptions.all})
 
 gulp.task('js-webext', 'Generate WebExtension application.', [], (done) => {
@@ -359,19 +373,19 @@ gulp.task('js-webext', 'Generate WebExtension application.', [], (done) => {
 }, {options: taskOptions.browser})
 
 gulp.task('js-app-bg', 'Generate the extension background entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'app_bg', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'app_bg', [], done)
 }, {options: taskOptions.browser})
 
 gulp.task('js-app-fg', 'Generate webextension fg/popout js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', [], done)
 }, {options: taskOptions.browser})
 
 gulp.task('js-app-observer', 'Generate WebExtension observer js that runs in all tab frames.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', [], done)
 }, {options: taskOptions.browser})
 
 gulp.task('js-app-tab', 'Generate webextension tab js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'tab/index', 'app_tab', done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'tab/index', 'app_tab', [], done)
 }, {options: taskOptions.browser})
 
 

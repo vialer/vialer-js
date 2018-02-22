@@ -81,6 +81,10 @@ module.exports = function(app) {
                 if (this.callingDisabled) return
                 app.emit('bg:calls:call_create', {number: number, start, transfer})
             },
+            openHelp: function() {
+                if (app.env.isExtension) browser.tabs.create({url: process.env.HOMEPAGE})
+                else window.open(process.env.HOMEPAGE, '_blank')
+            },
             openPlatformUrl: function(path = '') {
                 const token = this.user.platform.tokens.portal
                 path = `client/${this.user.client_id}/${path}`

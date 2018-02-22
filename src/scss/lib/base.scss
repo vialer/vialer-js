@@ -28,7 +28,7 @@ body {
 
     .button {
         font-size: 1rem;
-        font-weight: bold;
+        font-weight: 500;
         line-height: none;
     }
 }
@@ -172,11 +172,8 @@ video {
     }
 }
 
-.help {
-    .warning {
-        color: $brand-variation-color;
-        font-weight: bold;
-    }
+.info-box {
+    background: rgba($brand-color, 0.1);
 }
 
 @include keyframes(hint-pulse) {
@@ -242,12 +239,11 @@ video {
 }
 
 .spinner {
-    -moz-animation: spin 0.75s linear infinite;
     animation: spin 0.75s linear infinite;
 }
 
-
-
-@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}

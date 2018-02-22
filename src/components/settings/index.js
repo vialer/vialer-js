@@ -49,7 +49,7 @@ module.exports = (app) => {
                     settings: this.settings,
                 }, {persist: true})
 
-                app.vm.$notify({icon: 'database', message: app.$t('Settings stored'), type: 'success'})
+                app.vm.$notify({icon: 'settings', message: app.$t('Settings stored'), type: 'success'})
                 app.emit('bg:calls:connect')
             },
             setTab: function(name) {

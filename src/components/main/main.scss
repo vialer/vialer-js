@@ -35,19 +35,35 @@
             }
         }
 
-        // A box for suggesting actions to the user.
-        .platform-hint {
-            background: $grey-color-lightest;
-            color: $primary-color;
-            font-size: 0.9rem;
-            padding: $spacer $spacer * 3;
-            position: relative;
+        .notification-box {
+            background: rgba($brand-color, 0.1);
+            border-radius: $spacer / 2;
+            font-size: 0.75rem;
+            overflow: auto;
+            padding: $spacer ($spacer * 2);
 
-            &::before {
-                // Change me when changing ``.icon-info`.
-                color: $brand-color;
-                content: "\e91a";
-                font-family: "vialer-js";
+            header {
+                align-items: center;
+                display: flex;
+                font-weight: bold;
+                margin-bottom: $spacer;
+                text-transform: uppercase;
+
+                svg {
+                    color: $brand-color;
+                    margin-right: $spacer;
+                }
+            }
+
+            .description {
+                font-style: italic;
+                margin-bottom: $spacer;
+            }
+
+            ul {
+                li {
+                    margin-bottom: $spacer / 4;
+                }
             }
         }
     }

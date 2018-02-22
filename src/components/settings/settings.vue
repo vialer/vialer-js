@@ -33,15 +33,15 @@
                 :options="settings.webrtc.account.options"
                 :placeholder="$t('Select a VoIP-account')"/>
 
-            <em class="help">
-                <span class="warning">{{$t('Please check the VoIP-account requirements')}}:</span>
-                <ul class="styled-list">
+            <div class="notification-box troubleshoot" v-if="settings.webrtc.enabled">
+                <header><svgicon name="warning"/><span>{{$t('Troubleshooting')}}</span></header>
+                <ul>
                     <!-- Reference to the popout mode from the popup modus only-->
                     <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount`)">{{$t('the account')}}</a></b> {{$t('is not in use by another device')}}.</li>
                     <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b> {{$t('is set in Expert options')}}.</li>
                     <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b> {{$t('is set in Expert options')}}.</li>
                 </ul>
-            </em>
+            </div>
         </template>
         <template v-else>
             <Field name="webrtc_username" type="text"

@@ -28,11 +28,8 @@ module.exports = (app) => {
                 return classes
             },
             logout: app.helpers.logout,
-            openHelp: function() {
-                if (app.env.isExtension) browser.tabs.create({url: process.env.HOMEPAGE})
-                else window.open(process.env.HOMEPAGE, '_blank')
-            },
             refreshApiData: function() {
+                this.$notify({icon: 'settings', message: `${app.$t('Reloading application data')}...`, type: 'success'})
                 app.emit('bg:refresh_api_data')
                 app.emit('bg:calls:disconnect', {reconnect: true})
             },

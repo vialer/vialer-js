@@ -49,7 +49,7 @@ class UserModule extends Module {
         const res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-            this.app.emit('fg:notify', {icon: 'warning', message: this.app.$t('Invalid credentials'), type: 'warning'})
+            this.app.emit('fg:notify', {icon: 'warning', message: this.app.$t('Unable to login. Please check your credentials.'), type: 'warning'})
             // Remove credentials from the store.
             Object.assign(this.app.state.user, {authenticated: false, password: ''})
             return
@@ -68,7 +68,7 @@ class UserModule extends Module {
         if (this.app.state.app.installed) {
             // On install, go to the settings page.
             startLayer = 'settings'
-            this.app.emit('fg:notify', {icon: 'cog', message: this.app.$t('Review your softphone and audio settings.'), timeout: 0, type: 'warning'})
+            this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('Review your softphone and audio settings.'), timeout: 0, type: 'warning'})
         } else {
             startLayer = 'contacts'
             this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: realName}), type: 'success'})
@@ -108,7 +108,7 @@ class UserModule extends Module {
         this.app.api.setupClient()
         // Disconnect without reconnect attempt.
         this.app.modules.calls.disconnect(false)
-        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('You are logged out'), type: 'success'})
+        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Goodbye!'), type: 'success'})
         this.app.setState({ui: {menubar: {default: 'inactive'}}})
     }
 
