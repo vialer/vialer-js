@@ -29,7 +29,7 @@ module.exports = (app) => {
             },
             logout: app.helpers.logout,
             refreshApiData: function() {
-                this.$notify({icon: 'settings', message: `${app.$t('Reloading application data')}...`, type: 'success'})
+                this.$notify({icon: 'refresh', message: `${app.$t('Reloaded application data')}...`, type: 'success'})
                 app.emit('bg:refresh_api_data')
                 app.emit('bg:calls:disconnect', {reconnect: true})
             },

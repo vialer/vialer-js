@@ -40,7 +40,7 @@
             }
 
             &:not(.active) {
-                @include animation("hint-pulse 1.5s infinite");
+                @include animation("hint-pulse 1.5s ease-in infinite");
             }
         }
 

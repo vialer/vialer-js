@@ -178,14 +178,14 @@ video {
 
 @include keyframes(hint-pulse) {
     0%  {
-        background-color: rgba(255, 255, 255, 0);
+        background-color: rgba(255, 255, 255, 0.1);
         color: $white;
     }
 
     50% {background-color: rgba(255, 255, 255, 0.2);}
 
     100% {
-        background-color: rgba(255, 255, 255, 0);
+        background-color: rgba(255, 255, 255, 0.1);
         color: $white;
     }
 }
@@ -193,14 +193,14 @@ video {
 
 @include keyframes(hint-pulse-active) {
     0%  {
-        background-color: rgba(255, 255, 255, 0.6);
+        background-color: rgba(255, 255, 255, 0.7);
         color: $brand-variation-color;
     }
 
     50% {background-color: rgba(255, 255, 255, 1);}
 
     100% {
-        background-color: rgba(255, 255, 255, 0.6);
+        background-color: rgba(255, 255, 255, 0.7);
         color: $brand-variation-color;
     }
 }

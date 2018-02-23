@@ -21,6 +21,8 @@ module.exports = (app) => {
                 if (call.status === 'new') {
                     if (call.active) return 'close'
                     else return 'dialpad'
+                } else if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
+                    return 'hang-up'
                 } else {
                     if (call.hold.active) return 'on-hold'
                     return 'phone'

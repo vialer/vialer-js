@@ -203,6 +203,10 @@ class Call {
         this.app.setState({ui: {menubar: {event: null}}})
         this.setState({keypad: {active: false}})
 
+        // Reset the transfer state of target calls in case the transfer mode
+        // of this Call is active and the callee ends the call.
+        if (this.state.transfer.active) this.module.__setTransferState(this, false)
+
         window.setTimeout(() => {
             this.busyTone.stop()
             this.module.deleteCall(this)

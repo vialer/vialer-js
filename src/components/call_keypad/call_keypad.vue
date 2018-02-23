@@ -5,8 +5,8 @@
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
             v-on:keyup.enter="createCall(number)"/>
 
-        <i class="icon icon-transfer" v-if="mode === 'call'" :class="{'disabled': !number}"
-            v-on:keyup.enter="keypadAction" @click="createCall(number)"/>
+        <i class="icon icon-small" v-if="mode === 'call'" :class="{'disabled': !number}"
+            v-on:keyup.enter="keypadAction" @click="createCall(number)"><svgicon name="transfer"/></i>
     </div>
     <div :class="classes('number-input')" v-else-if="display === 'touch'">
         <input type="text" ref="input" autofocus placeholder="..."

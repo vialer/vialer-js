@@ -18,10 +18,3 @@
     font-weight: 500;
     src: local("Roboto Medium"), local("Roboto-Medium"), url("#{$font-path}/Roboto-Medium.woff2") format("woff2");
 }
-
-@font-face {
-    font-family: "vialer-js";
-    font-style: normal;
-    font-weight: normal;
-    src: url("#{$font-path}/vialer-js.woff") format("woff");
-}

@@ -47,7 +47,7 @@
             <span>{{$t('Adding more queue callgroups')}}</span>
         </header>
         <div class="description">
-            {{$t('You have {count} queue callgroup configured. ::: You have {count} queue callgroups configured.', {count: queues.length}, queues.length)}} {{$t('To add more:')}}
+            {{$t('You have {count} queue callgroup configured. ::: You have {count} queue callgroups configured.', {count: queues.length}, queues.length)}}
         </div>
         <ul>
             <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Callgroups')}}</a> {{$t('to manage your {target}', {target: $t('callgroups')})}}.</li>

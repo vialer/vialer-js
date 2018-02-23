@@ -36,7 +36,11 @@ class CallSIP extends Call {
         })
         this.session.on('rejected', (e) => {
             this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
-            this.setState({status: 'rejected_b'})
+
+            // `e.method` is CANCEL when the incoming caller hung up.
+            // `e` will be a SIP response 480 when the callee hung up.
+            if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
+            else this.setState({status: 'rejected_a'})
             this._stop()
         })
 
@@ -111,7 +115,14 @@ class CallSIP extends Call {
         this.session.on('rejected', (e) => {
             this.app.telemetry.event('call[sip]', 'outgoing', 'rejected')
             this.busyTone.play()
-            this.setState({status: 'rejected_b'})
+
+            // Busy here; Callee is busy.
+            if (e.status_code === 486) this.setState({status: 'rejected_b'})
+            // Request terminated; Request has terminated by bye or cancel.
+            else if (e.status_code === 487) this.setState({status: 'rejected_a'})
+            // Just assume that Callee rejected the call otherwise.
+            else this.setState({status: 'rejected_b'})
+
             this._stop()
         })
     }
@@ -163,26 +174,35 @@ class CallSIP extends Call {
     */
     terminate() {
         if (this.state.status === 'new') {
-            // Just delete the Call object without noise.
+            // An empty/new call; just delete the Call object without noise.
             this.module.deleteCall(this)
             return
-        }
-
-        // Calls with other statuses need some more work to end.
-        try {
-            if (this.state.status === 'invite') this.session.reject() // Decline an incoming call.
-            else if (this.state.status === 'create') this.session.terminate() // Cancel a self-initiated call.
-            else if (['accepted'].includes(this.state.status)) {
-                // Hangup a running call.
-                this.session.bye()
-                // Set the status here manually, because the bye event on the
-                // session is not triggered.
-                this.setState({status: 'bye'})
+        } else if (this.state.status === 'create') {
+            // A fresh outgoing Call; not yet started. There may or may not
+            // be a session object. End the session if there is one.
+            if (this.session) this.session.terminate()
+            // Decrease the stop event delay, because the user is already
+            // aware of the intend to end the call.
+            this.setState({status: 'rejected_a'})
+            this._stop(1500)
+        } else {
+            // Calls with other statuses need some more work to end.
+            try {
+                if (this.state.status === 'invite') {
+                    this.setState({status: 'rejected_a'})
+                    this.session.reject() // Decline an incoming call.
+                } else if (['accepted'].includes(this.state.status)) {
+                    // Hangup a running call.
+                    this.session.bye()
+                    // Set the status here manually, because the bye event on the
+                    // session is not triggered.
+                    this.setState({status: 'bye'})
+                }
+            } catch (err) {
+                this.app.logger.warn(`${this}unable to close the session properly.`)
             }
-        } catch (err) {
-            this.app.logger.warn(`${this}unable to close the session properly.`)
+            this._stop()
         }
-        this._stop()
     }
 
 

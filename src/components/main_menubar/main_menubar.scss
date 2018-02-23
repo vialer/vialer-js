@@ -70,6 +70,14 @@
             svg {
                 fill: $brand-color;
             }
+
+            &.hint {
+                @include animation("hint-pulse-active 1.5s ease-in infinite");
+
+                svg {
+                    fill: $brand-color;
+                }
+            }
         }
     }
 }

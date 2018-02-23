@@ -66,7 +66,7 @@ module.exports = function(app) {
                 dialing_b: $t('Dialing phone B'),
                 invite: $t('Incoming call'),
                 rejected_a: $t('You disconnected'),
-                rejected_b: $t('Declined'),
+                rejected_b: $t('Callee is busy'),
             },
         }
     }

@@ -14,9 +14,18 @@
                     :options="destinations"
                     :placeholder="$t('Select a destination')"/>
 
+                <div class="notification-box info">
+                    <header><svgicon name="info"/><span>{{$t('Changing your availability')}}</span></header>
+                    <ul>
+                        <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('your user settings')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
+                        <li>{{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to manage your {target}', {target: $t('availability')})}}.
+                            {{$t('Changing your availability only has effect when your {vendor} user is part of the dialplan for the incoming call.', {vendor: vendor.name})}}
+                        </li>
+                    </ul>
+                </div>
+
                 <em class="help">
-                    {{$t('Changing your availability only has effect when your {vendor} user is part of the dialplan for the incoming call.', {vendor: vendor.name})}}
-                    {{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to manage your {target}', {target: $t('dialplans')})}}.
+
                 </em>
             </div>
         </div>
