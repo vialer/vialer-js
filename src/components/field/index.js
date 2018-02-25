@@ -14,42 +14,43 @@ module.exports = (app) => {
             validationMessage: function() {
                 let errorMessages = []
                 if (this.validation.required === false) {
-                    errorMessages.push(this.$t('Field is required.'))
+                    errorMessages.push(this.$t('This field is required.'))
                 }
+                if (this.validation.requiredIf === false) {
+                    errorMessages.push(this.$t('This field is required.'))
+                }
+
                 if (this.validation.minLength === false) {
                     errorMessages.push(this.$t(
-                        'Field must be at least {min} characters.', {
+                        'Please fill in a value of at least {min} characters.', {
                             min: this.validation.$params.minLength.min,
                         })
                     )
                 }
                 if (this.validation.maxLength === false) {
                     errorMessages.push(this.$t(
-                        'Field must not be longer than {max} characters.', {
+                        'Please fill in a value no longer than {max} characters.', {
                             max: this.validation.$params.maxLength.max,
                         })
                     )
                 }
+
+                if (this.validation.domain === false) {
+                    errorMessages.push(this.$t('Please fill in a valid domain.'))
+                }
                 if (this.validation.email === false) {
-                    errorMessages.push(this.$t('Field must be a valid email address.'))
+                    errorMessages.push(this.$t('Please fill in a valid email address.'))
                 }
                 if (this.validation.url === false) {
-                    errorMessages.push(this.$t('Field must be a valid url.'))
-                }
-                if (this.validation.incorrect_password === false) {
-                    errorMessages.push(this.$t('Incorrect password.'))
+                    errorMessages.push(this.$t('Please fill in a valid url.'))
                 }
                 if (this.validation.must_be_unique === false) {
-                    errorMessages.push(this.$t('Field must have a unique value.'))
+                    errorMessages.push(this.$t('Please fill in a unique value.'))
                 }
                 if (this.validation.sameAs === false) {
                     errorMessages.push(this.$t('Field "{fieldName}" must have the same value.', {
                         fieldName: this.validation.$params.sameAs.eq,
                     }))
-                }
-
-                if (this.validation.requiredIf === false) {
-                    errorMessages.push(this.$t('Field is required.'))
                 }
 
                 return errorMessages.join('</br>')
@@ -59,6 +60,21 @@ module.exports = (app) => {
             },
         },
         methods: {
+            classes: function(block) {
+                let classes = {}
+                const invalid = this.vInvalid()
+                if (block === 'input') {
+                    classes.input = true
+                    if (invalid) classes['is-danger'] = true
+                    else if (invalid === false) classes['is-success'] = true
+                } else if (block === 'select') {
+                    classes.select = true
+                    if (invalid) classes['is-danger'] = true
+                    else if (invalid === false) classes['is-success'] = true
+                }
+
+                return classes
+            },
             onChange: function(event) {
                 if (!this.change) return
                 this.change(event)
@@ -117,16 +133,16 @@ module.exports = (app) => {
              * @returns {Boolean} - Whether the field is valid or not.
              */
             vInvalid: function() {
-                if (!this.validation) return false
+                if (!this.validation) return null
+                if (!this.validation.$dirty) return null
                 // Validation for `requiredIf` depends on the state of other
                 // fields. Therefor don't use the $dirty check on this field,
                 // but go straight for the $invalid state.
                 if ('requiredIf' in this.validation) {
                     return this.validation.$invalid
                 }
-
-                if (!this.validation.$dirty) return false
-                return true
+                // Invalid has 3 states: true, false and null (not changed/dirty).
+                return this.validation.$error
             },
             vRequired: function() {
                 // Field has no validation at all.

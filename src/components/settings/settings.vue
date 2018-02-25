@@ -19,22 +19,26 @@
         <Field name="sip_endpoint" type="text"
             :label="$t('SIP server')" :model.sync="settings.sipEndpoint"
             :help="$t('Domainname of the SIP server with websocket support.')"
-            :placeholder="$t('SIP server')"/>
+            :placeholder="$t('SIP server')"
+            :validation="$v.settings.sipEndpoint"/>
 
         <Field name="webrtc_enabled" type="checkbox"
             :label="$t('Use as softphone')" :model.sync="settings.webrtc.enabled"
             :help="$t('Use WebRTC to be able to receive incoming calls with and place outgoing calls.')"/>
 
         <!-- Platform integration allows the user to select a voip-account. -->
-        <template v-if="settings.platform.enabled">
+        <template v-if="settings.webrtc.enabled && ['closed', 'open'].includes(app.vendor.type)">
             <Field name="webrtc_account" type="select"
                 :disabled="!settings.webrtc.enabled"
                 :label="$t('Softphone VoIP-account')" :model.sync="settings.webrtc.account.selected"
                 :options="settings.webrtc.account.options"
-                :placeholder="$t('Select a VoIP-account')"/>
+                :placeholder="$t('Select a VoIP-account')"
+                :validation="$v.settings.webrtc.account.selected.id"/>
 
             <div class="notification-box troubleshoot" v-if="settings.webrtc.enabled">
-                <header><svgicon name="warning"/><span>{{$t('Troubleshooting')}}</span></header>
+                <header>
+                    <svgicon name="warning"/><span>{{$t('Troubleshooting')}}</span>
+                </header>
                 <ul>
                     <!-- Reference to the popout mode from the popup modus only-->
                     <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount`)">{{$t('the account')}}</a></b> {{$t('is not in use by another device')}}.</li>
@@ -43,7 +47,8 @@
                 </ul>
             </div>
         </template>
-        <template v-else>
+
+        <template v-else-if="settings.webrtc.enabled && app.vendor.type === 'free'">
             <Field name="webrtc_username" type="text"
                 :disabled="!settings.webrtc.enabled"
                 :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.account.username"
@@ -54,10 +59,6 @@
                 :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.account.password"
                 :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
         </template>
-
-        <div class="settings-actions field is-grouped">
-            <button class="button is-primary" @click="save">{{$t('Save changes')}}</button>
-        </div>
     </div>
 
     <!-- Audio settings -->
@@ -128,10 +129,6 @@
             :label="$t('Output device')" :model.sync="settings.webrtc.sinks.output"
             :options="outputDevice.options"
             :placeholder="$t('Select an output device')"/>
-
-        <div class="settings-actions field is-grouped">
-            <button class="button is-primary" @click="save">{{$t('Save changes')}}</button>
-        </div>
     </div>
 
     <!-- User preferences -->
@@ -160,10 +157,10 @@
         <Field name="telemetry_enabled" type="checkbox"
             :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
             :help="$t('Enabling anonymized usage statistics is the easiest way to help us improve the software.')"/>
+    </div>
 
-        <div class="settings-actions field is-grouped">
-            <button class="button is-primary" @click="save">{{$t('Save changes')}}</button>
-        </div>
+    <div class="settings-actions field is-grouped">
+        <button class="button is-primary" :disabled="settings._form.invalid" @click="save">{{$t('Save changes')}}</button>
     </div>
 
 </div>

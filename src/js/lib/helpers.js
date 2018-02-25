@@ -167,6 +167,16 @@ module.exports = function(app) {
     }
 
 
+    helpers.validators = {
+        // Regex source: https://github.com/johnotander/domain-regex/blob/master/index.js
+        domain: function(e) {
+            let res = e.match(/\b((?=[a-z0-9-]{1,63}\.)(xn--)?[a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,63}\b/)
+            if (!res) return false
+            return true
+        },
+    }
+
+
     /**
     * Set user state to unauthenticated and notify the background.
     */

@@ -93,6 +93,7 @@
     "vue": "^2.5.13",
     "vue-i18n-stash": "git+https://github.com/wearespindle/vue-stash-i18n.git#master",
     "vue-stash": "^2.0.1-beta",
+    "vuelidate": "^0.6.1",
     "webextension-polyfill": "^0.2.1"
   }
 }

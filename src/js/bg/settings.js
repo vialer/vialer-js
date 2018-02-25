@@ -12,6 +12,9 @@ class SettingsModule extends Module {
 
     _initialState() {
         return {
+            _form: {
+                invalid: false,
+            },
             click2dial: {
                 blacklist: [],
                 enabled: true,

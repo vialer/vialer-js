@@ -1,4 +1,7 @@
 module.exports = (app) => {
+
+    const v = Vuelidate.validators
+
     return {
         computed: {
             greeting: function() {
@@ -23,6 +26,22 @@ module.exports = (app) => {
             url: 'settings.platform.url',
             user: 'user',
             vendor: 'app.vendor',
+        },
+        validations: function() {
+            let validations = {
+                user: {
+                    password: {
+                        minLength: v.minLength(6),
+                        required: v.required,
+                    },
+                    username: {
+                        email: v.email,
+                        required: v.required,
+                    },
+                },
+            }
+
+            return validations
         },
         watch: {
             'user.username': function(newVal, oldVal) {

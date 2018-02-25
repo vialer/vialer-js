@@ -35,7 +35,7 @@
 
 <div class="field" v-else-if="type === 'password'">
     <label :class="{'required': vRequired(), 'label': true}" :for="name">{{label}}</label>
-    <input type="password" v-bind:class="{'is-danger': vInvalid(), 'input': true}"
+    <input type="password" v-bind:class="classes('input')"
         v-on:input="vChange($event, $event.target.value)" v-bind:value="vmodel"
         :id="name" :name="name" :placeholder="placeholder" :disabled="disabled"/>
     <em class="help" v-if="help">{{help}}</em>
@@ -45,12 +45,12 @@
 <div class="field" v-else-if="type === 'select'">
     <label class="label" :class="{'required': vRequired()}" :for="name">{{label}}</label>
     <div class="control">
-        <div class="select">
-            <select @change="onChange" v-on:change="vChange($event, $event.target.value, options)" :id="name"
+        <div class="select" v-bind:class="classes('select')">
+            <select v-on:change="vChange($event, $event.target.value, options)" :id="name"
                 :name="name" :v-bind:value="vmodel" :disabled="disabled">
-                <option value="" v-if="placeholder">{{placeholder}}</option>
                 <option :selected="option[idfield] == vmodel.id" :value="option[idfield]" v-for="option in options">
-                    {{$t(option.name)}}
+                    <template v-if="option[idfield] === null && placeholder">{{placeholder}}</template>
+                    <template v-else>{{$t(option.name)}}</template>
                 </option>
             </select>
         </div>
@@ -62,7 +62,7 @@
 <div class="field" v-else-if="type === 'text'">
     <label :class="{'required': vRequired(), 'label': true}" :for="name">{{label}}</label>
     <div class="control">
-        <input type="text" v-bind:class="{'is-danger': vInvalid(), 'input': true}"
+        <input type="text" v-bind:class="classes('input')"
             v-on:input="vChange($event, $event.target.value)" v-bind:value="vmodel"
             :id="name" :name="name" :placeholder="placeholder" :disabled="disabled" :autofocus="autofocus"/>
     </div>

@@ -9,15 +9,21 @@
     </header>
 
     <Field name="username" type="text"
-        :label="$t('Username')" :model.sync="user.username"
-        :placeholder="$t('Enter your email address')" :autofocus="true"/>
+        :autofocus="true" :label="$t('Username')" :model.sync="user.username"
+        :placeholder="$t('Enter your email address')"
+        :validation="$v.user.username"
+        />
 
     <Field name="password" type="password"
         :label="$t('Password')" :model.sync="user.password"
-        :placeholder="$t('Enter your password')"/>
+        :placeholder="$t('Enter your password')"
+        :validation="$v.user.password"
+        />
 
     <div class="buttons is-centered">
-        <button type="button" class="button is-primary" data-link="login" @click="login">{{$t('Log in')}}</button>
+        <button type="button" class="button is-primary" data-link="login"
+            :disabled="$v.$invalid"
+            @click="login">{{$t('Log in')}}</button>
     </div>
 
     <footer>

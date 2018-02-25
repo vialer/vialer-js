@@ -1,6 +1,7 @@
 module.exports = (app) => {
 
     var soundMeter = false
+    const v = Vuelidate.validators
 
     async function microphoneCheck() {
         try {
@@ -57,6 +58,8 @@ module.exports = (app) => {
             },
         }, app.helpers.sharedMethods()),
         mounted: async function() {
+            // State was modified; form was set invalid in the meanwhile.
+            if (this.settings._form.invalid) this.$v.$touch()
             if (!soundMeter) soundMeter = await microphoneCheck()
             if (soundMeter) {
                 app.state.settings.webrtc.permission = true
@@ -88,24 +91,42 @@ module.exports = (app) => {
         render: templates.settings.r,
         staticRenderFns: templates.settings.s,
         store: {
+            app: 'app',
             env: 'env',
             settings: 'settings',
             tabs: 'ui.tabs.settings',
             user: 'user',
             vendor: 'app.vendor',
         },
+        validations: function() {
+            let validations = {
+                settings: {
+                    sipEndpoint: {
+                        domain: app.helpers.validators.domain,
+                        required: v.required,
+                    },
+                    webrtc: {
+                        account: {
+                            selected: {
+                                id: {
+                                    requiredIf: v.requiredIf(() => {
+                                        return this.settings.webrtc.enabled
+                                    }),
+                                },
+                            },
+                        },
+                    },
+                },
+            }
+
+            return validations
+        },
         watch: {
-            // Copy changes to settings to the background state when they
-            // happen, but do not persist them until the user saves. This
-            // may not be completely 100% foolproof, since the changed
-            // state could be saved from another setState call that DOES
-            // persist. For now let's keep it like this, because it allows
-            // the user to enter settings, close the popup, and re-edit
-            // where it left off.
             settings: {
                 deep: true,
                 handler: function(newVal, oldVal) {
-                    app.setState({settings: this.settings}, {persist: false})
+                    if (this.$v.$invalid) this.settings._form.invalid = true
+                    else this.settings._form.invalid = false
                 },
             },
             'settings.language.selected': function(newVal, oldVal) {

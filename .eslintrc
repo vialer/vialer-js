@@ -28,7 +28,8 @@
         "translations": true,
         "I18nStore": true,
         "i18n": true,
-        "EventEmitter": true
+        "EventEmitter": true,
+        "Vuelidate": true
     },
     "plugins": [
         "sort-class-members"

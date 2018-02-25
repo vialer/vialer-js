@@ -38,6 +38,11 @@ class AppModule extends Module {
             },
         }
     }
+
+
+    _hydrateState(moduleStore) {
+        moduleStore.notifications = []
+    }
 }
 
 module.exports = AppModule

@@ -46,18 +46,24 @@ module.exports = (app) => {
                 this.$emit('update:model', newVal)
             },
             pressKey: function(key) {
-                if (this.callingDisabled || !allowedKeys.includes(key)) return
+                if (this.callingDisabled) return
+                if (!key) {
+                    // No key pressed. Stop playing sound.
+                    window.setTimeout(() => keyTone.stop(), 50)
+                    return
+                }
+                if (!allowedKeys.includes(key)) return
                 keyTone.play(key)
+                // Force stop playing dtmf sound after x amount of time,
+                // because mouseup event may not fire properly, in case of
+                // a right-click => contextmenu.
+                window.setTimeout(() => keyTone.stop(), 500)
                 let newVal = app.utils.sanitizeNumber(`${this.number}${key}`)
                 if (newVal) this.$emit('update:model', newVal)
                 if (this.mode === 'dtmf') app.emit('bg:calls:dtmf', {callId: this.call.id, key})
             },
             removeLastNumber: function() {
                 if (this.number) this.$emit('update:model', this.number.substring(0, this.number.length - 1))
-            },
-            unpressKey: function() {
-                if (this.callingDisabled) return
-                window.setTimeout(() => keyTone.stop(), 50)
             },
         }, app.helpers.sharedMethods()),
         mounted: function() {
