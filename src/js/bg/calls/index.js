@@ -23,7 +23,7 @@ class CallsModule extends Module {
         // made when the websocket connection is gone.
         this.reconnect = true
         // The default connection timeout to start with.
-        this.retryDefault = {interval: 2500, limit: 9000000}
+        this.retryDefault = {interval: 1250, limit: 60000, timeout: 1250}
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
         // // Start with a clean state.
@@ -219,7 +219,7 @@ class CallsModule extends Module {
         // Log in with the WebRTC voipaccount when it is enabled.
         // The voipaccount should be from the same client as the logged-in
         // user, or subscribe information won't work.
-        if (settings.webrtc.enabled) {
+        if (settings.webrtc.enabled && (settings.webrtc.account.username && settings.webrtc.account.password)) {
             options.authorizationUser = settings.webrtc.account.username
             options.password = settings.webrtc.account.password
             options.register = true
@@ -450,8 +450,7 @@ class CallsModule extends Module {
 
 
     /**
-    * Init and start a new stack, connecting
-    * SipML5 to the websocket SIP backend.
+    * Initialize the SIPJS UserAgent and register its events.
     */
     connect() {
         // Reconnect when already connected.
@@ -517,12 +516,21 @@ class CallsModule extends Module {
 
 
         this.ua.on('disconnected', () => {
+            // Don't use SIPJS simpler reconnect logic, which doesn't have
+            // jitter and an increasing timeout.
+            this.ua.stop()
             this.app.setState({calls: {ua: {state: 'disconnected'}}})
             this.app.logger.info(`${this}ua disconnected`)
 
             if (this.reconnect) {
-                this.app.logger.debug(`${this}reconnecting ua`)
-                this.connect()
+                // Increase the timeout in case the user doesn't have
+                // a connection and to circumvent hammering the websocket
+                // backend.
+                this.app.logger.debug(`${this}ua reconnecting in ${this.retry.timeout} ms`)
+                setTimeout(() => this.connect(), this.retry.timeout)
+                this.retry = this.app.timer.increaseTimeout(this.retry)
+            } else {
+                this.retry = this.retryDefault
             }
         })
 
@@ -567,9 +575,11 @@ class CallsModule extends Module {
     */
     disconnect(reconnect = true) {
         this.reconnect = reconnect
+        // Directly try to reconnect.
+        if (reconnect) this.retry.timeout = 0
         if (this.ua && this.ua.isConnected()) {
             this.ua.stop()
-            this.app.logger.debug(`${this}disconnected ua`)
+            this.app.logger.debug(`${this}ua disconnected`)
         }
     }
 

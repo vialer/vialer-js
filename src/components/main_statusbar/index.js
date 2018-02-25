@@ -3,30 +3,6 @@ module.exports = (app) => {
     return {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
-            classes: function(block) {
-                let classes = {}
-                if (block === 'indicator') {
-                    if (this.ua.state === 'disconnected') {
-                        classes['icon-disconnected'] = true
-                    } else if (this.ua.state === 'connected') {
-                        classes.connected = true
-                        classes['icon-vialer-icon'] = true
-                    } else if (this.ua.state === 'registered') {
-                        if (this.settings.webrtc.permission) {
-                            classes.registered = true
-                            classes['icon-vialer-icon'] = true
-                        } else {
-                            classes['microphone-denied'] = true
-                            classes.fa = true
-                            classes['fa-microphone'] = true
-                        }
-                    } else if (this.ua.state === 'registration_failed') {
-                        classes['icon-disconnected'] = true
-                        classes['registration-failed'] = true
-                    }
-                }
-                return classes
-            },
             logout: app.helpers.logout,
             refreshApiData: function() {
                 this.$notify({icon: 'refresh', message: `${app.$t('Reloaded application data')}...`, type: 'success'})
@@ -41,12 +17,14 @@ module.exports = (app) => {
                 if (block === 'indicator') {
                     title += `${this.$t('Status:')} `
                     if (this.ua.state === 'disconnected') title += this.$t('disconnected')
-                    else if (this.ua.state === 'connected') title += this.$t('connected')
-                    else if (this.ua.state === 'registered') {
+                    else if (this.ua.state === 'connected') {
+                        title += `${this.$t('connected')} (${this.$t('ConnectAB')})`
+                    } else if (this.ua.state === 'registered') {
                         title += this.$t('registered')
                         if (!this.settings.webrtc.permission) {
                             title += ` (${this.$t('no microphone access')})`
                         } else if (this.dnd) title += ` (${this.$t('Do not Disturb')})`
+                        else title += ` (${this.$t('WebRTC')})`
                     } else if (this.ua.state === 'registration_failed') title += this.$t('registration failed')
                 }
                 return title

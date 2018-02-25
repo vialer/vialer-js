@@ -1,5 +1,5 @@
 const Presence = require('./index')
-
+const SUBSCRIBE_DELAY = 150
 
 class PresenceSip extends Presence {
 
@@ -10,13 +10,22 @@ class PresenceSip extends Presence {
 
 
     /**
-    * Subscribe to the SIP server.
+    * Subscribe to the SIP server. Use a subscription delay
+    * to prevent the server from being hammered.
+    * @returns {Promise} - Resolves when ready.
     */
-    async subscribe() {
-        this.subscription = this.calls.ua.subscribe(`${this.contact.state.id}@voipgrid.nl`, 'dialog')
-        this.subscription.on('notify', (notification) => {
-            const state = this.stateFromDialog(notification)
-            this.contact.setState({state: state})
+    subscribe() {
+        return new Promise((resolve, reject) => {
+            this.subscription = this.calls.ua.subscribe(`${this.contact.state.id}@voipgrid.nl`, 'dialog')
+            this.subscription.on('notify', (notification) => {
+                const state = this.stateFromDialog(notification)
+                this.contact.setState({state: state})
+                setTimeout(() => {
+                    resolve({
+                        state: state,
+                    })
+                }, SUBSCRIBE_DELAY)
+            })
         })
     }
 

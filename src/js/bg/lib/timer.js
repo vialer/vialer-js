@@ -40,14 +40,10 @@ class Timer {
     */
     increaseTimeout(retry) {
         // Make sure that interval doesn't go past the limit.
-        if (retry.interval * 2 < retry.limit) {
-            retry.interval = retry.interval * 2
-        } else {
-            retry.interval = retry.limit
-        }
+        if (retry.interval * 2 < retry.limit) retry.interval = retry.interval * 2
+        else retry.interval = retry.limit
 
         retry.timeout = retry.interval + jitter(retry.interval, 30)
-        if (this.app.verbose) this.app.logger.debug(`${this}increase timeout to '${retry.timeout}'`)
         return retry
     }
 

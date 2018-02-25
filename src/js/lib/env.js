@@ -3,6 +3,7 @@
 */
 module.exports = (function() {
     let env = {
+        isBrowser: false,
         isChrome: false,
         isEdge: false,
         isElectron: false,
@@ -31,9 +32,13 @@ module.exports = (function() {
         env.isChrome = true
     }
 
-    if (navigator.platform.match(/(Linux)/i)) env.isLinux = true
-    else if (navigator.platform.match(/(Mac)/i)) env.isMacOS = true
-    else if (navigator.platform.match(/(Windows)/i)) env.isWindows = true
+    if (global.navigator) {
+        env.isBrowser = true
+
+        if (navigator.platform.match(/(Linux)/i)) env.isLinux = true
+        else if (navigator.platform.match(/(Mac)/i)) env.isMacOS = true
+        else if (navigator.platform.match(/(Windows)/i)) env.isWindows = true
+    }
 
     try {
         if ((chrome && chrome.extension) || (browser && browser.extension)) {

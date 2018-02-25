@@ -98,24 +98,6 @@ class App extends Skeleton {
                 state[moduleName] = this.modules[moduleName]._initialState()
             }
         }
-        // Generic non-module state.
-        Object.assign(state, {
-            app: {
-                installed: true,
-                name: process.env.APP_NAME,
-                updated: false,
-                vendor: {
-                    name: process.env.VENDOR_NAME,
-                    support: process.env.VENDOR_SUPPORT,
-                    type: process.env.VENDOR_TYPE,
-                },
-                version: {
-                    current: process.env.VERSION,
-                    previous: process.env.VERSION,
-                },
-            },
-            notifications: [],
-        })
 
         return state
     }

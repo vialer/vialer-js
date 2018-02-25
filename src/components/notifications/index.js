@@ -9,10 +9,10 @@ module.exports = function(app) {
                 notification.id = idCounter
                 idCounter += 1
 
-                this.$store.notifications.push(notification)
+                this.$store.app.notifications.push(notification)
                 if (typeof notification.timeout === 'number' && notification.timeout > 0) {
                     setTimeout(() => {
-                        this.$store.notifications = this.$store.notifications.filter((i) => i.id !== notification.id)
+                        this.$store.app.notifications = this.$store.app.notifications.filter((i) => i.id !== notification.id)
                     }, notification.timeout)
                 }
             }
@@ -27,14 +27,14 @@ module.exports = function(app) {
                 return cssClasses
             },
             close: function(notification) {
-                this.$store.notifications = this.$store.notifications.filter((i) => i.id !== notification.id)
+                this.$store.app.notifications = this.$store.app.notifications.filter((i) => i.id !== notification.id)
             },
         },
         props: ['notification'],
         render: templates.notifications.r,
         staticRenderFns: templates.notifications.s,
         store: {
-            notifications: 'notifications',
+            notifications: 'app.notifications',
         },
     }
 }

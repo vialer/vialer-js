@@ -56,6 +56,12 @@ class ContactsModule extends Module {
         for (let contactData of contacts) {
             this.contacts[contactData.account_id] = new ContactSip(this.app, contactData)
         }
+
+        if (['registered', 'connected'].includes(this.app.state.calls.ua.state)) {
+            for (let contactId of Object.keys(this.contacts)) {
+                await this.contacts[contactId].presence.subscribe()
+            }
+        }
     }
 
 

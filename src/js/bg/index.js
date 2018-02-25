@@ -38,7 +38,7 @@ class BackgroundApp extends App {
         this.api.setupClient(this.state.user.username, this.state.user.password)
         // Continue last session if credentials are available.
         if (this.state.user.authenticated) {
-            this.logger.info(`${this}assume authentication with existing credentials`)
+            this.logger.info(`${this}continuing logged in session`)
             this._platformData()
             this.modules.calls.connect()
             this.setState({ui: {menubar: {default: 'active', event: null}}})
@@ -46,7 +46,6 @@ class BackgroundApp extends App {
 
         if (this.env.isExtension) {
             this.setState({ui: {visible: false}})
-
             // Fired when the popup opens..
             browser.runtime.onConnect.addListener((port) => {
                 this.setState({ui: {visible: true}})
@@ -143,6 +142,7 @@ class BackgroundApp extends App {
 
 function startApp(options) {
     options.modules = [
+        {Module: require('./app'), name: 'app'},
         {Module: require('./availability'), name: 'availability'},
         {Module: require('./calls'), name: 'calls'},
         {Module: require('./contacts'), name: 'contacts'},
