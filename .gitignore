@@ -7,5 +7,6 @@ docs/build
 .vialer-jsrc
 .directory
 src/brand/*
+src/brand/vialer/icons/
 !src/brand/vialer/
 !src/brand/vialer/*.*
