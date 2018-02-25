@@ -11,9 +11,14 @@
     .list-item {
         &.contact {
             .icon-availability {
-                color: $grey-color;
                 height: $spacer * 2.5;
                 width: $spacer * 2.5;
+
+                &.unavailable,
+                &.no-results {
+                    path[pid="0"] {fill: $grey-color;}
+                    path[pid="1"] {fill: $white;}
+                }
 
                 &.busy {
                     path[pid="0"] {fill: $red-color;}

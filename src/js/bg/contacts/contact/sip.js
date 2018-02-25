@@ -10,7 +10,7 @@ class ContactSip extends Contact {
             id: state.account_id,
             name: state.callerid_name,
             number: state.internal_number,
-            state: '',
+            status: 'unavailable',
             userAgent: state.sipreginfo.useragent,
         }
 

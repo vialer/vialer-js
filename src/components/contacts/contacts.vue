@@ -8,7 +8,7 @@
     <ul class="list-items">
         <li class="list-item contact" v-for="contact in filteredContacts" :key="contact.id" :class="{'disabled': calls.length}">
             <div class="status-icon">
-                <svgicon class="icon-availability" name="availability" :class="contact.state"/>
+                <svgicon class="icon-availability" name="availability" :class="contact.status"/>
             </div>
             <div class="info">
                 <div class="name">{{contact.name}}</div>
@@ -19,7 +19,7 @@
                     <svgicon name="transfer"/>
                 </div>
                 <div class="rounded-button" v-if="callsReady && !transferStatus" v-on:click="createCall(contact.number)">
-                    <svgicon name="phone" :class="contact.state"/>
+                    <svgicon name="phone" :class="contact.status"/>
                 </div>
             </div>
         </li>

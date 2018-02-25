@@ -60,6 +60,10 @@ module.exports = (app) => {
                 window.setTimeout(() => keyTone.stop(), 50)
             },
         }, app.helpers.sharedMethods()),
+        mounted: function() {
+            // Focus the input element directly.
+            this.$refs.input.focus()
+        },
         props: {
             call: {default: null},
             display: {default: 'expanded', type: String},

@@ -20,6 +20,7 @@ module.exports = (app) => {
         staticRenderFns: templates.login.s,
         store: {
             app: 'app',
+            url: 'settings.platform.url',
             user: 'user',
             vendor: 'app.vendor',
         },
