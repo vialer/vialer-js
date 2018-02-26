@@ -37,17 +37,25 @@ class ObserverFrame extends Skeleton {
         * Triggered when the user logs out or when the click2dial
         * setting is modified from the popup.
         */
-        this.on('observer:toggle', ({enabled}) => {
-            if (enabled) {
-                this.processPage()
+        this.on('observer:click2dial:toggle', ({enabled, numbers}) => {
+            if (numbers.length) {
+                // Target a specific number/icon.
+                for (let number of numbers) {
+                    if (enabled) for (let node of $$(`.ctd-icon-${number}`)) node.classList.remove('disabled')
+                    else for (let node of $$(`.ctd-icon-${number}`)) node.classList.add('disabled')
+                }
             } else {
-                if (this.observer) this.observer.disconnect()
-                // Remove icons.
-                this.revertInsertedIcons()
-                this.stylesheet.remove()
+                // For the whole page.
+                if (enabled) {
+                    this.processPage()
+                } else {
+                    if (this.observer) this.observer.disconnect()
+                    // Remove icons.
+                    this.revertInsertedIcons()
+                    this.stylesheet.remove()
+                }
             }
         })
-
 
         /**
         * Signal the background that the observer has been loaded and is
@@ -266,10 +274,7 @@ class ObserverFrame extends Skeleton {
         }
 
         if (this.observer) {
-            this.observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-            })
+            this.observer.observe(document.body, {childList: true, subtree: true})
         }
     }
 
@@ -279,11 +284,8 @@ class ObserverFrame extends Skeleton {
     */
     processPage() {
         this.logger.debug(`${this}start observing`)
-        // Inject our print stylesheet.
         $('head').appendChild(this.stylesheet)
-        // Insert icons.
         this.insertIconInDom()
-        // Start listening to DOM mutations.
         this.observePage()
     }
 

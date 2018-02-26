@@ -209,6 +209,8 @@ class Call {
 
         window.setTimeout(() => {
             this.busyTone.stop()
+            // Signal browser tabs to re-enable the icon(s) for this number again.
+            if (this.app.env.isExtension) this.app.modules.extension.tabs.toggleIcons(true, [this.state.number])
             this.module.deleteCall(this)
         }, timeout)
     }

@@ -79,13 +79,14 @@ class Tabs {
     * This will toggle Click-to-dial icons and the
     * accompanying DOM observer in each tab on or off.
     * @param {Boolean} enable - Whether to switch it on or off.
+    * @param {Number} [number] - Target a specific icon by number.
     */
-    toggleIcons(enable) {
+    toggleIcons(enable, numbers = []) {
         browser.tabs.query({}).then((tabs) => {
             tabs.forEach((tab) => {
                 if (this.tabIconsEnabled(tab) && enable) {
-                    this.app.emit('observer:toggle', {enabled: true, frame: 'observer'}, false, tab.id)
-                } else this.app.emit('observer:toggle', {enabled: false, frame: 'observer'}, false, tab.id)
+                    this.app.emit('observer:click2dial:toggle', {enabled: true, frame: 'observer', numbers}, false, tab.id)
+                } else this.app.emit('observer:click2dial:toggle', {enabled: false, frame: 'observer', numbers}, false, tab.id)
             })
         })
     }
