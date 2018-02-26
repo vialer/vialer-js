@@ -27,7 +27,7 @@ module.exports = {
                 k = decode(e[1])
                 v = decode(e[2])
                 if (params[k] !== undefined) {
-                    if (!$.isArray(params[k])) {
+                    if (!Array.isArray(params[k])) {
                         params[k] = [params[k]]
                     }
                     params[k].push(v)
