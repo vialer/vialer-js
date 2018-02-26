@@ -28,7 +28,6 @@ class ObserverFrame extends Skeleton {
         this.stylesheet.setAttribute('rel', 'stylesheet')
         this.stylesheet.setAttribute('href', browser.runtime.getURL('css/observer.css'))
         $('head').appendChild(this.stylesheet)
-
         /**
         * Toggle listening to DOM mutations and adding icons to the tab.
         * Triggered when the user logs out or when the click2dial
@@ -40,7 +39,7 @@ class ObserverFrame extends Skeleton {
             } else {
                 if (this.observer) this.observer.disconnect()
                 // Remove icons.
-                this.revertCtdIcons()
+                this.revertInsertedIcons()
                 this.stylesheet.remove()
             }
         })
@@ -87,6 +86,10 @@ class ObserverFrame extends Skeleton {
                 e.preventDefault()
                 const data = e.target.dataset
                 if (data.number) this.emit('bg:calls:call_create', {number: data.number, start: true})
+                // Immediatly disable all the icons for this number.
+                for (let node of $$(`.ctd-icon-${data.number}`)) {
+                    node.classList.add('disabled')
+                }
             }
         })
     }
@@ -100,24 +103,70 @@ class ObserverFrame extends Skeleton {
     */
     createNumberIconElement(number) {
         let icon = document.createElement('ctdicon')
-        icon.classList.add('ctd-icon')
-
-        // let icon = this.iconElement.cloneNode(false)
-        // Add properties unique for "number".
+        icon.classList.add('ctd-icon', `ctd-icon-${number}`)
         icon.setAttribute('data-number', number)
-        icon.classList.add(`ctd-icon-${number}`)
         return icon
     }
 
 
-    doInsert(root) {
-        let pause = !!root
+    /**
+    * Escape HTML chars when assigning text to innerHTML.
+    * @param {String} str - The string to escape html from.
+    * @returns {String} - The HTML escaped string.
+    */
+    escapeHTML(str) {
+        const replacements = {
+            '"': '&quot;',
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+        }
+        return str.replace(/[&"<>]/g, (m) => replacements[m])
+    }
+
+
+    /**
+     * Process parked DOM mutations.
+     */
+    handleMutations() {
+        // Copy and clear parkedNodes.
+        let _parkedNodes = this.parkedNodes.slice()
+        this.parkedNodes = []
+        // Handle mutations if it probably isn't too much to handle
+        // (current limit is totally random).
+        if (_parkedNodes.length < 151) {
+            this.logger.debug(`${this}processing ${_parkedNodes.length} parked nodes.`)
+            let batchSize = 40 // random size
+            for (let i = 0; i < Math.ceil(_parkedNodes.length / batchSize); i++) {
+                ((index) => {
+                    setTimeout(() => {
+                        for (let j = index * batchSize; j < (index + 1) * batchSize; j++) {
+                            let node = _parkedNodes[j]
+                            let stillInDocument = document.contains(node) // no lookup costs
+                            if (stillInDocument) {
+                                this.insertIconInDom(node)
+                            }
+                        }
+                    }, 0) // Push back execution to the end on the current event stack.
+                })(i)
+            }
+        }
+    }
+
+
+    /**
+    * Transforms matching phonenumbers in augmented
+    * elements which contain the icon.
+    * @param {Node} [root] - The DOM node to start matching from.
+    */
+    insertIconInDom(root) {
+        const pause = !!root
         if (pause && this.observer) this.observer.disconnect()
         root = root || document.body
 
         // Walk the DOM looking for elements to parse, but block reasonably
         // sized pages to prevent locking the page.
-        let childrenLength = root.querySelectorAll('*').length // no lookup costs
+        const childrenLength = root.querySelectorAll('*').length // no lookup costs
         if (childrenLength >= 2001) return
 
         this.walker.walkTheDOM(root, (currentNode) => {
@@ -175,68 +224,6 @@ class ObserverFrame extends Skeleton {
 
 
     /**
-    * Injects icons in the page and start observing the page for changes.
-    */
-    processPage() {
-        this.logger.debug(`${this}start observing`)
-        // Inject our print stylesheet.
-        $('head').appendChild(this.stylesheet)
-        // Insert icons.
-        const before = new Date().getTime()
-        this.doInsert()
-        this.logger.debug(`${this}doInsert (processPage) took`, new Date().getTime() - before)
-        // Start listening to DOM mutations.
-        this.observePage()
-    }
-
-
-    /**
-    * Escape HTML chars when assigning text to innerHTML.
-    * @param {String} str - The string to escape html from.
-    * @returns {String} - The HTML escaped string.
-    */
-    escapeHTML(str) {
-        const replacements = {
-            '"': '&quot;',
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-        }
-        return str.replace(/[&"<>]/g, (m) => replacements[m])
-    }
-
-
-
-    /**
-     * Process parked DOM mutations.
-     */
-    handleMutations() {
-        // Copy and clear parkedNodes.
-        let _parkedNodes = this.parkedNodes.slice()
-        this.parkedNodes = []
-        // Handle mutations if it probably isn't too much to handle
-        // (current limit is totally random).
-        if (_parkedNodes.length < 151) {
-            this.logger.debug(`${this}processing ${_parkedNodes.length} parked nodes.`)
-            let batchSize = 40 // random size
-            for (let i = 0; i < Math.ceil(_parkedNodes.length / batchSize); i++) {
-                ((index) => {
-                    setTimeout(() => {
-                        for (let j = index * batchSize; j < (index + 1) * batchSize; j++) {
-                            let node = _parkedNodes[j]
-                            let stillInDocument = document.contains(node) // no lookup costs
-                            if (stillInDocument) {
-                                this.doInsert(node)
-                            }
-                        }
-                    }, 0) // Push back execution to the end on the current event stack.
-                })(i)
-            }
-        }
-    }
-
-
-    /**
      * Observer start: listen for DOM mutations and let `handleMutations`
      * process them.
      */
@@ -251,11 +238,11 @@ class ObserverFrame extends Skeleton {
                 mutations.forEach((mutation) => {
                     // Filter mutations to park.
                     if (mutation.addedNodes.length) {
-                        $.each(mutation.addedNodes, (index, addedNode) => {
-                            if (!this.walker.skipNode(addedNode)) {
-                                this.parkedNodes.push(addedNode)
+                        for (const node of mutation.addedNodes) {
+                            if (!this.walker.skipNode(node)) {
+                                this.parkedNodes.push(node)
                             }
-                        })
+                        }
                     } else if (!mutation.removedNodes.length && mutation.target) {
                         if (!this.walker.skipNode(mutation.target)) {
                             this.parkedNodes.push(mutation.target)
@@ -281,10 +268,24 @@ class ObserverFrame extends Skeleton {
 
 
     /**
+    * Injects icons in the page and start observing the page for changes.
+    */
+    processPage() {
+        this.logger.debug(`${this}start observing`)
+        // Inject our print stylesheet.
+        $('head').appendChild(this.stylesheet)
+        // Insert icons.
+        this.insertIconInDom()
+        // Start listening to DOM mutations.
+        this.observePage()
+    }
+
+
+    /**
      * Restore the original numbers by replacing all ctd nodes with a new
      * text node containing the phonenumber.
      */
-    revertCtdIcons() {
+    revertInsertedIcons() {
         $$('ctd').forEach((el) => {
             el.parentNode.replaceChild(document.createTextNode(el.dataset.original), el)
         })
