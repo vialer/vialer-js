@@ -2,7 +2,11 @@
 
 .settings-component {
     background: none;
-    padding-top: 0;
+
+    // A bit more specific selector to keep the tab space at the top a bit dense.
+    &.panel-content-container.panel-content {
+        padding-top: 0;
+    }
 
     .ringtone {
         align-items: flex-end;

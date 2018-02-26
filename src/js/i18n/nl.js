@@ -12,7 +12,7 @@ global.translations.nl = {
     'Availability': 'Bereikbaarheid',
     'Availability options': 'Bereikbaarheidsvoorkeuren',
     'Call %s with {vendor} user': 'Bel %s met {vendor} gebruiker',
-    'Call %s with WebRTC': 'Bel %s met WebRTC',
+    'Call %s with softphone': 'Bel %s met softphone',
     'Call ended': 'Gesprek beëindigd',
     'Callee is busy': 'Beller is bezet',
     'callgroups': 'belgroepen',

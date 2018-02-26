@@ -44,7 +44,7 @@ class Tabs {
                     this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'SIP'}, true)
                     browser.browserAction.openPopup((window) => {})
                 },
-                title: this.app.$t('Call %s with WebRTC'),
+                title: this.app.$t('Call %s with softphone'),
             })
         }
 
@@ -62,6 +62,7 @@ class Tabs {
 
     tabIconsEnabled(tab) {
         if (!this.app.state.user.authenticated) return false
+        if (!this.app.state.settings.click2dial.enabled) return false
         // Test if one of the blacklisted sites matches.
         let allowedUrl = true
         for (let blacklistRegex of this.app.state.settings.click2dial.blacklist) {
