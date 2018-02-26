@@ -37,7 +37,6 @@ class Store {
 
 
     set(key, value) {
-        if (this.app.verbose) this.app.logger.debug(`${this}set ${value} for ${key}`)
         localStorage.setItem(key, JSON.stringify(value))
     }
 

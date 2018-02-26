@@ -208,9 +208,6 @@ class CallsModule extends Module {
                 },
                 modifiers: [this._formatSdp],
             },
-            stunServers: [
-                'stun.voipgrid.nl',
-            ],
             traceSip: false,
             userAgentString: this._userAgent(),
             wsServers: [`wss://${settings.sipEndpoint}`],

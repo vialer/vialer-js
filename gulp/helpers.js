@@ -71,20 +71,23 @@ class Helpers {
                     const api = this.settings.brands[brandName].store.chrome
                     const zipFile = fs.createReadStream(`./dist/${brandName}/${buildType}/${distributionName}.zip`)
 
-                    let extensionId
-                    // Deploy to production or test environment, based on DEPLOY_TARGET.
-                    if (this.settings.DEPLOY_TARGET === 'production') extensionId = api.extensionId
-                    else if (this.settings.DEPLOY_TARGET === 'beta') extensionId = api.extensionId_beta
+                    let res, token
 
                     const webStore = require('chrome-webstore-upload')({
                         clientId: api.clientId,
                         clientSecret: api.clientSecret,
-                        extensionId: extensionId,
+                        // (!) Deploys to production, alpha or beta environment.
+                        extensionId: api[`extensionId_${this.settings.DEPLOY_TARGET}`],
                         refreshToken: api.refreshToken,
                     })
 
-                    const token = await webStore.fetchToken()
-                    const res = await webStore.uploadExisting(zipFile, token)
+                    try {
+                        token = await webStore.fetchToken()
+                        res = await webStore.uploadExisting(zipFile, token)
+                    } catch (err) {
+                        gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+                    }
+
 
                     if (res.uploadState !== 'SUCCESS') {
                         gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
@@ -143,11 +146,8 @@ class Helpers {
     * @returns {String} - The distribution name to use.
     */
     distributionName(brandName) {
-        let distributionName = `${brandName}-${this.settings.PACKAGE.version}`
-        if (this.settings.DEPLOY_TARGET === 'beta') {
-            distributionName += '-beta'
-        }
-        return distributionName
+        let name = this.settings.brands[brandName].name[this.settings.DEPLOY_TARGET]
+        return `${name}-${this.settings.PACKAGE.version}`
     }
 
 
@@ -172,12 +172,8 @@ class Helpers {
     getManifest(brandName, buildType) {
         const PACKAGE = require('../package')
         let manifest = require('../src/manifest.json')
-        // The 16x16px icon is used for the context menu.
-        // It is different from the logo.
-        manifest.name = this.settings.brands[brandName].name
-        // Distinguish between the test-version and production
-        // by adding a `beta` postfix.
-        if (this.settings.DEPLOY_TARGET === 'beta') manifest.name = `${manifest.name}-beta`
+        // Distinguish between the test-version and production name.
+        manifest.name = this.settings.brands[brandName].name[this.settings.DEPLOY_TARGET]
 
         if (buildType === 'edge') {
             manifest.background.persistent = true
@@ -188,18 +184,25 @@ class Helpers {
             }
         } else if (buildType === 'firefox') {
             // The id_beta property should not end up in the manifest.
-            let betaId = this.settings.brands[brandName].store.firefox.gecko.id_beta
+            let storeIds = {
+                alpha: this.settings.brands[brandName].store.firefox.gecko.id_alpha,
+                beta: this.settings.brands[brandName].store.firefox.gecko.id_beta,
+                production: this.settings.brands[brandName].store.firefox.gecko.id_production,
+            }
+            // Make sure these don't end up in the manifest.
+            delete this.settings.brands[brandName].store.firefox.gecko.id_alpha
             delete this.settings.brands[brandName].store.firefox.gecko.id_beta
+            delete this.settings.brands[brandName].store.firefox.gecko.id_production
 
             manifest.applications = {
                 gecko: this.settings.brands[brandName].store.firefox.gecko,
             }
             // The deploy target for Firefox is specified in the manifest,
             // instead of being passed with the API call to the store.
-            if (this.settings.DEPLOY_TARGET === 'beta') manifest.applications.gecko.id = betaId
+            manifest.applications.gecko.id = storeIds[this.settings.DEPLOY_TARGET]
         }
 
-        manifest.browser_action.default_title = this.settings.brands[brandName].name
+        manifest.browser_action.default_title = manifest.name
         // Make sure this permission is not pushed multiple times
         // to the same manifest.
         if (!manifest.permissions.includes(this.settings.brands[brandName].permissions)) {
@@ -248,7 +251,7 @@ class Helpers {
             .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
             .pipe(envify({
                 ANALYTICS_ID: this.settings.brands[brandName].analytics_id[buildType],
-                APP_NAME: this.settings.brands[brandName].name,
+                APP_NAME: this.settings.brands[brandName].name.production,
                 HOMEPAGE: this.settings.brands[brandName].homepage_url,
                 NODE_ENV: this.settings.NODE_ENV,
                 PLATFORM_URL: this.settings.brands[brandName].permissions,

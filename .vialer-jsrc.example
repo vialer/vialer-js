@@ -4,8 +4,11 @@
             "permissions": "https://partner.voipgrid.nl/",
             "sip_endpoint": "websocket.voipgrid.nl",
             "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
-            "name": "Vialer",
-
+            "name": {
+                "alpha": "Vialer-alpha",
+                "beta": "Vialer-beta",
+                "production": "Vialer"
+            },
             "vendor": {
                 "name": "Vialer",
                 "support": "support@email",
@@ -30,16 +33,18 @@
             "store": {
                 "firefox": {
                     "gecko": {
-                        "id": "",
+                        "id_alpha": "",
                         "id_beta": "",
+                        "id_production": "",
                          "strict_min_version": "50.0"
                     },
                     "apiKey": "",
                     "apiSecret": ""
                 },
                 "chrome": {
-                    "extensionId": "",
+                    "extensionId_alpha": "",
                     "extensionId_beta": "",
+                    "extensionId_production": "",
                     "clientId": "",
                     "clientSecret": "",
                     "refreshToken": ""

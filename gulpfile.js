@@ -43,9 +43,10 @@ if (!settings.BUILD_TARGETS.includes(settings.BUILD_TARGET)) {
     process.exit(0)
 }
 
-settings.DEPLOY_TARGET = argv.deploy ? argv.deploy : 'beta'
+// Default deploy target is `alpha` because it has the least impact.
+settings.DEPLOY_TARGET = argv.deploy ? argv.deploy : 'alpha'
 // Exit when the deploy target is not in the allowed list.
-if (!['production', 'beta'].includes(settings.DEPLOY_TARGET)) {
+if (!['alpha', 'beta', 'production'].includes(settings.DEPLOY_TARGET)) {
     gutil.log(`Invalid deployment target: '${settings.DEPLOY_TARGET}'`)
     process.exit(0)
 }
