@@ -195,11 +195,12 @@ class Helpers {
             delete this.settings.brands[brandName].store.firefox.gecko.id_production
 
             manifest.applications = {
-                gecko: this.settings.brands[brandName].store.firefox.gecko,
+                gecko: {
+                    // (!) Deploys to production, alpha or beta environment.
+                    id: this.settings.brands[brandName].store.firefox.gecko[`id_${this.settings.DEPLOY_TARGET}`],
+                    strict_min_version: this.settings.brands[brandName].store.firefox.gecko.strict_min_version,
+                },
             }
-            // The deploy target for Firefox is specified in the manifest,
-            // instead of being passed with the API call to the store.
-            manifest.applications.gecko.id = storeIds[this.settings.DEPLOY_TARGET]
         }
 
         manifest.browser_action.default_title = manifest.name
