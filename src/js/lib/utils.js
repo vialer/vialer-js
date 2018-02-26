@@ -46,7 +46,8 @@ module.exports = {
     * @returns {String} - The cleaned number.
     */
     sanitizeNumber(number) {
-        number = String(number).replace(/[^\d|!+|!*|!#]/g, '')
+        number = String(number).replace('+', '00')
+        number = number.replace(/[^\d|!*|!#]/g, '')
         return number
     },
 

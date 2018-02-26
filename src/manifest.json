@@ -62,16 +62,6 @@
                 "<all_urls>"
             ],
             "js": [
-                "js/app_tab.js"
-            ],
-            "run_at": "document_end",
-            "all_frames": false
-        },
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
                 "js/app_observer.js"
             ],
             "run_at": "document_end",

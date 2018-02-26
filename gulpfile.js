@@ -366,7 +366,6 @@ gulp.task('js-webext', 'Generate WebExtension application.', [], (done) => {
         'js-app-bg',
         'js-app-fg',
         'js-app-observer',
-        'js-app-tab',
     ], 'manifest', () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
         done()
@@ -381,14 +380,9 @@ gulp.task('js-app-fg', 'Generate webextension fg/popout js.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', [], done)
 }, {options: taskOptions.browser})
 
-gulp.task('js-app-observer', 'Generate WebExtension observer js that runs in all tab frames.', (done) => {
+gulp.task('js-app-observer', 'Generate WebExtension icon observer which runs in all tab frames.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', [], done)
 }, {options: taskOptions.browser})
-
-gulp.task('js-app-tab', 'Generate webextension tab js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'tab/index', 'app_tab', [], done)
-}, {options: taskOptions.browser})
-
 
 
 gulp.task('manifest', 'Create a browser-specific manifest file.', async() => {

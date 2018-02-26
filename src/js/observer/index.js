@@ -3,8 +3,12 @@
 global.$ = document.querySelector.bind(document)
 global.$$ = document.querySelectorAll.bind(document)
 
+global.EventEmitter = require('eventemitter3')
+
+
 const Skeleton = require('../lib/skeleton')
 const Walker = require('./walker')
+const utils = require('../lib/utils')
 
 
 /**
@@ -84,9 +88,12 @@ class ObserverFrame extends Skeleton {
             } else if (e.target.nodeName === 'CTDICON') {
                 // Handle clicking on injected c2d icons.
                 e.preventDefault()
+                // Skip disabled icons.
+                if (e.target.classList.contains('disabled')) return
                 const data = e.target.dataset
                 if (data.number) this.emit('bg:calls:call_create', {number: data.number, start: true})
                 // Immediatly disable all the icons for this number.
+                console.log("NUMBER TO CALL:", data.number)
                 for (let node of $$(`.ctd-icon-${data.number}`)) {
                     node.classList.add('disabled')
                 }
@@ -102,6 +109,7 @@ class ObserverFrame extends Skeleton {
     * @returns {Node} - Newly created p element.
     */
     createNumberIconElement(number) {
+        number = utils.sanitizeNumber(number)
         let icon = document.createElement('ctdicon')
         icon.classList.add('ctd-icon', `ctd-icon-${number}`)
         icon.setAttribute('data-number', number)
