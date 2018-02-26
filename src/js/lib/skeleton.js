@@ -138,9 +138,7 @@ class Skeleton extends EventEmitter {
                 // ignored, because otherwise all events emitted on the tab will
                 // also be processed by the callstatus and observer scripts.
                 if (this.env.role.callstatus || this.env.role.observer) {
-                    if (this.env.role.callstatus && message.data.frame && message.data.frame === 'callstatus') {
-                        this.emit(message.event, message.data, true)
-                    } else if (this.env.role.observer && message.data.frame && message.data.frame === 'observer') {
+                    if (this.env.role.observer && message.data.frame && message.data.frame === 'observer') {
                         this.emit(message.event, message.data, true)
                     }
                 } else {

@@ -1,0 +1,41 @@
+// Entrypoint for vialer-js observer SCSS.
+@media print {
+    .vialer-icon {
+        display: none;
+    }
+}
+
+@media screen {
+    html {
+        body {
+            ctd {
+                align-items: center;
+                display: inline-flex;
+                flex-direction: row;
+                justify-content: flex-start;
+
+                ctdicon.ctd-icon {
+                    background-color: transparent;
+                    background-image: url("../img/click-to-dial.png");
+                    background-position: center center;
+                    background-repeat: no-repeat;
+                    border-radius: 9px;
+                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+                    display: inline-block;
+                    height: 18px;
+                    line-height: inherit;
+                    margin: 0 4px;
+                    margin-top: -2px;
+                    padding: 0;
+                    width: 18px;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+
+
+}

@@ -80,9 +80,9 @@ function initApp(initParams) {
     initParams.modules = []
     const app = new ForegroundApp(initParams)
 
-    if (app.env.isChrome) $('html').addClass('chrome')
-    if (app.env.isEdge) $('html').addClass('edge')
-    if (app.env.isFirefox) $('html').addClass('firefox')
+    if (app.env.isChrome) $('html').classList.add('chrome')
+    if (app.env.isEdge) $('html').classList.add('edge')
+    if (app.env.isFirefox) $('html').classList.add('firefox')
 
     if (app.env.isMacOS) {
         // Forces height recalculation of the popup in Chrome OSX.

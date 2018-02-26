@@ -5,13 +5,16 @@ module.exports = (app) => {
     // we detect the mouseup event on the window tag as opposed to the li
     // tag because otherwise if we release the mouse when not over a button,
     // the tone will remain playing.
-    $(window).on('mouseup touchend', function() {
+    function stopKeypress() {
         if (keyTone.status) {
             window.setTimeout(() => {
                 keyTone.stop()
             }, 50)
         }
-    })
+    }
+
+    document.addEventListener('mouseup', stopKeypress)
+    document.addEventListener('touchend', stopKeypress)
 
     return {
         computed: Object.assign({

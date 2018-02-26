@@ -1,12 +1,10 @@
 /** @module Observer */
 
+global.$ = document.querySelector.bind(document)
+global.$$ = document.querySelectorAll.bind(document)
 
 const Skeleton = require('../lib/skeleton')
 const Walker = require('./walker')
-
-// Identify our elements with these class names.
-const phoneElementClassName = 'vialer-phone-number'
-const phoneIconClassName = 'vialer-icon'
 
 
 /**
@@ -26,25 +24,27 @@ class ObserverFrame extends Skeleton {
         this.observer = null
         this.handleMutationsTimeout = null
         this.parkedNodes = []
-        this.printStyle = $(`<link rel="stylesheet" href="${browser.runtime.getURL('css/print.css')}" media="print">`)
+        this.stylesheet = document.createElement('link')
+        this.stylesheet.setAttribute('rel', 'stylesheet')
+        this.stylesheet.setAttribute('href', browser.runtime.getURL('css/observer.css'))
+        $('head').appendChild(this.stylesheet)
 
         /**
-        * Stop listening to DOM mutations. Triggered when
-        * the user logs out.
+        * Toggle listening to DOM mutations and adding icons to the tab.
+        * Triggered when the user logs out or when the click2dial
+        * setting is modified from the popup.
         */
-        this.on('observer:disable', (data) => {
-            if (this.observer) this.observer.disconnect()
-            // Remove icons.
-            this.restorePhonenumbers()
-            // Remove our stylesheet.
-            $(this.printStyle).remove()
+        this.on('observer:toggle', ({enabled}) => {
+            if (enabled) {
+                this.processPage()
+            } else {
+                if (this.observer) this.observer.disconnect()
+                // Remove icons.
+                this.revertCtdIcons()
+                this.stylesheet.remove()
+            }
         })
 
-
-        // Manually trigger to observe the current tab.
-        this.on('observer:enable', (data) => {
-            this.processPage()
-        })
 
         /**
         * Signal the background that the observer has been loaded and is
@@ -56,119 +56,39 @@ class ObserverFrame extends Skeleton {
                 if (!observe) return
 
                 if (window !== window.top && !(document.body.offsetWidth > 0 || document.body.offsetHeight > 0)) {
-                    // this.Wait for this hidden iframe to become visible, before
-                    // starting the observer.
-                    $(window).on('resize', () => {
+                    // This is a hidden iframe. We wait for it to become visible,
+                    // before starting the observer.
+                    const resizeListener = (e) => {
                         this.processPage()
-                        // No reason to wait for more resize events.
-                        $(window).off('resize')
-                    })
+                        window.removeEventListener('resize', resizeListener)
+                    }
+                    this.resizeListener = window.addEventListener('resize', resizeListener)
                 } else {
                     this.processPage()
                 }
             },
         })
 
-        /**
-        * Handle a click on a click-to-dial icon next to a phonenumber within
-        * a tab. Use the number in the attribute `data-number`.
-        */
-        $('body').on('click', `.${phoneIconClassName}`, (e) => {
-            // Don't process the click when the icon has
-            // a disabled property set.
-            if ($(e.currentTarget).attr('disabled')) {
-                e.preventDefault()
-                return
-            }
-
-            if ($(e.currentTarget).attr('data-number') &&
-                $(e.currentTarget).parents(`.${phoneElementClassName}`).length) {
-                // Disable all c2d icons until the tab is notified
-                // by the callstatus that it wants to close again.
-                // $(`.${phoneIconClassName}`).each((i, el) => {
-                //     $(el).attr('disabled', true)
-                // })
-                $(e.currentTarget).blur()
-
-                // Don't do anything with this click in the actual page.
-                e.preventDefault()
-                e.stopPropagation()
-                e.stopImmediatePropagation()
-
-                const number = $(e.currentTarget).attr('data-number')
-                this.emit('bg:calls:call_create', {number: number, start: true})
-            }
-        })
 
         /**
-        * Handle the event when a link is clicked that contains
-        * <a href="tel:"></a>.
+        * Event delegate for the whole page. Respond to <A> tags
+        * and <CTDICON> tags; otherwise just let it pass.
         */
-        $('body').on('click', '[href^="tel:"]', (e) => {
-            $(e.currentTarget).blur()
-            // Don't do anything with this click in the actual page.
-            e.preventDefault()
-            e.stopPropagation()
-            e.stopImmediatePropagation()
-
-            // Dial the b_number.
-            const bNumber = $(e.currentTarget).attr('href').substring(4)
-            this.emit('dialer:dial', {
-                analytics: 'Webpage',
-                b_number: bNumber,
-            })
+        document.addEventListener('click', (e) => {
+            if (e.target.nodeName === 'A') {
+                // Handle links with hrefs starting with `tel:`.
+                const href = e.target.getAttribute('href')
+                if (href.startsWith('tel:')) {
+                    e.preventDefault()
+                    this.emit('bg:calls:call_create', {number: href.substring(4), start: true})
+                }
+            } else if (e.target.nodeName === 'CTDICON') {
+                // Handle clicking on injected c2d icons.
+                e.preventDefault()
+                const data = e.target.dataset
+                if (data.number) this.emit('bg:calls:call_create', {number: data.number, start: true})
+            }
         })
-    }
-
-
-    get iconStyle() {
-        let iconStyle = {
-            '-moz-border-radius': '9px !important',
-            '-moz-box-shadow': '0 1px 1px rgba(0, 0, 0, 0.2) !important',
-            'background-color': 'transparent !important',
-            'background-image': `url("${browser.runtime.getURL('img/click-to-dial.png')}")`,
-            'background-position': 'center center',
-            'background-repeat': 'no-repeat',
-            'border-radius': '9px !important',
-            bottom: '-3px !important',
-            'box-shadow': '0 1px 1px rgba(0, 0, 0, 0.2) !important',
-            display: 'inline-block',
-            height: '18px !important',
-            'line-height': '18px !important',
-            margin: '0 4px !important',
-            padding: '0 !important',
-            position: 'relative !important',
-            width: '18px !important',
-        }
-        let style = ''
-        for (let property in iconStyle) {
-            style += `${property}: ${iconStyle[property]}; `
-        }
-        return style
-    }
-
-
-    /**
-    * Returns a new `<ctd></ctd>` node, that will wrap the phonenumber
-    * and the click-to-dial icon.
-    */
-    get ctdNode() {
-        let ctd = document.createElement('ctd')
-        ctd.setAttribute('style', 'font-style: inherit; font-family: inherit;')
-        ctd.classList.add(phoneElementClassName)
-        return ctd
-    }
-
-
-    /**
-    * Element that shows the icon and triggers a call.
-    */
-    get iconElement() {
-        let a = document.createElement('a')
-        a.setAttribute('style', this.iconStyle)
-        a.setAttribute('href', '')
-        a.classList.add(phoneIconClassName)
-        return a
     }
 
 
@@ -179,14 +99,14 @@ class ObserverFrame extends Skeleton {
     * @returns {Node} - Newly created p element.
     */
     createNumberIconElement(number) {
-        let icon = this.iconElement.cloneNode(false)
+        let icon = document.createElement('ctdicon')
+        icon.classList.add('ctd-icon')
+
+        // let icon = this.iconElement.cloneNode(false)
         // Add properties unique for "number".
         icon.setAttribute('data-number', number)
-        icon.classList.add(`c2d-icon-${number}`)
-        // Wrap in element so ".innerHTML" contains the icon HTML.
-        let wrapper = document.createElement('p')
-        wrapper.appendChild(icon)
-        return wrapper
+        icon.classList.add(`ctd-icon-${number}`)
+        return icon
     }
 
 
@@ -197,54 +117,60 @@ class ObserverFrame extends Skeleton {
 
         // Walk the DOM looking for elements to parse, but block reasonably
         // sized pages to prevent locking the page.
-        let childrenLength = $(root).find('*').length // no lookup costs
-        if (childrenLength < 2001) {
-            this.logger.debug(`${this}scanning ${childrenLength} elements`)
+        let childrenLength = root.querySelectorAll('*').length // no lookup costs
+        if (childrenLength >= 2001) return
 
-            this.walker.walkTheDOM(root, (currentNode) => {
-                // Scan using every available parser.
-                this.parsers.forEach((localeParser) => {
-                    let parser = localeParser[1]()
-                    // Transform Text node to HTML-capable node, to
-                    // - deal with html-entities (&nbsp;, &lt;, etc.) since
-                    // they mess up the start/end from matches when reading
-                    // from node.data, and
-                    // - enable inserting the icon html
-                    // (doesn't work with a text node)
-                    let replacementNode = this.ctdNode.cloneNode(false)
-                    replacementNode.textContent = currentNode.data
-                    replacementNode.innerHTML = this.escapeHTML(currentNode.data)
+        this.walker.walkTheDOM(root, (currentNode) => {
+            // Scan using every available parser.
+            this.parsers.forEach((localeParser) => {
+                const parser = localeParser[1]()
+                // Transform Text node to HTML-capable node, to
+                // - deal with html-entities (&nbsp;, &lt;, etc.) since
+                // they mess up the start/end from matches when reading
+                // from node.data, and
+                // - enable inserting the icon html
+                // (doesn't work with a text node)
+                const ctdNode = document.createElement('ctd')
+                ctdNode.classList.add('ctd-phone-number')
+                // ctdNode.textContent = currentNode.data
+                const nodeData = this.escapeHTML(currentNode.data)
+                const matches = parser.parse(nodeData)
+                if (matches.length) {
+                    if (!parser.isBlockingNode(currentNode.previousElementSibling) &&
+                            !parser.isBlockingNode(currentNode.parentNode.previousElementSibling)) {
 
-                    let matches = parser.parse(replacementNode.innerHTML)
-                    if (matches.length) {
-                        if (!parser.isBlockingNode(currentNode.previousElementSibling) &&
-                                !parser.isBlockingNode(currentNode.parentNode.previousElementSibling)) {
+                        matches.reverse().forEach((match) => {
+                            const numberIconElement = this.createNumberIconElement(match.number)
+                            ctdNode.setAttribute('data-original', nodeData)
+                            const numberText = nodeData.slice(match.start, match.end)
+                            const beforeText = nodeData.slice(0, match.start)
+                            const afterText = nodeData.slice(match.end)
 
-                            matches.reverse().forEach((match) => {
-                                let numberIconElement = this.createNumberIconElement(match.number)
+                            const numberTextNode = document.createTextNode(numberText)
+                            // There may be text in front of the phonenumber.
+                            if (beforeText.length) {
+                                const beforeTextNode = document.createTextNode(beforeText)
+                                ctdNode.appendChild(beforeTextNode)
+                            }
+                            // The phonenumber itself.
+                            ctdNode.appendChild(numberTextNode)
+                            // The icon.
+                            ctdNode.appendChild(numberIconElement)
+                            // And finally text after the icon when there is any.
+                            if (afterText.length) {
+                                const afterTextNode = document.createTextNode(afterText)
+                                ctdNode.appendChild(afterTextNode)
+                            }
+                        })
 
-                                // prefix icon with match (==number)
-                                let originalText = replacementNode.innerHTML.slice(match.start, match.end)
-                                numberIconElement.innerHTML = `${originalText} ${numberIconElement.innerHTML}`
-
-                                let before = replacementNode.innerHTML.slice(0, match.start)
-                                let after = replacementNode.innerHTML.slice(match.end)
-                                replacementNode.innerHTML = before + numberIconElement.innerHTML + after
-                            })
-
-                            currentNode.parentNode.insertBefore(replacementNode, currentNode)
-                            currentNode.parentNode.removeChild(currentNode)
-                        }
+                        currentNode.parentNode.insertBefore(ctdNode, currentNode)
+                        currentNode.parentNode.removeChild(currentNode)
                     }
-                })
+                }
             })
-        } else {
-            this.logger.debug(`${this}not scanning ${childrenLength} elements`)
-        }
+        })
 
-        if (pause) {
-            this.observePage()
-        }
+        if (pause) this.observePage()
     }
 
 
@@ -254,7 +180,7 @@ class ObserverFrame extends Skeleton {
     processPage() {
         this.logger.debug(`${this}start observing`)
         // Inject our print stylesheet.
-        $('head').append(this.printStyle)
+        $('head').appendChild(this.stylesheet)
         // Insert icons.
         const before = new Date().getTime()
         this.doInsert()
@@ -300,12 +226,7 @@ class ObserverFrame extends Skeleton {
                             let node = _parkedNodes[j]
                             let stillInDocument = document.contains(node) // no lookup costs
                             if (stillInDocument) {
-                                let before = new Date().getTime()
                                 this.doInsert(node)
-                                this.logger.debug(
-                                    `${this}doInsert (handleMutations) took`, new Date().getTime() - before)
-                            } else {
-                                this.logger.debug(`${this}doInsert (handleMutations) took 0 - removed node`)
                             }
                         }
                     }, 0) // Push back execution to the end on the current event stack.
@@ -363,9 +284,9 @@ class ObserverFrame extends Skeleton {
      * Restore the original numbers by replacing all ctd nodes with a new
      * text node containing the phonenumber.
      */
-    restorePhonenumbers() {
-        document.querySelectorAll('ctd').forEach((el) => {
-            el.parentNode.replaceChild(document.createTextNode(el.textContent), el)
+    revertCtdIcons() {
+        $$('ctd').forEach((el) => {
+            el.parentNode.replaceChild(document.createTextNode(el.dataset.original), el)
         })
     }
 }

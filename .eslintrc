@@ -23,6 +23,7 @@
         "webkitNotifications": true,
         "electron": true,
         "$": true,
+        "$$": true,
         "templates": true,
         "Vue": true,
         "translations": true,

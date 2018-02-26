@@ -1,8 +1,11 @@
 window.global = window
+
+global.$ = document.querySelector.bind(document)
+global.$$ = document.querySelectorAll.bind(document)
+
 global.EventEmitter = require('eventemitter3')
 if (!global.translations) global.translations = {}
 
-global.$ = require('jquery')
 global.Vue = require('vue/dist/vue.runtime')
 global.VueStash = require('vue-stash').default
 Vue.use(global.VueStash)

@@ -41,7 +41,7 @@ class Tabs {
                 contexts: ['selection'],
                 onclick: (info, _tab) => {
                     // The extension popup may be opened from a contextmenu action.
-                    this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'SIP'}, true)
+                    this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'CallSIP'}, true)
                     browser.browserAction.openPopup((window) => {})
                 },
                 title: this.app.$t('Call %s with softphone'),
@@ -84,8 +84,8 @@ class Tabs {
         browser.tabs.query({}).then((tabs) => {
             tabs.forEach((tab) => {
                 if (this.tabIconsEnabled(tab) && enable) {
-                    this.app.emit('observer:enable', {frame: 'observer'}, false, tab.id)
-                } else this.app.emit('observer:disable', {frame: 'observer'}, false, tab.id)
+                    this.app.emit('observer:toggle', {enabled: true, frame: 'observer'}, false, tab.id)
+                } else this.app.emit('observer:toggle', {enabled: false, frame: 'observer'}, false, tab.id)
             })
         })
     }

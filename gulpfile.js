@@ -401,7 +401,7 @@ gulp.task('manifest', 'Create a browser-specific manifest file.', async() => {
 gulp.task('scss', 'Compile all css.', [], (done) => {
     runSequence([
         'scss-app',
-        'scss-print',
+        'scss-observer',
     ], () => {
         // Targetting webext.css for livereload changed only works in the
         // webview.
@@ -421,8 +421,8 @@ gulp.task('scss-app', 'Generate application css.', () => {
         path.join(settings.SRC_DIR, 'components', '**', '*.scss'))
 }, {options: taskOptions.all})
 
-gulp.task('scss-print', 'Generate print css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'print', !settings.PRODUCTION)
+gulp.task('scss-observer', 'Generate observer css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer', !settings.PRODUCTION)
 }, {options: taskOptions.all})
 
 gulp.task('scss-vendor', 'Generate vendor css.', () => {
@@ -512,9 +512,11 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     gulp.watch(path.join(__dirname, 'src', 'index.html'), ['html'])
     gulp.watch([
         path.join(__dirname, 'src', 'scss', '**', '*.scss'),
+        `!${path.join(__dirname, 'src', 'scss', 'observer.scss')}`,
         path.join(__dirname, 'src', 'components', '**', '*.scss'),
     ], ['scss-app'])
 
+    gulp.watch(path.join(__dirname, 'src', 'scss', 'observer.scss'), ['scss-observer'])
     gulp.watch(path.join(__dirname, 'src', 'scss', 'vendor.scss'), ['scss-vendor'])
 
     gulp.watch(path.join(__dirname, 'src', 'components', '**', '*.vue'), ['templates'])
