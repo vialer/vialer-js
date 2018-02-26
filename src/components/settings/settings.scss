@@ -2,7 +2,7 @@
 
 .settings-component {
     background: none;
-    padding-top: 0 !important;
+    padding-top: 0;
 
     .ringtone {
         align-items: flex-end;
@@ -42,10 +42,19 @@
         }
     }
 
+    .video-cam-disabled {
+        path[pid="0"] {fill: $primary-color;}
+        path[pid="1"] {fill: $white;}
+        rect[pid="2"] {fill: $red-color;}
+    }
+
+
+    // The enable microphone button that opens the popout mode.
     .microphone-popout.button {
         margin-top: $spacer;
     }
 
+    // The container for the save button.
     .settings-actions {
         margin-top: $spacer * 3;
     }

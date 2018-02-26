@@ -81,26 +81,30 @@
         <div class="field">
             <Field name="webrtc_permission" type="checkbox" :disabled="true" class="webrtc-switch"
                 :label="$t('Microphone access')" :model.sync="settings.webrtc.permission" />
+
             <!-- Additional help to guide the user to the browser permission settings. -->
             <em class="help" v-if="settings.webrtc.permission">
                 {{$t('The softphone has access to your microphone.')}}
             </em>
 
-            <div class="notification-box troubleshoot" v-else>
-                <header><svgicon name="warning"/><span>{{$t('The softphone doesn\'t have access to your microphone!')}}</span></header>
+            <!-- Give the user instructions how to enable the microphone in the popout -->
+            <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.permission && env.isPopout">
+                <header>
+                    <svgicon name="warning"/><span>{{$t('The softphone doesn\'t have access to your microphone!')}}</span>
+                </header>
                 <ul>
                     <!-- Reference to the popout mode from the popup modus only-->
-                    <li v-if="env.isPopout">
+                    <li >
                         {{$t('Inspect the browser navigation bar for microphone access.')}}
-                        <svgicon name="microphone"/>
+                        <svgicon name="video-cam-disabled" class="video-cam-disabled"/>
                     </li>
-                    <li v-if="env.isPopout">
+                    <li>
                         {{$t('Refresh or close this tab afterwards to reflect your changes.')}}
                     </li>
                 </ul>
             </div>
 
-            <a class="microphone-popout button is-danger" v-if="!env.isPopout && !settings.webrtc.permission" @click="openPopoutView">
+            <a class="microphone-popout button is-danger" v-else-if="!settings.webrtc.permission && !env.isPopout" @click="openPopoutView">
                 <span class="icon is-small">
                     <svgicon name="microphone"/>
                 </span>

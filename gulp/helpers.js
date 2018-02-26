@@ -86,6 +86,7 @@ class Helpers {
                         res = await webStore.uploadExisting(zipFile, token)
                     } catch (err) {
                         gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+                        return
                     }
 
 
@@ -183,17 +184,6 @@ class Helpers {
                 },
             }
         } else if (buildType === 'firefox') {
-            // The id_beta property should not end up in the manifest.
-            let storeIds = {
-                alpha: this.settings.brands[brandName].store.firefox.gecko.id_alpha,
-                beta: this.settings.brands[brandName].store.firefox.gecko.id_beta,
-                production: this.settings.brands[brandName].store.firefox.gecko.id_production,
-            }
-            // Make sure these don't end up in the manifest.
-            delete this.settings.brands[brandName].store.firefox.gecko.id_alpha
-            delete this.settings.brands[brandName].store.firefox.gecko.id_beta
-            delete this.settings.brands[brandName].store.firefox.gecko.id_production
-
             manifest.applications = {
                 gecko: {
                     // (!) Deploys to production, alpha or beta environment.
