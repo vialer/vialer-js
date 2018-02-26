@@ -93,7 +93,6 @@ class ObserverFrame extends Skeleton {
                 const data = e.target.dataset
                 if (data.number) this.emit('bg:calls:call_create', {number: data.number, start: true})
                 // Immediatly disable all the icons for this number.
-                console.log("NUMBER TO CALL:", data.number)
                 for (let node of $$(`.ctd-icon-${data.number}`)) {
                     node.classList.add('disabled')
                 }

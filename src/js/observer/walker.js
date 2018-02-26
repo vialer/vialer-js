@@ -62,7 +62,6 @@ class Walker {
     isBlockedElement(element) {
         if (element.tagName in this.blockedTagNames) return true
 
-        // console.log("BLOCKED ELEMENT?", element.isContentEditable)
         const isContentEditable = element.isContentEditable
         // Deal with ARIA accessability content.
         const role = element.getAttribute('role')
