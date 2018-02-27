@@ -37,12 +37,22 @@ class ObserverFrame extends Skeleton {
         * Triggered when the user logs out or when the click2dial
         * setting is modified from the popup.
         */
-        this.on('observer:click2dial:toggle', ({enabled, numbers}) => {
+        this.on('observer:click2dial:toggle', ({enabled, label, numbers}) => {
             if (numbers.length) {
                 // Target a specific number/icon.
                 for (let number of numbers) {
-                    if (enabled) for (let node of $$(`.ctd-icon-${number}`)) node.classList.remove('disabled')
-                    else for (let node of $$(`.ctd-icon-${number}`)) node.classList.add('disabled')
+                    for (let node of $$(`.ctd-icon-${number}`)) {
+                        if (enabled) node.classList.remove('disabled')
+                        else node.classList.add('disabled')
+
+                        if (label) {
+                            node.classList.add('label')
+                            node.setAttribute('data-content', label)
+                        } else {
+                            node.classList.remove('label')
+                            node.removeAttribute('data-content')
+                        }
+                    }
                 }
             } else {
                 // For the whole page.

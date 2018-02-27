@@ -57,14 +57,14 @@ module.exports = function(app) {
             call: {
                 accepted: {
                     hold: $t('On hold'),
-                    incoming: $t('Connected'),
-                    outgoing: $t('Calling'),
+                    incoming: $t('Incoming call...'),
+                    outgoing: $t('Outgoing call...'),
                 },
                 bye: $t('Call ended'),
                 create: $t('Setting up call'),
                 dialing_a: $t('Dialing phone A'),
                 dialing_b: $t('Dialing phone B'),
-                invite: $t('Incoming call'),
+                invite: $t('You are being called'),
                 rejected_a: $t('You disconnected'),
                 rejected_b: $t('Callee is busy'),
             },

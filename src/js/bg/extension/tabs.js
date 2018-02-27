@@ -10,9 +10,13 @@ class Tabs {
         this.app.on('bg:user:login', () => this.contextMenuItems())
         this.app.on('bg:user:logout', () => browser.contextMenus.removeAll())
 
-        // Triggered by a tab frame's observer script.
+        // Triggered by a tab frame's observer script when starting.
         this.app.on('bg:tabs:observer_toggle', (data) => {
             data.callback({observe: this.tabIconsEnabled(data.sender.tab)})
+            // Restore last active message.
+            if (this.app.modules.ui.lastLabelMessage) {
+                this.signalIcons(this.app.modules.ui.lastLabelMessage)
+            }
         })
         // Call this event when the updated application state needs to be
         // reflected in the context menus. Used for instance in a settings
@@ -22,10 +26,10 @@ class Tabs {
         // Start with a clean contextmenu slate.
         if (this.app.state.user.authenticated) {
             this.contextMenuItems()
-            this.toggleIcons(this.app.state.settings.click2dial.enabled)
+            this.signalIcons({enabled: this.app.state.settings.click2dial.enabled})
         } else {
             browser.contextMenus.removeAll()
-            this.toggleIcons(false)
+            this.signalIcons({enabled: false})
         }
     }
 
@@ -78,15 +82,19 @@ class Tabs {
     /**
     * This will toggle Click-to-dial icons and the
     * accompanying DOM observer in each tab on or off.
-    * @param {Boolean} enable - Whether to switch it on or off.
-    * @param {Number} [number] - Target a specific icon by number.
+    * @param {Object} opts - Options to pass to the observer event.
+    * @param {Boolean} opts.enable - Whether to switch it on or off.
+    * @param {String} [opts.label] - Assign a label to a Click-to-dial icon.
+    * @param {Number} [opts.numbers] - Target a specific icon by number.
     */
-    toggleIcons(enable, numbers = []) {
+    signalIcons({enabled, label = null, numbers = []}) {
         browser.tabs.query({}).then((tabs) => {
             tabs.forEach((tab) => {
-                if (this.tabIconsEnabled(tab) && enable) {
-                    this.app.emit('observer:click2dial:toggle', {enabled: true, frame: 'observer', numbers}, false, tab.id)
-                } else this.app.emit('observer:click2dial:toggle', {enabled: false, frame: 'observer', numbers}, false, tab.id)
+                if (this.tabIconsEnabled(tab)) {
+                    this.app.emit('observer:click2dial:toggle', {enabled, frame: 'observer', label, numbers}, false, tab.id)
+                } else {
+                    this.app.emit('observer:click2dial:toggle', {enabled: false, frame: 'observer'}, false, tab.id)
+                }
             })
         })
     }

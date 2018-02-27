@@ -1,3 +1,6 @@
+@import "lib/variables";
+@import "lib/fonts";
+
 // Entrypoint for vialer-js observer SCSS.
 @media print {
     .vialer-icon {
@@ -20,21 +23,33 @@
                     background-position: center center;
                     background-repeat: no-repeat;
                     border-radius: 9px;
-                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+                    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
                     display: inline-block;
                     height: 18px;
                     line-height: inherit;
                     margin: 0 4px;
                     margin-top: -2px;
                     padding: 0;
+                    transition: all 300ms ease;
                     width: 18px;
 
-                    &::after {
-                        content: attr(data-content);
+                    // The label class toggles the data-content label.
+                    &.label {
+                        &::after {
+                            background: rgba($grey-color-darkest, 0.8);
+                            color: $white;
+                            content: attr(data-content);
+                            font-family: "Roboto";
+                            font-size: $spacer;
+                            font-weight: bold;
+                            margin-left: $spacer * 2;
+                            padding: $spacer / 4;
+                            position: absolute;
+                        }
                     }
 
                     &.disabled {
-                        opacity: 0.5;
+                        filter: grayscale(100%);
 
                         &:hover {
                             cursor: not-allowed;
@@ -42,6 +57,7 @@
                     }
 
                     &:hover {
+                        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
                         cursor: pointer;
                     }
                 }

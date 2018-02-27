@@ -50,44 +50,6 @@ class Logger {
     }
 
 
-    notification(title, message, stack = false) {
-        // Edge doesn't support webextension Notifications yet.
-        if (this.app.env.isEdge) return
-        const options = {
-            message: message,
-            title: title,
-            type: 'basic',
-        }
-        options.iconUrl = 'img/notification.png'
-
-        if (this.app.env.isExtension) {
-            options.iconUrl = browser.runtime.getURL(options.iconUrl)
-            if (!stack) browser.notifications.clear('c2d')
-            browser.notifications.create('c2d', options)
-            setTimeout(() => browser.notifications.clear('c2d'), 3000)
-            return
-        }
-
-        options.icon = options.iconUrl
-        options.body = message
-
-        if (Notification.permission === 'granted') {
-            if (!stack && this._notification) this._notification.close()
-            this._notification = new Notification(title, options) // eslint-disable-line no-new
-            setTimeout(this._notification.close.bind(this._notification), 3000)
-        } else if (Notification.permission !== 'denied') {
-            // Create a notification after the user
-            // accepted the permission.
-            Notification.requestPermission((permission) => {
-                if (permission === 'granted') {
-                    this._notification = new Notification(title, options) // eslint-disable-line no-new
-                    setTimeout(this._notification.close.bind(this._notification), 3000)
-                }
-            })
-        }
-    }
-
-
     setLevel(level) {
         this.level = this.levels[level]
     }

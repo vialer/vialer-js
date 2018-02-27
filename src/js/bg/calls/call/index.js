@@ -12,6 +12,7 @@ class Call {
         this._started = false
 
         this.busyTone = new this.app.sounds.BusyTone()
+        this.translations = this.app.helpers.getTranslations().call
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringbackTone = new this.app.sounds.RingbackTone()
 
@@ -81,7 +82,11 @@ class Call {
         if (!this.silent) {
             this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
             if (!this.app.state.ui.visible) {
-                this.app.logger.notification(this.app.$t('Incoming call'), `${this.state.number}: ${this.state.displayName}`, false)
+                this.app.modules.ui.notification({
+                    message: `${this.state.number}: ${this.state.displayName}`,
+                    number: this.state.number,
+                    title: this.translations.invite,
+                })
             }
 
             this.ringtone.play()
@@ -108,10 +113,10 @@ class Call {
             // connection has been made.
             this.module.activateCall(this, true)
             if (!this.app.state.ui.visible) {
-                let notificationMessage = ''
-                if (displayName) notificationMessage = `${this.state.number}: ${displayName}`
-                else notificationMessage = this.state.number
-                this.app.logger.notification(this.app.$t('Calling'), notificationMessage, false)
+                let message = ''
+                if (displayName) message = `${this.state.number}: ${displayName}`
+                else message = this.state.number
+                this.app.modules.ui.notification({message, number: this.state.number, title: this.translations.create})
             }
         }
 
@@ -160,7 +165,11 @@ class Call {
         this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})
 
         if (forceNotify || (!this.silent && !this.app.state.ui.visible)) {
-            this.app.logger.notification(this.app.$t('Call accepted'), `${this.state.number}: ${this.state.displayName}`, false)
+            this.app.modules.ui.notification({
+                message: `${this.state.number}: ${this.state.displayName}`,
+                number: this.state.number,
+                title: this.translations.accepted[this.state.type],
+            })
         }
 
         this.app.setState({ui: {menubar: {event: 'calling'}}})
@@ -181,21 +190,21 @@ class Call {
     * @param {String} reason - An optional notification text for errors.
     */
     _stop(timeout = 3000, forceNotify = false, reason = '') {
-        let notificationText
+        let message
         // Stop all call state sounds that may still be playing.
         this.ringbackTone.stop()
         this.ringtone.stop()
-        if (reason) notificationText = reason
+        if (reason) message = reason
         else {
-            notificationText = this.state.number
-            if (this.state.displayName) notificationText += `:${this.state.displayName}`
+            message = this.state.number
+            if (this.state.displayName) message += `:${this.state.displayName}`
         }
 
         if (forceNotify || (!this.silent && !this.app.state.ui.visible)) {
             if (this.state.status === 'rejected_b') {
-                this.app.logger.notification(this.app.$t('Callee is busy'), notificationText, false)
+                this.app.modules.ui.notification({message, number: this.state.number, stack: true, title: this.translations.rejected_b})
             } else {
-                this.app.logger.notification(this.app.$t('Call ended'), notificationText, true)
+                this.app.modules.ui.notification({message, number: this.state.number, stack: true, title: this.translations.bye})
             }
         }
 
@@ -209,9 +218,9 @@ class Call {
 
         window.setTimeout(() => {
             this.busyTone.stop()
-            // Signal browser tabs to re-enable the icon(s) for this number again.
-            if (this.app.env.isExtension) this.app.modules.extension.tabs.toggleIcons(true, [this.state.number])
             this.module.deleteCall(this)
+            // Signal browser tabs to remove the click-to-dial notification label.
+            this.app.modules.ui.notification({number: this.state.number})
         }, timeout)
     }
 

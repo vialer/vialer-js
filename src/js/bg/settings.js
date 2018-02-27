@@ -64,7 +64,7 @@ class SettingsModule extends Module {
         return {
             'store.settings.click2dial.enabled': (newVal, oldVal) => {
                 if (this.app.env.isExtension) {
-                    this.app.modules.extension.tabs.toggleIcons(newVal)
+                    this.app.modules.extension.tabs.signalIcons({enabled: newVal})
                 }
             },
             'store.settings.telemetry.enabled': (newVal, oldVal) => {

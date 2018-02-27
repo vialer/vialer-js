@@ -69,6 +69,7 @@
         }
     ],
     "web_accessible_resources": [
+        "fonts/*.woff2",
         "img/*.png",
         "css/*.css",
         "js/*.map"
