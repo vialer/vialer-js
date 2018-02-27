@@ -81,13 +81,12 @@ class Call {
         // Signal the user about the incoming call.
         if (!this.silent) {
             this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
-            if (!this.app.state.ui.visible) {
-                this.app.modules.ui.notification({
-                    message: `${this.state.number}: ${this.state.displayName}`,
-                    number: this.state.number,
-                    title: this.translations.invite,
-                })
-            }
+
+            this.app.modules.ui.notification({
+                message: `${this.state.number}: ${this.state.displayName}`,
+                number: this.state.number,
+                title: this.translations.invite,
+            })
 
             this.ringtone.play()
             this.module.activateCall(this, true)
@@ -112,12 +111,10 @@ class Call {
             // Always set this call to be the active call as soon a new
             // connection has been made.
             this.module.activateCall(this, true)
-            if (!this.app.state.ui.visible) {
-                let message = ''
-                if (displayName) message = `${this.state.number}: ${displayName}`
-                else message = this.state.number
-                this.app.modules.ui.notification({message, number: this.state.number, title: this.translations.create})
-            }
+            let message = ''
+            if (displayName) message = `${this.state.number}: ${displayName}`
+            else message = this.state.number
+            this.app.modules.ui.notification({message, number: this.state.number, title: this.translations.create})
         }
 
         this.setState({displayName: displayName, status: this._statusMap.create})
@@ -164,7 +161,7 @@ class Call {
         this.ringtone.stop()
         this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})
 
-        if (forceNotify || (!this.silent && !this.app.state.ui.visible)) {
+        if (forceNotify || !this.silent) {
             this.app.modules.ui.notification({
                 message: `${this.state.number}: ${this.state.displayName}`,
                 number: this.state.number,

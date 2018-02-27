@@ -1,10 +1,19 @@
+// sass-lint:disable no-important
+
 @import "lib/variables";
 @import "lib/fonts";
 
-// Entrypoint for vialer-js observer SCSS.
+// Make sure that the icon styling doesn't end up
+// in the print version.
 @media print {
-    .vialer-icon {
-        display: none;
+    html {
+        body {
+            ctd {
+                ctdicon.ctd-icon {
+                    display: none !important;
+                }
+            }
+        }
     }
 }
 
@@ -12,43 +21,48 @@
     html {
         body {
             ctd {
-                align-items: center;
-                display: inline-flex;
-                flex-direction: row;
-                justify-content: flex-start;
+                align-items: center !important;
+                display: inline-flex !important;
+                flex-direction: row !important;
+                justify-content: flex-start !important;
 
+                // Make a best effort to force a consist style.
                 ctdicon.ctd-icon {
-                    background-color: transparent;
-                    background-image: url("../img/click-to-dial.png");
-                    background-position: center center;
-                    background-repeat: no-repeat;
-                    border-radius: 9px;
-                    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-                    display: inline-block;
-                    height: 18px;
-                    line-height: inherit;
-                    margin: 0 4px;
-                    margin-top: -2px;
-                    padding: 0;
-                    transition: all 300ms ease;
-                    width: 18px;
+                    background-color: transparent !important;
+                    background-image: url("../img/click-to-dial.png") !important;
+                    background-position: center center !important;
+                    background-repeat: no-repeat !important;
+                    border-radius: 9px !important;
+                    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2) !important;
+                    box-sizing: border-box !important;
+                    display: inline-block !important;
+                    font-size: $spacer !important;
+                    height: 18px !important;
+                    line-height: 18px !important;
+                    margin: 0 4px !important;
+                    margin-top: -2px !important;
+                    padding: 0 !important;
+                    transition: all 300ms ease !important;
+                    width: 18px !important;
 
                     // The label class toggles the data-content label.
-                    &.label {
+                    &.ctd-label {
                         &::after {
-                            background: rgba($grey-color-darkest, 0.8);
-                            color: $white;
-                            content: attr(data-content);
-                            font-family: "Roboto";
-                            font-size: $spacer;
-                            font-weight: bold;
-                            margin-left: $spacer * 2;
-                            padding: $spacer / 4;
-                            position: absolute;
+                            background: rgba($grey-color-darkest, 0.8) !important;
+                            color: $white !important;
+                            content: attr(data-content) !important;
+                            font-family: "Roboto" !important;
+                            font-size: $spacer !important;
+                            font-weight: bold !important;
+                            height: 18px !important;
+                            line-height: 18px !important;
+                            margin-left: $spacer * 2.5 !important;
+                            padding: 0 $spacer / 4 !important;
+                            position: absolute !important;
                         }
                     }
 
-                    &.disabled {
+                    &.ctd-disabled {
                         filter: grayscale(100%);
 
                         &:hover {

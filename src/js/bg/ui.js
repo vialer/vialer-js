@@ -116,7 +116,7 @@ class UiModule extends Module {
             }
 
             // Only create a notification with a message and a title.
-            if (!message || !title) return
+            if (!message || !title || this.app.state.ui.visible) return
 
             options.iconUrl = browser.runtime.getURL(options.iconUrl)
             if (!stack) browser.notifications.clear('c2d')
@@ -127,7 +127,7 @@ class UiModule extends Module {
 
 
         // Only create a notification with a message and a title.
-        if (!message || !title) return
+        if (!message || !title || this.app.state.ui.visible) return
 
         options.icon = options.iconUrl
         options.body = message

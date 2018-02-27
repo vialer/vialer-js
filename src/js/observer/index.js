@@ -43,22 +43,22 @@ class ObserverFrame extends Skeleton {
                 for (let number of numbers) {
                     // Target icons.
                     for (let node of $$(`.ctd-icon-${number}`)) {
-                        if (enabled) node.classList.remove('disabled')
-                        else node.classList.add('disabled')
+                        if (enabled) node.classList.remove('ctd-disabled')
+                        else node.classList.add('ctd-disabled')
 
                         if (label) {
-                            node.classList.add('label')
+                            node.classList.add('ctd-label')
                             node.setAttribute('data-content', label)
                         } else {
-                            node.classList.remove('label')
+                            node.classList.remove('ctd-label')
                             node.removeAttribute('data-content')
                         }
                     }
                     // Target links with `tel:` hrefs. These don't have
                     // labels.
                     for (let node of $$(`a[href^="tel:${number}"]`)) {
-                        if (enabled) node.classList.remove('disabled')
-                        else node.classList.add('disabled')
+                        if (enabled) node.classList.remove('ctd-disabled')
+                        else node.classList.add('ctd-disabled')
                     }
                 }
             } else {
@@ -108,27 +108,27 @@ class ObserverFrame extends Skeleton {
                 const href = e.target.getAttribute('href')
                 if (href.startsWith('tel:')) {
                     e.preventDefault()
-                    if (e.target.classList.contains('disabled')) return
+                    if (e.target.classList.contains('ctd-disabled')) return
                     const number = href.substring(4)
                     this.emit('bg:calls:call_create', {number, start: true})
                     // Immediatly disable all the links with this number and
                     // let the `observer:click2dial:toggle` event further decide
                     // whether the user should be able to interact with a tel link.
                     for (let node of $$(`a[href^="tel:${number}"]`)) {
-                        node.classList.add('disabled')
+                        node.classList.add('ctd-disabled')
                     }
                 }
             } else if (e.target.nodeName === 'CTDICON') {
                 // Handle clicking on injected c2d icons.
                 e.preventDefault()
-                if (e.target.classList.contains('disabled')) return
+                if (e.target.classList.contains('ctd-disabled')) return
                 const data = e.target.dataset
                 if (data.number) this.emit('bg:calls:call_create', {number: data.number, start: true})
                 // Immediatly disable all the c2d icons for this number and
                 // let the `observer:click2dial:toggle` event further decide
                 // whether the user should be able to interact with an icon.
                 for (let node of $$(`.ctd-icon-${data.number}`)) {
-                    node.classList.add('disabled')
+                    node.classList.add('ctd-disabled')
                 }
             }
         })
