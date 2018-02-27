@@ -25,6 +25,7 @@
                 display: inline-flex !important;
                 flex-direction: row !important;
                 justify-content: flex-start !important;
+                position: relative;
 
                 // Make a best effort to force a consist style.
                 ctdicon.ctd-icon {
@@ -48,17 +49,18 @@
                     // The label class toggles the data-content label.
                     &.ctd-label {
                         &::after {
-                            background: rgba($grey-color-darkest, 0.8) !important;
-                            color: $white !important;
+                            background: $white !important;
+                            box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2) !important;
+                            color: $grey-color-darker !important;
                             content: attr(data-content) !important;
                             font-family: "Roboto" !important;
                             font-size: $spacer !important;
                             font-weight: bold !important;
-                            height: 18px !important;
                             line-height: 18px !important;
                             margin-left: $spacer * 2.5 !important;
                             padding: 0 $spacer / 4 !important;
                             position: absolute !important;
+                            white-space: nowrap !important;
                         }
                     }
 

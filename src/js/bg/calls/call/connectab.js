@@ -60,7 +60,7 @@ class CallConnectAB extends Call {
         // Start the call the first time a `connected` status is returned.
         if (!this._started && connectabStatus === 'connected') {
             this.app.telemetry.event('call[connectab]', 'outgoing', 'accepted')
-            this._start()
+            this._start({message: this.translations.accepted.outgoing})
         }
 
         // Stop the status timer when the call is in a final state.
@@ -68,7 +68,8 @@ class CallConnectAB extends Call {
             // Get rid of the Call.
             this.app.timer.stopTimer(`call:connectab:status-${this.id}`)
             this.app.timer.unregisterTimer(`call:connectab:status-${this.id}`)
-            this._stop()
+            // Map to a generic call exit code and find the human translation for it.
+            this._stop({message: this.translations[this._statusMap[connectabStatus]]})
         }
     }
 
@@ -87,11 +88,11 @@ class CallConnectAB extends Call {
             // For now don't make a distination between rejected_a and rejected_b.
             // Just use the latter.
             this.setState({status: 'rejected_b'})
-            let reason = this.app.$t('An unknown error occured during call setup.')
+            let message = this.app.$t('An unknown error occured during call setup.')
             // Hope we dealt with all possible failures.
-            if (res.data.error) reason = this.app.$t(res.data.error)
-            else if (res.data.clicktodial.b_number) reason = this.app.$t(res.data.clicktodial.b_number.join(' '))
-            this._stop(undefined, true, reason)
+            if (res.data.error) message = this.app.$t(res.data.error)
+            else if (res.data.clicktodial.b_number) message = this.app.$t(res.data.clicktodial.b_number.join(' '))
+            this._stop({message})
         } else {
             this.app.telemetry.event('call[connectab]', 'outgoing', 'create')
             // A ConnectAB call id; not our Vialer-js Call id.

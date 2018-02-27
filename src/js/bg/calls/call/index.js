@@ -153,20 +153,23 @@ class Call {
 
     /**
     * Handle logic when a call is started; both incoming and outgoing.
-    * @param {Boolean} forceNotify - Force a notification, even when the popup is open.
+    * @param {Object} opts - Options to pass to _start.
+    * @param {Number} opts.timeout - Postpones resetting the call state.
+    * @param {Boolean} opts.force - Force showing a notification.
+    * @param {String} [opts.message] - Force a notification message.
     */
-    _start(forceNotify = false) {
+    _start({force = false, message = ''}) {
+        if (!message) {
+            message = this.state.number
+            if (this.state.displayName) message += `:${this.state.displayName}`
+        }
         this._started = true
         this.ringbackTone.stop()
         this.ringtone.stop()
         this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})
 
-        if (forceNotify || !this.silent) {
-            this.app.modules.ui.notification({
-                message: `${this.state.number}: ${this.state.displayName}`,
-                number: this.state.number,
-                title: this.translations.accepted[this.state.type],
-            })
+        if (!this.silent) {
+            this.app.modules.ui.notification({force, message, number: this.state.number, title: this.translations.accepted[this.state.type]})
         }
 
         this.app.setState({ui: {menubar: {event: 'calling'}}})
@@ -178,30 +181,30 @@ class Call {
 
     /**
     * Takes care of returning to a state before the call
-    * was made. Make sure you set the final state of a call
+    * was created. Make sure you set the final state of a call
     * before calling cleanup. The timeout is meant to postpone
-    * resetting the state, in order to give the user a hint of
-    * what happened in between.
-    * @param {Number} timeout - Postpones resetting the call state.
-    * @param {Boolean} forceNotify - Force a notification, even when the popup is open.
-    * @param {String} reason - An optional notification text for errors.
+    * resetting the state, so the user has a hint of what
+    * happened in between.
+    * @param {Object} opts - Options to pass to _stop.
+    * @param {Boolean} opts.force - Force showing a notification.
+    * @param {String} [opts.message] - Force a notification message.
+    * @param {Number} opts.timeout - Postpones resetting the call state.
     */
-    _stop(timeout = 3000, forceNotify = false, reason = '') {
-        let message
-        // Stop all call state sounds that may still be playing.
-        this.ringbackTone.stop()
-        this.ringtone.stop()
-        if (reason) message = reason
-        else {
+    _stop({force = false, message = '', timeout = 3000}) {
+        if (!message) {
             message = this.state.number
             if (this.state.displayName) message += `:${this.state.displayName}`
         }
+        // Stop all call state sounds that may still be playing.
+        this.ringbackTone.stop()
+        this.ringtone.stop()
 
-        if (forceNotify || (!this.silent && !this.app.state.ui.visible)) {
+
+        if (force || !this.silent) {
             if (this.state.status === 'rejected_b') {
-                this.app.modules.ui.notification({message, number: this.state.number, stack: true, title: this.translations.rejected_b})
+                this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title: this.translations.rejected_b})
             } else {
-                this.app.modules.ui.notification({message, number: this.state.number, stack: true, title: this.translations.bye})
+                this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title: this.translations.bye})
             }
         }
 

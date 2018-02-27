@@ -92,7 +92,7 @@ class UiModule extends Module {
     * @param {String} [opts.number] - Number is used to target specific click-to-dial labels.
     * @param {Boolean} [opts.stack] - Whether to stack the notifications.
     */
-    notification({message, number = null, title, stack = false}) {
+    notification({force = false, message, number = null, title, stack = false}) {
         const options = {
             message: message,
             title: title,

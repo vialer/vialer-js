@@ -32,7 +32,7 @@ class CallSIP extends Call {
         // Setup some event handlers for the different stages of a call.
         this.session.on('accepted', (request) => {
             this.app.telemetry.event('call[sip]', 'incoming', 'accepted')
-            this._start()
+            this._start({message: this.translations.accepted.incoming})
         })
         this.session.on('rejected', (e) => {
             this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
@@ -41,7 +41,7 @@ class CallSIP extends Call {
             // `e` will be a SIP response 480 when the callee hung up.
             if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
             else this.setState({status: 'rejected_a'})
-            this._stop()
+            this._stop({message: this.translations[this.state.status]})
         })
 
         this.session.on('bye', (e) => {
@@ -55,7 +55,7 @@ class CallSIP extends Call {
 
             this.setState({status: 'bye'})
             this.localVideo.srcObject = null
-            this._stop()
+            this._stop({message: this.translations[this.state.status]})
         })
 
         // Blind transfer event.
@@ -87,7 +87,7 @@ class CallSIP extends Call {
                 this.remoteVideo.play()
             })
 
-            this._start()
+            this._start({message: this.translations.accepted.outgoing})
         })
 
         /**
@@ -109,7 +109,7 @@ class CallSIP extends Call {
         this.session.on('bye', (e) => {
             this.localVideo.srcObject = null
             this.setState({status: 'bye'})
-            this._stop()
+            this._stop({message: this.translations[this.state.status]})
         })
 
         this.session.on('rejected', (e) => {
@@ -122,8 +122,7 @@ class CallSIP extends Call {
             else if (e.status_code === 487) this.setState({status: 'rejected_a'})
             // Just assume that Callee rejected the call otherwise.
             else this.setState({status: 'rejected_b'})
-
-            this._stop()
+            this._stop({message: this.translations[this.state.status]})
         })
     }
 
@@ -184,7 +183,7 @@ class CallSIP extends Call {
             // Decrease the stop event delay, because the user is already
             // aware of the intend to end the call.
             this.setState({status: 'rejected_a'})
-            this._stop(1500)
+            this._stop({message: this.translations[this.state.status], timeout: 1500})
         } else {
             // Calls with other statuses need some more work to end.
             try {
@@ -201,7 +200,7 @@ class CallSIP extends Call {
             } catch (err) {
                 this.app.logger.warn(`${this}unable to close the session properly.`)
             }
-            this._stop()
+            this._stop({message: this.translations[this.state.status]})
         }
     }
 
