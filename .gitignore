@@ -2,6 +2,7 @@ node_modules
 build
 dist
 docs/build
+package-lock.json
 .tags
 .publish
 .vialer-jsrc

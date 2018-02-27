@@ -302,7 +302,7 @@ class Helpers {
         livereload.listen({silent: false})
         app.use(serveStatic(this.settings.BUILD_DIR))
         app.use('/', serveIndex(this.settings.BUILD_DIR, {icons: false}))
-        app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
+        app.use(mount('/docs', serveStatic(path.join(__dirname, 'build', 'docs'))))
         http.createServer(app).listen(8999)
     }
 }
