@@ -29,6 +29,10 @@
                     padding: 0;
                     width: 18px;
 
+                    &::after {
+                        content: attr(data-content);
+                    }
+
                     &.disabled {
                         opacity: 0.5;
 

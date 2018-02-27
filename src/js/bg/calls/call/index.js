@@ -193,7 +193,7 @@ class Call {
 
         if (forceNotify || (!this.silent && !this.app.state.ui.visible)) {
             if (this.state.status === 'rejected_b') {
-                this.app.logger.notification(this.app.$t('Call rejected'), notificationText, false)
+                this.app.logger.notification(this.app.$t('Callee is busy'), notificationText, false)
             } else {
                 this.app.logger.notification(this.app.$t('Call ended'), notificationText, true)
             }
