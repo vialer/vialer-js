@@ -10,6 +10,10 @@ body {
 body {
     color: $primary-color;
 
+    component {
+        display: block;
+    }
+
     // Bulma label class override.
     .label {
         color: $primary-color;
