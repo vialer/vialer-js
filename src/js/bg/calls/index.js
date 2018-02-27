@@ -351,10 +351,11 @@ class CallsModule extends Module {
     }
 
     /**
-    * A loosely coupled Call action handler. Operates on all Calls.
+    * A loosely coupled Call action handler. Operates on all current Calls.
     * Supported actions are:
     *   `accept-new`: Accepts an incoming call or switch to the new call dialog.
     *   `deline-hangup`: Declines an incoming call or an active call.
+    *   `hold-active`: Toggle hold on the active call.
     * @param {String} action - The action; `accept-new` or `decline`.
     */
     callAction(action) {
@@ -377,6 +378,13 @@ class CallsModule extends Module {
             let activeCall = this.activeCall()
             if (inviteCall) inviteCall.terminate()
             else if (activeCall) activeCall.terminate()
+        } else if (action === 'hold-active') {
+            let activeCall = this.activeCall()
+            // Make sure the action isn't provoked on a closing call.
+            if (activeCall && !['bye', 'rejected_a', 'rejected_b'].includes(activeCall.state.status)) {
+                if (activeCall.state.hold.active) activeCall.unhold()
+                else activeCall.hold()
+            }
         }
     }
 

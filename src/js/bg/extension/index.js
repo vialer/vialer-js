@@ -62,6 +62,8 @@ class Extension extends Module {
                 if (!this.app.helpers.callingDisabled() && this.app.state.settings.webrtc.enabled) {
                     this.app.setState({availability: {dnd: !this.app.state.availability.dnd}})
                 }
+            } else if (command === 'action-hold-active') {
+                this.app.modules.calls.callAction('hold-active')
             }
         })
     }

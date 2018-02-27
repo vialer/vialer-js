@@ -40,12 +40,13 @@
             "suggested_key": {
                 "default": "Ctrl+Shift+S"
             },
-            "description": "Toggle the dnd function for the softphone."
+            "description": "Toggle do-not-disturb in softphone mode."
         },
-        "_execute_browser_action": {
+        "action-hold-active": {
             "suggested_key": {
                 "default": "Ctrl+Shift+X"
-            }
+            },
+            "description": "Toggle on-hold on the active call in softphone mode."
         }
     },
     "permissions": [

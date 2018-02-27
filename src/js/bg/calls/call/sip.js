@@ -146,8 +146,10 @@ class CallSIP extends Call {
 
 
     hold() {
-        this.session.hold()
-        this.setState({hold: {active: true}})
+        if (this.session) {
+            this.session.hold()
+            this.setState({hold: {active: true}})
+        }
     }
 
 
@@ -215,8 +217,10 @@ class CallSIP extends Call {
 
 
     unhold() {
-        this.session.unhold()
-        this.setState({hold: {active: false}})
+        if (this.session) {
+            this.session.unhold()
+            this.setState({hold: {active: false}})
+        }
     }
 }
 
