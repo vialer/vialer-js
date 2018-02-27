@@ -43,6 +43,7 @@
                     margin: 0 4px !important;
                     margin-top: -2px !important;
                     padding: 0 !important;
+                    text-align: right !important;
                     transition: all 300ms ease !important;
                     width: 18px !important;
 
@@ -50,6 +51,7 @@
                     &.ctd-label {
                         &::after {
                             background: $white !important;
+                            border-radius: $spacer / 2;
                             box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2) !important;
                             color: $grey-color-darker !important;
                             content: attr(data-content) !important;
@@ -57,10 +59,10 @@
                             font-size: $spacer !important;
                             font-weight: bold !important;
                             line-height: 18px !important;
-                            margin-left: $spacer * 2.5 !important;
-                            padding: 0 $spacer / 4 !important;
+                            padding: 0 $spacer !important;
                             position: absolute !important;
                             white-space: nowrap !important;
+                            margin-left: $spacer / 2;
                         }
                     }
 
