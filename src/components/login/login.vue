@@ -1,4 +1,4 @@
-<div class="login-component" tabindex="-1" v-on:keyup.enter="login">
+<component class="component-login" tabindex="-1" v-on:keyup.enter="login">
     <header>
         <div class="greeting">{{greeting}}</div>
 
@@ -31,4 +31,4 @@
         <div class="help-message">{{$t('Need help?')}}<br/> {{$t('Click on the')}} <i @click="openHelp"><svgicon name="help"/></i>{{$t('icon')}} {{$t('or contact us at')}}</div>
         <div class="support"><a :href="'mailto:' + vendor.support">{{vendor.support}}</a></div>
     </footer>
-</div>
+</component>

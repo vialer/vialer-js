@@ -1,11 +1,11 @@
+/**
+* @module ModuleContacts
+*/
 const ContactSip = require('./contact/sip')
 const Module = require('../lib/module')
 
 
-/**
- * @module Contacts
- */
-class ContactsModule extends Module {
+class ModuleContacts extends Module {
     /**
     * @param {ClickToDialApp} app - The application object.
     */
@@ -75,4 +75,4 @@ class ContactsModule extends Module {
     }
 }
 
-module.exports = ContactsModule
+module.exports = ModuleContacts

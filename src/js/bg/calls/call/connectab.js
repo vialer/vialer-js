@@ -1,8 +1,10 @@
 const Call = require('./index')
 
 /**
-* Call flow wrapper around SipJS which enables incoming and outgoing
-* calls using WebRTC.
+* Call implementation that uses VoIPGRID's ConnectAB API
+* to setup outgoing calls with. This doesn't use the
+* WebRTC transport, but makes two calls from the API
+* to the source and target phone instead.
 */
 class CallConnectAB extends Call {
 

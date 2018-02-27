@@ -1,10 +1,13 @@
+/**
+* @module ModuleQueues
+*/
 const Module = require('./lib/module')
 
 
 /**
-* @module Queues
+* VoIPGRID platform queues module.
 */
-class QueuesModule extends Module {
+class ModuleQueues extends Module {
 
     /**
     * @param {ClickToDialApp} app - The application object.
@@ -106,4 +109,4 @@ class QueuesModule extends Module {
     }
 }
 
-module.exports = QueuesModule
+module.exports = ModuleQueues

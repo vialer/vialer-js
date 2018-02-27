@@ -7,6 +7,9 @@ global.EventEmitter = require('eventemitter3')
 if (!global.translations) global.translations = {}
 
 global.Vue = require('vue/dist/vue.runtime')
+// Define custom tags here, so they are not interpreted by Vue.
+Vue.config.ignoredElements = ['component']
+
 global.VueStash = require('vue-stash').default
 Vue.use(global.VueStash)
 

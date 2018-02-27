@@ -5,7 +5,10 @@ let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.fg = true
 
 
-class ForegroundApp extends App {
+/**
+* Main user interface implementation for web.
+*/
+class AppForeground extends App {
 
     constructor(options) {
         options.env = env
@@ -78,7 +81,7 @@ class ForegroundApp extends App {
 
 function initApp(initParams) {
     initParams.modules = []
-    const app = new ForegroundApp(initParams)
+    const app = new AppForeground(initParams)
 
     if (app.env.isChrome) $('html').classList.add('chrome')
     if (app.env.isEdge) $('html').classList.add('edge')

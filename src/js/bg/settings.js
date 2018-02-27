@@ -1,9 +1,13 @@
+/**
+* @module ModuleSettings
+*/
 const Module = require('./lib/module')
 
+
 /**
-* @module Settings
+* Vialer-js settings module for `AppBackground`.
 */
-class SettingsModule extends Module {
+class ModuleSettings extends Module {
 
     constructor(...args) {
         super(...args)
@@ -77,4 +81,4 @@ class SettingsModule extends Module {
     }
 }
 
-module.exports = SettingsModule
+module.exports = ModuleSettings

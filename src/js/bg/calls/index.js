@@ -1,15 +1,19 @@
+/**
+* @module ModuleCalls
+*/
 const callFactory = require('./call/factory')
 const transform = require('sdp-transform')
 const Module = require('../lib/module')
 
 
 /**
+
 * The call module takes care of the plumbing involved with setting up
 * and breaking down calls. The user interface mostly emits events,
 * because the state logic involved depends on the calls and their
 * state.
 */
-class CallsModule extends Module {
+class ModuleCalls extends Module {
     /**
     * @param {App} app - The application object.
     */
@@ -595,4 +599,4 @@ class CallsModule extends Module {
 
 }
 
-module.exports = CallsModule
+module.exports = ModuleCalls

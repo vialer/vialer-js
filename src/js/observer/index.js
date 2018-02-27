@@ -17,7 +17,7 @@ const utils = require('../lib/utils')
 * This script needs to be as lightweight as possible, so it doesn't
 * affect browsing performance too much.
 */
-class ObserverFrame extends Skeleton {
+class AppObserver extends Skeleton {
 
     constructor(...args) {
         super(...args)
@@ -331,7 +331,7 @@ class ObserverFrame extends Skeleton {
 let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.fg = true
 
-global.app = new ObserverFrame({
+global.app = new AppObserver({
     env: env,
     name: 'observer',
 })

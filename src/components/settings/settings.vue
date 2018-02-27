@@ -1,4 +1,4 @@
-<div class="settings-component">
+<component class="component-settings">
 
     <div class="tabs">
         <ul>
@@ -167,4 +167,4 @@
         <button class="button is-primary" :disabled="settings._form.invalid" @click="save">{{$t('Save changes')}}</button>
     </div>
 
-</div>
+</component>

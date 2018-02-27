@@ -1,4 +1,4 @@
-<div class="call-component" :class="classes('component')">
+<component class="component-call" :class="classes('component')">
     <!-- Call information during a call. Hide when the keypad takes too muchs space. -->
     <div class="call-info" v-if="(!call.keypad.active || call.keypad.display === 'dense') && !['new'].includes(call.status)">
         <div class="info-name" v-if="call.displayName">{{call.displayName}}</div>
@@ -66,4 +66,4 @@
             <svgicon name="phone"/>
         </div>
     </div>
-</div>
+</component>

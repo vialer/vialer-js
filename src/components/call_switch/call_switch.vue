@@ -1,4 +1,4 @@
-<div class="call-switch-component">
+<component class="component-call-switch">
 
     <!-- First loop through all the active calls -->
     <div :data-tooltip="callTitle(call)" class="call tooltip tooltip-left" :class="classes(call, 'call-button')"
@@ -13,4 +13,4 @@
     <div :data-tooltip="$t('Setup new Call')" class="call tooltip tooltip-left" v-if="newCallAllowed()" @click="createCall(false, false)">
         <svgicon name="dialpad"/>
     </div>
-</div>
+</component>

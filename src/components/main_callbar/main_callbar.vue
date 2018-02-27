@@ -1,4 +1,4 @@
-<div class="main-callbar-component" :class="{inactive: call.status === 'new'}">
+<component class="component-main-callbar" :class="{inactive: call.status === 'new'}">
     <div></div>
     <div class="in-call-info">
         <div class="caller-status" v-if="call.status === 'new'">
@@ -17,4 +17,4 @@
             <span class="timer" v-if="call.timer.start"> {{sessionTime}}</span>
         </div>
     </div>
-</div>
+</component>

@@ -1,9 +1,13 @@
+/**
+* @module ModuleAvailability
+*/
 const Module = require('./lib/module')
 
+
 /**
-* @module Availability
+* VoIPGRID platform availability module.
 */
-class AvailabilityModule extends Module {
+class ModuleAvailability extends Module {
 
     /**
     * @param {ClickToDialApp} app - The application object.
@@ -133,4 +137,4 @@ class AvailabilityModule extends Module {
     }
 }
 
-module.exports = AvailabilityModule
+module.exports = ModuleAvailability

@@ -1,4 +1,4 @@
-<div class="notifications-component">
+<component class="component-notifications">
     <span v-for="item in notifications" v-bind:key="notifications.indexOf(item)" class="notification" :class="classes('notification', item)">
         <div class="icon">
             <svgicon :name="item.icon" v-if="item.icon"/>
@@ -9,4 +9,4 @@
             <button class="delete" @click="close(item)"></button>
         </div>
     </span>
-</div>
+</component>

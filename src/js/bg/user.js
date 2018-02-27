@@ -1,10 +1,13 @@
+/**
+* @module ModuleUser
+*/
 const Module = require('./lib/module')
 
 
 /**
-* @module User
+* The User module is still bound to the VoIPGRID API.
 */
-class UserModule extends Module {
+class ModuleUser extends Module {
 
     constructor(...args) {
         super(...args)
@@ -118,4 +121,4 @@ class UserModule extends Module {
     }
 }
 
-module.exports = UserModule
+module.exports = ModuleUser

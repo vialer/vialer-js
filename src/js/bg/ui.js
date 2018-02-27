@@ -1,10 +1,14 @@
+/**
+* @module ModuleUI
+*/
 const Module = require('./lib/module')
 
 
 /**
-* @module UserInterfaceModule
+* The UI module handles state and the global properties of the
+* User-interface.
 */
-class UiModule extends Module {
+class ModuleUI extends Module {
 
     constructor(...args) {
         super(...args)
@@ -87,9 +91,10 @@ class UiModule extends Module {
     * uses inotify by default. Note that we can't use buttons here, because
     * that would require a service-worker implementation.
     * @param {Object} opts - Notification options.
-    * @param {String} opts.title - Title header for the notification.
-    * @param {String} opts.message - Message body for the notification
+    * @param {Boolean} opts.force - Force to show the notification.
+    * @param {String} opts.message - Message body for the notification.
     * @param {String} [opts.number] - Number is used to target specific click-to-dial labels.
+    * @param {String} opts.title - Title header for the notification.
     * @param {Boolean} [opts.stack] - Whether to stack the notifications.
     */
     notification({force = false, message, number = null, title, stack = false}) {
@@ -175,4 +180,4 @@ class UiModule extends Module {
     }
 }
 
-module.exports = UiModule
+module.exports = ModuleUI

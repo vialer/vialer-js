@@ -8,7 +8,11 @@ let env = JSON.parse(JSON.stringify(require('../lib/env')))
 env.role.bg = true
 
 
-class BackgroundApp extends App {
+/**
+* The main Vialer-js application which is a separate process,
+* when ran as an extension.
+*/
+class AppBackground extends App {
 
     constructor(options) {
         options.env = env
@@ -156,7 +160,7 @@ function startApp(options) {
     if (env.isExtension) {
         options.modules.push({Module: require('./extension'), name: 'extension'})
     }
-    return new BackgroundApp(options)
+    return new AppBackground(options)
 }
 
 // For extensions, this is an executable endpoint.

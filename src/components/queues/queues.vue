@@ -1,4 +1,4 @@
-<div class="queues-component no-padding">
+<component class="component-queues no-padding">
 
     <div class="panel-content">
         <h1>{{$t('Queue')}} {{$t('callgroups')}}</h1>
@@ -54,11 +54,7 @@
             <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Queues')}}</a> {{$t('to manage your {target}', {target: $t('queues')})}}.</li>
             <li>{{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to add the {source} to a {target}', {source: $t('queue'), target: $t('dialplan')})}}.</li>
         </ul>
-
-
-
-
     </div>
 
     <div class="unauthorized-warning hide">{{$t('You are not authorized to monitor any queues you might have.')}}</div>
-</div>
+</component>

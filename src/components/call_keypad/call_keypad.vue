@@ -1,4 +1,4 @@
-<div class="call-keypad-component" tabindex="-1" :class="{'call-ongoing': callOngoing}">
+<component class="component-call-keypad" tabindex="-1" :class="{'call-ongoing': callOngoing}">
     <div :class="classes('number-input')" v-if="display === 'dense'">
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="pressKey()" @keydown="pressKey($event.key)"
@@ -49,4 +49,4 @@
             <svgicon name="phone"/>
         </div>
     </div>
-</div>
+</component>

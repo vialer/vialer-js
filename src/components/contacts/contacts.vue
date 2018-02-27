@@ -1,4 +1,4 @@
-<div class="contacts-component">
+<component class="component-contacts">
 
     <div class="panel-content">
         <h1>{{$t('Contacts')}}</h1>
@@ -52,4 +52,4 @@
             </div>
         </li>
     </ul>
-</div>
+</component>

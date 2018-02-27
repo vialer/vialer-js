@@ -1,7 +1,7 @@
 @import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
-.main-menubar-component {
+.component-main-menubar {
     background: $brand-color;
     display: flex;
     flex: 1 0 $spacer * 5;

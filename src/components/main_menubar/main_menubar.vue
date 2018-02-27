@@ -1,4 +1,4 @@
-<div class="main-menubar-component">
+<component class="component-main-menubar">
 
     <div class="option availability" :class="classes('availability')" @click="setLayer('availability')">
         <svgicon name="availability"/>
@@ -14,4 +14,4 @@
     <div class="option calls" :class="classes('calls')" @click="setLayer('calls')">
          <svgicon name="dialpad"/>
     </div>
-</div>
+</component>

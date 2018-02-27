@@ -1,4 +1,4 @@
-<div class="availability-component">
+<component class="component-availability">
     <div class="panel-content">
         <h1>{{$t('Availability options')}}</h1>
 
@@ -39,4 +39,4 @@
             </em>
         </div>
     </div>
-</div>
+</component>

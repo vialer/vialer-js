@@ -1,9 +1,9 @@
+/**
+* @module ModuleApp
+*/
 const Module = require('./lib/module')
 
-/**
-* @module App
-*/
-class AppModule extends Module {
+class ModuleApp extends Module {
 
     constructor(...args) {
         super(...args)
@@ -45,4 +45,4 @@ class AppModule extends Module {
     }
 }
 
-module.exports = AppModule
+module.exports = ModuleApp

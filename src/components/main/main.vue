@@ -1,4 +1,4 @@
-<div class="main-component" id="app">
+<component class="component-main" id="app">
     <!-- Force the telemetry window to show up -->
     <template v-if="telemetry.enabled === null">
         <Telemetry></Telemetry>
@@ -24,4 +24,4 @@
             </template>
         </div>
     </template>
-</div>
+</component>

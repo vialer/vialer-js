@@ -1,4 +1,4 @@
-<div class="main-statusbar-component">
+<component class="component-main-statusbar">
     <div class="status-left" v-if="user.authenticated">
         <span class="status-indicator tooltip tooltip-right" :data-tooltip="titles('indicator')">
             <svgicon class="dnd" name="dnd" v-if="dnd"/>
@@ -44,4 +44,4 @@
             <svgicon name="help"/>
         </div>
     </div>
-</div>
+</component>
