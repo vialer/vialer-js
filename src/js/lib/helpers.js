@@ -86,12 +86,15 @@ module.exports = function(app) {
                 else window.open(process.env.HOMEPAGE, '_blank')
             },
             openPlatformUrl: function(path = '') {
-                const token = this.user.platform.tokens.portal
-                path = `client/${this.user.client_id}/${path}`
-                path = `user/autologin/?token=${token}&username=${this.user.username}&next=/${path}`
-                let url = `${app.state.settings.platform.url}${path}`
-                if (app.env.isExtension) browser.tabs.create({url: url})
-                else window.open(url, '_blank')
+                app.emit('bg:user:update-token', {
+                    callback: ({token}) => {
+                        path = `client/${this.user.client_id}/${path}`
+                        path = `user/autologin/?token=${token}&username=${this.user.username}&next=/${path}`
+                        let url = `${app.state.settings.platform.url}${path}`
+                        if (app.env.isExtension) browser.tabs.create({url: url})
+                        window.open(url, '_blank')
+                    },
+                })
             },
             openPopoutView: function() {
                 // This is only available in extensions.

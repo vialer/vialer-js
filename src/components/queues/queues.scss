@@ -41,8 +41,9 @@
         }
     }
 
-    .notification-box {
+    .notification-box.info {
         margin: $spacer * 3;
+        margin-bottom: $spacer * 3;
         margin-top: $spacer * 3;
     }
 

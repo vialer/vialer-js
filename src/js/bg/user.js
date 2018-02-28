@@ -14,6 +14,11 @@ class ModuleUser extends Module {
 
         this.app.on('bg:user:login', ({username, password}) => this.login(username, password))
         this.app.on('bg:user:logout', this.logout.bind(this))
+
+        this.app.on('bg:user:update-token', async({callback}) => {
+            await this._platformData()
+            callback({token: this.app.state.user.platform.tokens.portal})
+        })
     }
 
 
