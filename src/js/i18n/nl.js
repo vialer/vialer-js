@@ -102,7 +102,7 @@ global.translations.nl = {
     'Queue': 'Wachtrij',
     'Queues': 'Wachtrijen',
     'queues': 'wachtrijen',
-    'refresh option to reflect changes from the': 'ververs optie om aanpassingen te verwerken uit',
+    'refresh option to reflect changes from the': 'ververs optie om aanpassingen te verwerken uit de',
     'Refresh or close this tab afterwards to reflect your changes.': 'Ververs of sluit deze tab na de wijziging om het effect te zien.',
     'registered': 'geregistreerd',
     'registration failed': 'registratie mislukt',
