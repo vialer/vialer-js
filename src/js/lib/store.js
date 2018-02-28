@@ -50,7 +50,7 @@ class Store {
         let schema = this.get('db_schema')
         if (!schema || schema !== this.dbSchema) {
             this.set('db_schema', this.dbSchema)
-            this.app.logger.warn(`${this}clear data (schema change)`)
+            this.app.logger.warn(`${this}storage schema change detected! db: ${schema} state: ${this.dbSchema}`)
             return false
         }
 

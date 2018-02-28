@@ -14,7 +14,7 @@
         </div>
     </div>
 
-    <div class="notification-box info" >
+    <div class="notification-box info">
         <header><svgicon name="info"/><span>{{$t('Changing the availability of your {user}', {user: `${vendor.name} ${$t('user')}`})}}</span></header>
         <ul v-if="destinations.length">
             <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>

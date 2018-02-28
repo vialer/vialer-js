@@ -30,12 +30,20 @@
         <template v-if="settings.webrtc.enabled && ['closed', 'open'].includes(app.vendor.type)">
             <Field name="webrtc_account" type="select"
                 :disabled="!settings.webrtc.enabled"
+                empty="No VoIP-accounts"
                 :label="$t('Softphone VoIP-account')" :model.sync="settings.webrtc.account.selected"
                 :options="settings.webrtc.account.options"
                 :placeholder="$t('Select a VoIP-account')"
                 :validation="$v.settings.webrtc.account.selected.id"/>
 
-            <div class="notification-box troubleshoot" v-if="settings.webrtc.enabled">
+            <div class="notification-box info" v-if="!settings.webrtc.account.options || !settings.webrtc.account.options.length">
+                <header><svgicon name="info"/><span>{{$t('A VoIP-account is required.')}}</span></header>
+                <ul>
+                    <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
+                    <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`phoneaccount`)">{{$t('VoIP-accounts')}}</a> {{ $t('to create a VoIP-account.') }}.</li>
+                </ul>
+            </div>
+            <div class="notification-box troubleshoot" v-else-if="settings.webrtc.enabled">
                 <header>
                     <svgicon name="warning"/><span>{{$t('Troubleshooting')}}</span>
                 </header>

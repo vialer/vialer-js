@@ -47,8 +47,11 @@
     <div class="control">
         <div class="select" v-bind:class="classes('select')">
             <select v-on:change="vChange($event, $event.target.value, options)" :id="name"
-                :name="name" :v-bind:value="vmodel" :disabled="disabled">
-                <option :selected="option[idfield] == vmodel.id" :value="option[idfield]" v-for="option in options">
+                :name="name" :v-bind:value="vmodel" :disabled="disabled || !options.length">
+                <template v-if="!options.length">
+                    <option value="" disabled selected>{{$t(empty)}}</option>
+                </template>
+                <option :selected="option[idfield] == vmodel.id" :value="option[idfield]" v-for="option in options" v-else>
                     <template v-if="option[idfield] === null && placeholder">{{placeholder}}</template>
                     <template v-else>{{$t(option.name)}}</template>
                 </option>

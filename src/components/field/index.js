@@ -155,6 +155,10 @@ module.exports = (app) => {
             change: Function,
             click: Function,
             disabled: Boolean,
+            empty: {
+                default: 'No options available',
+                type: String,
+            },
             help: String,
             idfield: {
                 default: 'id',

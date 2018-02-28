@@ -100,8 +100,7 @@ class ModuleAvailability extends Module {
             name: i.description,
             password: i.password,
         }))
-        // Add empty value.
-        platformAccounts.unshift({account_id: null, id: null, name: null, password: null})
+
         this.app.setState({
             availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id},
             settings: {webrtc: {account: {options: platformAccounts}}},
