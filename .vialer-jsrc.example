@@ -11,6 +11,10 @@
             },
             "vendor": {
                 "name": "Vialer",
+                "portal": {
+                    "name": "VoIPGRID portal",
+                    "url": "https://partner.voipgrid.nl/"
+                },
                 "support": "support@email",
                 "type": "closed"
             },

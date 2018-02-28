@@ -40,6 +40,7 @@
             background: rgba($brand-color, 0.1);
             border-radius: $spacer / 2;
             font-size: 0.75rem;
+            margin: $spacer 0;
             overflow: auto;
             padding: $spacer ($spacer * 2);
 
@@ -63,6 +64,12 @@
             ul {
                 li {
                     margin-bottom: $spacer / 4;
+
+                    // Icons that are used in help texts.
+                    svg {
+                        height: 0.75rem;
+                        width: 0.75rem;
+                    }
                 }
             }
         }

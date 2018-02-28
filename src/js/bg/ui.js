@@ -97,7 +97,7 @@ class ModuleUI extends Module {
     * @param {String} opts.title - Title header for the notification.
     * @param {Boolean} [opts.stack] - Whether to stack the notifications.
     */
-    notification({force = false, message, number = null, title, stack = false}) {
+    notification({force = false, message, number = null, title, stack = false, timeout = 3000}) {
         const options = {
             message: message,
             title: title,
@@ -120,19 +120,19 @@ class ModuleUI extends Module {
                 }
             }
 
-            // Only create a notification with a message and a title.
-            if (!message || !title || this.app.state.ui.visible) return
+            // Only create a notification under the right conditions.
+            if (!message || !title || (this.app.state.ui.visible && !force)) return
 
             options.iconUrl = browser.runtime.getURL(options.iconUrl)
             if (!stack) browser.notifications.clear('c2d')
             browser.notifications.create('c2d', options)
-            setTimeout(() => browser.notifications.clear('c2d'), 3000)
+            setTimeout(() => browser.notifications.clear('c2d'), timeout)
             return
         }
 
 
-        // Only create a notification with a message and a title.
-        if (!message || !title || this.app.state.ui.visible) return
+        // Only create a notification under the right conditions.
+        if (!message || !title || (this.app.state.ui.visible && !force)) return
 
         options.icon = options.iconUrl
         options.body = message
@@ -140,14 +140,14 @@ class ModuleUI extends Module {
         if (Notification.permission === 'granted') {
             if (!stack && this._notification) this._notification.close()
             this._notification = new Notification(title, options) // eslint-disable-line no-new
-            setTimeout(this._notification.close.bind(this._notification), 3000)
+            setTimeout(this._notification.close.bind(this._notification), timeout)
         } else if (Notification.permission !== 'denied') {
             // Create a notification after the user
             // accepted the permission.
             Notification.requestPermission((permission) => {
                 if (permission === 'granted') {
                     this._notification = new Notification(title, options) // eslint-disable-line no-new
-                    setTimeout(this._notification.close.bind(this._notification), 3000)
+                    setTimeout(this._notification.close.bind(this._notification), timeout)
                 }
             })
         }

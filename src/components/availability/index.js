@@ -20,9 +20,20 @@ module.exports = (app, actions) => {
                 // Sending an empty object like this will unset the
                 // user's availability.
                 let selected
+                const unavailable = {id: null, name: null, type: null}
 
-                if (!this.placeholder.id) selected = {id: null, name: null, type: null}
-                else selected = this.placeholder
+                // User wants to be available.
+                if (newVal) {
+                    // Set from remembered account.
+                    if (this.placeholder.id) selected = this.placeholder
+                    // No remembered value; choose the first available option.
+                    else if (this.destinations.length) selected = this.destinations[0]
+                    // No choice; just set to unavailable.
+                    else selected = unavailable
+                } else {
+                    // Availability is disabled. Set to unavailable.
+                    selected = unavailable
+                }
 
                 app.emit('bg:availability:update', {
                     available: newVal,

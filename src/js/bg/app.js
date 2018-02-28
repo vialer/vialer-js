@@ -29,6 +29,10 @@ class ModuleApp extends Module {
             updated: false,
             vendor: {
                 name: process.env.VENDOR_NAME,
+                portal: {
+                    name: process.env.PORTAL_NAME,
+                    url: process.env.PORTAL_URL,
+                },
                 support: process.env.VENDOR_SUPPORT,
                 type: process.env.VENDOR_TYPE,
             },

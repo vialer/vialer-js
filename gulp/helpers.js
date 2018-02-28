@@ -246,6 +246,8 @@ class Helpers {
                 HOMEPAGE: this.settings.brands[brandName].homepage_url,
                 NODE_ENV: this.settings.NODE_ENV,
                 PLATFORM_URL: this.settings.brands[brandName].permissions,
+                PORTAL_NAME: this.settings.brands[brandName].vendor.portal.name,
+                PORTAL_URL: this.settings.brands[brandName].vendor.portal.url,
                 SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
                 VENDOR_NAME: this.settings.brands[brandName].vendor.name,
                 VENDOR_SUPPORT: this.settings.brands[brandName].vendor.support,

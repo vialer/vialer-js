@@ -1,5 +1,4 @@
 <component class="component-contacts">
-
     <div class="panel-content">
         <h1>{{$t('Contacts')}}</h1>
         <input class="input" autofocus type="email" :placeholder="$t('Find contact') + '...'" :disabled="search.disabled" v-model="search.input">

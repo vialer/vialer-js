@@ -18,13 +18,6 @@ class AppBackground extends App {
         options.env = env
         super(options)
 
-        // Clear all state if the schema changed after a plugin update.
-        if (!this.store.validSchema()) {
-            this.store.remove('state')
-            // Do a hard reload; nothing to save from there.
-            location.reload()
-        }
-
         this.timer = new Timer(this)
         this.utils = require('../lib/utils')
 
@@ -132,10 +125,28 @@ class AppBackground extends App {
             if (this.modules[module]._watchers) {
                 Object.assign(watchers, this.modules[module]._watchers())
             }
-
         }
 
         this.initViewModel(watchers)
+
+        // Clear all state if the schema changed after a plugin update.
+        if (!this.store.validSchema()) {
+            // this.store.remove('state')
+            const timeout = 5000
+            let message = this.$t(`Our apologies! This new version of {name} introduces changes that requires you to relogin.
+                                   You will be automatically logged out after {seconds} seconds.`, {
+                name: this.state.app.name,
+                seconds: timeout / 1000,
+            })
+
+            this.modules.ui.notification({force: true, message, timeout, title: this.$t('Relogin required')})
+
+            // Remove the stored state and do a hard reload.
+            setTimeout(() => {
+                this.store.remove('state')
+                location.reload()
+            }, timeout)
+        }
 
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()

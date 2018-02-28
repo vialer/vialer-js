@@ -133,11 +133,19 @@ module.exports = (app) => {
                 Vue.i18n.set(newVal.id)
             },
             'settings.webrtc.account.selected': function(newVal, oldVal) {
-                // The `options` and `selected` fields are just placeholders
+                // The `options` and `selected` fields are placeholders
                 // for easier account selection. The actual username/password
-                // is stored on these properties.
+                // is stored in these properties.
                 this.settings.webrtc.account.username = newVal.account_id
                 this.settings.webrtc.account.password = newVal.password
+            },
+            'settings.webrtc.enabled': function(newVal, oldVal) {
+                if (!this.settings.platform.enabled) return
+                // Sync the platform credentials field when enabling the softphone.
+                if (newVal) {
+                    this.settings.webrtc.account.username = this.settings.webrtc.account.selected.account_id
+                    this.settings.webrtc.account.password = this.settings.webrtc.account.selected.password
+                }
             },
             'settings.webrtc.permission': async function(newVal, oldVal) {
                 if (!soundMeter) soundMeter = await microphoneCheck()
