@@ -12,15 +12,14 @@ module.exports = (app) => {
             },
         },
         methods: Object.assign({
-            login: function() {
-                app.emit('bg:user:login', {
+            unlock: function() {
+                app.emit('bg:user:unlock', {
                     password: this.user.password,
-                    username: this.user.username,
                 })
             },
         }, app.helpers.sharedMethods()),
-        render: templates.login.r,
-        staticRenderFns: templates.login.s,
+        render: templates.unlock.r,
+        staticRenderFns: templates.unlock.s,
         store: {
             app: 'app',
             url: 'settings.platform.url',
@@ -34,19 +33,10 @@ module.exports = (app) => {
                         minLength: v.minLength(6),
                         required: v.required,
                     },
-                    username: {
-                        email: v.email,
-                        required: v.required,
-                    },
                 },
             }
 
             return validations
-        },
-        watch: {
-            'user.username': function(newVal, oldVal) {
-                app.setState({user: {username: newVal}}, {persist: false})
-            },
         },
     }
 }

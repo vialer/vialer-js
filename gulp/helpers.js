@@ -91,7 +91,7 @@ class Helpers {
 
 
                     if (res.uploadState !== 'SUCCESS') {
-                        gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+                        gutil.log(`An error occured after uploading: ${JSON.stringify(res, null, 4)}`)
                         return
                     }
 

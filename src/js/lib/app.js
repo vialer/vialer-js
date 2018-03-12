@@ -24,6 +24,20 @@ class App extends Skeleton {
     }
 
 
+    /**
+    * Application parts using this class should provide their own
+    * initStore implementation. The foreground script for instance
+    * gets its state from the background, while the background
+    * gets its state from localstorage or from a
+    * hardcoded default fallback.
+    */
+    __initStore() {
+        this.state = {
+            env: this.env,
+        }
+    }
+
+
     __isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item))
     }
@@ -49,10 +63,12 @@ class App extends Skeleton {
 
 
     /**
-    * Vue-friendly object operations.
+    * Vue-friendly object merging. The `path` is used to assist
+    * Vue's reactivity system to catch up with the changes.
     */
-    __mergeState({action, path, persist, state}) {
-        if (path) {
+    async __mergeState({action, encrypt = true, path, persist, state}) {
+        if (!path) this.__mergeDeep(this.state, state)
+        else {
             path = path.split('/')
             if (action === 'insert') {
                 this.__setFromPath(this.state, path, state)
@@ -66,11 +82,21 @@ class App extends Skeleton {
                 const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
                 Vue.set(_ref, path[path.length - 1], state)
             }
-
-        } else {
-            this.__mergeDeep(this.state, state)
         }
-        if (persist) this.store.set('state', this.state)
+
+        if (persist && this.name === 'bg') {
+            // Background is leading and is the only one that
+            // writes to storage using encryption.
+            if (encrypt) {
+                const encryptedState = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(this.state))
+                this.store.set('state.encrypted', encryptedState)
+            } else {
+                let stateClone = this.store.get('state.unencrypted')
+                if (!stateClone) stateClone = {}
+                this.__mergeDeep(stateClone, state)
+                this.store.set('state.unencrypted', stateClone)
+            }
+        }
     }
 
 
@@ -104,40 +130,6 @@ class App extends Skeleton {
 
 
     /**
-    * Make sure that these values in the state are
-    * set fresh when reviving the state.
-    * @param {Store} store - The Stash store.
-    */
-    _hydrateState(store) {
-        store.notifications = []
-    }
-
-
-    /**
-    * Sets the state back to defaults without loosing some
-    * all personalized general settings and preferences.
-    * @returns {Object} Stripped state.
-    */
-    _resetState() {
-        let _state = this._initialState()
-        delete _state.app
-
-        Object.assign(_state, {
-            availability: _state.availability,
-            calls: _state.calls,
-            contacts: _state.contacts,
-            queues: _state.queues,
-            settings: {
-                webrtc: _state.settings.webrtc,
-            },
-            ui: {layer: 'login'},
-        })
-
-        return _state
-    }
-
-
-    /**
     * Create a I18n stash store and pass it to the I18n plugin.
     */
     initI18n() {
@@ -150,20 +142,6 @@ class App extends Skeleton {
         Vue.i18n.set(selectedLanguage)
         // Add a simple reference to the translation module.
         this.$t = Vue.i18n.translate
-    }
-
-
-    /**
-    * Application parts using this class should provide their own
-    * initStore implementation. The foreground script for instance
-    * gets its state from the background, while the background
-    * gets its state from localstorage or from a
-    * hardcoded default fallback.
-    */
-    initStore() {
-        this.state = {
-            env: this.env,
-        }
     }
 
 
@@ -190,36 +168,21 @@ class App extends Skeleton {
 
 
     /**
-    * Load all modules.
-    */
-    loadModules() {
-        // Init these modules.
-        for (let module of this._modules) {
-            this.modules[module.name] = new module.Module(this)
-        }
-    }
-
-
-    /**
     * Set the background state and propagate it to the other end.
     * @param {Object} state - The state to update.
     * @param {Boolean} options - Whether to persist the changed state to localStorage.
     */
-    setState(state, {action, path, persist} = {}) {
+    setState(state, {action, encrypt, path, persist} = {}) {
         if (!action) action = 'merge'
-        this.__mergeState({
-            action: action,
-            path: path,
-            persist: persist,
-            state: state,
-        })
-
-        this.emit(`${this._emitTarget}:set_state`, {
-            action: action,
-            path: path,
-            persist: persist,
-            state: this.env.isExtension ? state : JSON.parse(JSON.stringify(state)),
-        })
+        // Merge state in the context of the exeucting script.
+        this.__mergeState({action, encrypt, path, persist, state})
+        // Sync the state to the other script context(bg/fg).
+        // Make sure that we don't pass a state reference over the
+        // EventEmitter in case of a webview; this would create
+        // unpredicatable side-effects.
+        let stateClone = state
+        if (!this.env.isExtension) stateClone = JSON.parse(JSON.stringify(state))
+        this.emit(`${this._emitTarget}:set_state`, {action, encrypt, path, persist, state: stateClone})
     }
 }
 

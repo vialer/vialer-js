@@ -1,10 +1,6 @@
 {
-    "extTitle": {
-        "message": "Vialer",
-        "description": "Plugin titel."
-    },
     "extDescription": {
-        "message": "Klik&bel, statusupdate en wachtrij monitoring",
+        "message": "WebRTC softphone & communication platform",
         "description": "Plugin omschrijving."
     }
 }

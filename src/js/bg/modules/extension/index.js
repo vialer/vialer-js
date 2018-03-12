@@ -1,7 +1,6 @@
-const Module = require('../lib/module')
-
-
+const Module = require('../../lib/module')
 const Tabs = require('./tabs')
+
 
 /**
 * Root class for all extension-related logic.

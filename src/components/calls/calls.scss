@@ -1,21 +1,8 @@
 @import "../../scss/lib/variables";
 
 .component-calls {
-    position: relative;
-
-    &::before {
-        background: $white;
-        content: "";
-        height: 100%;
-        position: absolute;
-        top: 0;
-        transition: all 600ms ease;
-        width: 100%;
-    }
 
     &.call-ongoing {
-        &::before {
-            background: linear-gradient(180deg, $brand-color, $brand-variation-color);
-        }
+        background: linear-gradient(180deg, $brand-color, $brand-variation-color);
     }
 }

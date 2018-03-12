@@ -1,7 +1,7 @@
 /**
 * @module ModuleApp
 */
-const Module = require('./lib/module')
+const Module = require('../lib/module')
 
 class ModuleApp extends Module {
 
@@ -16,7 +16,6 @@ class ModuleApp extends Module {
                 this.app.setState({app: {online: true}})
             })
         }
-
     }
 
 
@@ -44,7 +43,7 @@ class ModuleApp extends Module {
     }
 
 
-    _hydrateState(moduleStore) {
+    _restoreState(moduleStore) {
         moduleStore.notifications = []
     }
 }

@@ -58,18 +58,26 @@ module.exports = (app) => {
             },
         }, app.helpers.sharedMethods()),
         mounted: async function() {
-            // State was modified; form was set invalid in the meanwhile.
-            if (this.settings._form.invalid) this.$v.$touch()
+            // Immediatly triger validation on the fields.
+            this.$v.$touch()
+
             if (!soundMeter) soundMeter = await microphoneCheck()
             if (soundMeter) {
                 app.state.settings.webrtc.permission = true
                 this.soundMeterInterval = setInterval(() => {
-                    Vue.set(this.sound, 'inputLevel', (soundMeter.instant * 2))
-                }, 25)
+                    window.requestAnimationFrame(() => {
+                        Vue.set(this.sound, 'inputLevel', soundMeter.slow)
+                    })
+                }, 10)
             } else {
+                // Still no soundMeter? Something terrible happened
+                // and we can't use WebRTC now.
                 app.state.settings.webrtc.permission = false
             }
 
+            // Query devices and fill the store with them. This is
+            // currently a feature behind a developer flag, because
+            // its not stable yet.
             navigator.mediaDevices.enumerateDevices().then((devices) => {
                 for (const device of devices) {
                     if (device.kind === 'audioinput') {
@@ -85,7 +93,7 @@ module.exports = (app) => {
                     }
                 }
             }).catch((err) => {
-                console.log('ERROR', err)
+                console.error(err)
             })
         },
         render: templates.settings.r,
@@ -101,6 +109,12 @@ module.exports = (app) => {
         validations: function() {
             let validations = {
                 settings: {
+                    platform: {
+                        url: {
+                            required: v.required,
+                            url: v.url,
+                        },
+                    },
                     sipEndpoint: {
                         domain: app.helpers.validators.domain,
                         required: v.required,
@@ -122,29 +136,36 @@ module.exports = (app) => {
             return validations
         },
         watch: {
-            settings: {
-                deep: true,
-                handler: function(newVal, oldVal) {
-                    if (this.$v.$invalid) this.settings._form.invalid = true
-                    else this.settings._form.invalid = false
-                },
-            },
+            /**
+            * Reactively change the language when the select updates.
+            * @param {Object} newVal - New select value.
+            * @param {Object} oldVal - Old select value.
+            */
             'settings.language.selected': function(newVal, oldVal) {
                 Vue.i18n.set(newVal.id)
             },
-            'settings.webrtc.account.selected': function(newVal, oldVal) {
-                // The `options` and `selected` fields are placeholders
-                // for easier account selection. The actual username/password
-                // is stored in these properties.
-                this.settings.webrtc.account.username = newVal.account_id
-                this.settings.webrtc.account.password = newVal.password
-            },
+            /**
+            * The switch to toggle the softphone. This is a bit more complicated
+            * because the store data that is used to setup the connection, e.g.
+            * `settings.webrtc.account`, is not directly bound to the VoIP-account
+            * selection
+            * @param {Object} newVal - New checkbox/switch value.
+            * @param {Object} oldVal - Old checkbox/switch value.
+            */
             'settings.webrtc.enabled': function(newVal, oldVal) {
-                if (!this.settings.platform.enabled) return
-                // Sync the platform credentials field when enabling the softphone.
                 if (newVal) {
-                    this.settings.webrtc.account.username = this.settings.webrtc.account.selected.account_id
-                    this.settings.webrtc.account.password = this.settings.webrtc.account.selected.password
+                    // No option is set in the VoIP-account select yet.
+                    // This is required. Help the user by setting the first
+                    // account as the default. An info-message is shown if
+                    // there are no accounts yet.
+                    if (!this.settings.webrtc.account.selected.username) {
+                        // There are options to choose from.
+                        if (this.settings.webrtc.account.options.length) {
+                            this.settings.webrtc.account.selected = this.settings.webrtc.account.options[0]
+                        }
+                    }
+                } else {
+                    this.settings.webrtc.account.selected = {id: null, name: null, password: null, username: null}
                 }
             },
             'settings.webrtc.permission': async function(newVal, oldVal) {

@@ -37,7 +37,7 @@ module.exports = (function() {
 
         if (navigator.platform.match(/(Linux)/i)) env.isLinux = true
         else if (navigator.platform.match(/(Mac)/i)) env.isMacOS = true
-        else if (navigator.platform.match(/(Windows)/i)) env.isWindows = true
+        else if (navigator.platform.match(/(Windows|Win32)/i)) env.isWindows = true
     }
 
     try {

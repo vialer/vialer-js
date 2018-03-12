@@ -1,6 +1,6 @@
 {
   "name": "vialer-js",
-  "version": "3.0.0.70",
+  "version": "3.0.81",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
     "node": ">=8.0.0"
@@ -37,7 +37,7 @@
   "homepage": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
   "devDependencies": {
     "browserify": "^14.1.0",
-    "chrome-webstore-upload": "^0.2.1",
+    "chrome-webstore-upload": "^0.2.2",
     "connect": "^3.6.0",
     "connect-mount": "^1.0.0",
     "del": "^2.2.2",

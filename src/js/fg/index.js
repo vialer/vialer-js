@@ -16,7 +16,11 @@ class AppForeground extends App {
 
         // Distinguish between the popout(tab) and popup view.
         let searchParams = this.utils.parseSearch(location.search)
-        if (searchParams.popout) env.role.popout = true
+        if (searchParams.popout) {
+            $('html').classList.add('popout')
+            env.role.popout = true
+        } else $('html').classList.add('popup')
+
         this.env = env
 
         this.on('fg:notify', (message) => this.vm.$notify(message))
@@ -41,14 +45,15 @@ class AppForeground extends App {
         Vue.component('Notifications', require('../../components/notifications')(this))
         Vue.component('Settings', require('../../components/settings')(this))
         Vue.component('Telemetry', require('../../components/telemetry')(this))
+        Vue.component('Unlock', require('../../components/unlock')(this))
         Vue.component('Queues', require('../../components/queues')(this))
 
-        this.initStore()
+        this.__initStore()
     }
 
 
-    initStore() {
-        super.initStore()
+    __initStore() {
+        super.__initStore()
         // Initialize with the initial state from the background.
 
         this.emit('bg:get_state', {
@@ -86,6 +91,7 @@ function initApp(initParams) {
     if (app.env.isChrome) $('html').classList.add('chrome')
     if (app.env.isEdge) $('html').classList.add('edge')
     if (app.env.isFirefox) $('html').classList.add('firefox')
+    if (app.env.isExtension) $('html').classList.add('extension')
 
     if (app.env.isMacOS) {
         // Forces height recalculation of the popup in Chrome OSX.
@@ -112,7 +118,11 @@ function initApp(initParams) {
 
 // For extensions, this is an executable endpoint.
 if (env.isExtension) {
-    global.app = initApp({name: 'fg'})
+    const fgApp = initApp({name: 'fg'})
+    // Globals are disabled in production mode.
+    if (process.env.NODE_ENV !== 'production') {
+        if (!global.app) global.app = fgApp
+    }
 }
 
 module.exports = initApp

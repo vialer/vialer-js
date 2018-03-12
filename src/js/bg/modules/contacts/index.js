@@ -2,7 +2,7 @@
 * @module ModuleContacts
 */
 const ContactSip = require('./contact/sip')
-const Module = require('../lib/module')
+const Module = require('../../lib/module')
 
 
 class ModuleContacts extends Module {
@@ -43,11 +43,9 @@ class ModuleContacts extends Module {
             return
         }
 
-        // Remove unregistered accounts and the user's own account.
-        const ownAccountId = parseInt(this.app.state.settings.webrtc.account.username)
-        let contacts = res.data.objects.filter((c) => {
-            return (c.sipreginfo && (c.account_id !== ownAccountId))
-        })
+        // Remove the user's own account from the list.
+        const ownAccountId = parseInt(this.app.state.settings.webrtc.account.selected.username)
+        let contacts = res.data.objects.filter((c) => (c.account_id !== ownAccountId))
 
         this.app.setState({contacts: {status: null}})
 
@@ -59,13 +57,13 @@ class ModuleContacts extends Module {
 
         if (['registered', 'connected'].includes(this.app.state.calls.ua.state)) {
             for (let contactId of Object.keys(this.contacts)) {
-                await this.contacts[contactId].presence.subscribe()
+                if (this.contacts[contactId].presence) await this.contacts[contactId].presence.subscribe()
             }
         }
     }
 
 
-    _hydrateState(moduleStore) {
+    _restoreState(moduleStore) {
         moduleStore.contacts = {}
     }
 

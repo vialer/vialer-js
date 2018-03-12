@@ -153,19 +153,22 @@ class CallSIP extends Call {
     }
 
 
-    start() {
+    async start() {
         if (this.silent) {
             if (this.state.status === 'invite') this._incoming()
             else this._outgoing()
         } else {
             // Query media and assign the stream. The actual permission must be
             // already granted from a foreground script running in a tab.
-            this.hasMedia = this._initMedia().then((stream) => {
+            try {
+                const stream = await this._initMedia()
                 this._sessionOptions.media.stream = stream
                 this.stream = stream
                 if (this.state.status === 'invite') this._incoming()
                 else this._outgoing()
-            })
+            } catch (err) {
+                console.error(err)
+            }
         }
     }
 

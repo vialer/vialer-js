@@ -271,7 +271,7 @@ class SoundMeter {
                 if (Math.abs(input[i]) > 0.99) clipcount += 1
             }
             this.instant = Math.sqrt(sum / input.length)
-            this.slow = 0.95 * this.slow + 0.05 * this.instant
+            this.slow = 0.70 * this.slow + 0.8 * this.instant
             this.clip = clipcount / input.length
         }
     }

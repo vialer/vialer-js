@@ -1,26 +1,27 @@
 <component class="component-main" id="app">
     <!-- Force the telemetry window to show up -->
-    <template v-if="telemetry.enabled === null">
+    <template v-if="telemetry.enabled === null && user.authenticated">
         <Telemetry></Telemetry>
     </template>
     <template v-else>
-        <MainStatusBar v-if="!callOngoing" />
+        <MainStatusBar v-if="!callOngoing"/>
         <MainCallBar v-if="callOngoing && call.active" :call="call" v-for="call in calls"/>
 
-        <div class="panel">
-            <div class="panel-content-container" v-if="!user.authenticated">
-                <Notifications/>
-                <Login v-if="layer==='login'" class="panel-content"/>
-            </div>
+        <Notifications  :class="classes('notifications')"/>
+        <div class="panel" :class="classes('panel')">
+            <template v-if="layer === 'login' || layer === 'unlock'">
+                <Login v-if="layer === 'login'" class="panel-content"/>
+                <Unlock v-else-if="layer === 'unlock'" class="panel-content"d/>
+            </template>
 
             <template v-else>
-                <MainMenuBar class="panel-sidebar"/>
-                <Notifications class="with-sidebar"/>
-                <Availability v-if="layer==='availability'" class="panel-content-container with-sidebar"/>
-                <Contacts v-else-if="layer==='contacts'" class="panel-content-container with-sidebar"/>
-                <Queues v-else-if="layer==='queues'" class="panel-content-container with-sidebar"/>
-                <Settings v-else-if="layer==='settings'" class="panel-content-container with-sidebar panel-content"/>
-                <Calls v-else-if="layer==='calls'" :calls="calls" class="panel-content-container with-sidebar"/>
+                <MainMenuBar/>
+
+                <Availability v-if="layer==='availability'"/>
+                <Contacts v-else-if="layer==='contacts'"/>
+                <Queues v-else-if="layer==='queues'"/>
+                <Settings v-else-if="layer==='settings'"/>
+                <Calls v-else-if="layer==='calls'" :calls="calls"/>
             </template>
         </div>
     </template>

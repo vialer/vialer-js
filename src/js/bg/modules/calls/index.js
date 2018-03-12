@@ -3,7 +3,7 @@
 */
 const callFactory = require('./call/factory')
 const transform = require('sdp-transform')
-const Module = require('../lib/module')
+const Module = require('../../lib/module')
 
 
 /**
@@ -101,7 +101,6 @@ class ModuleCalls extends Module {
 
 
         /**
-        *
         * @param {String} callId - The call id of the call to transfer to.
         */
         this.app.on('bg:calls:transfer_finalize', ({callId}) => {
@@ -210,7 +209,7 @@ class ModuleCalls extends Module {
                     audio: true,
                     video: false,
                 },
-                modifiers: [this._formatSdp],
+                modifiers: [this._formatSdp.bind(this)],
             },
             traceSip: false,
             userAgentString: this._userAgent(),
@@ -220,11 +219,11 @@ class ModuleCalls extends Module {
         // Log in with the WebRTC voipaccount when it is enabled.
         // The voipaccount should be from the same client as the logged-in
         // user, or subscribe information won't work.
-        if (settings.webrtc.enabled && (settings.webrtc.account.username && settings.webrtc.account.password)) {
-            options.authorizationUser = settings.webrtc.account.username
-            options.password = settings.webrtc.account.password
+        if (settings.webrtc.enabled && (settings.webrtc.account.selected.username && settings.webrtc.account.selected.password)) {
+            options.authorizationUser = settings.webrtc.account.selected.username
+            options.password = settings.webrtc.account.selected.password
             options.register = true
-            options.uri = `sip:${settings.webrtc.account.username}@voipgrid.nl`
+            options.uri = `sip:${settings.webrtc.account.selected.username}@voipgrid.nl`
         } else {
             // Login with platform email without SIP register.
             options.authorizationUser = this.app.state.user.username
@@ -292,7 +291,12 @@ class ModuleCalls extends Module {
 
 
     _formatSdp(sessionDescription) {
-        let allowedCodecs = ['G722', 'telephone-event', 'opus']
+        const selectedCodec = this.app.state.settings.webrtc.codecs.selected.name
+
+        // (!) The `opus` codec must always be in the sdp.
+        let allowedCodecs = ['telephone-event', 'opus']
+        if (selectedCodec !== 'opus') allowedCodecs.push(selectedCodec)
+
         let sdpObj = transform.parse(sessionDescription.sdp);
         let rtp = {media: []}
         let payloads = []
@@ -312,6 +316,7 @@ class ModuleCalls extends Module {
         sdpObj.media[0].rtp = rtp.media
         sdpObj.media[0].payloads = payloads.join(' ')
         sdpObj.media[0].fmtp = fmtps
+
         sessionDescription.sdp = transform.write(sdpObj)
         return Promise.resolve(sessionDescription)
     }
@@ -327,7 +332,7 @@ class ModuleCalls extends Module {
     }
 
 
-    _hydrateState(moduleStore) {
+    _restoreState(moduleStore) {
         moduleStore.calls = {}
     }
 
@@ -340,8 +345,10 @@ class ModuleCalls extends Module {
     _userAgent() {
         const env = this.app.env
         // Don't use dynamic extension state here as version.
-        // Vialer-js may run outside of an extension context.
-        let userAgent = 'Vialer-js/' + process.env.VERSION
+        // Vialer-js may run outside of an extension's (manifest)
+        // context. Also don't use template literals, because envify
+        // can't deal with string replacement otherwise.
+        let userAgent = 'Vialer-js/' + process.env.VERSION + ' '
         if (env.isLinux) userAgent += '(Linux/'
         else if (env.isMacOS) userAgent += '(MacOS/'
         else if (env.isWindows) userAgent += '(Windows/'
@@ -477,26 +484,27 @@ class ModuleCalls extends Module {
         this.app.setState({calls: {ua: {state: 'disconnected'}}})
         this.ua = new this.lib.UA(uaOptions)
 
+        const allowedIncomingStatus = ['new', 'rejected_a', 'rejected_b', 'bye']
+
         // An incoming call. Set the session object and set state to call.
         this.ua.on('invite', (session) => {
-            // Call-waiting is not supported(for now). A new incoming call
+            // Call-waiting is not allowed for now. A new incoming call
             // on top of a call that is already active will be silently
             // dropped.
             const callIds = Object.keys(this.calls)
 
-            if (
-                // No microphone access; don't accept any Call.
-                this.app.state.settings.webrtc.permission &&
-                // Do not disturb; skip any incoming Call.
-                !this.app.state.availability.dnd &&
-                // No ongoing Calls yet.
-                (callIds.length === 0 || (callIds.length === 1 && this.calls[callIds[0]].state.status === 'new'))
+            if (this.app.state.settings.webrtc.permission && // No microphone access; don't accept any Call.
+                !this.app.state.availability.dnd && // Do not disturb; skip any incoming Call.
+                (callIds.length === 0 || (callIds.length === 1 && allowedIncomingStatus.includes(this.calls[callIds[0]].state.status))) // No ongoing Calls yet.
             ) {
+                // First remove the old call that's being closed before proceeding.
+                if (callIds.length === 1) this.deleteCall(this.calls[callIds[0]])
                 // No reason to pretend that we can switch to a different type
                 // of call(yet), because Connectab can't handle incoming calls.
                 const call = callFactory(this, session, {}, 'CallSIP')
                 this.calls[call.id] = call
                 call.start()
+
             } else {
                 // Treat the call as a silenced call and terminate it directly.
                 const call = callFactory(this, session, {silent: true}, 'CallSIP')

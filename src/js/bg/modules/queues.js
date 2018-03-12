@@ -1,7 +1,7 @@
 /**
 * @module ModuleQueues
 */
-const Module = require('./lib/module')
+const Module = require('../lib/module')
 
 
 /**

@@ -1,7 +1,7 @@
 /**
 * @module ModuleUI
 */
-const Module = require('./lib/module')
+const Module = require('../lib/module')
 
 
 /**
@@ -44,7 +44,13 @@ class ModuleUI extends Module {
     }
 
 
-    _hydrateState(moduleStore) {
+    /**
+    * Set the initial restored state for the webextension menubar,
+    * which should be inactive without active events that could
+    * override the status.
+    * @param {Object} moduleStore - The root key of the restored store module.
+    */
+    _restoreState(moduleStore) {
         moduleStore.menubar = {
             default: 'inactive',
             event: null,
@@ -132,7 +138,9 @@ class ModuleUI extends Module {
 
 
         // Only create a notification under the right conditions.
-        if (!message || !title || (this.app.state.ui.visible && !force)) return
+        if (this.app.state.ui) {
+            if (!message || !title || (this.app.state.ui.visible && !force)) return
+        }
 
         options.icon = options.iconUrl
         options.body = message
@@ -140,14 +148,14 @@ class ModuleUI extends Module {
         if (Notification.permission === 'granted') {
             if (!stack && this._notification) this._notification.close()
             this._notification = new Notification(title, options) // eslint-disable-line no-new
-            setTimeout(this._notification.close.bind(this._notification), timeout)
+            setTimeout(() => this._notification.close(), timeout)
         } else if (Notification.permission !== 'denied') {
             // Create a notification after the user
             // accepted the permission.
             Notification.requestPermission((permission) => {
                 if (permission === 'granted') {
                     this._notification = new Notification(title, options) // eslint-disable-line no-new
-                    setTimeout(this._notification.close.bind(this._notification), timeout)
+                    setTimeout(() => this._notification.close(), timeout)
                 }
             })
         }

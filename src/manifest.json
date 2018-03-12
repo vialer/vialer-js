@@ -51,6 +51,7 @@
     },
     "permissions": [
         "*://*/*",
+        "background",
         "contextMenus",
         "notifications",
         "storage",
