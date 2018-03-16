@@ -1,39 +1,52 @@
 @import "../../scss/lib/variables";
 
+// Specific styling for different environments.
+html {
+    &.extension {
+        .component-main {
+            max-width: $max-popup-width * 2.5;
+        }
+
+        &.popout {
+            .panel {
+                // The minimal height should allow all sidebar icons to show.
+                height: calc(100vh - #{$spacer * 5});
+                min-height: 260px;
+            }
+        }
+
+        &.popup {
+            .panel {
+                // The minimal height should allow all sidebar icons to show.
+                max-height: calc(600px - #{$spacer * 5});
+                min-height: 260px;
+            }
+        }
+    }
+}
+
 .component-main {
-    display: flex;
-    flex-direction: column;
-    max-width: $max-popup-width;
-    min-height: 275px;
-    min-width: $max-popup-width;
-    position: relative;
 
     .panel {
-        display: flex;
-        flex: 1 1 auto;
-        overflow: auto;
-        position: relative;
+        display: grid;
+        // Show a scrollbar when the content height exceeds the max-height.
+        overflow-y: auto;
+
+        // Split into grid columns for the menubar when logged in.
+        &.sidebar {
+            grid-template-columns: ($spacer * 5) auto;
+        }
+
+        h1 {
+            color: $brand-color;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: $spacer * 2;
+            text-transform: uppercase;
+        }
 
         .panel-content {
             padding: $spacer * 3;
-        }
-
-        .panel-content-container {
-            margin-top: $spacer * 5;
-            overflow: auto;
-            width: 100%;
-
-            &.with-sidebar {
-                margin-left: $spacer * 5;
-            }
-
-            h1 {
-                color: $brand-color;
-                font-size: 1rem;
-                font-weight: 500;
-                margin-bottom: $spacer * 2;
-                text-transform: uppercase;
-            }
         }
 
         .notification-box {

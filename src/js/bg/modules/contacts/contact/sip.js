@@ -10,11 +10,11 @@ class ContactSip extends Contact {
             id: state.account_id,
             name: state.callerid_name,
             number: state.internal_number,
-            status: 'unavailable',
-            userAgent: state.sipreginfo.useragent,
+            status: state.sipreginfo ? 'unavailable' : 'unregistered',
+            userAgent: state.sipreginfo ? state.sipreginfo.useragent : this.app.$t('Not available'),
         }
 
-        this.presence = new PresenceSip(this, app.modules.calls)
+        if (state.sipreginfo) this.presence = new PresenceSip(this, app.modules.calls)
         this.setState(this.state)
     }
 }

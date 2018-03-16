@@ -4,11 +4,7 @@
     color: $white;
     display: flex;
     flex-direction: column;
-    min-height: 250px;
 
-    > * {
-        position: relative;
-    }
 
     .call-info {
         align-self: flex-start;

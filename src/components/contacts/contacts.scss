@@ -14,6 +14,11 @@
                 height: $spacer * 2.5;
                 width: $spacer * 2.5;
 
+                &.unregistered {
+                    path[pid="0"] {fill: $grey-color-lighter;}
+                    path[pid="1"] {fill: $grey-color;}
+                }
+
                 &.unavailable,
                 &.no-results {
                     path[pid="0"] {fill: $grey-color;}

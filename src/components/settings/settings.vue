@@ -3,10 +3,13 @@
     <div class="tabs">
         <ul>
             <li :class="{'is-active': tabs.active === 'phone'}" @click="setTab('phone')">
-                <a><span class="icon is-small"><svgicon name="phone"/></span><span>{{$t('Phone')}}</span></a>
+                <a><span class="icon is-small"><svgicon name="phone"/></span><span>{{$t('Calling')}}</span></a>
             </li>
             <li :class="{'is-active': tabs.active === 'audio'}" @click="setTab('audio')">
                 <a><span class="icon is-small"><svgicon name="microphone"/></span><span>Audio</span></a>
+            </li>
+            <li :class="{'is-active': tabs.active === 'privacy'}" @click="setTab('privacy')">
+                <a><span class="icon is-small"><svgicon name="lock-on"/></span><span>{{$t('Privacy')}}</span></a>
             </li>
             <li :class="{'is-active': tabs.active === 'general'}" @click="setTab('general')">
                 <a><span class="icon is-small"><svgicon name="user"/></span><span>{{$t('General')}}</span></a>
@@ -16,11 +19,11 @@
 
     <!-- Phone preferences -->
     <div class="tab" :class="{'is-active': tabs.active === 'phone'}">
-        <Field name="sip_endpoint" type="text"
-            :label="$t('SIP server')" :model.sync="settings.sipEndpoint"
-            :help="$t('Domainname of the SIP server with websocket support.')"
-            :placeholder="$t('SIP server')"
-            :validation="$v.settings.sipEndpoint"/>
+
+        <Field name="click2dial" type="checkbox"
+            :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
+            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
+            :placeholder="$t('SIP Server')"/>
 
         <Field name="webrtc_enabled" type="checkbox"
             :label="$t('Use as softphone')" :model.sync="settings.webrtc.enabled"
@@ -30,7 +33,7 @@
         <template v-if="settings.webrtc.enabled && ['closed', 'open'].includes(app.vendor.type)">
             <Field name="webrtc_account" type="select"
                 :disabled="!settings.webrtc.enabled"
-                empty="No VoIP-accounts"
+                :empty="$t('No VoIP-accounts')"
                 :label="$t('Softphone VoIP-account')" :model.sync="settings.webrtc.account.selected"
                 :options="settings.webrtc.account.options"
                 :placeholder="$t('Select a VoIP-account')"
@@ -59,33 +62,43 @@
         <template v-else-if="settings.webrtc.enabled && app.vendor.type === 'free'">
             <Field name="webrtc_username" type="text"
                 :disabled="!settings.webrtc.enabled"
-                :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.account.username"
+                :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.account.selected.username"
                 :placeholder="$t('VoIP account') + ' id'"/>
 
             <Field name="webrtc_password" type="password"
                 :disabled="!settings.webrtc.enabled"
-                :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.account.password"
+                :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.account.selected.password"
                 :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
         </template>
     </div>
 
     <!-- Audio settings -->
     <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
+
         <div class="ringtone">
             <Field class="ringtone-select" name="ringtone" type="select"
                 :disabled="!settings.webrtc.enabled"
+                :help="$t('The ringtone that is played when you\'re being called.')"
                 :label="$t('Ringtone')" :model.sync="settings.ringtones.selected"
                 :options="settings.ringtones.options"
-                :placeholder="$t('Select a ringtone')"/>
+                :placeholder="$t('Select a ringtone')">
 
-            <a class="ringtone-play button is-link" :disabled="!sound.enabled" @click="playSound()">
-                <span class="icon is-small">
-                    <svgicon name="ring"/>
-                </span>
-            </a>
+                <button slot="select-extra" class="ringtone-play button is-link select-button" :disabled="!sound.enabled || !settings.webrtc.enabled" @click="playSound()">
+                    <span class="icon is-small">
+                        <svgicon name="ring"/>
+                    </span>
+                </button>
+            </Field>
         </div>
 
-        <!-- Media permission switch -->
+        <Field name="audio_codec" type="select"
+            :disabled="!settings.webrtc.enabled"
+            :help="$t('This setting affects the sound quality of your calls.')"
+            :label="$t('Audio codec')" :model.sync="settings.webrtc.codecs.selected"
+            :options="settings.webrtc.codecs.options"
+            :placeholder="$t('Select an input device')"/>
+
+        <!-- Microphone permission switch -->
         <div class="field">
             <Field name="webrtc_permission" type="checkbox" :disabled="true" class="webrtc-switch"
                 :label="$t('Microphone access')" :model.sync="settings.webrtc.permission" />
@@ -143,36 +156,55 @@
             :placeholder="$t('Select an output device')"/>
     </div>
 
+    <!-- Privacy settings -->
+    <div class="tab" :class="{'is-active': tabs.active === 'privacy'}">
+
+        <Field name="store_key" type="checkbox"
+            :label="$t('Store encryption key')" :model.sync="settings.vault.store"
+            :help="$t('Automatically unlock after a browser restart.')"/>
+
+        <div class="notification-box info" v-if="settings.vault.store">
+            <header><svgicon name="lock-off"/><span>{{$t('Data security warning')}}</span></header>
+            <ul>
+                <li>{{$t('Your data and credentials are stored encrypted in the browser by a password-generated key.')}}
+                    {{$t('This key is intentionally not stored anywhere, to make it unlikely that your credentials are looked at without knowing the password.')}}
+                    {{$t('Make sure your computer is in a trusted environment before enabling this option.')}}
+                </li>
+            </ul>
+        </div>
+
+        <Field name="telemetry_enabled" type="checkbox"
+            :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
+            :help="$t('Pseudo-anonymized usage statistics help us to improve the software.')"/>
+    </div>
+
     <!-- User preferences -->
     <div class="tab" :class="{'is-active': tabs.active === 'general'}">
         <Field name="language" type="select"
-            :label="$t('Language')" :model.sync="settings.language.selected"
-            :help="$t('Language to use within the app.')"
+            :label="$t('Application language')" :model.sync="settings.language.selected"
             :options="settings.language.options"
             :placeholder="$t('Select a language')"/>
 
-        <Field name="click2dial" type="checkbox"
-            :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
-            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
-            :placeholder="$t('SIP Server')"/>
+        <Field name="platform_url" type="text"
+            :disabled="!settings.platform.enabled"
+            :label="$t('Platform URL')" :model.sync="settings.platform.url"
+            :help="$t('This URL is used to communicate with the platform API. Don\'t change it unless you know what you\'re doing.')"
+            :validation="$v.settings.platform.url"
+            placeholder="https://"/>
+
+        <Field name="sip_endpoint" type="text"
+            :label="$t('SIP server')" :model.sync="settings.sipEndpoint"
+            :help="$t('Domainname of the SIP server with websocket support.')"
+            :placeholder="$t('SIP server')"
+            :validation="$v.settings.sipEndpoint"/>
 
         <Field name="platform_enabled" type="checkbox" v-if="vendor.type === 'open'"
             :label="`${vendor.name} ${$t('platform integration')}`" :model.sync="settings.platform.enabled"
             :help="$t('Add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor.name})"/>
-
-        <Field name="platform_url" type="text" v-if="user.developer"
-            :disabled="!settings.platform.enabled"
-            :label="$t('Platform URL')" :model.sync="settings.platform.url"
-            :help="$t('This URL is used to communicate with the platform API. Don\'t change it unless you know what you\'re doing.')"
-            placeholder="https://"/>
-
-        <Field name="telemetry_enabled" type="checkbox"
-            :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
-            :help="$t('Enabling anonymized usage statistics is the easiest way to help us improve the software.')"/>
     </div>
 
-    <div class="settings-actions field is-grouped">
-        <button class="button is-primary" :disabled="settings._form.invalid" @click="save">{{$t('Save changes')}}</button>
+    <div class="tabs-actions field is-grouped">
+        <button class="button is-primary" :disabled="$v.$invalid" @click="save">{{$t('Save changes')}}</button>
     </div>
 
 </component>

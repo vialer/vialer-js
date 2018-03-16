@@ -199,7 +199,6 @@ class Call {
         this.ringbackTone.stop()
         this.ringtone.stop()
 
-
         if (force || !this.silent) {
             if (this.state.status === 'rejected_b') {
                 this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title: this.translations.rejected_b})

@@ -5,6 +5,11 @@ body {
     margin: 0;
     padding: 0;
     zoom: 1;
+
+
+    &.extension {
+        width: $max-popup-width;
+    }
 }
 
 body {
@@ -143,12 +148,21 @@ video {
 
     a {
         height: $spacer * 7;
+        padding: 0.5rem 0.5rem;
+
     }
+}
+
+// Button beneath tabs.
+.tabs-actions {
+    padding: 0 ($spacer * 3);
+    padding-bottom: ($spacer * 3);
 }
 
 .tab {
     display: none;
     margin-bottom: $spacer * 2;
+    padding: 0 ($spacer * 3);
 
     &.is-active {
         display: block;

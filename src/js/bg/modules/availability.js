@@ -1,7 +1,7 @@
 /**
 * @module ModuleAvailability
 */
-const Module = require('./lib/module')
+const Module = require('../lib/module')
 
 
 /**
@@ -95,16 +95,16 @@ class ModuleAvailability extends Module {
 
         // Platform users select an existing WebRTC-SIP VoIP-account.
         let platformAccounts = userdestination.phoneaccounts.map((i) => ({
-            account_id: i.account_id,
             id: i.id,
             name: i.description,
             password: i.password,
+            username: i.account_id,
         }))
 
         this.app.setState({
             availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id},
             settings: {webrtc: {account: {options: platformAccounts}}},
-        }, true)
+        }, {persist: true})
 
         // Set an icon depending on whether the user is available.
         if (selected.id) this.app.setState({ui: {menubar: {default: 'active'}}})

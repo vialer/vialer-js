@@ -17,7 +17,7 @@
                 <div class="rounded-button" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.number)" v-on:click.once="createCall(contact.number)">
                     <svgicon name="transfer"/>
                 </div>
-                <div class="rounded-button" v-if="callsReady && !transferStatus" v-on:click="createCall(contact.number)">
+                <div class="rounded-button" v-if="callsReady && !transferStatus && contact.status === 'available'" v-on:click="createCall(contact.number)">
                     <svgicon name="phone" :class="contact.status"/>
                 </div>
             </div>

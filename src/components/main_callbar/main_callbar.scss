@@ -10,11 +10,6 @@
     font-size: 0.8rem;
     font-weight: 500;
     justify-content: space-between;
-    max-width: $max-popup-width;
-    min-height: $spacer * 5;
-    position: fixed;
-    top: 0;
-    width: 100%;
     z-index: 100000;
 
     // Another call that isn't started yet.

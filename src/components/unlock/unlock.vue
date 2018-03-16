@@ -1,18 +1,11 @@
-<component class="component-login" tabindex="-1" v-on:keyup.enter="login">
+<component class="component-unlock" tabindex="-1" v-on:keyup.enter="unlock">
     <header>
         <div class="greeting">{{greeting}}</div>
 
         <p class="welcome-message">
-            {{$t('Welcome to your')}} {{app.name}}.<br/>
-            {{$t('Please enter your {appName} credentials below to proceed.', {appName: app.name})}}
+            {{$t('Please enter your password to unlock the {appName}.', {appName: app.name})}}
         </p>
     </header>
-
-    <Field name="username" type="text"
-        :autofocus="true" :label="$t('Username')" :model.sync="user.username"
-        :placeholder="$t('Enter your email address')"
-        :validation="$v.user.username"/>
-
     <Field name="password" type="password"
         :label="$t('Password')" :model.sync="user.password"
         :placeholder="$t('Enter your password')"
@@ -21,7 +14,7 @@
     <div class="buttons is-centered">
         <button type="button" class="button is-primary" data-link="login"
             :disabled="$v.$invalid"
-            @click="login">{{$t('Log in')}}</button>
+            @click="unlock">{{$t('Unlock')}}</button>
     </div>
 
     <footer>

@@ -3,19 +3,12 @@
 // The most upper box containing account info and
 // icon-links to several locations.
 .component-main-statusbar {
-    align-items: center;
     background: $grey-color-lighter;
     color: $grey-color;
     display: flex;
     font-size: 0.8rem;
     font-weight: 500;
     justify-content: space-between;
-    max-width: $max-popup-width;
-    min-height: $spacer * 5;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    z-index: 100000000;
 
     .vendor {
         align-items: center;
@@ -69,7 +62,7 @@
 
                 &.dnd {fill: $orange-color;}
                 &.disconnected {fill: $red-color;}
-                &.connected {fill: $orange-color;}
+                &.connected {fill: $green-color;}
                 &.microphone-denied {fill: $red-color;}
                 &.registered {fill: $green-color;}
                 &.registration-failed {fill: $red-color;}

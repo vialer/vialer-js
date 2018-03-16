@@ -8,6 +8,24 @@ module.exports = (app) => {
     return {
         computed: {
             /**
+             * Validation flag being used to conditionally render
+             * validation-helper styling.
+             * @returns {Boolean} - Whether the field is valid or not.
+             */
+            invalidFieldValue: function() {
+                if (!this.validation) return null
+                if (!this.validation.$dirty) return null
+                // Validation for `requiredIf` depends on the state of other
+                // fields. Therefor don't use the $dirty check on this field,
+                // but go straight for the $invalid state.
+                if ('requiredIf' in this.validation) {
+                    return this.validation.$invalid
+                }
+
+                // Invalid has 3 states: true, false and null (not changed/dirty).
+                return this.validation.$error
+            },
+            /**
              * Match a validation error with a (translated) error message.
              * @returns {Array} - An array of translated error messages.
              */
@@ -41,9 +59,6 @@ module.exports = (app) => {
                 if (this.validation.email === false) {
                     errorMessages.push(this.$t('Please fill in a valid email address.'))
                 }
-                if (this.validation.url === false) {
-                    errorMessages.push(this.$t('Please fill in a valid url.'))
-                }
                 if (this.validation.must_be_unique === false) {
                     errorMessages.push(this.$t('Please fill in a unique value.'))
                 }
@@ -52,41 +67,56 @@ module.exports = (app) => {
                         fieldName: this.validation.$params.sameAs.eq,
                     }))
                 }
+                if (this.validation.url === false) {
+                    errorMessages.push(this.$t('Please fill in a valid url.'))
+                }
 
                 return errorMessages.join('</br>')
-            },
-            vmodel: function() {
-                return this.model
             },
         },
         methods: {
             classes: function(block) {
                 let classes = {}
-                const invalid = this.vInvalid()
                 if (block === 'input') {
                     classes.input = true
-                    if (invalid) classes['is-danger'] = true
-                    else if (invalid === false) classes['is-success'] = true
+                    if (this.invalidFieldValue) classes['is-danger'] = true
                 } else if (block === 'select') {
                     classes.select = true
-                    if (invalid) classes['is-danger'] = true
-                    else if (invalid === false) classes['is-success'] = true
+                    if (this.invalidFieldValue) classes['is-danger'] = true
+                } else if (block === 'label') {
+                    // Field has no validation at all.
+                    if (this.validation) {
+                        if (this.validation.required === false || this.validation.required === true) {
+                            classes.required = true
+                        }
+                    }
                 }
 
                 return classes
             },
-            onChange: function(event) {
-                if (!this.change) return
-                this.change(event)
+            /**
+            * This is the default value for a select that has no options.
+            * @returns {Object} - An empty select option.
+            */
+            emptySelectOption: function() {
+                // Handle syncing an empty option to the model.
+                let emptyOption = {id: null, name: null}
+                // Use the first option to determine additional keys.
+                if (this.options.length) {
+                    for (let key of Object.keys(this.options[0])) {
+                        emptyOption[key] = null
+                    }
+                }
+                return emptyOption
             },
             /**
             * Emit the child component's state back to it's
-            * defining parent. The value is captured using `:model.sync`.
-            * @param {Event} event - The original change event from the input.
-            * @param {String} value - The value before the change happened.
-            * @param {Array} options - Options when its a select.
+            * parent component. The parent container captures the value
+            * using `:model.sync` instead of `v-model`.
+            * @param {Event} event - The original browser event that triggered the change.
             */
-            vChange: function(event, value, options) {
+            updateModel: function(event) {
+                let value = event.target.value
                 // Toggles value of a checkbox.
                 if (event.target.type === 'checkbox') {
                     this.$emit('update:model', event.target.checked)
@@ -102,13 +132,9 @@ module.exports = (app) => {
                     }
 
                     if (!value) {
-                        // Handle syncing an empty option to the model.
-                        let emptyOption = {id: null, name: null}
-                        // Use the first option to determine additional keys.
-                        if (options.length) for (let key of Object.keys(options[0])) emptyOption[key] = null
-                        this.$emit('update:model', emptyOption)
+                        this.$emit('update:model', this.emptySelectOption())
                     } else {
-                        for (const option of options) {
+                        for (const option of this.options) {
                             if (String(option.id) === String(value)) {
                                 this.$emit('update:model', option)
                             }
@@ -118,37 +144,16 @@ module.exports = (app) => {
 
                 if (this.validation) this.validation.$touch()
             },
-            /**
-            * Handles executing a referenced click function from
-            * a parent component.
-            * @param {Event} event - The original change event from the input.
-            */
-            vClick: function(event) {
-                if (!this.click) return
-                this.click(event)
-            },
-            /**
-             * Validation flag being used to conditionally render
-             * validation-helper styling.
-             * @returns {Boolean} - Whether the field is valid or not.
-             */
-            vInvalid: function() {
-                if (!this.validation) return null
-                if (!this.validation.$dirty) return null
-                // Validation for `requiredIf` depends on the state of other
-                // fields. Therefor don't use the $dirty check on this field,
-                // but go straight for the $invalid state.
-                if ('requiredIf' in this.validation) {
-                    return this.validation.$invalid
+        },
+        mounted: function() {
+            if (this.type === 'select') {
+                // There are no options which means there won't be a filled
+                // model value. Force an update here, because the model value
+                // may still be cached from the store.
+                if (!this.options.length) {
+                    this.$emit('update:model', this.emptySelectOption())
                 }
-                // Invalid has 3 states: true, false and null (not changed/dirty).
-                return this.validation.$error
-            },
-            vRequired: function() {
-                // Field has no validation at all.
-                if (!this.validation) return false
-                return this.validation.required === false || this.validation.required === true
-            },
+            }
         },
         props: {
             autofocus: Boolean,
@@ -164,7 +169,7 @@ module.exports = (app) => {
                 default: 'id',
             },
             label: String,
-            model: '',
+            model: null,
             name: '',
             options: Array,
             placeholder: String,

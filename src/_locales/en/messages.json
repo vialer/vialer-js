@@ -1,10 +1,6 @@
 {
-    "extTitle": {
-        "message": "Vialer",
-        "description": "Plugin title."
-    },
     "extDescription": {
-        "message": "Click-to-Dial, status updates and queue monitoring",
+        "message": "WebRTC softphone & communication platform",
         "description": "Extension description."
     }
 }

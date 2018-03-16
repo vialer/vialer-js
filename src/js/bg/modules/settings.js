@@ -1,7 +1,7 @@
 /**
 * @module ModuleSettings
 */
-const Module = require('./lib/module')
+const Module = require('../lib/module')
 
 
 /**
@@ -16,9 +16,6 @@ class ModuleSettings extends Module {
 
     _initialState() {
         return {
-            _form: {
-                invalid: false,
-            },
             click2dial: {
                 blacklist: [],
                 enabled: true,
@@ -46,12 +43,28 @@ class ModuleSettings extends Module {
                 clientId: null,
                 enabled: null, // Three values; null(not decided), false(disable), true(enable)
             },
+            vault: {
+                active: false,
+                key: null,
+                salt: null,
+                store: false,
+            },
             webrtc: {
                 account: {
                     options: [], // Platform integration provides these choices.
                     password: '',
-                    selected: {},
-                    username: '',
+                    selected: {
+                        id: null,
+                        password: null,
+                        username: null,
+                    },
+                },
+                codecs: {
+                    options: [
+                        {id: 1, name: 'opus'},
+                        {id: 2, name: 'G722'},
+                    ],
+                    selected: {id: 1, name: 'opus'},
                 },
                 enabled: false,
                 permission: false, // The microphone permission.
@@ -73,6 +86,12 @@ class ModuleSettings extends Module {
             },
             'store.settings.telemetry.enabled': (newVal, oldVal) => {
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: newVal, eventName: 'telemetry', override: true})
+            },
+            'store.settings.vault.store': (newVal, oldVal) => {
+                if (newVal) this.app.crypto.storeVault()
+                else {
+                    this.app.setState({settings: {vault: {key: null}}}, {encrypt: false, persist: true})
+                }
             },
             'store.settings.webrtc.enabled': (newVal, oldVal) => {
                 this.app.emit('bg:tabs:update_contextmenus', {}, true)

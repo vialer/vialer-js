@@ -1,12 +1,12 @@
 <component class="component-telemetry">
-    <h1>{{$t('Software improvements')}}</h1>
+    <h1>{{$t('Telemetry permission')}}</h1>
     <p class="telemetry-text">
-        {{$t('Enabling anonymized usage statistics is the easiest way to help us improve the software.')}}
-        {{$t('You can always change this option later from the Settings page.')}}
+        {{$t('Pseudo-anonymized usage statistics help us to improve the software.')}}
+        {{$t('You can change the telemetry permission from the Settings page.')}}
         <br/><br/>
     </p>
     <p class="telemetry-tldr">
-        {{$t('Would you like to help us improving this software?')}}
+        {{$t('Would you like to help us?')}}
     </p>
 
     <div class="buttons is-centered">
