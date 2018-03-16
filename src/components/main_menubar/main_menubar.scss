@@ -1,0 +1,84 @@
+@import "../../scss/lib/mixins";
+@import "../../scss/lib/variables";
+
+.component-main-menubar {
+    background: $brand-color;
+    display: flex;
+    flex: 1 0 $spacer * 5;
+    flex-direction: column;
+    text-align: center;
+
+    .options {
+        position: fixed;
+        width: $spacer * 5;
+
+        .option {
+            align-items: center;
+            color: $white;
+            display: flex;
+            flex-direction: column;
+            height: $spacer * 7;
+            justify-content: center;
+            transition: all 250ms ease-in-out;
+
+            svg {
+                height: $spacer * 3;
+                width: $spacer * 3;
+            }
+
+            &.availability {
+                path[pid="0"] {fill: $white;}
+                path[pid="1"] {fill: $brand-color;}
+
+                &.available {
+                    path[pid="0"] {fill: $green-color;}
+                    path[pid="1"] {fill: $white;}
+                }
+
+                &.unavailable {
+                    path[pid="0"] {fill: $red-color;}
+                    path[pid="1"] {fill: $white;}
+                }
+            }
+
+            &.calls {
+                &.calls-active {color: $green-color;}
+            }
+
+
+            &.hint {
+                @include animation("hint-pulse 1.5s infinite");
+            }
+
+            &.disabled {
+                color: rgba(255, 255, 255, 0.5);
+
+                &:hover {
+                    background: none;
+                    color: rgba(255, 255, 255, 0.5);
+                    cursor: not-allowed;
+                }
+            }
+
+            &.active,
+            &:hover {
+                background: $white;
+                cursor: pointer;
+                // Cascading error in Chrome when using svg path selector.
+
+                svg {
+                    fill: $brand-color;
+                }
+
+                &.hint {
+                    @include animation("hint-pulse-active 1.5s ease-in infinite");
+
+                    svg {
+                        fill: $brand-color;
+                    }
+                }
+            }
+        }
+    }
+
+}

@@ -15,7 +15,7 @@ const {ipcMain} = require('electron')
 let mainWindow
 
 function createWindow() {
-    let tray = new Tray(path.join(__dirname, 'img', 'icon-systray.png'))
+    let tray = new Tray(path.join(__dirname, 'img', 'systray-active.png'))
     tray.setToolTip('This is my application.')
 
 
@@ -37,7 +37,7 @@ function createWindow() {
         }
     })
 
-    mainWindow.setIcon(path.join(__dirname, 'img', 'icon-systray.png'))
+    mainWindow.setIcon(path.join(__dirname, 'img', 'systray-active.png'))
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),

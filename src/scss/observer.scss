@@ -1,0 +1,87 @@
+// sass-lint:disable no-important
+
+@import "lib/variables";
+@import "lib/fonts";
+
+// Make sure that the icon styling doesn't end up
+// in the print version.
+@media print {
+    html {
+        body {
+            ctd {
+                ctdicon.ctd-icon {
+                    display: none !important;
+                }
+            }
+        }
+    }
+}
+
+@media screen {
+    html {
+        body {
+            ctd {
+                align-items: center !important;
+                display: inline-flex !important;
+                flex-direction: row !important;
+                justify-content: flex-start !important;
+                position: relative;
+
+                // Make a best effort to force a consist style.
+                ctdicon.ctd-icon {
+                    background-color: transparent !important;
+                    background-image: url("../img/click-to-dial.png") !important;
+                    background-position: center center !important;
+                    background-repeat: no-repeat !important;
+                    border-radius: 9px !important;
+                    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2) !important;
+                    box-sizing: border-box !important;
+                    display: inline-block !important;
+                    font-size: $spacer !important;
+                    height: 18px !important;
+                    line-height: 18px !important;
+                    margin: 0 4px !important;
+                    margin-top: -2px !important;
+                    padding: 0 !important;
+                    text-align: right !important;
+                    transition: all 300ms ease !important;
+                    width: 18px !important;
+
+                    // The label class toggles the data-content label.
+                    &.ctd-label {
+                        &::after {
+                            background: $white !important;
+                            border-radius: $spacer / 2;
+                            box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2) !important;
+                            color: $grey-color-darker !important;
+                            content: attr(data-content) !important;
+                            font-family: "Roboto" !important;
+                            font-size: $spacer !important;
+                            font-weight: bold !important;
+                            line-height: 18px !important;
+                            margin-left: $spacer / 2;
+                            padding: 0 $spacer !important;
+                            position: absolute !important;
+                            white-space: nowrap !important;
+                        }
+                    }
+
+                    &.ctd-disabled {
+                        filter: grayscale(100%);
+
+                        &:hover {
+                            cursor: not-allowed;
+                        }
+                    }
+
+                    &:hover {
+                        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+                        cursor: pointer;
+                    }
+                }
+            }
+        }
+    }
+
+
+}

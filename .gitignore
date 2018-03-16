@@ -2,10 +2,12 @@ node_modules
 build
 dist
 docs/build
-src/brand.json
+package-lock.json
 .tags
 .publish
-./*.zip
 .vialer-jsrc
 .directory
-src/brand
+src/brand/*
+src/brand/vialer/icons/
+!src/brand/vialer/
+!src/brand/vialer/*.*

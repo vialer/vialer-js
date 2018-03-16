@@ -1,0 +1,51 @@
+@import "../../scss/lib/variables";
+
+@keyframes ringing {
+    0% {fill: $red-color;}
+    50% {fill: $green-color;}
+    100% {fill: $red-color;}
+}
+
+.component-contacts {
+    // A single contact item in the contacts list.
+    .list-item {
+        &.contact {
+            .icon-availability {
+                height: $spacer * 2.5;
+                width: $spacer * 2.5;
+
+                &.unregistered {
+                    path[pid="0"] {fill: $grey-color-lighter;}
+                    path[pid="1"] {fill: $grey-color;}
+                }
+
+                &.unavailable,
+                &.no-results {
+                    path[pid="0"] {fill: $grey-color;}
+                    path[pid="1"] {fill: $white;}
+                }
+
+                &.busy {
+                    path[pid="0"] {fill: $red-color;}
+                    path[pid="1"] {fill: $white;}
+                }
+
+                &.available {
+                    path[pid="0"] {fill: $green-color;}
+                    path[pid="1"] {fill: $white;}
+                }
+
+                &.ringing {
+                    path[pid="0"] {
+                        animation: ringing 1.5s ease-in-out infinite;
+                        transition-timing-function: ease;
+                    }
+
+                    path[pid="1"] {
+                        fill: $white;
+                    }
+                }
+            }
+        }
+    }
+}

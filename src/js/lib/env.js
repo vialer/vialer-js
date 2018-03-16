@@ -3,24 +3,25 @@
 */
 module.exports = (function() {
     let env = {
+        isBrowser: false,
         isChrome: false,
         isEdge: false,
-        isFirefox: false,
         isElectron: false,
         isExtension: false,
+        isFirefox: false,
         isLinux: false,
-        isOsx: false,
-        isWindows: false,
+        isMacOS: false,
         isPopout: false,
+        isWindows: false,
         role: {
-            background: false,
+            bg: false,
             callstatus: false,
+            fg: false,
             observer: false,
             options: false,
             popout: false,
-            popup: true,
             tab: false,
-        }
+        },
     }
     const ua = navigator.userAgent.toLowerCase()
     if (ua.includes('edge')) {
@@ -30,19 +31,23 @@ module.exports = (function() {
     } else if (ua.includes('chrome')) {
         env.isChrome = true
     }
-    
-    if (navigator.platform.match(/(Linux)/i)) env.isLinux = true
-    else if (navigator.platform.match(/(Mac)/i)) env.isOsx = true
-    else if (navigator.platform.match(/(Windows)/i)) env.isWindows = true
-    
+
+    if (global.navigator) {
+        env.isBrowser = true
+
+        if (navigator.platform.match(/(Linux)/i)) env.isLinux = true
+        else if (navigator.platform.match(/(Mac)/i)) env.isMacOS = true
+        else if (navigator.platform.match(/(Windows|Win32)/i)) env.isWindows = true
+    }
+
     try {
         if ((chrome && chrome.extension) || (browser && browser.extension)) {
             env.isExtension = true
         }
-    } catch(e) {
+    } catch (e) {
         // Catch reference errors.
     }
-    
+
     try {
         // Skip electron from transpilation.
         let electronNamespace = 'electron'

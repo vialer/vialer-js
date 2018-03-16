@@ -1,0 +1,90 @@
+@import "../../scss/lib/variables";
+
+// Specific styling for different environments.
+html {
+    &.extension {
+        .component-main {
+            max-width: $max-popup-width * 2.5;
+        }
+
+        &.popout {
+            .panel {
+                // The minimal height should allow all sidebar icons to show.
+                height: calc(100vh - #{$spacer * 5});
+                min-height: 260px;
+            }
+        }
+
+        &.popup {
+            .panel {
+                // The minimal height should allow all sidebar icons to show.
+                max-height: calc(600px - #{$spacer * 5});
+                min-height: 260px;
+            }
+        }
+    }
+}
+
+.component-main {
+
+    .panel {
+        display: grid;
+        // Show a scrollbar when the content height exceeds the max-height.
+        overflow-y: auto;
+
+        // Split into grid columns for the menubar when logged in.
+        &.sidebar {
+            grid-template-columns: ($spacer * 5) auto;
+        }
+
+        h1 {
+            color: $brand-color;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: $spacer * 2;
+            text-transform: uppercase;
+        }
+
+        .panel-content {
+            padding: $spacer * 3;
+        }
+
+        .notification-box {
+            background: rgba($brand-color, 0.1);
+            border-radius: $spacer / 2;
+            font-size: 0.75rem;
+            margin: $spacer 0;
+            overflow: auto;
+            padding: $spacer ($spacer * 2);
+
+            header {
+                align-items: center;
+                display: flex;
+                font-weight: bold;
+                margin-bottom: $spacer;
+                text-transform: uppercase;
+
+                svg {
+                    color: $brand-color;
+                    margin-right: $spacer;
+                }
+            }
+
+            .description {
+                margin-bottom: $spacer;
+            }
+
+            ul {
+                li {
+                    margin-bottom: $spacer / 4;
+
+                    // Icons that are used in help texts.
+                    svg {
+                        height: 0.75rem;
+                        width: 0.75rem;
+                    }
+                }
+            }
+        }
+    }
+}

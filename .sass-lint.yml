@@ -29,11 +29,11 @@ rules:
     no-empty-rulesets: 1
     no-extends: 0
     no-ids: 1
-    no-important: 0
+    no-important: 1
     no-invalid-hex: 1
     no-mergeable-selectors: 1
     no-misspelled-properties: 1
-    no-qualifying-elements: 1
+    no-qualifying-elements: 0
     no-trailing-whitespace: 1
     no-trailing-zero: 1
     no-transition-all: 0
@@ -71,7 +71,7 @@ rules:
         - 1
         -
             max-depth: 5
-    property-sort-order: 0
+    property-sort-order: 1
     pseudo-element: 0
     quotes:
       - 1

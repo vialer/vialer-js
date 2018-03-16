@@ -1,0 +1,203 @@
+@import "../../scss/lib/variables";
+
+.component-call {
+    color: $white;
+    display: flex;
+    flex-direction: column;
+
+
+    .call-info {
+        align-self: flex-start;
+        font-weight: 400;
+        margin-bottom: $spacer * 3;
+        text-align: center;
+        width: 100%;
+
+        .info-name {font-size: 1.2rem;}
+
+        .info-number {
+            font-size: 1.8rem;
+            font-weight: 500;
+            margin-bottom: $spacer;
+        }
+
+        .info-status {font-size: 1.1rem;}
+        .info-timer {font-size: 1rem;}
+    }
+
+    .call-options {
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        margin-bottom: $spacer;
+        padding: 0 ($spacer * 5);
+        width: 100%;
+
+        .rounded-button-with-text {
+            padding: $spacer;
+            text-align: center;
+
+            .rounded-button {
+                border: 2px solid $white;
+                margin-bottom: $spacer;
+
+                svg {
+                    height: $spacer * 3;
+                    width: $spacer * 3;
+                }
+
+                &:hover,
+                &.active {
+                    background: $white;
+                    color: $brand-color;
+                }
+
+                &.disabled {
+                    border: 2px solid rgba(255, 255, 255, 0.5);
+                    color: rgba(255, 255, 255, 0.5);
+                    cursor: not-allowed;
+
+                    &:hover {
+                        background: none;
+                    }
+                }
+            }
+        }
+
+        .option {
+            padding: 10px;
+            text-align: center;
+
+            &.active {
+                .icon {
+                    background: $white;
+
+                    i {
+                        color: $brand-color;
+                    }
+                }
+            }
+
+            .icon {
+                border: 2px solid $white;
+                border-radius: 100%;
+                height: 60px;
+                line-height: 60px;
+                margin-bottom: 8px;
+                text-align: center;
+                width: 60px;
+
+                i {
+                    font-size: 24px;
+                }
+            }
+        }
+    }
+
+    .transfer-options {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        .transfer-buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            margin-bottom: $spacer * 3;
+            width: 100%;
+
+            .transfer-button {
+                border: 2px solid $white;
+                border-radius: $spacer / 2;
+                font-size: 0.7rem;
+                font-weight: bold;
+                line-height: $spacer * 4;
+                margin: 0 ($spacer * 2);
+                padding: 0 $spacer;
+                text-align: center;
+                width: 130px;
+
+                &.active,
+                &:hover {
+                    background: $white;
+                    color: $brand-color;
+                    cursor: pointer;
+                }
+
+                &.active {
+                    cursor: default;
+                }
+
+
+                &.disabled {
+                    opacity: 0.5;
+
+                    &:hover {
+                        background: none;
+                        color: $white;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+
+        .transfer-text {
+            font-size: 1.1rem;
+            margin-bottom: $spacer * 3;
+            text-align: center;
+        }
+
+        .transfer-keypad {
+            text-align: center;
+        }
+    }
+}
+
+
+.call-actions {
+    align-self: flex-start;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    // TODO: Cleanup rounded-button class.
+    .rounded-button {
+        svg {
+            height: $spacer * 4;
+            width: $spacer * 4;
+        }
+    }
+
+    .action {
+        box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);
+        margin: $spacer;
+
+        &.decline {
+            background: $red-color;
+            color: $white;
+        }
+
+        &.accept {
+            background: $green-color;
+            color: $white;
+            &:hover {background: darken($green-color, 3%);}
+        }
+
+        &.dial {
+            background: $green-color;
+            color: $white;
+            &:hover {background: darken($green-color, 3%);}
+        }
+
+        &.disabled {
+            background: $grey-color;
+
+            &:hover {
+                background: $grey-color;
+                cursor: not-allowed;
+            }
+        }
+    }
+}

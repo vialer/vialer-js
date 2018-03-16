@@ -1,0 +1,92 @@
+@import "../../scss/lib/variables";
+
+// The most upper box containing account info and
+// icon-links to several locations.
+.component-main-callbar {
+    align-items: center;
+    background: $green-color;
+    color: $white;
+    display: flex;
+    font-size: 0.8rem;
+    font-weight: 500;
+    justify-content: space-between;
+    z-index: 100000;
+
+    // Another call that isn't started yet.
+    &.inactive {
+        background: $brand-variation-color;
+        color: #fff;
+    }
+
+
+    [class^="icon-"] {
+        color: $brand-color;
+        &:hover {color: $brand-color;}
+    }
+
+    .status-left {
+        // Don't wrap but put dots at the end if it doesn't fit.
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        white-space: nowrap;
+
+        .status-indicator {
+            width: $spacer * 5;
+
+            i {
+                font-size: 1.2rem;
+                line-height: $spacer * 4;
+                margin: 0;
+                text-align: center;
+                vertical-align: middle;
+                width: $spacer * 5;
+            }
+        }
+
+    }
+
+    // The icon links container at the right top of the popup.
+    .options {
+        display: flex;
+        flex-direction: row;
+        vertical-align: middle;
+
+        .option {
+            height: $spacer * 4;
+            line-height: $spacer * 4;
+            padding: 0 $spacer;
+
+            &.active,
+            &:hover {
+                background: $white;
+                cursor: pointer;
+
+                i {
+                    color: $brand-color;
+                }
+            }
+
+            i {
+                color: $white;
+                font-size: $spacer * 2;
+                line-height: $spacer * 4;
+            }
+        }
+    }
+
+    .in-call-info {
+        display: flex;
+        flex-grow: 1;
+        justify-content: space-between;
+
+        .caller-status {
+            margin-left: $spacer;
+        }
+    }
+
+    .call-info {
+        margin-right: $spacer;
+    }
+}

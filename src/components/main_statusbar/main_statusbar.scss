@@ -1,0 +1,106 @@
+@import "../../scss/lib/variables";
+
+// The most upper box containing account info and
+// icon-links to several locations.
+.component-main-statusbar {
+    background: $grey-color-lighter;
+    color: $grey-color;
+    display: flex;
+    font-size: 0.8rem;
+    font-weight: 500;
+    justify-content: space-between;
+
+    .vendor {
+        align-items: center;
+        display: flex;
+
+        .vendor-logo {
+            fill: $brand-color;
+            height: $spacer * 3;
+            margin-left: $spacer / 2;
+            width: $spacer * 3;
+        }
+
+        .vendor-name {
+            color: $brand-color;
+            font-size: 1rem;
+            line-height: $spacer * 5;
+            padding-left: $spacer;
+        }
+    }
+
+
+    &.dnd {
+        background: $red-color;
+    }
+
+    &.call-active {
+        background: $green-color;
+    }
+
+    [class^="icon-"] {
+        &:hover {
+            color: $brand-color;
+        }
+    }
+
+    .status-left {
+        // Don't wrap but put dots at the end if it doesn't fit.
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        white-space: nowrap;
+
+        .status-indicator {
+            text-align: center;
+            width: $spacer * 5;
+
+            svg {
+                height: $spacer * 3;
+                width: $spacer * 3;
+
+                &.dnd {fill: $orange-color;}
+                &.disconnected {fill: $red-color;}
+                &.connected {fill: $green-color;}
+                &.microphone-denied {fill: $red-color;}
+                &.registered {fill: $green-color;}
+                &.registration-failed {fill: $red-color;}
+            }
+        }
+
+        .username {
+            margin-left: $spacer;
+        }
+
+    }
+
+    // The icon links container at the right top of the popup.
+    .options {
+        display: flex;
+        flex-direction: row;
+        vertical-align: middle;
+
+        .option {
+            height: $spacer * 5;
+            line-height: $spacer * 5;
+            padding: 0 $spacer;
+
+            &.active,
+            &:hover {
+                background: $white;
+                cursor: pointer;
+            }
+        }
+    }
+
+    .in-call-info {
+        display: flex;
+        flex-grow: 1;
+        justify-content: space-between;
+    }
+
+    .call-info {
+        margin-right: $spacer;
+    }
+}

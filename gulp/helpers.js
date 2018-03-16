@@ -1,5 +1,6 @@
 const {_extend} = require('util')
 
+const addsrc = require('gulp-add-src')
 const browserify = require('browserify')
 const buffer = require('vinyl-buffer')
 const childExec = require('child_process').exec
@@ -20,6 +21,7 @@ const minifier = composer(require('uglify-es'), console)
 const mount = require('connect-mount')
 const notify = require('gulp-notify')
 const path = require('path')
+
 const runSequence = require('run-sequence')
 const sass = require('gulp-sass')
 const serveIndex = require('serve-index')
@@ -30,7 +32,7 @@ const sourcemaps = require('gulp-sourcemaps')
 const watchify = require('watchify')
 
 // Browserify instance caching.
-let BUNDLERS = {bg: null, callstatus: null, popup: null, tab: null}
+let BUNDLERS = {bg: null, fg: null, tab: null}
 // Switches extra application verbosity on/off.
 
 
@@ -69,23 +71,27 @@ class Helpers {
                     const api = this.settings.brands[brandName].store.chrome
                     const zipFile = fs.createReadStream(`./dist/${brandName}/${buildType}/${distributionName}.zip`)
 
-                    let extensionId
-                    // Deploy to production or test environment, based on DEPLOY_TARGET.
-                    if (this.settings.DEPLOY_TARGET === 'production') extensionId = api.extensionId
-                    else if (this.settings.DEPLOY_TARGET === 'beta') extensionId = api.extensionId_beta
+                    let res, token
 
                     const webStore = require('chrome-webstore-upload')({
                         clientId: api.clientId,
                         clientSecret: api.clientSecret,
-                        extensionId: extensionId,
+                        // (!) Deploys to production, alpha or beta environment.
+                        extensionId: api[`extensionId_${this.settings.DEPLOY_TARGET}`],
                         refreshToken: api.refreshToken,
                     })
 
-                    const token = await webStore.fetchToken()
-                    const res = await webStore.uploadExisting(zipFile, token)
+                    try {
+                        token = await webStore.fetchToken()
+                        res = await webStore.uploadExisting(zipFile, token)
+                    } catch (err) {
+                        gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+                        return
+                    }
+
 
                     if (res.uploadState !== 'SUCCESS') {
-                        gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+                        gutil.log(`An error occured after uploading: ${JSON.stringify(res, null, 4)}`)
                         return
                     }
 
@@ -141,11 +147,8 @@ class Helpers {
     * @returns {String} - The distribution name to use.
     */
     distributionName(brandName) {
-        let distributionName = `${brandName}-${this.settings.PACKAGE.version}`
-        if (this.settings.DEPLOY_TARGET === 'beta') {
-            distributionName += '-beta'
-        }
-        return distributionName
+        let name = this.settings.brands[brandName].name[this.settings.DEPLOY_TARGET]
+        return `${name}-${this.settings.PACKAGE.version}`
     }
 
 
@@ -170,16 +173,10 @@ class Helpers {
     getManifest(brandName, buildType) {
         const PACKAGE = require('../package')
         let manifest = require('../src/manifest.json')
-        // The 16x16px icon is used for the context menu.
-        // It is different from the logo.
-        manifest.name = this.settings.brands[brandName].name
-        // Distinguish between the test-version and production
-        // by adding a `beta` postfix.
-        if (this.settings.DEPLOY_TARGET === 'beta') manifest.name = `${manifest.name}-beta`
+        // Distinguish between the test-version and production name.
+        manifest.name = this.settings.brands[brandName].name[this.settings.DEPLOY_TARGET]
 
-        if (buildType === 'chrome') {
-            manifest.options_ui.chrome_style = false
-        } else if (buildType === 'edge') {
+        if (buildType === 'edge') {
             manifest.background.persistent = true
             manifest.browser_specific_settings = {
                 edge: {
@@ -187,20 +184,16 @@ class Helpers {
                 },
             }
         } else if (buildType === 'firefox') {
-            // The id_beta property should not end up in the manifest.
-            let betaId = this.settings.brands[brandName].store.firefox.gecko.id_beta
-            delete this.settings.brands[brandName].store.firefox.gecko.id_beta
-
-            manifest.options_ui.browser_style = true
             manifest.applications = {
-                gecko: this.settings.brands[brandName].store.firefox.gecko,
+                gecko: {
+                    // (!) Deploys to production, alpha or beta environment.
+                    id: this.settings.brands[brandName].store.firefox.gecko[`id_${this.settings.DEPLOY_TARGET}`],
+                    strict_min_version: this.settings.brands[brandName].store.firefox.gecko.strict_min_version,
+                },
             }
-            // The deploy target for Firefox is specified in the manifest,
-            // instead of being passed with the API call to the store.
-            if (this.settings.DEPLOY_TARGET === 'beta') manifest.applications.gecko.id = betaId
         }
 
-        manifest.browser_action.default_title = this.settings.brands[brandName].name
+        manifest.browser_action.default_title = manifest.name
         // Make sure this permission is not pushed multiple times
         // to the same manifest.
         if (!manifest.permissions.includes(this.settings.brands[brandName].permissions)) {
@@ -219,9 +212,10 @@ class Helpers {
     * @param {String} buildType - Target environment to produce js for.
     * @param {String} target - Path to the entrypoint.
     * @param {String} bundleName - Name of the entrypoint.
+    * @param {Function} entries - Optional extra entries.
     * @param {Function} cb - Callback when the task is done.
     */
-    jsEntry(brandName, buildType, target, bundleName, cb) {
+    jsEntry(brandName, buildType, target, bundleName, entries = [], cb) {
         if (!BUNDLERS[bundleName]) {
             BUNDLERS[bundleName] = browserify({
                 cache: {},
@@ -230,6 +224,7 @@ class Helpers {
                 packageCache: {},
             })
             if (this.settings.LIVERELOAD) BUNDLERS[bundleName].plugin(watchify)
+            for (let entry of entries) BUNDLERS[bundleName].add(entry)
         }
         BUNDLERS[bundleName].ignore('process')
         // Exclude the webextension polyfill from non-webextension builds.
@@ -247,11 +242,16 @@ class Helpers {
             .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
             .pipe(envify({
                 ANALYTICS_ID: this.settings.brands[brandName].analytics_id[buildType],
+                APP_NAME: this.settings.brands[brandName].name.production,
                 HOMEPAGE: this.settings.brands[brandName].homepage_url,
                 NODE_ENV: this.settings.NODE_ENV,
                 PLATFORM_URL: this.settings.brands[brandName].permissions,
-                PLUGIN_NAME: this.distributionName(brandName),
+                PORTAL_NAME: this.settings.brands[brandName].vendor.portal.name,
+                PORTAL_URL: this.settings.brands[brandName].vendor.portal.url,
                 SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
+                VENDOR_NAME: this.settings.brands[brandName].vendor.name,
+                VENDOR_SUPPORT: this.settings.brands[brandName].vendor.support,
+                VENDOR_TYPE: this.settings.brands[brandName].vendor.type,
                 VERBOSE: this.settings.VERBOSE,
                 VERSION: this.settings.PACKAGE.version,
             }))
@@ -267,23 +267,30 @@ class Helpers {
     * @param {String} brandName - Brand to produce scss for.
     * @param {String} buildType - Target environment to produce scss for.
     * @param {String} scssName - Name of the scss entrypoint.
+    * @param {String} sourcemap - Generate sourcemaps.
+    * @param {String} extraSource - Add extra entrypoints.
     * @returns {Function} - Sass function to use.
     */
-    scssEntry(brandName, buildType, scssName) {
+    scssEntry(brandName, buildType, scssName, sourcemap = false, extraSource = false) {
         const brandColors = this.formatScssVars(this.settings.brands[brandName].colors)
         return gulp.src(`./src/scss/${scssName}.scss`)
+            .pipe(ifElse(extraSource, () => addsrc(extraSource)))
             .pipe(insert.prepend(brandColors))
+            .pipe(ifElse(sourcemap, () => sourcemaps.init({loadMaps: true})))
             .pipe(sass({
                 includePaths: this.settings.NODE_PATH,
-                sourceMap: !this.settings.PRODUCTION,
-                sourceMapContents: !this.settings.PRODUCTION,
-                sourceMapEmbed: !this.settings.PRODUCTION,
+                sourceMap: false,
+                sourceMapContents: false,
             }))
             .on('error', notify.onError('Error: <%= error.message %>'))
             .pipe(concat(`${scssName}.css`))
             .pipe(ifElse(this.settings.PRODUCTION, () => cleanCSS({advanced: true, level: 2})))
+            .pipe(ifElse(sourcemap, () => sourcemaps.write('./')))
             .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'css')))
             .pipe(size(_extend({title: `scss-${scssName}`}, this.settings.SIZE_OPTIONS)))
+            .on('end', () => {
+                if (this.settings.LIVERELOAD) livereload.changed(`${scssName}.css`)
+            })
     }
 
 
@@ -297,7 +304,7 @@ class Helpers {
         livereload.listen({silent: false})
         app.use(serveStatic(this.settings.BUILD_DIR))
         app.use('/', serveIndex(this.settings.BUILD_DIR, {icons: false}))
-        app.use(mount('/docs', serveStatic(path.join(__dirname, 'docs', 'build'))))
+        app.use(mount('/docs', serveStatic(path.join(__dirname, 'build', 'docs'))))
         http.createServer(app).listen(8999)
     }
 }

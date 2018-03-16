@@ -3,41 +3,32 @@
 * combined, replacing all ipc messaging with local
 * event emitters.
 */
-let env_bg = require('../lib/env')
-let env_popup = require('../lib/env')
 const resizeSensor = require('css-element-queries').ResizeSensor
 
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Set content height for electron.
-    if (env_bg.isElectron) {
-        electron.ipcRenderer.send('resize-window', {
-            height: document.body.clientHeight,
-            width: document.body.clientWidth,
-        })
+    const bgApp = require('../bg')({name: 'bg'})
+    bgApp.on('ready', () => {
+        const fgApp = require('../fg')({apps: {bg: bgApp}, name: 'fg'})
+        if (process.env.NODE_ENV !== 'production') app.fg = fgApp
 
-        resizeSensor(document.body, (e) => {
+        // Set content height for electron.
+        if (bgApp.env.isElectron) {
             electron.ipcRenderer.send('resize-window', {
                 height: document.body.clientHeight,
                 width: document.body.clientWidth,
             })
-        })
+
+            resizeSensor(document.body, (e) => {
+                electron.ipcRenderer.send('resize-window', {
+                    height: document.body.clientHeight,
+                    width: document.body.clientWidth,
+                })
+            })
+        }
+    })
+
+    // Globals are disabled in production mode.
+    if (process.env.NODE_ENV !== 'production') {
+        if (!global.app) global.app = {bg: bgApp}
     }
-
-    env_bg.role.background = true
-    const bgApp = require('../bg')({
-        environment: env_bg,
-        i18n: require('../../_locales/en/messages.json'),
-        name: 'webview_bg',
-    })
-
-    env_popup.role.popup = true
-    require('../popup')({
-        apps: {
-            bg: bgApp,
-        },
-        environment: env_popup,
-        i18n: require('../../_locales/en/messages.json'),
-        name: 'webview_popup',
-    })
 })

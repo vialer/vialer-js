@@ -14,6 +14,8 @@ class Logger {
             verbose: 3,
             warn: 1,
         }
+
+        this.id = 0
         this._notification = null
     }
 
@@ -45,39 +47,6 @@ class Logger {
 
     groupEnd() {
         console.groupEnd()
-    }
-
-
-    notification(message, title = 'Vialer', stack = false, type = 'info') {
-        // Edge doesn't support webextension Notifications yet.
-        if (this.app.env.isEdge) return
-        const options = {
-            message: message,
-            title: title,
-            type: 'basic',
-        }
-        if (type === 'warning') options.iconUrl = 'img/icon-notification-warning.png'
-        else options.iconUrl = 'img/icon-notification-info.png'
-
-        if (this.app.env.isExtension) {
-            options.iconUrl = browser.runtime.getURL(options.iconUrl)
-            if (!stack) browser.notifications.clear('c2d')
-            browser.notifications.create('c2d', options)
-        } else {
-            if (Notification.permission === 'granted') {
-                if (!stack && this._notification) this._notification.close()
-                this._notification = new Notification(message, options) // eslint-disable-line no-new
-            } else if (Notification.permission !== 'denied') {
-                // Create a notification after the user
-                // accepted the permission.
-                Notification.requestPermission(function(permission) {
-                    if (permission === 'granted') {
-                        if (!stack && this._notification) this._notification.close()
-                        this._notification = new Notification(message, options) // eslint-disable-line no-new
-                    }
-                })
-            }
-        }
     }
 
 

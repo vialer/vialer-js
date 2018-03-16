@@ -4,7 +4,20 @@
             "permissions": "https://partner.voipgrid.nl/",
             "sip_endpoint": "websocket.voipgrid.nl",
             "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
-            "name": "Vialer",
+            "name": {
+                "alpha": "Vialer-alpha",
+                "beta": "Vialer-beta",
+                "production": "Vialer"
+            },
+            "vendor": {
+                "name": "Vialer",
+                "portal": {
+                    "name": "VoIPGRID portal",
+                    "url": "https://partner.voipgrid.nl/"
+                },
+                "support": "support@email",
+                "type": "closed"
+            },
             "analytics_id": {
                 "chrome": "",
                 "edge": "",
@@ -13,28 +26,29 @@
                 "webview": ""
             },
             "colors": {
-                "vg-brand-color": "#de6b35",
-                "vg-failed-color": "#d9534f",
-                "vg-grey-light": "#999",
-                "vg-grey-lighter": "#e5e5e5",
-                "vg-grey-lightest": "#fbfbfb",
-                "vg-primary-color": "#3c3c50",
-                "vg-state-available-color": "#5cb85c",
-                "vg-state-busy-color": "#d9534f"
+                "brand-color": "#de6b35",
+                "brand-variation-color": "#fb791e",
+                "grey-color": "#999",
+                "primary-color": "#3c3c50",
+                "green-color": "#28ca42",
+                "orange-color": "#f98644",
+                "red-color": "#da534F"
             },
             "store": {
                 "firefox": {
                     "gecko": {
-                        "id": "",
+                        "id_alpha": "",
                         "id_beta": "",
+                        "id_production": "",
                          "strict_min_version": "50.0"
                     },
                     "apiKey": "",
                     "apiSecret": ""
                 },
                 "chrome": {
-                    "extensionId": "",
+                    "extensionId_alpha": "",
                     "extensionId_beta": "",
+                    "extensionId_production": "",
                     "clientId": "",
                     "clientSecret": "",
                     "refreshToken": ""

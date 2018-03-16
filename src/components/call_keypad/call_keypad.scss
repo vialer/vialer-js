@@ -1,0 +1,211 @@
+@import "../../scss/lib/variables";
+@import "../../scss/lib/mixins";
+
+// The default styling is against a white background. The
+// `call-ongoing` class is used to differentiate.
+.component-call-keypad {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    z-index: 10000000;
+
+    .contacts-match {
+        color: $brand-color;
+        font-weight: 500;
+        height: $spacer * 3;
+        text-align: center;
+    }
+
+    .number-input {
+        align-items: center;
+        color: $brand-color;
+        display: flex;
+        justify-content: center;
+        max-width: 300px;
+        position: relative;
+
+        input {
+            background: transparent;
+            color: $brand-color;
+            font-size: 1.8rem;
+            font-weight: 500;
+            text-align: right;
+            &::placeholder {color: lighten($brand-color, 20%);}
+        }
+
+        &.dense {
+            flex-direction: row;
+            margin-bottom: $spacer;
+
+            input {
+                border: 1px solid $white;
+                border-radius: ($spacer / 2) 0 0 ($spacer / 2);
+                height: 40px;
+                padding-right: $spacer;
+                width: 200px;
+
+                &::placeholder {
+                    color: lighten($brand-color, 20%);
+                }
+            }
+
+            // Transfer button next to input.
+            i {
+                background: $white;
+                border: 1px solid $white;
+                border-bottom-right-radius: $spacer / 2;
+                border-left: 0;
+                border-top-right-radius: $spacer / 2;
+                color: $brand-variation-color;
+                height: 40px;
+                transition: all 300ms ease;
+                width: 40px;
+
+                &:hover {cursor: pointer;}
+
+                &.disabled {
+                    background: $brand-variation-color;
+                    border: 1px solid $brand-variation-color;
+                    color: $grey-color-lighter;
+                    cursor: not-allowed;
+                }
+            }
+
+            & + .number-input-match {
+                color: $white;
+                height: $spacer * 3;
+                line-height: $spacer * 3;
+            }
+        }
+
+        &.touch {
+            input {
+                @include no-outline;
+                border: 0;
+                height: $spacer * 6;
+                padding: 0 40px;
+                text-align: center;
+                width: 100%;
+            }
+
+            .correct {
+                position: absolute;
+                right: 10px;
+
+                svg {
+                    height: 1.8rem;
+                    width: 1.8rem;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
+            & + .number-input-match {
+                color: $grey-color-darker;
+                height: $spacer * 5;
+                line-height: $spacer * 5;
+            }
+        }
+    }
+
+    .keys {
+        align-content: center;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-top: $spacer;
+        width: 100%;
+
+        &.disabled {
+            opacity: 0.5;
+
+            .key-row {
+                .key {
+                    &:hover {
+                        background: $white;
+                        color: $brand-color;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
+
+        .key-row {
+            display: flex;
+            flex-grow: 1;
+            justify-content: center;
+            padding-bottom: 5px;
+
+            .key {
+                @include no-outline;
+                background: none;
+                border: 2px solid $brand-color;
+                border-radius: 100%;
+                break-inside: avoid;
+                color: $brand-color;
+                font-size: 1rem;
+                font-weight: bold;
+                height: 65px;
+                margin: 0 $spacer;
+                width: 65px;
+
+                &:hover {
+                    background: $brand-color;
+                    color: $white;
+                    cursor: pointer;
+                }
+
+                .sub {
+                    font-size: 0.7rem;
+                }
+            }
+        }
+    }
+
+    // TODO: Cleanup rounded-button class.
+    .rounded-button {
+        svg {
+            height: $spacer * 4;
+            width: $spacer * 4;
+        }
+    }
+
+    .call-actions {
+        margin-top: $spacer * 3;
+    }
+
+
+    &.call-ongoing {
+        .number-input {
+            input {
+                color: $white;
+
+                &::placeholder {
+                    color: $white;
+                }
+            }
+        }
+
+        .keys {
+            .key-row {
+                .key {
+                    border: 2px solid $white;
+                    color: $white;
+
+                    &:hover {
+                        background: $white;
+                        color: $brand-color;
+                    }
+                }
+            }
+        }
+
+        .contacts-match {
+            color: $white;
+        }
+    }
+}

@@ -1,0 +1,65 @@
+@import "../../scss/lib/variables";
+
+.component-settings {
+    background: none;
+
+    // A bit more specific selector to keep the tab space at the top a bit dense.
+    &.panel-content-container.panel-content {
+        padding-top: 0;
+    }
+
+    .ringtone {
+        align-items: center;
+        display: flex;
+        // Use the Bulma margin-default on the container, instead of the field.
+        margin-bottom: $size-7;
+
+        .ringtone-select {
+            margin-bottom: 0;
+            margin-right: $spacer;
+        }
+    }
+
+    // The switch is disabled, but use more opacity to indicate
+    // that it's value is set from the browser.
+    .webrtc-switch {
+        input[type="checkbox"][disabled] {
+            &:checked {
+                + label {
+                    opacity: 0.9;
+
+                    &::before {
+                        background: $green-color;
+                    }
+                }
+            }
+
+            &:not(:checked) {
+                + label {
+                    opacity: 0.9;
+
+                    &::before {
+                        background: $red-color;
+                    }
+                }
+            }
+        }
+    }
+
+    .video-cam-disabled {
+        path[pid="0"] {fill: $primary-color;}
+        path[pid="1"] {fill: $white;}
+        rect[pid="2"] {fill: $red-color;}
+    }
+
+
+    // The enable microphone button that opens the popout mode.
+    .microphone-popout.button {
+        margin-top: $spacer;
+    }
+
+    // The container for the save button.
+    .settings-actions {
+        margin-top: $spacer * 3;
+    }
+}

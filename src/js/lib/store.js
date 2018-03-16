@@ -5,7 +5,17 @@ class Store {
 
     constructor(app) {
         this.app = app
-        this.dbSchema = '1.0'
+        this.schema = 5
+    }
+
+
+    /**
+    * Remove all keys from localStorage, except the schema field.
+    */
+    clear() {
+        for (const key in localStorage) {
+            if (localStorage.hasOwnProperty(key) && key !== 'schema') this.remove(key)
+        }
     }
 
 
@@ -32,7 +42,6 @@ class Store {
 
 
     set(key, value) {
-        if (this.app.verbose) this.app.logger.debug(`${this}set ${value} for ${key}`)
         localStorage.setItem(key, JSON.stringify(value))
     }
 
@@ -43,10 +52,10 @@ class Store {
 
 
     validSchema() {
-        let schema = this.get('db_schema')
-        if (!schema || schema !== this.dbSchema) {
-            this.set('db_schema', this.dbSchema)
-            this.app.logger.warn(`${this}clear data (schema change)`)
+        let schema = this.get('schema')
+        if (schema === null || schema !== this.schema) {
+            this.set('schema', this.schema)
+            this.app.logger.warn(`${this}store schema changed! db: ${schema} state: ${this.schema}`)
             return false
         }
 

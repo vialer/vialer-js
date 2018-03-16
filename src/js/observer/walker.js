@@ -1,9 +1,6 @@
 /**
 * @module Observer
 */
-// Identify our elements with these class names.
-const phoneElementClassName = 'vialer-phone-number'
-
 
 /**
 * Using an object to check if tagName is disallowed is faster when using
@@ -63,24 +60,23 @@ class Walker {
     * @returns {Boolean} - Whether the element is blocked or not.
     */
     isBlockedElement(element) {
-        if (element.tagName in this.blockedTagNames) {
-            return true
-        }
+        if (element.tagName in this.blockedTagNames) return true
+
+        const isContentEditable = element.isContentEditable
+        // Deal with ARIA accessability content.
+        const role = element.getAttribute('role')
+        const isBlockedRole = (role && (role.toLowerCase() in this.blockedRoles))
+        const hasRoleLabelledBy = element.hasAttribute('aria-labelledby')
 
         // Check for attributes on *element*.
-        if ($(element).is('[contenteditable="true"]') ||
-                $(element).is('[aria-labelledby]') ||
-                ($(element).is('[role]') && $(element).attr('role').toLowerCase() in this.blockedRoles)) {
-            return true
-        } else {
+        if (isContentEditable || hasRoleLabelledBy || isBlockedRole) return true
+        else {
             // check for attributes on *parents*
-            let closest_role_element = $(element).closest('[role]')
-            if (!!$(element).closest('[contenteditable="true"]').length ||
-                    !!$(element).closest('[aria-labelledby]').length ||
-                    (!!closest_role_element.length &&
-                     $(closest_role_element[0]).attr('role').toLowerCase() in this.blockedRoles)) {
-                return true
-            }
+            const closestRoleElement = element.closest('[role]')
+            const closestIsBlockedRole = (closestRoleElement && closestRoleElement.toLowerCase() in this.blockedRoles)
+            const closestAriaLabelledBy = element.closest('[aria-labelledby]')
+            const closestContentEditable = element.closest('[contenteditable]')
+            if (closestContentEditable || closestAriaLabelledBy || closestIsBlockedRole) return true
         }
 
         return false
@@ -94,35 +90,18 @@ class Walker {
     */
     skipNode(node) {
         // Only parse element and text nodes.
-        if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.TEXT_NODE) {
-            return true
-        }
-
-        if (node.nodeType === Node.ELEMENT_NODE && this.isBlockedElement(node)) {
-            return true
-        }
-
-        // Skip empty nodes.
-        if (node.nodeType === Node.TEXT_NODE && node.data.trim().length === 0) {
-            return true
-        }
+        if (node.nodeType !== Node.ELEMENT_NODE && node.nodeType !== Node.TEXT_NODE) return true
+        if (node.nodeType === Node.ELEMENT_NODE && this.isBlockedElement(node)) return true
+        if (node.nodeType === Node.TEXT_NODE && node.data.trim().length === 0) return true // Skip empty nodes.
 
         let parentElement = node.parentElement
         if (parentElement) {
             // skip invisible elements,
             // Sizzle: an element is invisible when it has no height or width
-            if (!(parentElement.offsetWidth > 0 || parentElement.offsetHeight > 0)) {
-                return true
-            }
-
+            if (!(parentElement.offsetWidth > 0 || parentElement.offsetHeight > 0)) return true
             // Skip existing numbers with an icon.
-            if ($(parentElement).hasClass(phoneElementClassName)) {
-                return true
-            }
-
-            if (this.isBlockedElement(parentElement)) {
-                return true
-            }
+            if (parentElement.classList.contains('ctd-phone-number')) return true
+            if (this.isBlockedElement(parentElement)) return true
         }
 
         return false

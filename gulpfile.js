@@ -4,20 +4,27 @@ const path = require('path')
 const addsrc = require('gulp-add-src')
 const argv = require('yargs').argv
 const childExec = require('child_process').exec
+const composer = require('gulp-uglify/composer')
+const concat = require('gulp-concat')
 const del = require('del')
 const flatten = require('gulp-flatten')
+const fuet = require('gulp-fuet')
 const ghPages = require('gulp-gh-pages')
 const gulp = require('gulp-help')(require('gulp'), {})
 const gutil = require('gulp-util')
 const Helpers = require('./gulp/helpers')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
+const insert = require('gulp-insert')
 const imagemin = require('gulp-imagemin')
+const minifier = composer(require('uglify-es'), console)
 const mkdirp = require('mkdirp')
+const notify = require('gulp-notify')
 const replace = require('gulp-replace')
 const rc = require('rc')
 const runSequence = require('run-sequence')
 const size = require('gulp-size')
+const svgo = require('gulp-svgo')
 const zip = require('gulp-zip')
 
 const writeFileAsync = promisify(fs.writeFile)
@@ -26,26 +33,29 @@ const writeFileAsync = promisify(fs.writeFile)
 let settings = {}
 
 settings.BRAND_TARGET = argv.brand ? argv.brand : 'vialer'
-settings.BUILD_DIR = process.env.BUILD_DIR || path.join(__dirname, 'build')
+settings.BUILD_DIR = process.env.BUILD_DIR || path.join('./', 'build')
 settings.BUILD_TARGET = argv.target ? argv.target : 'chrome'
 settings.BUILD_TARGETS = ['chrome', 'electron', 'edge', 'firefox', 'webview']
+
 // Exit when the build target is not in the allowed list.
 if (!settings.BUILD_TARGETS.includes(settings.BUILD_TARGET)) {
     gutil.log(`Invalid build target: ${settings.BUILD_TARGET}`)
     process.exit(0)
 }
 
-settings.DEPLOY_TARGET = argv.deploy ? argv.deploy : 'beta'
+// Default deploy target is `alpha` because it has the least impact.
+settings.DEPLOY_TARGET = argv.deploy ? argv.deploy : 'alpha'
 // Exit when the deploy target is not in the allowed list.
-if (!['production', 'beta'].includes(settings.DEPLOY_TARGET)) {
+if (!['alpha', 'beta', 'production'].includes(settings.DEPLOY_TARGET)) {
     gutil.log(`Invalid deployment target: '${settings.DEPLOY_TARGET}'`)
     process.exit(0)
 }
 settings.LIVERELOAD = false
 settings.NODE_PATH = path.join(__dirname, 'node_modules') || process.env.NODE_PATH
 settings.PACKAGE = require('./package')
-settings.SRC_DIR = path.join(__dirname, 'src')
+settings.SRC_DIR = path.join('./', 'src')
 settings.SIZE_OPTIONS = {showFiles: true, showTotal: true}
+settings.TEMP_DIR = path.join(settings.BUILD_DIR, '__tmp')
 settings.VERBOSE = argv.verbose ? true : false
 
 // Force production mode when running certain tasks from
@@ -124,9 +134,9 @@ gutil.log(`- VERBOSE: ${settings.VERBOSE}`)
 gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
     const robotoPath = path.join(settings.NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
     return gulp.src(path.join(robotoPath, '{Roboto-Light.woff2,Roboto-Regular.woff2,Roboto-Medium.woff2}'))
-        .pipe(addsrc(path.join(settings.SRC_DIR, 'fonts', '*'), {base: settings.SRC_DIR}))
         .pipe(flatten({newPath: './fonts'}))
-        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/ringtones/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(ifElse(settings.PRODUCTION, imagemin))
         .pipe(addsrc('./LICENSE'))
         .pipe(addsrc('./README.md'))
@@ -144,7 +154,7 @@ gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
     else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-webview', 'js-vendor']
     else targetTasks = ['js-vendor', 'js-webext']
 
-    runSequence(['assets', 'html', 'scss'].concat(targetTasks), done)
+    runSequence(['assets', 'templates', 'translations', 'html', 'scss', 'scss-vendor'].concat(targetTasks), done)
 }, {options: taskOptions.all})
 
 
@@ -212,7 +222,7 @@ gulp.task('build-run', 'Make a development build and run it in the target enviro
     } else if (settings.BUILD_TARGET === 'webview') {
         helpers.startDevServer()
         const urlTarget = `http://localhost:8999/${settings.BRAND_TARGET}/webview/index.html`
-        command = `${command};chromium --user-data-dir=/tmp/vialer-js --disable-web-security --new-window ${urlTarget}`
+        command = `${command};chromium --disable-web-security --new-window ${urlTarget}`
     }
     childExec(command, undefined, (err, stdout, stderr) => {
         if (err) gutil.log(err)
@@ -269,29 +279,54 @@ gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
 
 
 gulp.task('html', 'Preprocess and build application HTML.', () => {
-    let jsbottom, target
+    let jsbottom
 
     if (['electron', 'webview'].includes(settings.BUILD_TARGET)) {
-        target = 'electron'
-        jsbottom = '<script src="js/webview.js"></script>'
+        jsbottom = '<script src="js/app.js"></script>'
 
     } else {
-        target = 'webext'
-        jsbottom = '<script src="js/webext_popup.js"></script>'
+        jsbottom = '<script src="js/app_fg.js"></script>'
     }
 
     // The index.html file is shared with the electron build target.
     // Appropriate scripts are inserted based on the build target.
-    return gulp.src(path.join('src', 'html', 'index.html'))
+    return gulp.src(path.join('src', 'index.html'))
         .pipe(replace('<!--JSBOTTOM-->', jsbottom))
         .pipe(flatten())
-        .pipe(ifElse((target === 'webext'), () => addsrc(path.join('src', 'html', 'webext_{options,callstatus}.html'))))
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
         .pipe(ifElse(settings.LIVERELOAD, livereload))
 }, {options: taskOptions.all})
 
 
-gulp.task('js-electron', 'Generate electron js.', (done) => {
+gulp.task('__tmp-icons', 'Copy default SVG icons and brand icons to a temp dir.', (done) => {
+    return gulp.src('./src/svg/*.svg', {base: 'src'})
+        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/svg/*.svg`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(gulp.dest(path.join(settings.TEMP_DIR, settings.BRAND_TARGET)))
+        .pipe(svgo())
+        .pipe(size(_extend({title: 'icons'}, settings.SIZE_OPTIONS)))
+})
+
+
+/**
+* Process all images with Vue-svgicon into Javascript Vue components,
+* which can be included as regular components.
+* TODO: Integrate vue-svgicon with Gulp.
+*/
+gulp.task('icons', 'Build an SVG iconset.', ['__tmp-icons'], (done) => {
+    const srcDir = path.join(settings.TEMP_DIR, settings.BRAND_TARGET, 'svg')
+    // The icons JavaScript is added inside the source.
+    const srcBuildDir = path.join(settings.SRC_DIR, 'brand', settings.BRAND_TARGET, 'icons')
+    let execCommand = `vsvg -s ${srcDir} -t ${srcBuildDir}`
+    childExec(execCommand, undefined, (_err, stdout, stderr) => {
+        if (stderr) gutil.log(stderr)
+        if (stdout) gutil.log(stdout)
+        done()
+    })
+
+}, {options: taskOptions.all})
+
+
+gulp.task('js-electron', 'Generate Electron application.', (done) => {
     runSequence([
         'js-electron-main',
         'js-webview',
@@ -300,7 +335,7 @@ gulp.task('js-electron', 'Generate electron js.', (done) => {
 })
 
 
-gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-webview'], () => {
+gulp.task('js-electron-main', 'Copy Electron main thread js to build.', ['js-webview'], () => {
     return gulp.src('./src/js/main.js', {base: './src/js/'})
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
         .pipe(size(_extend({title: 'electron-main'}, settings.SIZE_OPTIONS)))
@@ -308,51 +343,49 @@ gulp.task('js-electron-main', 'Generate electron main thread js.', ['js-webview'
 })
 
 
-gulp.task('js-webview', 'Generate webview js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'webview', done)
+gulp.task('js-webview', 'Generate generic webview application.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'app', [], () => {
+        if (settings.LIVERELOAD) livereload.changed('web.js')
+        done()
+    })
 })
 
-gulp.task('js-vendor', 'Generate third-party vendor js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor', done)
+gulp.task('js-vendor', 'Generate third-party vendor js.', ['icons'], (done) => {
+    helpers.jsEntry(
+        settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor',
+        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`],
+        () => {
+            if (settings.LIVERELOAD) livereload.changed('web.js')
+            done()
+        }
+    )
 }, {options: taskOptions.all})
 
-gulp.task('js-webext', 'Generate WebExtension js.', [], (done) => {
+gulp.task('js-webext', 'Generate WebExtension application.', [], (done) => {
     runSequence([
-        'js-webext-bg',
-        'js-webext-callstatus',
-        'js-webext-observer',
-        'js-webext-options',
-        'js-webext-popup',
-        'js-webext-tab',
-    ], 'manifest-webext', () => {
+        'js-app-bg',
+        'js-app-fg',
+        'js-app-observer',
+    ], 'manifest', () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
         done()
     })
 }, {options: taskOptions.browser})
 
-gulp.task('js-webext-bg', 'Generate the extension background entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'webext_bg', done)
-}, {options: taskOptions.browser})
-gulp.task('js-webext-callstatus', 'Generate the callstatus entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'callstatus/index', 'webext_callstatus', done)
-}, {options: taskOptions.browser})
-gulp.task('js-webext-observer', 'Generate WebExtension observer js that runs in all tab frames.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'webext_observer', done)
+gulp.task('js-app-bg', 'Generate the extension background entry js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'app_bg', [], done)
 }, {options: taskOptions.browser})
 
-gulp.task('js-webext-options', 'Generate webextension options js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'options/index', 'webext_options', done)
+gulp.task('js-app-fg', 'Generate webextension fg/popout js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', [], done)
 }, {options: taskOptions.browser})
-gulp.task('js-webext-popup', 'Generate webextension popup/popout js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'popup/index', 'webext_popup', done)
-}, {options: taskOptions.browser})
-gulp.task('js-webext-tab', 'Generate webextension tab js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'tab/index', 'webext_tab', done)
+
+gulp.task('js-app-observer', 'Generate WebExtension icon observer which runs in all tab frames.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', [], done)
 }, {options: taskOptions.browser})
 
 
-
-gulp.task('manifest-webext', 'Generate a manifest for a browser WebExtension.', async() => {
+gulp.task('manifest', 'Create a browser-specific manifest file.', async() => {
     let manifest = helpers.getManifest(settings.BRAND_TARGET, settings.BUILD_TARGET)
     const manifestTarget = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET, 'manifest.json')
     await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))
@@ -361,33 +394,63 @@ gulp.task('manifest-webext', 'Generate a manifest for a browser WebExtension.', 
 
 gulp.task('scss', 'Compile all css.', [], (done) => {
     runSequence([
-        'scss-webext',
-        'scss-webext-callstatus',
-        'scss-webext-options',
-        'scss-webext-print',
+        'scss-app',
+        'scss-observer',
     ], () => {
         // Targetting webext.css for livereload changed only works in the
-        // webview. In the callstatus html, it will trigger a page reload.
-        if (settings.LIVERELOAD) livereload.changed('webext.css')
+        // webview.
+        if (settings.LIVERELOAD) livereload.changed('app.css')
         done()
     })
 }, {options: taskOptions.all})
 
 
-gulp.task('scss-webext', 'Generate popover webextension css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext')
+gulp.task('scss-app', 'Generate application css.', () => {
+    return helpers.scssEntry(
+        settings.BRAND_TARGET,
+        settings.BUILD_TARGET,
+        'app',
+        !settings.PRODUCTION,
+        // Mixin the component scss.
+        path.join(settings.SRC_DIR, 'components', '**', '*.scss'))
 }, {options: taskOptions.all})
 
-gulp.task('scss-webext-callstatus', 'Generate webextension callstatus dialog css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_callstatus')
-}, {options: taskOptions.all})
-gulp.task('scss-webext-options', 'Generate webextension options css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_options')
+gulp.task('scss-observer', 'Generate observer css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer', !settings.PRODUCTION)
 }, {options: taskOptions.all})
 
-gulp.task('scss-webext-print', 'Generate webextension print css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webext_print')
+gulp.task('scss-vendor', 'Generate vendor css.', () => {
+    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', false)
 }, {options: taskOptions.all})
+
+
+gulp.task('templates', 'Build Vue component templates', () => {
+    gulp.src('./src/components/**/*.vue')
+        .pipe(fuet({
+            commonjs: false,
+            namespace: 'global.templates',
+            pathfilter: ['src', 'components'],
+        }))
+        .on('error', notify.onError('Error: <%= error.message %>'))
+        .pipe(ifElse(settings.PRODUCTION, () => minifier()))
+        .on('end', () => {
+            if (settings.LIVERELOAD) livereload.changed('templates.js')
+        })
+        .pipe(concat('templates.js'))
+        .pipe(insert.prepend('global.templates={};'))
+        .pipe(gulp.dest(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')))
+        .pipe(size(_extend({title: 'templates'}, settings.SIZE_OPTIONS)))
+})
+
+
+gulp.task('translations', 'Generate translations', (done) => {
+    return gulp.src('./src/js/i18n/*.js', {base: './src/js/'})
+        .pipe(concat('translations.js'))
+        .pipe(ifElse(settings.PRODUCTION, () => minifier()))
+        .pipe(gulp.dest(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')))
+        .pipe(size(_extend({title: 'js-translations'}, settings.SIZE_OPTIONS)))
+        .pipe(ifElse(settings.LIVERELOAD, livereload))
+})
 
 
 gulp.task('watch', 'Start development server and watch for changes.', () => {
@@ -409,12 +472,19 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     // Watch files related to working on the webextension.
     gulp.watch([
         path.join(__dirname, 'src', 'js', '**', '*.js'),
+        path.join(__dirname, 'src', 'components', '**', '*.js'),
         `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'main.js')}`,
         `!${path.join(__dirname, 'src', 'js', 'webview.js')}`,
+        `!${path.join(__dirname, 'src', 'js', 'i18n', '*.js')}`,
     ], () => {
-        if (settings.BUILD_TARGET === 'electron') gulp.start('js-electron')
-        else gulp.start('js-webext')
+        if (settings.BUILD_TARGET === 'electron') {
+            gulp.start('js-electron')
+        } else if (settings.BUILD_TARGET === 'webview') {
+            gulp.start('js-webview')
+        } else {
+            gulp.start('js-webext')
+        }
 
         if (WITHDOCS) gulp.start('docs')
     })
@@ -422,11 +492,32 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
 
     if (!['electron', 'webview'].includes(settings.BUILD_TARGET)) {
-        gulp.watch(path.join(__dirname, 'src', 'manifest.json'), ['manifest-webext'])
+        gulp.watch(path.join(__dirname, 'src', 'manifest.json'), ['manifest'])
         gulp.watch(path.join(__dirname, 'src', 'brand.json'), ['build'])
     }
 
-    // Watch files related to working on linked packages.
+    // Watch files related to working on assets.
+    gulp.watch([
+        path.join(__dirname, 'src', '_locales', '**', '*.json'),
+        path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
+    ], ['assets'])
+
+    // Watch files related to working on the html and css.
+    gulp.watch(path.join(__dirname, 'src', 'index.html'), ['html'])
+    gulp.watch([
+        path.join(__dirname, 'src', 'scss', '**', '*.scss'),
+        `!${path.join(__dirname, 'src', 'scss', 'observer.scss')}`,
+        path.join(__dirname, 'src', 'components', '**', '*.scss'),
+    ], ['scss-app'])
+
+    gulp.watch(path.join(__dirname, 'src', 'scss', 'observer.scss'), ['scss-observer'])
+    gulp.watch(path.join(__dirname, 'src', 'scss', 'vendor.scss'), ['scss-vendor'])
+
+    gulp.watch(path.join(__dirname, 'src', 'components', '**', '*.vue'), ['templates'])
+    gulp.watch(path.join(__dirname, 'src', 'js', 'i18n', '**', '*.js'), ['translations'])
+
+
+    // Add linked packages here that are used during development.
     if (WATCHLINKED) {
         gutil.log('Watching linked development packages')
         gulp.watch([
@@ -437,17 +528,8 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         ], ['docs'])
 
         gulp.watch([
-            path.join(settings.NODE_PATH, 'webextension-polyfill', 'src', '*'),
-        ], ['js-webext'])
+            path.join(settings.NODE_PATH, 'fuet-notify', 'src', 'js', '*.js'),
+        ], ['js-vendor'])
+
     }
-
-    // Watch files related to working on assets.
-    gulp.watch([
-        path.join(__dirname, 'src', '_locales', '**', '*.json'),
-        path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
-    ], ['assets'])
-
-    // Watch files related to working on the html and css.
-    gulp.watch(path.join(__dirname, 'src', 'html', '**', '*.html'), ['html'])
-    gulp.watch(path.join(__dirname, 'src', 'scss', '**', '*.scss'), ['scss'])
 })

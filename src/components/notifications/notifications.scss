@@ -1,0 +1,49 @@
+@import "../../scss/lib/variables";
+
+.component-notifications {
+    left: 0;
+    max-width: $max-popup-width;
+    position: fixed;
+    top: $spacer * 5;
+    width: 100%;
+    z-index: 100000;
+
+    &.sidebar {
+        left: $spacer * 5;
+        max-width: $max-popup-width - ($spacer * 5);
+        width: calc(100% - #{$spacer * 5});
+    }
+
+    .notification {
+        align-items: center;
+        border-radius: 0;
+        color: $white;
+        display: flex;
+        flex-direction: row;
+        height: $spacer * 7;
+        justify-content: space-between;
+        margin: 0;
+        padding: 0;
+
+        .icon {
+            height: 100%;
+            line-height: $spacer * 6;
+            min-width: $spacer * 5;
+        }
+
+        .message {
+            flex-grow: 1;
+            padding-left: $spacer;
+        }
+
+        .actions {
+            line-height: $spacer * 6;
+        }
+
+        .delete {
+            margin-left: $spacer;
+            margin-right: $spacer;
+            vertical-align: middle;
+        }
+    }
+}

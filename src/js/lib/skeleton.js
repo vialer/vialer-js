@@ -1,11 +1,9 @@
-const EventEmitter = require('eventemitter3')
-const I18n = require('./i18n')
 const Logger = require('./logger')
 const Store = require('./store')
 
 
 /**
-* This is the minimal class that all parts of the Vialer-js
+* This is the minimal class that all runnable parts of the Vialer-js
 * application inherit from(tab, contentscript, background, popup/out).
 * It sets some basic properties that can be reused, like a logger, store,
 * an IPC eventemitter and some environmental properties.
@@ -14,27 +12,23 @@ class Skeleton extends EventEmitter {
 
     constructor(options) {
         super()
-        this.env = options.environment
+
+        this.env = options.env
+        // Make Chrome plugin API compatible with the standards
+        // WebExtension API as (partly) supported by Firefox and Edge.
         if (this.env.isChrome) window.browser = require('webextension-polyfill')
 
         // A webview build passes the separate apps, so they can be reached
         // by the EventEmitter.
         if (options.apps) this.apps = options.apps
-
-        this.cache = {}
         this._listeners = 0
-
         this.utils = require('./utils')
-        this.modules = {}
 
         this.name = options.name
         this.logger = new Logger(this)
         this.store = new Store(this)
-        this.i18n = new I18n(this, options.i18n)
 
         if (this.env.isExtension) {
-            // Make Chrome plugin API compatible with the standards
-            // WebExtension API as supported by Firefox and Edge.
             this.ipcListener()
             // Allows parent scripts to use the same EventEmitter syntax.
             if (this.env.role.tab) {
@@ -43,12 +37,6 @@ class Skeleton extends EventEmitter {
                     this.emit(event.data.event, event.data.data, true)
                 })
             }
-        }
-
-        this._init()
-        // Init these modules.
-        for (let module of options.modules) {
-            this.modules[module.name] = new module.Module(this)
         }
 
         // Sets the verbosity of the logger.
@@ -83,10 +71,7 @@ class Skeleton extends EventEmitter {
     */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
         if (this.env.isExtension && (!noIpc || noIpc === 'both')) {
-            let payloadData = {
-                data: data,
-                event: event,
-            }
+            let payloadData = {data: data, event: event}
 
             if (tabId) {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
@@ -153,9 +138,7 @@ class Skeleton extends EventEmitter {
                 // ignored, because otherwise all events emitted on the tab will
                 // also be processed by the callstatus and observer scripts.
                 if (this.env.role.callstatus || this.env.role.observer) {
-                    if (this.env.role.callstatus && message.data.frame && message.data.frame === 'callstatus') {
-                        this.emit(message.event, message.data, true)
-                    } else if (this.env.role.observer && message.data.frame && message.data.frame === 'observer') {
+                    if (this.env.role.observer && message.data.frame && message.data.frame === 'observer') {
                         this.emit(message.event, message.data, true)
                     }
                 } else {
@@ -186,13 +169,6 @@ class Skeleton extends EventEmitter {
     toString() {
         return `[${this.name}] `
     }
-
-
-    /**
-    * This method may be overriden to initialize logic before loading
-    * modules, e.g. like initializing a sip stack.
-    */
-    _init() {}
 }
 
 module.exports = Skeleton

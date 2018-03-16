@@ -1,0 +1,8 @@
+@import "../../scss/lib/variables";
+
+.component-calls {
+
+    &.call-ongoing {
+        background: linear-gradient(180deg, $brand-color, $brand-variation-color);
+    }
+}

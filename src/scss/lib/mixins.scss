@@ -1,0 +1,44 @@
+// Prevent firefox from showing the cursor: text for normal elements like divs etc.
+@mixin no-select {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+@mixin no-outline {
+    outline: none;
+}
+
+
+// Source: http://joshbroton.com/quick-fix-sass-mixins-for-css-keyframe-animations/
+@mixin animation($animate...) {
+    $max: length($animate);
+    $animations: "";
+
+    @for $i from 1 through $max {
+        $animations: #{$animations + nth($animate, $i)};
+
+        @if $i < $max {
+            $animations: #{$animations + ", "};
+        }
+    }
+    -moz-animation: $animations;
+    -webkit-animation: $animations;
+    animation: $animations;
+}
+
+// Source: http://joshbroton.com/quick-fix-sass-mixins-for-css-keyframe-animations/
+@mixin keyframes($animation-name) {
+    @-webkit-keyframes #{$animation-name} {
+        @content;
+    }
+    @-moz-keyframes #{$animation-name} {
+        @content;
+    }
+    @-o-keyframes #{$animation-name} {
+        @content;
+    }
+    @keyframes #{$animation-name} {
+        @content;
+    }
+}

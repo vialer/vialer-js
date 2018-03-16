@@ -1,27 +1,57 @@
 {
     "author": "Devhouse Spindle",
     "manifest_version": 2,
+    "homepage_url": "https://github.com/voipgrid/vialer-js",
     "description": "__MSG_extDescription__",
     "icons": {
-        "16": "img/icon-contextmenu.png",
+        "16": "img/contextmenu.png",
         "32": "img/logo-32.png",
         "64": "img/logo-64.png",
         "128": "img/logo-128.png"
     },
     "browser_action": {
         "default_icon": {
-          "22": "img/icon-menubar-inactive.png"
+          "22": "img/menubar-inactive.png"
         },
         "default_popup": "index.html"
     },
     "background": {
         "scripts": [
             "js/vendor.js",
-            "js/webext_bg.js"
+            "js/templates.js",
+            "js/translations.js",
+            "js/app_bg.js"
         ]
+    },
+    "commands": {
+        "action-accept-new": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+A"
+            },
+            "description": "Accept an incoming call or head over to create a new call."
+        },
+        "action-decline-hangup": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+Z"
+            },
+            "description": "Decline an incoming call or hangup an active call."
+        },
+        "action-dnd": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+S"
+            },
+            "description": "Toggle do-not-disturb in softphone mode."
+        },
+        "action-hold-active": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+X"
+            },
+            "description": "Toggle on-hold on the active call in softphone mode."
+        }
     },
     "permissions": [
         "*://*/*",
+        "background",
         "contextMenus",
         "notifications",
         "storage",
@@ -34,31 +64,16 @@
                 "<all_urls>"
             ],
             "js": [
-                "js/vendor.js",
-                "js/webext_tab.js"
-            ],
-            "run_at": "document_end",
-            "all_frames": false
-        },
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "js/vendor.js",
-                "js/webext_observer.js"
+                "js/app_observer.js"
             ],
             "run_at": "document_end",
             "all_frames": true
         }
     ],
-    "options_ui": {
-        "page": "webext_options.html"
-    },
     "web_accessible_resources": [
+        "fonts/*.woff2",
         "img/*.png",
         "css/*.css",
-        "webext_callstatus.html",
         "js/*.map"
     ],
     "default_locale": "en"

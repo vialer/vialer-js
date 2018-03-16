@@ -1,0 +1,49 @@
+@import "../../scss/lib/variables";
+
+.component-login {
+    header {
+        text-align: center;
+        width: 100%;
+
+        .greeting {
+            color: $brand-color;
+            font-size: 1.8rem;
+        }
+
+        .welcome-message {
+            color: $grey-color-darker;
+            padding-bottom: $spacer * 3;
+            padding-top: $spacer * 2;
+        }
+    }
+
+    footer {
+        color: $grey-color;
+        font-size: 0.75rem;
+        text-align: center;
+
+        .forgot-pw {
+            margin-bottom: $spacer;
+
+            a {
+                color: $grey-color;
+            }
+        }
+
+        svg {
+            color: $brand-color;
+            margin-top: -2px;
+            padding: 0 ($spacer / 3);
+            width: $spacer * 2.5;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+
+
+    .buttons {
+        padding-top: ($spacer * 2);
+    }
+}
