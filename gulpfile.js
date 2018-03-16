@@ -4,6 +4,7 @@ const path = require('path')
 const addsrc = require('gulp-add-src')
 const argv = require('yargs').argv
 const childExec = require('child_process').exec
+const colorize = require('tap-colorize')
 const composer = require('gulp-uglify/composer')
 const concat = require('gulp-concat')
 const del = require('del')
@@ -25,9 +26,13 @@ const rc = require('rc')
 const runSequence = require('run-sequence')
 const size = require('gulp-size')
 const svgo = require('gulp-svgo')
+const tape = require('gulp-tape')
+const test = require('tape')
+
 const zip = require('gulp-zip')
 
 const writeFileAsync = promisify(fs.writeFile)
+
 // The main settings object containing info
 // from .vialer-jsrc and build flags.
 let settings = {}
@@ -35,7 +40,7 @@ let settings = {}
 settings.BRAND_TARGET = argv.brand ? argv.brand : 'vialer'
 settings.BUILD_DIR = process.env.BUILD_DIR || path.join('./', 'build')
 settings.BUILD_TARGET = argv.target ? argv.target : 'chrome'
-settings.BUILD_TARGETS = ['chrome', 'electron', 'edge', 'firefox', 'webview']
+settings.BUILD_TARGETS = ['chrome', 'electron', 'edge', 'firefox', 'node', 'webview']
 
 // Exit when the build target is not in the allowed list.
 if (!settings.BUILD_TARGETS.includes(settings.BUILD_TARGET)) {
@@ -103,7 +108,7 @@ if (settings.VERBOSE) {
     taskOptions = {
         all: {
             'brand=vialer': '',
-            'target=chrome': 'chrome|firefox|electron|webview',
+            'target=chrome': 'chrome|electron|firefox|node|webview',
         },
         brandOnly: {
             'brand=vialer': '',
@@ -113,7 +118,7 @@ if (settings.VERBOSE) {
             'target=chrome': 'chrome|firefox',
         },
         targetOnly: {
-            'target=chrome': 'chrome|firefox|electron|webview',
+            'target=chrome': 'chrome|electron|firefox|node|webview',
         },
         webview: {
             'brand=vialer': '',
@@ -366,7 +371,7 @@ gulp.task('js-webext', 'Generate WebExtension application.', [], (done) => {
         'js-app-bg',
         'js-app-fg',
         'js-app-observer',
-    ], 'manifest', () => {
+    ], 'manifest', 'test', () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
         done()
     })
@@ -443,6 +448,14 @@ gulp.task('templates', 'Build Vue component templates', () => {
 })
 
 
+gulp.task('test', function() {
+    return gulp.src('test/**/*.js')
+        .pipe(tape({
+            outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
+        }))
+})
+
+
 gulp.task('translations', 'Generate translations', (done) => {
     return gulp.src('./src/js/i18n/*.js', {base: './src/js/'})
         .pipe(concat('translations.js'))
@@ -469,25 +482,30 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         })
     }
 
-    // Watch files related to working on the webextension.
-    gulp.watch([
-        path.join(__dirname, 'src', 'js', '**', '*.js'),
-        path.join(__dirname, 'src', 'components', '**', '*.js'),
-        `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
-        `!${path.join(__dirname, 'src', 'js', 'main.js')}`,
-        `!${path.join(__dirname, 'src', 'js', 'webview.js')}`,
-        `!${path.join(__dirname, 'src', 'js', 'i18n', '*.js')}`,
-    ], () => {
-        if (settings.BUILD_TARGET === 'electron') {
-            gulp.start('js-electron')
-        } else if (settings.BUILD_TARGET === 'webview') {
-            gulp.start('js-webview')
-        } else {
-            gulp.start('js-webext')
-        }
 
-        if (WITHDOCS) gulp.start('docs')
-    })
+    if (settings.BUILD_TARGET !== 'node') {
+        gulp.watch([
+            path.join(__dirname, 'src', 'js', '**', '*.js'),
+            path.join(__dirname, 'src', 'components', '**', '*.js'),
+            `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
+            `!${path.join(__dirname, 'src', 'js', 'main.js')}`,
+            `!${path.join(__dirname, 'src', 'js', 'webview.js')}`,
+            `!${path.join(__dirname, 'src', 'js', 'i18n', '*.js')}`,
+        ], () => {
+            if (settings.BUILD_TARGET === 'electron') {
+                gulp.start('js-electron')
+            } else if (settings.BUILD_TARGET === 'webview') {
+                gulp.start('js-webview')
+            } else {
+                gulp.start('js-webext')
+            }
+
+            if (WITHDOCS) gulp.start('docs')
+        })
+    } else {
+        // Node development doesn't need transpilation.
+        gulp.watch([path.join(__dirname, 'src', 'js', '**', '*.js')], ['test'])
+    }
 
     gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
 
@@ -515,6 +533,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
 
     gulp.watch(path.join(__dirname, 'src', 'components', '**', '*.vue'), ['templates'])
     gulp.watch(path.join(__dirname, 'src', 'js', 'i18n', '**', '*.js'), ['translations'])
+    gulp.watch(path.join(__dirname, 'test', '**', '*.js'), ['test'])
 
 
     // Add linked packages here that are used during development.

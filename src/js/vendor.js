@@ -1,7 +1,9 @@
-window.global = window
+if (global.document) {
+    window.global = window
+    global.$ = document.querySelector.bind(document)
+    global.$$ = document.querySelectorAll.bind(document)
+}
 
-global.$ = document.querySelector.bind(document)
-global.$$ = document.querySelectorAll.bind(document)
 
 global.EventEmitter = require('eventemitter3')
 if (!global.translations) global.translations = {}

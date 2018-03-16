@@ -1,4 +1,27 @@
 /**
+* An in-memory store that can implements (part of) the
+* localStorage interface.
+*/
+class MemoryStore {
+    constructor() {
+        this.data = {}
+    }
+
+    getItem(key) {
+        return this.data[key]
+    }
+
+    removeItem(key) {
+        delete this.data[key]
+    }
+
+    setItem(key, value) {
+        this.data[key] = value
+    }
+}
+
+
+/**
 * A simple localstorage store.
 */
 class Store {
@@ -6,6 +29,9 @@ class Store {
     constructor(app) {
         this.app = app
         this.schema = 5
+
+        if (this.app.env.isNode) this.store = new MemoryStore()
+        else this.store = localStorage
     }
 
 
@@ -13,15 +39,18 @@ class Store {
     * Remove all keys from localStorage, except the schema field.
     */
     clear() {
-        for (const key in localStorage) {
-            if (localStorage.hasOwnProperty(key) && key !== 'schema') this.remove(key)
+        let keys
+        if (this.app.env.isNode) keys = Object.keys(this.store.data)
+        else keys = this.store
+        for (const key in keys) {
+            if (this.store.getItem(key) && key !== 'schema') this.remove(key)
         }
     }
 
 
     get(key) {
         if (this.app.verbose) this.app.logger.debug(`${this}get value for key '${key}'`)
-        var value = localStorage.getItem(key)
+        var value = this.store.getItem(key)
         if (value) {
             return JSON.parse(value)
         }
@@ -31,18 +60,18 @@ class Store {
 
     remove(key) {
         if (this.get(key)) {
-            localStorage.removeItem(key)
+            this.store.removeItem(key)
         }
     }
 
 
     reset() {
-        localStorage.clear()
+        this.store.clear()
     }
 
 
     set(key, value) {
-        localStorage.setItem(key, JSON.stringify(value))
+        this.store.setItem(key, JSON.stringify(value))
     }
 
 

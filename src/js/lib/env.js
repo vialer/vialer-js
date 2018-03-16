@@ -23,14 +23,20 @@ module.exports = (function() {
             tab: false,
         },
     }
-    const ua = navigator.userAgent.toLowerCase()
-    if (ua.includes('edge')) {
-        env.isEdge = true
-    } else if (ua.includes('firefox')) {
-        env.isFirefox = true
-    } else if (ua.includes('chrome')) {
-        env.isChrome = true
-    }
+
+    let ua
+
+    if (global.document) {
+        ua = navigator.userAgent.toLowerCase()
+
+        if (ua.includes('edge')) {
+            env.isEdge = true
+        } else if (ua.includes('firefox')) {
+            env.isFirefox = true
+        } else if (ua.includes('chrome')) {
+            env.isChrome = true
+        }
+    } else env.isNode = true
 
     if (global.navigator) {
         env.isBrowser = true
@@ -57,5 +63,6 @@ module.exports = (function() {
         // Catch reference errors.
     }
 
+    global.env = env
     return env
 })()

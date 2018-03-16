@@ -2,13 +2,13 @@
 * Phone tone generators.
 * based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 */
-const context = new AudioContext()
+let context = null
 
 
 class BusyTone {
 
     constructor() {
-
+        if (!context) context = new AudioContext()
     }
 
     createRingerLFO() {
@@ -62,6 +62,7 @@ class BusyTone {
 class DtmfTone {
 
     constructor() {
+        if (!context) context = new AudioContext()
         this.started = false
 
         this.frequencies = {
@@ -124,6 +125,7 @@ class DtmfTone {
 class RingbackTone {
 
     constructor(region = 'europe') {
+        if (!context) context = new AudioContext()
         this.region = region
         this.started = false
     }
@@ -217,6 +219,7 @@ class RingbackTone {
 class RingTone extends EventEmitter {
 
     constructor(target, loop = true) {
+        if (!context) context = new AudioContext()
         super()
         this.audio = new Audio(`ringtones/${target}`)
         // Loop the sound.

@@ -104,6 +104,8 @@ class ModuleUI extends Module {
     * @param {Boolean} [opts.stack] - Whether to stack the notifications.
     */
     notification({force = false, message, number = null, title, stack = false, timeout = 3000}) {
+        if (this.app.env.isNode) return
+
         const options = {
             message: message,
             title: title,

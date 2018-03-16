@@ -45,7 +45,8 @@ class AppBackground extends App {
     __factoryDefaults({title, message}) {
         this.modules.ui.notification({force: true, message, title})
         this.store.clear()
-        location.reload()
+        if (this.env.isBrowser) location.reload()
+        this.emit('factory-defaults')
     }
 
 
@@ -92,6 +93,15 @@ class AppBackground extends App {
                 }
             }
         }
+
+        // Clear all state if the schema changed after a plugin update.
+        // This is done here because of translations, which are only available
+        // after initializing Vue.
+        if (!this.store.validSchema()) {
+            let message = this.$t('We are constantly improving this software. At the moment this requires you to re-login and setup your account again. Our apologies.')
+            this.__factoryDefaults({message, title: this.$t('Database schema changed')})
+        }
+
         this.emit('ready')
     }
 
@@ -155,13 +165,6 @@ class AppBackground extends App {
         // (!) State is reactive from here on.
 
         this.setState({ui: {menubar: {default: menubarIcon}}})
-        // Clear all state if the schema changed after a plugin update.
-        // This is done here because of translations, which are only available
-        // after initializing Vue.
-        if (!this.store.validSchema()) {
-            let message = this.$t('We are constantly improving this software. At the moment this requires you to re-login and setup your account again. Our apologies.')
-            this.__factoryDefaults({message, title: this.$t('Database schema changed')})
-        }
 
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()
