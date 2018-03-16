@@ -1,26 +1,29 @@
 @import "../../scss/lib/variables";
 
-// Specific styling for different environments.
+// Specific styling per environment.
 html {
-    &.extension {
-        .component-main {
-            max-width: $max-popup-width * 2.5;
+    &.popout {
+        .component-main {max-width: $max-popup-width;}
+        .panel {
+            height: calc(100vh - #{$spacer * 5});
+            // The minimal height should allow all sidebar icons to show.
+            min-height: 260px;
         }
+    }
 
-        &.popout {
-            .panel {
-                // The minimal height should allow all sidebar icons to show.
-                height: calc(100vh - #{$spacer * 5});
-                min-height: 260px;
-            }
+    &.popup {
+        .component-main {max-width: $max-popup-width;}
+        .panel {
+            // The minimal height should allow all sidebar icons to show.
+            max-height: calc(600px - #{$spacer * 5});
+            min-height: 260px;
         }
+    }
 
-        &.popup {
-            .panel {
-                // The minimal height should allow all sidebar icons to show.
-                max-height: calc(600px - #{$spacer * 5});
-                min-height: 260px;
-            }
+    &.webview {
+        .component-main {max-width: $max-popup-width;}
+        .panel {
+            height: calc(100vh - #{$spacer * 5});
         }
     }
 }

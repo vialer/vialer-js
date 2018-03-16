@@ -16,10 +16,13 @@ class AppForeground extends App {
 
         // Distinguish between the popout(tab) and popup view.
         let searchParams = this.utils.parseSearch(location.search)
-        if (searchParams.popout) {
-            $('html').classList.add('popout')
-            env.role.popout = true
-        } else $('html').classList.add('popup')
+
+        if (env.isExtension) {
+            if (searchParams.popout) {
+                $('html').classList.add('popout')
+                env.role.popout = true
+            } else $('html').classList.add('popup')
+        } else  if (searchParams.webview) $('html').classList.add('webview')
 
         this.env = env
 
