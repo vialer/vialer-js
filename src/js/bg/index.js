@@ -26,7 +26,9 @@ class AppBackground extends App {
         this.utils = require('../lib/utils')
 
         // Send this script's state back to the requesting script.
-        this.on('bg:get_state', (data) => data.callback(this.state))
+        this.on('bg:get_state', (data) => {
+            data.callback(JSON.stringify(this.state))
+        })
         this.on('bg:refresh_api_data', this._platformData.bind(this))
         this.on('bg:set_state', this.__mergeState.bind(this))
         this.__init()
@@ -283,13 +285,8 @@ function initApp(options) {
     return new AppBackground(options)
 }
 
-// For extensions, this is an executable endpoint.
-if (env.isExtension) {
-    const bgApp = initApp({name: 'bg'})
-    // Globals are disabled in production mode.
-    if (process.env.NODE_ENV !== 'production') {
-        if (!global.app) global.app = bgApp
-    }
-}
+
+if (!global.app) global.app = {}
+global.app.bg = initApp({name: 'bg'})
 
 module.exports = initApp

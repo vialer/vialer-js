@@ -4,7 +4,7 @@ if (global.document) {
     global.$$ = document.querySelectorAll.bind(document)
 }
 
-
+global.resizeSensor = require('css-element-queries').ResizeSensor
 global.EventEmitter = require('eventemitter3')
 if (!global.translations) global.translations = {}
 

@@ -23,6 +23,7 @@ class AppForeground extends App {
                 env.role.popout = true
             } else $('html').classList.add('popup')
         } else if (searchParams.webview) $('html').classList.add('webview')
+        else if (env.isElectron) $('html').classList.add('electron')
 
         this.env = env
 
@@ -58,14 +59,13 @@ class AppForeground extends App {
     __initStore() {
         super.__initStore()
         // Initialize with the initial state from the background.
-
         this.emit('bg:get_state', {
             callback: (state) => {
                 // Make sure that the webview doesn't use the referenced
                 // state object from the background. Extensions also
                 // serialize data between scripts, so this is done in
                 // webview mode as well for consistency's sake.
-                this.state = JSON.parse(JSON.stringify(state))
+                this.state = JSON.parse(state)
 
                 // Extension has a popout mode, where the plugin is opened
                 // in a tab. Set a flag if this is the case.
@@ -80,6 +80,17 @@ class AppForeground extends App {
                     // Kkeep track of the popup's visibility status by
                     // opening a long-lived connection to the background.
                     chrome.runtime.connect({name: 'vialer-js'})
+                }
+
+                if (!this.env.isFirefox) {
+                    navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
+                        this.localStream = stream
+                        this.state.settings.webrtc.permission = true
+                    }).catch((err) => {
+                        this.state.settings.webrtc.permission = false
+                    })
+                } else {
+                    this.state.settings.webrtc.permission = false
                 }
             },
         })
@@ -108,24 +119,35 @@ function initApp(initParams) {
         }, 200)
     }
 
-    navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
-        app.localStream = stream
-        app.state.settings.webrtc.permission = true
-    }).catch((err) => {
-        app.state.settings.webrtc.permission = false
-    })
-
     return app
 }
 
 
 // For extensions, this is an executable endpoint.
-if (env.isExtension) {
-    const fgApp = initApp({name: 'fg'})
-    // Globals are disabled in production mode.
-    if (process.env.NODE_ENV !== 'production') {
-        if (!global.app) global.app = fgApp
-    }
+if (!global.app) global.app = {}
+
+if (env.isExtension) global.app.fg = initApp({name: 'fg'})
+else {
+    // Expect background app here.
+    global.app.bg.on('ready', () => {
+        global.app.fg = initApp({apps: {bg: global.app.bg}, name: 'fg'})
+
+        // Set content height for electron.
+        if (global.app.bg.env.isElectron) {
+            electron.ipcRenderer.send('resize-window', {
+                height: document.body.clientHeight,
+                width: document.body.clientWidth,
+            })
+
+            resizeSensor(document.body, (e) => {
+                electron.ipcRenderer.send('resize-window', {
+                    height: document.body.clientHeight,
+                    width: document.body.clientWidth,
+                })
+            })
+        }
+    })
 }
+
 
 module.exports = initApp

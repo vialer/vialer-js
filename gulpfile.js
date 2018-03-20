@@ -1,4 +1,5 @@
 const {_extend, promisify} = require('util')
+const archiver = require('archiver')
 const fs = require('fs')
 const path = require('path')
 const addsrc = require('gulp-add-src')
@@ -19,7 +20,7 @@ const ifElse = require('gulp-if-else')
 const insert = require('gulp-insert')
 const imagemin = require('gulp-imagemin')
 const minifier = composer(require('uglify-es'), console)
-const mkdirp = require('mkdirp')
+const mkdirp = promisify(require('mkdirp'))
 const notify = require('gulp-notify')
 const replace = require('gulp-replace')
 const rc = require('rc')
@@ -29,16 +30,16 @@ const svgo = require('gulp-svgo')
 const tape = require('gulp-tape')
 const test = require('tape')
 
-const zip = require('gulp-zip')
-
 const writeFileAsync = promisify(fs.writeFile)
 
 // The main settings object containing info
 // from .vialer-jsrc and build flags.
 let settings = {}
 
-settings.BRAND_TARGET = argv.brand ? argv.brand : 'vialer'
+settings.BUILD_ARCH = argv.arch ? argv.arch : 'x64' // all, or one or more of: ia32, x64, armv7l, arm64, mips64el
 settings.BUILD_DIR = process.env.BUILD_DIR || path.join('./', 'build')
+settings.BUILD_PLATFORM = argv.platform ? argv.platform : 'linux' // all, or one or more of: darwin, linux, mas, win32
+settings.BRAND_TARGET = argv.brand ? argv.brand : 'vialer'
 settings.BUILD_TARGET = argv.target ? argv.target : 'chrome'
 settings.BUILD_TARGETS = ['chrome', 'electron', 'edge', 'firefox', 'node', 'webview']
 
@@ -140,9 +141,10 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
     const robotoPath = path.join(settings.NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
     return gulp.src(path.join(robotoPath, '{Roboto-Light.woff2,Roboto-Regular.woff2,Roboto-Medium.woff2}'))
         .pipe(flatten({newPath: './fonts'}))
-        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.icns,*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/ringtones/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(ifElse(settings.PRODUCTION, imagemin))
+        .pipe(ifElse(settings.BUILD_TARGET === 'electron', () => addsrc('./package.json')))
         .pipe(addsrc('./LICENSE'))
         .pipe(addsrc('./README.md'))
         .pipe(addsrc('./src/_locales/**', {base: './src/'}))
@@ -155,9 +157,9 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
 gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
     // Refresh the brand content with each build.
     let targetTasks
-    if (settings.BUILD_TARGET === 'electron') targetTasks = ['js-electron-main', 'js-webview', 'js-vendor']
-    else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-webview', 'js-vendor']
-    else targetTasks = ['js-vendor', 'js-webext']
+    if (settings.BUILD_TARGET === 'electron') targetTasks = ['js-electron']
+    else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg']
+    else if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg', 'js-app-observer', 'manifest']
 
     runSequence(['assets', 'templates', 'translations', 'html', 'scss', 'scss-vendor'].concat(targetTasks), done)
 }, {options: taskOptions.all})
@@ -165,8 +167,8 @@ gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
 
 gulp.task('build-targets', 'Build all targets.', (done) => {
     // Refresh the brand content with each build.
-    let electronTargetTasks = ['assets', 'html', 'scss', 'js-electron-main', 'js-webview', 'js-vendor']
-    let pluginTargetTasks = ['assets', 'html', 'scss', 'js-vendor', 'js-webext']
+    let electronTargetTasks = ['assets', 'html', 'scss', 'js-electron-main', 'js-vendor']
+    let pluginTargetTasks = ['assets', 'html', 'scss', 'js-vendor', 'js-app-bg', 'js-app-fg', 'manifest']
     settings.BUILD_TARGET = 'chrome'
     runSequence(pluginTargetTasks, () => {
         settings.BUILD_TARGET = 'firefox'
@@ -185,33 +187,51 @@ gulp.task('build-targets', 'Build all targets.', (done) => {
 
 gulp.task('build-clean', 'Clear the build directory', async() => {
     await del([path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, '**')], {force: true})
-    mkdirp(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET))
+    await mkdirp(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET))
 }, {options: taskOptions.all})
 
 
-gulp.task('build-dist', 'Make an optimized build and generate a WebExtension zip file from it.', (done) => {
-    const buildDir = `./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`
+gulp.task('build-dist', 'Make an optimized build suitable for distribution.', async(done) => {
+    const buildDir = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET)
+    const distDir = path.join(__dirname, 'dist', settings.BRAND_TARGET)
+    await mkdirp(distDir)
+    let distName
+    if (settings.BUILD_TARGET === 'electron') {
+        distName = `${settings.BRAND_TARGET}-${settings.BUILD_PLATFORM}-${settings.BUILD_ARCH}-${settings.PACKAGE.version}.zip`
+    } else distName = `${settings.BRAND_TARGET}-${settings.BUILD_TARGET}-${settings.PACKAGE.version}.zip`
+
+    // Not using Gulp's Vinyl-based zip, because of a symlink issue that prevents
+    // the MacOS build to be zipped properly. See https://github.com/gulpjs/gulp/issues/1427
+    const output = fs.createWriteStream(path.join(distDir, distName))
+    const archive = archiver('zip', {zlib: {level: 6}})
+
+    output.on('close', function() {
+        gutil.log(archive.pointer() + ' total bytes archived')
+        // done()
+    })
+    // good practice to catch this error explicitly
+    archive.on('error', function(_err) {throw _err})
+    archive.on('warning', function(_err) {if (_err) throw _err})
+    archive.pipe(output)
+
     runSequence('build', async function() {
-        // Use the web-ext build method here, so the result will match
-        // the deployable version as closely as possible.
-        if (settings.BUILD_TARGET === 'firefox') {
-            const source = `--source-dir ${buildDir}`
-            const artifacts = `--artifacts-dir ./dist/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}/`
-            let execCommand = `web-ext build --overwrite-dest ${source} ${artifacts}`
-            let child = childExec(execCommand, undefined, (err, stdout, stderr) => {
+        if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) {
+            archive.directory(buildDir, false)
+            archive.finalize()
+        } else if (settings.BUILD_TARGET === 'electron') {
+            const iconParam = `--icon=${buildDir}/img/electron-icon.png`
+            const buildParams = `--arch=${settings.BUILD_ARCH} --asar --overwrite --platform=${settings.BUILD_PLATFORM} --prune=true`
+            // This is broken when used in combination with Wine due to rcedit.
+            // See: https://github.com/electron-userland/electron-packager/issues/769
+            if (settings.BUILD_PLATFORM !== 'win32') buildParams += iconParam
+            const distBuildName = `${settings.BRAND_TARGET}-${settings.BUILD_PLATFORM}-${settings.BUILD_ARCH}`
+            let execCommand = `electron-packager ${buildDir} ${settings.BRAND_TARGET} ${buildParams} --out=${distDir}`
+            childExec(execCommand, undefined, (err, stdout, stderr) => {
                 if (stderr) gutil.log(stderr)
                 if (stdout) gutil.log(stdout)
-                done()
+                archive.directory(path.join(distDir, distBuildName), distBuildName)
+                archive.finalize()
             })
-
-            child.stdout.on('data', (data) => {
-                process.stdout.write(`${data.toString()}\r`)
-            })
-        } else {
-            gulp.src([`${buildDir}/**`], {base: buildDir})
-                .pipe(zip(`${helpers.distributionName(settings.BRAND_TARGET)}.zip`))
-                .pipe(gulp.dest(`./dist/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}/`))
-                .on('end', done)
         }
     })
 }, {options: taskOptions.all})
@@ -286,9 +306,9 @@ gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
 gulp.task('html', 'Preprocess and build application HTML.', () => {
     let jsbottom
 
+    // Scripts are combined
     if (['electron', 'webview'].includes(settings.BUILD_TARGET)) {
-        jsbottom = '<script src="js/app.js"></script>'
-
+        jsbottom = '<script src="js/app_bg.js"></script><script src="js/app_fg.js"></script>'
     } else {
         jsbottom = '<script src="js/app_fg.js"></script>'
     }
@@ -332,28 +352,31 @@ gulp.task('icons', 'Build an SVG iconset.', ['__tmp-icons'], (done) => {
 
 
 gulp.task('js-electron', 'Generate Electron application.', (done) => {
+    const settingsFile = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET, 'settings.json')
     runSequence([
-        'js-electron-main',
-        'js-webview',
         'js-vendor',
-    ], done)
+        'js-app-bg',
+        'js-app-fg',
+        'js-electron-main',
+    ], async() => {
+        // Vendor-specific info for Electron's main.js file.
+        let mainSettings = {
+            name: settings.brands[settings.BRAND_TARGET].name[settings.DEPLOY_TARGET],
+            vendor: settings.brands[settings.BRAND_TARGET].vendor,
+        }
+        await writeFileAsync(settingsFile, JSON.stringify(mainSettings))
+        done()
+    })
 })
 
 
-gulp.task('js-electron-main', 'Copy Electron main thread js to build.', ['js-webview'], () => {
+gulp.task('js-electron-main', 'Copy Electron main thread js to build.', ['js-app-bg', 'js-app-fg'], () => {
     return gulp.src('./src/js/main.js', {base: './src/js/'})
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
         .pipe(size(_extend({title: 'electron-main'}, settings.SIZE_OPTIONS)))
         .pipe(ifElse(settings.LIVERELOAD, livereload))
 })
 
-
-gulp.task('js-webview', 'Generate generic webview application.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'webview/index', 'app', [], () => {
-        if (settings.LIVERELOAD) livereload.changed('web.js')
-        done()
-    })
-})
 
 gulp.task('js-vendor', 'Generate third-party vendor js.', ['icons'], (done) => {
     helpers.jsEntry(
@@ -366,33 +389,34 @@ gulp.task('js-vendor', 'Generate third-party vendor js.', ['icons'], (done) => {
     )
 }, {options: taskOptions.all})
 
-gulp.task('js-webext', 'Generate WebExtension application.', [], (done) => {
-    runSequence([
-        'js-app-bg',
-        'js-app-fg',
-        'js-app-observer',
-    ], 'manifest', 'test', () => {
+
+gulp.task('js-app-bg', 'Generate the extension background entry js.', (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'app_bg', [], () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
         done()
     })
 }, {options: taskOptions.browser})
 
-gulp.task('js-app-bg', 'Generate the extension background entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'app_bg', [], done)
-}, {options: taskOptions.browser})
 
 gulp.task('js-app-fg', 'Generate webextension fg/popout js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', [], done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', [], () => {
+        if (settings.LIVERELOAD) livereload.changed('web.js')
+        done()
+    })
 }, {options: taskOptions.browser})
 
+
 gulp.task('js-app-observer', 'Generate WebExtension icon observer which runs in all tab frames.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', [], done)
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', [], () => {
+        done()
+    })
 }, {options: taskOptions.browser})
 
 
 gulp.task('manifest', 'Create a browser-specific manifest file.', async() => {
     let manifest = helpers.getManifest(settings.BRAND_TARGET, settings.BUILD_TARGET)
     const manifestTarget = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET, 'manifest.json')
+    await mkdirp(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET))
     await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))
 }, {options: taskOptions.browser})
 
@@ -420,9 +444,11 @@ gulp.task('scss-app', 'Generate application css.', () => {
         path.join(settings.SRC_DIR, 'components', '**', '*.scss'))
 }, {options: taskOptions.all})
 
+
 gulp.task('scss-observer', 'Generate observer css.', () => {
     return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer', !settings.PRODUCTION)
 }, {options: taskOptions.all})
+
 
 gulp.task('scss-vendor', 'Generate vendor css.', () => {
     return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', false)
@@ -483,28 +509,23 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     }
 
 
-    if (settings.BUILD_TARGET !== 'node') {
-        gulp.watch([
-            path.join(__dirname, 'src', 'js', '**', '*.js'),
-            path.join(__dirname, 'src', 'components', '**', '*.js'),
-            `!${path.join(__dirname, 'src', 'js', 'vendor.js')}`,
-            `!${path.join(__dirname, 'src', 'js', 'main.js')}`,
-            `!${path.join(__dirname, 'src', 'js', 'webview.js')}`,
-            `!${path.join(__dirname, 'src', 'js', 'i18n', '*.js')}`,
-        ], () => {
-            if (settings.BUILD_TARGET === 'electron') {
-                gulp.start('js-electron')
-            } else if (settings.BUILD_TARGET === 'webview') {
-                gulp.start('js-webview')
-            } else {
-                gulp.start('js-webext')
-            }
-
-            if (WITHDOCS) gulp.start('docs')
-        })
-    } else {
-        // Node development doesn't need transpilation.
+    if (settings.BUILD_TARGET === 'node') {
+        // Node development doesn't require transpilation.
         gulp.watch([path.join(__dirname, 'src', 'js', '**', '*.js')], ['test'])
+    } else {
+
+        gulp.watch([
+            path.join(__dirname, 'src', 'js', 'components', '**', '*.js'),
+            path.join(__dirname, 'src', 'js', 'fg', '**', '*.js'),
+        ], ['js-app-fg'])
+
+        gulp.watch([
+            path.join(__dirname, 'src', 'js', 'bg', '**', '*.js'),
+        ], ['js-app-bg'])
+
+        if (settings.BUILD_TARGET === 'electron') {
+            gulp.watch([path.join(__dirname, 'src', 'js', 'main.js')], ['js-electron'])
+        }
     }
 
     gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
@@ -549,6 +570,5 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         gulp.watch([
             path.join(settings.NODE_PATH, 'fuet-notify', 'src', 'js', '*.js'),
         ], ['js-vendor'])
-
     }
 })

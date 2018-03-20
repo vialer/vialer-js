@@ -16,7 +16,7 @@ class Skeleton extends EventEmitter {
         this.env = options.env
         // Make Chrome plugin API compatible with the standards
         // WebExtension API as (partly) supported by Firefox and Edge.
-        if (this.env.isChrome) window.browser = require('webextension-polyfill')
+        if (this.env.isExtension && this.env.isChrome) window.browser = require('webextension-polyfill')
 
         // A webview build passes the separate apps, so they can be reached
         // by the EventEmitter.

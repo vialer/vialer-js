@@ -29,6 +29,16 @@ html {
             height: calc(100vh - #{$spacer * 5});
         }
     }
+
+    &.electron {
+        // Hide the vertical scrollbar.
+        overflow-y: hidden;
+
+        .panel {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+    }
 }
 
 .component-main {

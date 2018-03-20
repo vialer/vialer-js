@@ -30,7 +30,8 @@
         "I18nStore": true,
         "i18n": true,
         "EventEmitter": true,
-        "Vuelidate": true
+        "Vuelidate": true,
+        "resizeSensor": true
     },
     "plugins": [
         "sort-class-members"

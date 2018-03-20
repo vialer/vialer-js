@@ -30,7 +30,7 @@ class Extension extends Module {
                             current: chrome.runtime.getManifest().version,
                         },
                     },
-                }, {persist: true})
+                }, {encrypt: false, persist: true})
             } else if (details.reason === 'update') {
                 this.app.setState({
                     app: {
@@ -40,7 +40,7 @@ class Extension extends Module {
                             previous: details.previousVersion,
                         },
                     },
-                }, {persist: true})
+                }, {encrypt: false, persist: true})
             }
         })
     }

@@ -9,35 +9,36 @@ const path = require('path')
 const url = require('url')
 const {ipcMain} = require('electron')
 
+const settings = require('./settings')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow() {
-    let tray = new Tray(path.join(__dirname, 'img', 'systray-active.png'))
-    tray.setToolTip('This is my application.')
+    let tray = new Tray(path.join(__dirname, 'img', 'electron-systray.png'))
+    tray.setToolTip(settings.name)
 
 
     // Create the browser window.
     mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         height: 186,
+        icon: path.join(__dirname, 'img', 'electron-icon.png'),
         resizable: false,
         show: false,
-        title: 'Vialer',
-        useContentSize: true,
-        width: 400,
+        title: settings.name,
+        width: 550,
     })
 
     ipcMain.on('resize-window', (event, data) => {
         const currentSize = mainWindow.getContentSize()
         if (data.height !== currentSize[1]) {
-            mainWindow.setContentSize(data.width, data.height, false)
+            if (data.height > 800) data.height = 800
+            mainWindow.setContentSize(550, data.height, false)
         }
     })
 
-    mainWindow.setIcon(path.join(__dirname, 'img', 'systray-active.png'))
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
@@ -75,7 +76,5 @@ app.on('window-all-closed', function() {
 app.on('activate', function() {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (mainWindow === null) {
-        createWindow()
-    }
+    if (mainWindow === null) createWindow()
 })

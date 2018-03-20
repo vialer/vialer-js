@@ -175,7 +175,7 @@ class Crypto {
         const keydata = await crypto.subtle.exportKey('raw', aesKey)
         //returns the exported key data
         let base64Keydata = this.__dataArrayToBase64(keydata)
-        this.app.logger.info(`${this}export aes-gcm sessionkey:`, base64Keydata)
+        this.app.logger.info(`${this}export aes-gcm sessionkey`)
         return base64Keydata
     }
 
@@ -347,7 +347,6 @@ class Crypto {
         const iv = crypto.getRandomValues(this.__dataArray(16))
         if (additionalData) additionalData = this.__stringToDataArray(additionalData)
         else additionalData = this.__dataArray(0)
-
         const encrypted = await crypto.subtle.encrypt(
             {additionalData, iv, name: 'AES-GCM', tagLength: 128},
             sessionKey, this.__stringToDataArray(plaintext))
@@ -373,7 +372,7 @@ class Crypto {
         try {
             this.sessionKey = await this._generateVaultKey(username, password)
         } catch (err) {
-            console.error(err)
+            console.error('ERROR:', err)
             throw err
         }
 
