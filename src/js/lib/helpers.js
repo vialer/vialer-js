@@ -4,6 +4,13 @@ module.exports = function(app) {
 
     let helpers = {}
 
+    helpers.activeCall = function() {
+        for (const id of Object.keys(this.calls)) {
+            if (this.calls[id].active) return this.calls[id]
+        }
+        return null
+    }
+
     /**
     * Helper function to determine whether calling functionality
     * should be activated or not. Used both within and outside
@@ -107,6 +114,7 @@ module.exports = function(app) {
 
     helpers.sharedComputed = function() {
         return {
+            activeCall: helpers.activeCall,
             callingDisabled: helpers.callingDisabled,
             callOngoing: helpers.callOngoing,
             callsReady: helpers.callsReady,

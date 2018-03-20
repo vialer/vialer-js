@@ -2,7 +2,27 @@
 
 .component-calls {
 
+    // There should always be an active call. This is an error screen
+    // in case there is no active call for some reason.
+    &.no-call {
+        background: $red-color;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .no-call-error {
+            color: $white;
+            font-size: 1.3rem;
+            font-weight: 500;
+            font-style: italic;
+            width: 100%;
+            text-align: center;
+        }
+    }
+
     &.call-ongoing {
         background: linear-gradient(180deg, $brand-color, $brand-variation-color);
+        display: grid;
+        grid-template-columns: auto ($spacer * 5);
     }
 }

@@ -1,9 +1,10 @@
 @import "../../scss/lib/variables";
 
-// Specific styling per environment.
+// Specific main panel styling per environment.
 html {
     &.popout {
         .component-main {max-width: $max-popup-width;}
+
         .panel {
             height: calc(100vh - #{$spacer * 5});
             // The minimal height should allow all sidebar icons to show.
@@ -13,6 +14,7 @@ html {
 
     &.popup {
         .component-main {max-width: $max-popup-width;}
+
         .panel {
             // The minimal height should allow all sidebar icons to show.
             max-height: calc(600px - #{$spacer * 5});
@@ -22,6 +24,7 @@ html {
 
     &.webview {
         .component-main {max-width: $max-popup-width;}
+
         .panel {
             height: calc(100vh - #{$spacer * 5});
         }
@@ -32,6 +35,9 @@ html {
 
     .panel {
         display: grid;
+        // Make sure that the main panel is always at least as high as the
+        // left menubar container.
+        min-height: 280px;
         // Show a scrollbar when the content height exceeds the max-height.
         overflow-y: auto;
 

@@ -21,7 +21,7 @@
                 <Contacts v-else-if="layer==='contacts'"/>
                 <Queues v-else-if="layer==='queues'"/>
                 <Settings v-else-if="layer==='settings'"/>
-                <Calls v-else-if="layer==='calls'" :calls="calls"/>
+                <Calls v-else-if="layer==='calls'"/>
             </template>
         </div>
     </template>

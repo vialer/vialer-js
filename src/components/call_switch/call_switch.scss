@@ -4,11 +4,6 @@
 // The most upper box containing account info and
 // icon-links to several locations.
 .component-call-switch {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: $spacer * 5;
-    z-index: 100000;
 
     .call {
         align-items: center;
