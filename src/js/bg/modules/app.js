@@ -32,7 +32,11 @@ class ModuleApp extends Module {
                     name: process.env.PORTAL_NAME,
                     url: process.env.PORTAL_URL,
                 },
-                support: process.env.VENDOR_SUPPORT,
+                support: {
+                    email: process.env.VENDOR_SUPPORT_EMAIL,
+                    phone: process.env.VENDOR_SUPPORT_PHONE,
+                    website: process.env.VENDOR_SUPPORT_WEBSITE,
+                },
                 type: process.env.VENDOR_TYPE,
             },
             version: {

@@ -2,7 +2,6 @@
 
 .component-notifications {
     left: 0;
-    max-width: $max-popup-width;
     position: fixed;
     top: $spacer * 5;
     width: 100%;
@@ -10,7 +9,6 @@
 
     &.sidebar {
         left: $spacer * 5;
-        max-width: $max-popup-width - ($spacer * 5);
         width: calc(100% - #{$spacer * 5});
     }
 

@@ -145,12 +145,10 @@ class AppBackground extends App {
                     this.__initServices()
                 } else {
                     menubarIcon = 'lock-on'
-                    this.setState({ui: {layer: 'unlock'}})
-                    this.setState({user: {authenticated: false}}, {encrypt: false, persist: true})
+                    this.setState({ui: {layer: 'unlock'}, user: {authenticated: false}}, {encrypt: false, persist: true})
                 }
             } else {
-                this.setState({ui: {layer: 'login'}})
-                this.setState({user: {authenticated: false}}, {encrypt: false, persist: true})
+                this.setState({ui: {layer: 'login'}, user: {authenticated: false}}, {encrypt: false, persist: true})
             }
         }
 
@@ -224,7 +222,7 @@ class AppBackground extends App {
             // Clean the state after retrieving a state dump from the store.
             this._restoreState(this.state)
             // And we're authenticated again!
-            this.setState({user: {authenticated: true}}, {encrypt: false, persist: true})
+            this.setState({settings: {vault: {active: true, unlocked: true}}, user: {authenticated: true}}, {encrypt: false, persist: true})
             this.__initServices()
         } catch (err) {
             console.log(err)

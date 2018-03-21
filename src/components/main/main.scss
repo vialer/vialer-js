@@ -42,6 +42,27 @@ html {
 }
 
 .component-main {
+    position: relative;
+
+    .overlay {
+        animation: grow .3s ease-in-out;
+        background: $white;
+        height: 100vh;
+        position: absolute;
+        width: 100%;
+        z-index: 10000000000;
+
+        .close-button {
+            position: absolute;
+            right: $spacer;
+            top: $spacer;
+
+            &:hover {
+                color: $brand-color;
+                cursor: pointer;
+            }
+        }
+    }
 
     .panel {
         display: grid;
@@ -54,6 +75,10 @@ html {
         // Split into grid columns for the menubar when logged in.
         &.sidebar {
             grid-template-columns: ($spacer * 5) auto;
+        }
+
+        &.no-scroll {
+            overflow: hidden;
         }
 
         h1 {

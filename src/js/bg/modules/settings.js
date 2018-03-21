@@ -48,6 +48,7 @@ class ModuleSettings extends Module {
                 key: null,
                 salt: null,
                 store: false,
+                unlocked: false,
             },
             webrtc: {
                 account: {

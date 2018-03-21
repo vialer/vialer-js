@@ -111,10 +111,10 @@ class ModuleUser extends Module {
             this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: user.realName}), type: 'success'})
         }
 
+        this.app.setState({ui: {layer: startLayer, menubar: {default: 'active'}}}, {encrypt: false, persist: true})
         this.app.setState({
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},
-            ui: {layer: startLayer, menubar: {default: 'active'}},
             user: {
                 client_id: user.client.replace(/[^\d.]/g, ''),
                 id: user.id,
@@ -144,7 +144,7 @@ class ModuleUser extends Module {
         // the the lock screen. At this moment, the encrypted state
         // can't be persisted.
         this.app.setState({ui: {layer: 'login'}, user: {password: ''}}, this.app.state.user.authenticated ? {persist: true} : {})
-        this.app.setState({settings: {vault: {active: false}}, user: {authenticated: false}}, {encrypt: false, persist: true})
+        this.app.setState({settings: {vault: {active: false, unlocked: false}}, user: {authenticated: false}}, {encrypt: false, persist: true})
         // Remove credentials from basic auth.
         this.app.api.setupClient()
         // Disconnect without reconnect attempt.

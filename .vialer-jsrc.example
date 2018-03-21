@@ -15,7 +15,10 @@
                     "name": "VoIPGRID portal",
                     "url": "https://partner.voipgrid.nl/"
                 },
-                "support": "support@email",
+                "support": {
+                    "email": "support@voipgrid.nl",
+                    "phone": "1234567890"
+                },
                 "type": "closed"
             },
             "analytics_id": {

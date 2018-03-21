@@ -80,17 +80,18 @@ module.exports = function(app) {
 
     helpers.sharedMethods = function() {
         return {
+            closeOverlay: function() {
+                app.setState({ui: {overlay: null}}, {encrypt: false, persist: true})
+            },
             createCall: function(number, start = true, transfer = false) {
+                if (!this.user.authenticated) return false
                 // Empty Calls are allowed (used in the call switcher), but
                 // number must specifically be set to `false`. Default Store
                 // value `null` and an empty string are not allowed.
-                if (number === null || number === '') return
-                if (this.callingDisabled) return
-                app.emit('bg:calls:call_create', {number: number, start, transfer})
-            },
-            openHelp: function() {
-                if (app.env.isExtension) browser.tabs.create({url: process.env.HOMEPAGE})
-                else window.open(process.env.HOMEPAGE, '_blank')
+                if (number === null || number === '') return false
+                if (this.callingDisabled) return false
+                app.emit('bg:calls:call_create', {number, start, transfer})
+                return number
             },
             openPlatformUrl: function(path = '') {
                 app.emit('bg:user:update-token', {
@@ -108,6 +109,16 @@ module.exports = function(app) {
                 if (app.env.isExtension) {
                     browser.tabs.create({url: browser.runtime.getURL('index.html?popout=true')})
                 }
+            },
+            openTab: function(url) {
+                if (app.env.isExtension) browser.tabs.create({url})
+                else window.open(url, '_blank')
+            },
+            setLayer: function(layerName) {
+                app.setState({ui: {layer: layerName}}, {encrypt: false, persist: true})
+            },
+            setOverlay: function(layerName) {
+                app.setState({ui: {overlay: layerName}}, {encrypt: false, persist: true})
             },
         }
     }

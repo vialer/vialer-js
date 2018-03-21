@@ -514,12 +514,14 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     } else {
 
         gulp.watch([
-            path.join(__dirname, 'src', 'js', 'components', '**', '*.js'),
+            path.join(__dirname, 'src', 'components', '**', '*.js'),
+            path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
             path.join(__dirname, 'src', 'js', 'fg', '**', '*.js'),
         ], ['js-app-fg'])
 
         gulp.watch([
             path.join(__dirname, 'src', 'js', 'bg', '**', '*.js'),
+            path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
         ], ['js-app-bg'])
 
         if (settings.BUILD_TARGET === 'electron') {

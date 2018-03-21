@@ -51,6 +51,7 @@ class AppForeground extends App {
         Vue.component('Telemetry', require('../../components/telemetry')(this))
         Vue.component('Unlock', require('../../components/unlock')(this))
         Vue.component('Queues', require('../../components/queues')(this))
+        Vue.component('About', require('../../components/about')(this))
 
         this.__initStore()
     }
@@ -121,32 +122,27 @@ function initApp(initParams) {
     return app
 }
 
-
 // For extensions, this is an executable endpoint.
 if (!global.app) global.app = {}
-
 if (env.isExtension) global.app.fg = initApp({name: 'fg'})
-else {
-    // Expect background app here.
-    global.app.bg.on('ready', () => {
-        global.app.fg = initApp({apps: {bg: global.app.bg}, name: 'fg'})
+else global.app.fg = initApp({apps: {bg: global.app.bg}, name: 'fg'})
 
-        // Set content height for electron.
-        if (global.app.bg.env.isElectron) {
+// Expect background app here.
+global.app.fg.on('ready', () => {
+    // Set content height for electron.
+    if (global.app.bg.env.isElectron) {
+        electron.ipcRenderer.send('resize-window', {
+            height: document.body.clientHeight,
+            width: document.body.clientWidth,
+        })
+
+        resizeSensor(document.body, (e) => {
             electron.ipcRenderer.send('resize-window', {
                 height: document.body.clientHeight,
                 width: document.body.clientWidth,
             })
-
-            resizeSensor(document.body, (e) => {
-                electron.ipcRenderer.send('resize-window', {
-                    height: document.body.clientHeight,
-                    width: document.body.clientWidth,
-                })
-            })
-        }
-    })
-}
-
+        })
+    }
+})
 
 module.exports = initApp

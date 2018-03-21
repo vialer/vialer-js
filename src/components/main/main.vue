@@ -1,19 +1,23 @@
 <component class="component-main" id="app">
     <!-- Force the telemetry window to show up -->
-    <template v-if="telemetry.enabled === null && user.authenticated">
-        <Telemetry></Telemetry>
-    </template>
+    <Telemetry v-if="telemetry.enabled === null && user.authenticated"/>
     <template v-else>
+        <div class="overlay" v-if="overlay">
+            <div class="close-button" @click="closeOverlay()">
+                <svgicon name="close"/>
+            </div>
+            <About v-if="overlay==='about'"/>
+        </div>
+
         <MainStatusBar v-if="!callOngoing"/>
         <MainCallBar v-if="callOngoing && call.active" :call="call" v-for="call in calls"/>
 
         <Notifications  :class="classes('notifications')"/>
         <div class="panel" :class="classes('panel')">
-            <template v-if="layer === 'login' || layer === 'unlock'">
+            <template v-if="!user.authenticated">
                 <Login v-if="layer === 'login'" class="panel-content"/>
                 <Unlock v-else-if="layer === 'unlock'" class="panel-content"d/>
             </template>
-
             <template v-else>
                 <MainMenuBar/>
 

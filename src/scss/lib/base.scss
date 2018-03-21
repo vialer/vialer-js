@@ -41,6 +41,15 @@ body {
     }
 }
 
+// A generic link class that can be used on non-html elements
+// that function like a link.
+.link {
+    &:hover {
+        color: $brand-color;
+        cursor: pointer;
+    }
+}
+
 input {
     &[type="text"] {
         height: $spacer * 5;
@@ -191,6 +200,25 @@ video {
 
 .info-box {
     background: rgba($brand-color, 0.1);
+}
+
+
+@keyframes grow {
+    0% {
+        display: none;
+        opacity: 0;
+    }
+
+    1% {
+        display: block;
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @include keyframes(hint-pulse) {
