@@ -506,6 +506,7 @@ class ModuleCalls extends Module {
                 call.start()
 
             } else {
+                this.logger.info(`${this}dropping new call (${callIds.length} calls).`)
                 // Treat the call as a silenced call and terminate it directly.
                 const call = callFactory(this, session, {silent: true}, 'CallSIP')
                 call.start()
