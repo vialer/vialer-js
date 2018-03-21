@@ -220,7 +220,7 @@ gulp.task('build-dist', 'Make an optimized build suitable for distribution.', as
             archive.finalize()
         } else if (settings.BUILD_TARGET === 'electron') {
             const iconParam = `--icon=${buildDir}/img/electron-icon.png`
-            const buildParams = `--arch=${settings.BUILD_ARCH} --asar --overwrite --platform=${settings.BUILD_PLATFORM} --prune=true`
+            let buildParams = `--arch=${settings.BUILD_ARCH} --asar --overwrite --platform=${settings.BUILD_PLATFORM} --prune=true`
             // This is broken when used in combination with Wine due to rcedit.
             // See: https://github.com/electron-userland/electron-packager/issues/769
             if (settings.BUILD_PLATFORM !== 'win32') buildParams += iconParam
