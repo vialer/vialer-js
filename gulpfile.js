@@ -340,7 +340,7 @@ gulp.task('icons', 'Build an SVG iconset.', ['__tmp-icons'], (done) => {
     const srcDir = path.join(settings.TEMP_DIR, settings.BRAND_TARGET, 'svg')
     // The icons JavaScript is added inside the source.
     const srcBuildDir = path.join(settings.SRC_DIR, 'brand', settings.BRAND_TARGET, 'icons')
-    let execCommand = `vsvg -s ${srcDir} -t ${srcBuildDir}`
+    let execCommand = `node_modules/vue-svgicon/bin/svg.js -s ${srcDir} -t ${srcBuildDir}`
     childExec(execCommand, undefined, (_err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
         if (stdout) gutil.log(stdout)
