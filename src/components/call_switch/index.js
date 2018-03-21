@@ -89,6 +89,7 @@ module.exports = (app) => {
         staticRenderFns: templates.call_switch.s,
         store: {
             calls: 'calls.calls',
+            user: 'user',
         },
     }
 }

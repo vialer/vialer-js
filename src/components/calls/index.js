@@ -7,7 +7,6 @@ module.exports = (app) => {
                 let classes = {}
 
                 if (block === 'component') {
-                    if (!this.activeCall) classes['no-call'] = true
                     if (this.callOngoing) classes['call-ongoing'] = true
                 }
                 return classes

@@ -5,10 +5,16 @@ module.exports = function(app) {
     let helpers = {}
 
     helpers.activeCall = function() {
+        let activeCall = null
         for (const id of Object.keys(this.calls)) {
-            if (this.calls[id].active) return this.calls[id]
+            if (this.calls[id].active) activeCall = this.calls[id]
         }
-        return null
+
+        // Fallback to the first call in case there is no active call at all.
+        if (!activeCall) {
+            activeCall = this.calls[Object.keys(this.calls)[0]]
+        }
+        return activeCall
     }
 
     /**
