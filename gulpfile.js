@@ -207,7 +207,6 @@ gulp.task('build-dist', 'Make an optimized build suitable for distribution.', as
 
     output.on('close', function() {
         gutil.log(archive.pointer() + ' total bytes archived')
-        // done()
     })
     // good practice to catch this error explicitly
     archive.on('error', function(_err) {throw _err})

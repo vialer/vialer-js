@@ -45,9 +45,8 @@ class ModuleUI extends Module {
 
 
     /**
-    * Set the initial restored state for the webextension menubar,
-    * which should be inactive without active events that could
-    * override the status.
+    * Set the default restored state on the webextension menubar.
+    * The menubar should be inactive without any overriding events.
     * @param {Object} moduleStore - The root key of the restored store module.
     */
     _restoreState(moduleStore) {
@@ -71,6 +70,12 @@ class ModuleUI extends Module {
                     browser.browserAction.setIcon({path: `img/menubar-${newVal}.png`})
                 }
             },
+            /**
+            * Overrides the default menubar and restores the default
+            * when it is unset.
+            * @param {String} newVal - The new menubar event icon value.
+            * @param {String} oldVal - The old menubar event icon value.
+            */
             'store.ui.menubar.event': (newVal, oldVal) => {
                 if (this.app.env.isExtension) {
                     this.menubarAnimation()
