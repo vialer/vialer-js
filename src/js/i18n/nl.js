@@ -87,7 +87,6 @@ global.translations.nl = {
     'of': 'van',
     'On hold': 'In de wacht',
     'Open the microphone settings from the tab view to grant the microphone permission:': 'Open de microfoon instellingen vanuit het tab overzicht om de microfoon permissie te verlenen:',
-    'or contact us at': 'of neem contact met ons op via',
     'Outgoing call...': 'Uitgaand gesprek...',
     'Output device': 'Uitvoerapparaat',
     'password': 'wachtwoord',

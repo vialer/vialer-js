@@ -2,28 +2,28 @@ module.exports = (app) => {
 
     return {
         computed: app.helpers.sharedComputed(),
-        methods: {
+        methods: Object.assign({
             classes: function(block) {
                 let classes = {}
 
                 if (block === 'notifications') {
-                    if (!['login', 'unlock'].includes(this.layer)) {
+                    if (this.user.authenticated) {
                         classes.sidebar = true
                     }
                 } else if (block === 'panel') {
-                    if (!['login', 'unlock'].includes(this.layer)) {
-                        classes.sidebar = true
-                    }
+                    if (this.user.authenticated) classes.sidebar = true
+                    if (this.overlay) classes['no-scroll'] = true
                 }
 
                 return classes
             },
-        },
+        }, app.helpers.sharedMethods()),
         render: templates.main.r,
         staticRenderFns: templates.main.s,
         store: {
             calls: 'calls.calls',
             layer: 'ui.layer',
+            overlay: 'ui.overlay',
             telemetry: 'settings.telemetry',
             user: 'user',
         },

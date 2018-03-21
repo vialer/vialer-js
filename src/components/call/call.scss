@@ -170,7 +170,7 @@
     }
 
     .action {
-        box-shadow: 0 8px 14px 0 rgba(0, 0, 0, 0.4);
+        box-shadow: 0 $spacer 14px 0 rgba(0, 0, 0, 0.4);
         margin: $spacer;
 
         &.decline {

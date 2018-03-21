@@ -14,7 +14,6 @@
                 <svgicon class="registered" name="softphone" v-if="this.settings.webrtc.permission"/>
                 <svgicon class="microphone-denied" name="mute" v-else></svgicon>
             </template>
-
         </span>
 
         <span class="username">{{user.username}}</span>
@@ -40,11 +39,12 @@
             <svgicon class="refresh" name="refresh"/>
         </div>
 
-        <div class="option" @click="logout" v-if="layer === 'unlock'">
+        <!-- Allow the user to bail out when it's unable to unlock-->
+        <div class="option" @click="logout" v-else-if="layer === 'unlock'">
             <svgicon name="logout"/>
         </div>
 
-        <div class="option" @click="openHelp">
+        <div class="option" :class="{active: layer === 'about'}" @click="setOverlay('about')">
             <svgicon name="help"/>
         </div>
     </div>

@@ -1,0 +1,68 @@
+@import "../../scss/lib/variables";
+
+.component-about {
+
+    .about {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+
+        .about-version {
+            padding-top: $spacer * 3;
+            text-align: center;
+
+            .version-logo {
+                height: $spacer * 5;
+                margin-bottom: $spacer;
+                width: $spacer * 5;
+            }
+
+            .version-name {
+                font-weight: 500;
+                margin-bottom: $spacer * 2;
+            }
+        }
+    }
+
+    .support {
+        display: flex;
+        flex-flow: row wrap;
+        padding: $spacer * 3;
+
+        .support-option {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            height: 160px;
+            justify-content: center;
+            width: 50%;
+
+            .support-icon {
+                height: $spacer * 3;
+                margin-bottom: $spacer * 2;
+                width: $spacer * 3;
+            }
+
+            .support-title {
+                color: $grey-color-dark;
+                font-size: 1rem;
+            }
+
+            .support-description {
+                text-align: center;
+            }
+
+            .support-channel {
+                color: $brand-color;
+            }
+
+            &:hover {
+                box-shadow: 0 ($spacer / 2) 6px 0 rgba(0, 0, 0, 0.2);
+
+                .support-icon {
+                    color: $brand-color;
+                }
+            }
+        }
+    }
+}

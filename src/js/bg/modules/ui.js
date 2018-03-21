@@ -34,6 +34,7 @@ class ModuleUI extends Module {
                 default: 'inactive',
                 event: null,
             },
+            overlay: null,
             tabs: {
                 settings: {
                     active: 'phone',
