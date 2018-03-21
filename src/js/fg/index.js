@@ -112,10 +112,9 @@ function initApp(initParams) {
         // See: https://bugs.chromium.org/p/chromium/issues/detail?id=307912
         setTimeout(() => {
             const style = document.querySelector('#app').style
-            style.display = 'flex'
             setTimeout(() => {
                 style.opacity = 1
-            });
+            })
         }, 200)
     }
 
