@@ -265,6 +265,11 @@ class Call {
         clearInterval(this.timerId)
     }
 
+
+    toString() {
+        return `${this.app}[call] [${this.id}] `
+    }
+
 }
 
 

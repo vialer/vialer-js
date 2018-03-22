@@ -2,6 +2,8 @@
 // state from here.
 module.exports = function(app) {
 
+    const closingStatus = ['rejected_a', 'rejected_b', 'bye']
+
     let helpers = {}
 
     helpers.activeCall = function() {
@@ -12,7 +14,12 @@ module.exports = function(app) {
 
         // Fallback to the first call in case there is no active call at all.
         if (!activeCall) {
-            activeCall = this.calls[Object.keys(this.calls)[0]]
+            if (Object.keys(this.calls).length === 0) {
+                app.emit('bg:calls:call_create', {
+                    callback: ({call}) => {
+                        activeCall = call
+                    }, number: null, start: null})
+            }
         }
         return activeCall
     }
@@ -37,18 +44,32 @@ module.exports = function(app) {
 
 
     /**
-    * Checks whether any calls are going on.
+    * Filter and return all ids of Calls that are
+    * in a closing state.
+    * @returns {Array} - Closing Call ids.
+    */
+    helpers.callsClosing = function() {
+        const calls = app.state.calls.calls
+        return Object.keys(calls).filter((i) => closingStatus.includes(calls[i].status))
+    }
+
+
+    /**
+    * An ongoing Call is a Call that is either ongoing or
+    * in the process of being closed.
     * @returns {Boolean} - Whether one or more calls is active.
     */
     helpers.callOngoing = function() {
         const calls = app.state.calls.calls
         const callIds = Object.keys(calls)
-        // Calls component haven't been activated.
-        if (!callIds.length) return false
-        // User wants to create its first call.
-        if (callIds.length === 1 && calls[callIds[0]].status === 'new') {
-            return false
-        } else return true
+
+        for (const callId of callIds) {
+            const status = calls[callId].status
+            // An active Call is not a new Call, but may be a closing Call.
+            if (status !== 'new') return true
+        }
+
+        return false
     }
 
 

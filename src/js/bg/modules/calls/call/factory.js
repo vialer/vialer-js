@@ -27,20 +27,18 @@ function callFactory(module, callTarget = null, callOptions = {}, callType = nul
         }
     } else {
         // Let application state decide.
-        if (app.state.calls.ua.state === 'registered') {
-            call = new SipCall(module, callTarget, callOptions)
-        } else if (app.state.user.authenticated) {
-            // The user at least has access to the vendor API and should
-            // be able to place a Connectab call.
-            call = new ConnectabCall(module, callTarget, callOptions)
-        } else {
-            // This shouldn't happen. Make some noise if it does.
-            throw 'Factory couldn\'t produce a valid Call target!'
+        if (app.state.user.authenticated) {
+            if (app.state.settings.webrtc.enabled) {
+                call = new SipCall(module, callTarget, callOptions)
+            } else {
+                // Fallback to the vendor API.
+                call = new ConnectabCall(module, callTarget, callOptions)
+            }
         }
     }
 
-    if (call) app.logger.debug(`[bg] [factory] generate ${call.constructor.name} from factory.`)
-    return call
+    if (call) return call
+    throw 'Factory couldn\'t produce a valid Call target!'
 }
 
 module.exports = callFactory

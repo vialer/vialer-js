@@ -46,11 +46,9 @@ class ModuleCalls extends Module {
         * @param {String} callInfo.type - Defines the Call implementation. Leave empty to use the one supported
         *                                 by the application settings.
         */
-        this.app.on('bg:calls:call_create', ({number, start, type}) => {
+        this.app.on('bg:calls:call_create', ({callback, number, start, type}) => {
             // Always sanitize the number.
             number = this.app.utils.sanitizeNumber(number)
-            // Blind transfer when the current active call is in blind
-            // transfer mode.
 
             let activeCall = this.activeCall(true)
             if (activeCall && activeCall.state.transfer.active && activeCall.state.transfer.type === 'blind') {
@@ -60,18 +58,26 @@ class ModuleCalls extends Module {
                 activeCall.transfer(number)
             } else {
                 // Both a 'regular' new call and an attended transfer call will
-                // create or get a new call and active it.
+                // create or get a new Call and activate it.
                 let call = this._emptyCall(type, number)
 
                 // Sync the state back to the foreground.
                 if (start) call.start()
                 this.__setTransferState()
-                // // A newly created call is always activated.
-                this.activateCall(call, true, true)
+                // A newly created call is always activated unless
+                // there is another call already ringing.
+                if (!Object.keys(this.calls).find((i) => ['create', 'invite'].includes(this.calls[i].state.status))) {
+                    this.activateCall(call, true, true)
+                }
+
+                if (callback) callback({call: call.state})
             }
         })
 
-        this.app.on('bg:calls:call_delete', ({callId}) => this.deleteCall(this.calls[callId]))
+        this.app.on('bg:calls:call_delete', ({callId}) => {
+            if (this.calls[callId]) this.deleteCall(this.calls[callId])
+            else this.app.logger.debug(`${this}trying to delete non-existent Call with id ${callId}`)
+        })
         this.app.on('bg:calls:call_start', (callState) => {
             this.calls[callState.id].setState(callState)
             this.calls[callState.id].start()
@@ -247,28 +253,31 @@ class ModuleCalls extends Module {
     */
     _emptyCall(type, number = null) {
         let call
+
+        // See if we can reuse an existing `new` Call object.
         for (const callId of Object.keys(this.calls)) {
             if (this.calls[callId].state.status !== 'new') continue
 
             if (type) {
                 // Otherwise we just check if the call matches the
                 // expected type.
-                if (this.calls[callId].constructor.name !== type) this.deleteCall(this.calls[callId])
-                else call = this.calls[callId]
+                if (this.calls[callId].constructor.name !== type) {
+                    this.deleteCall(this.calls[callId])
+                } else {
+                    call = this.calls[callId]
+                }
             } else {
                 // When an empty call already exists, it must
                 // adhere to the current WebRTC-SIP/ConnectAB settings
                 // if the Call type is not explicitly passed.
                 if (this.app.state.settings.webrtc.enabled) {
                     if (this.calls[callId].constructor.name === 'CallConnectAB') {
-                        this.app.logger.debug(`${this}recreate a new call`)
                         this.deleteCall(this.calls[callId])
                     } else {
                         call = this.calls[callId]
                     }
                 } else {
                     if (this.calls[callId].constructor.name === 'CallSIP') {
-                        this.app.logger.debug(`${this}recreate a new call`)
                         this.deleteCall(this.calls[callId])
                     } else call = this.calls[callId]
                 }
@@ -277,6 +286,7 @@ class ModuleCalls extends Module {
             if (this.calls[callId]) call = this.calls[callId]
             break
         }
+
         if (!call) {
             call = callFactory(this, number, {}, type)
         }
@@ -285,7 +295,7 @@ class ModuleCalls extends Module {
         call.state.number = number
         call.setState(call.state)
         // Always set the number in the local state.
-        this.app.logger.debug(`${this}returning a ${call.constructor.name} instance with 'new' state`)
+        this.app.logger.debug(`${this}_emptyCall ${call.constructor.name} instance`)
         return call
     }
 
@@ -392,7 +402,7 @@ class ModuleCalls extends Module {
         } else if (action === 'hold-active') {
             let activeCall = this.activeCall()
             // Make sure the action isn't provoked on a closing call.
-            if (activeCall && !['bye', 'rejected_a', 'rejected_b'].includes(activeCall.state.status)) {
+            if (activeCall && activeCall.state.status === 'accepted') {
                 if (activeCall.state.hold.active) activeCall.unhold()
                 else activeCall.hold()
             }
@@ -410,7 +420,7 @@ class ModuleCalls extends Module {
             // Don't select a call that is already closing
             if (this.calls[callId].state.active) {
                 if (!ongoing) activeCall = this.calls[callId]
-                else if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) activeCall = this.calls[callId]
+                else if (this.calls[callId].state.status === 'accepted') activeCall = this.calls[callId]
             }
         }
         return activeCall
@@ -426,7 +436,6 @@ class ModuleCalls extends Module {
     * @returns {Call|Boolean} - The Call or false.
     */
     activateCall(call, holdOthers = true, unholdOwn = false) {
-        let activeCall = false
         const callIds = Object.keys(this.calls)
 
         if (!call) {
@@ -437,31 +446,32 @@ class ModuleCalls extends Module {
                     call = this.calls[callId]
                 }
             }
-            if (!call) return false
+
+            if (!call) {
+                this.app.logger.debug(`${this}no call to activate!`)
+                return false
+            }
         }
         for (const callId of Object.keys(this.calls)) {
             let _call = this.calls[callId]
             // A call that is closing. Don't bother changing hold
             // and active state properties.
-            if (!['bye', 'rejected_a', 'rejected_b'].includes(call.state.status)) {
-                if (call.id === callId) {
-                    activeCall = this.calls[callId]
-                    _call.setState({active: true})
-                    // New calls don't have a session yet. Nothing to unhold.
-                    if (unholdOwn && !['new', 'create', 'invite'].includes(_call.state.status)) {
-                        _call.unhold()
-                    }
-                } else {
-                    _call.setState({active: false})
-                    // New calls don't have a session yet. Nothing to hold.
-                    if (holdOthers && !['new', 'create', 'invite'].includes(_call.state.status)) {
-                        _call.hold()
-                    }
+            if (call.id === callId) {
+                call.setState({active: true})
+                // Only unhold calls that are in the right state.
+                if (unholdOwn && _call.state.status === 'accepted') {
+                    _call.unhold()
+                }
+            } else {
+                _call.setState({active: false})
+                // Only hold calls that are in the right state.
+                if (holdOthers && _call.state.status === 'accepted') {
+                    _call.hold()
                 }
             }
         }
 
-        return activeCall
+        return call
     }
 
 
@@ -484,32 +494,52 @@ class ModuleCalls extends Module {
         this.app.setState({calls: {ua: {state: 'disconnected'}}})
         this.ua = new this.lib.UA(uaOptions)
 
-        const allowedIncomingStatus = ['new', 'rejected_a', 'rejected_b', 'bye']
 
-        // An incoming call. Set the session object and set state to call.
+        /**
+        * An incoming call. Call-waiting is not implemented.
+        * A new incoming call on top of a call that is already
+        * ongoing will be silently terminated.
+        */
         this.ua.on('invite', (session) => {
-            // Call-waiting is not allowed for now. A new incoming call
-            // on top of a call that is already active will be silently
-            // dropped.
             const callIds = Object.keys(this.calls)
+            const callOngoing = this.app.helpers.callOngoing()
+            const closingCalls = this.app.helpers.callsClosing()
+            const dnd = this.app.state.availability.dnd
+            const microphoneAccess = this.app.state.settings.webrtc.permission
 
-            if (this.app.state.settings.webrtc.permission && // No microphone access; don't accept any Call.
-                !this.app.state.availability.dnd && // Do not disturb; skip any incoming Call.
-                (callIds.length === 0 || (callIds.length === 1 && allowedIncomingStatus.includes(this.calls[callIds[0]].state.status))) // No ongoing Calls yet.
-            ) {
-                // First remove the old call that's being closed before proceeding.
-                if (callIds.length === 1) this.deleteCall(this.calls[callIds[0]])
-                // No reason to pretend that we can switch to a different type
-                // of call(yet), because Connectab can't handle incoming calls.
-                const call = callFactory(this, session, {}, 'CallSIP')
-                this.calls[call.id] = call
-                call.start()
+            let acceptCall = true
+            if (dnd || !microphoneAccess) acceptCall = false
 
-            } else {
-                this.logger.info(`${this}dropping new call (${callIds.length} calls).`)
-                // Treat the call as a silenced call and terminate it directly.
-                const call = callFactory(this, session, {silent: true}, 'CallSIP')
-                call.start()
+            if (callOngoing) {
+                // All ongoing calls are closing. It is save to accept the call.
+                if (callIds.length === closingCalls.length) {
+                    acceptCall = true
+                } else {
+                    const notClosingCalls = callIds.filter((i) => !closingCalls.includes(i))
+                    const notClosingNotNewCalls = notClosingCalls.filter((i) => this.calls[i].state.status !== 'new')
+
+                    if (notClosingNotNewCalls.length) acceptCall = false
+                    else acceptCall = true
+                }
+            }
+
+            if (acceptCall) {
+                this.app.logger.info(`${this}accept incoming call.`)
+                // An ongoing call may be a closing call. In that case we first
+                // remove all the closing calls before starting the new one.
+                for (const callId of closingCalls) {
+                    this.app.logger.info(`${this}deleting closing call ${callId}.`)
+                    this.deleteCall(this.calls[callId])
+                }
+            }
+            // A declined Call will still be initialized, but as a silent
+            // Call, meaning it won't notify the user about it.
+            const call = callFactory(this, session, {silent: !acceptCall}, 'CallSIP')
+            this.calls[call.id] = call
+            call.start()
+
+            if (!acceptCall) {
+                this.app.logger.info(`${this}decline incoming call`)
                 call.terminate()
             }
         })
@@ -564,24 +594,33 @@ class ModuleCalls extends Module {
     * @param {Call} call - The call object to remove.
     */
     deleteCall(call) {
-        delete this.app.state.calls.calls[call.id]
-        delete this.calls[call.id]
         // This call is being cleaned up; move to a different call
         // when this call was the active call.
         if (call.state.active) {
-            let activeCall
+            let activeCall = null
+            let fallbackCall = null
             for (const callId of Object.keys(this.calls)) {
-                // Don't select a call that is already closing.
-                if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                // We are not going to activate the Call we are deleting.
+                if (callId === call.id) continue
+
+                // Prefer not to switch to a call that is already closing.
+                if (['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                    // The fallback Call is a non-specific closing call.
+                    if (this.calls[callId]) fallbackCall = this.calls[callId]
+                } else {
                     activeCall = this.calls[callId]
                     break
                 }
-            }
 
-            if (activeCall) {
-                this.activateCall(null, true, false)
             }
+            // Just select the first closing Call in case all of them are closing.
+            if (!activeCall && fallbackCall) activeCall = fallbackCall
+            this.activateCall(activeCall, true, false)
         }
+
+        // Finally delete the call and its references.
+        Vue.delete(this.app.state.calls.calls, call.id)
+        delete this.calls[call.id]
 
         this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${call.id}`})
     }

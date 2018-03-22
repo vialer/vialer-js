@@ -34,6 +34,7 @@ class CallSIP extends Call {
             this.app.telemetry.event('call[sip]', 'incoming', 'accepted')
             this._start({message: this.translations.accepted.incoming})
         })
+
         this.session.on('rejected', (e) => {
             this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
 

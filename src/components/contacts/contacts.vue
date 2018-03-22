@@ -5,7 +5,7 @@
     </div>
 
     <ul class="list-items">
-        <li class="list-item contact" v-for="contact in filteredContacts" :key="contact.id" :class="{'disabled': calls.length}">
+        <li class="list-item contact" v-for="contact in filteredContacts" :class="{'disabled': calls.length}">
             <div class="status-icon">
                 <svgicon class="icon-availability" name="availability" :class="contact.status"/>
             </div>
@@ -32,7 +32,7 @@
             </div>
         </li>
         <!-- No search results -->
-        <li class="list-item contact" v-else-if="!Object.keys(filteredContacts).length">
+        <li class="list-item contact" v-else-if="!filteredContacts.length">
             <div class="icon status-icon">
                 <svgicon class="icon-availability no-results" name="availability"/>
             </div>

@@ -61,6 +61,7 @@ class AppBackground extends App {
         this.api = new Api(this)
 
         await this.__initStore()
+
         this.telemetry = new Telemetry(this)
 
         if (this.env.isExtension) {
@@ -139,8 +140,7 @@ class AppBackground extends App {
                 if (this.state.settings.vault.key) {
                     await this.crypto._importVaultKey(this.state.settings.vault.key)
                     const decryptedState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, this.store.get('state.encrypted')))
-                    this.setState(decryptedState)
-                    this._restoreState(this.state)
+                    this.setState(this._restoreState(decryptedState))
                     // Authenticated again. Kickstart services.
                     this.__initServices()
                 } else {
@@ -249,17 +249,22 @@ class AppBackground extends App {
 
 
     /**
-    * Make sure that these values in the state are
-    * set fresh when reviving the state.
-    * @param {Store} store - The Stash store.
+    * The stored state is like a dump of the last known
+    * application state. When booting the application, the
+    * restoreState method corrects initial values that may
+    * have to be reset before making store reactive.
+    * @param {Store} store - A raw object that will be the store.
+    * @returns {Object} - The cleaned up initial state.
     */
     _restoreState(store) {
         store.notifications = []
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._restoreState) {
-                this.modules[module]._restoreState(this.state[module])
+                this.modules[module]._restoreState(store[module])
             }
         }
+
+        return store
     }
 }
 

@@ -3,8 +3,8 @@ module.exports = (app) => {
     return {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
-            activateCall: function(call) {
-                // Remove the new call when clicking on it again while
+            activateOrDeleteCall: function(call) {
+                // Remove the new call when clicking on the new Call while
                 // it is active.
                 if (call.active && call.status === 'new') {
                     app.emit('bg:calls:call_delete', {callId: call.id})
@@ -24,17 +24,27 @@ module.exports = (app) => {
                 } else if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
                     return 'hang-up'
                 } else {
-                    if (call.hold.active) return 'on-hold'
+                    if (call.status === 'invite') return 'incoming-call'
+                    else if (call.status === 'create') return 'outgoing-call'
+                    else if (call.hold.active) return 'on-hold'
                     return 'phone'
                 }
             },
             callTitle: function(call) {
+                const translations = app.helpers.getTranslations().call
                 if (call.status === 'new') {
                     if (call.active) return this.$t('Close new call')
                     else return `${this.$t('Select new Call')}`
                 } else {
-                    if (call.hold.active) return `${call.number} - ${this.$t('On hold')}`
-                    else return `${call.number} - ${this.$t('Active call')}`
+                    let text = `${call.number} - `
+                    if (call.status === 'accepted') {
+                        if (call.hold.active) text += translations[call.status].hold
+                        else text += translations[call.status][call.type]
+                    } else {
+                        text += translations[call.status]
+                    }
+
+                    return text
                 }
             },
             /**
@@ -48,24 +58,17 @@ module.exports = (app) => {
             classes: function(call, block) {
                 let classes = {}
                 if (block === 'call-button') {
-                    classes.fa = true
+                    classes.active = call.active
                     if (call.status === 'new') {
-                        classes.active = call.active
                         classes['new-call'] = true
-                        // Show the close icon.
-                        if (call.active) {
-                            classes['fa-times'] = true
-                        } else {
-                            // Otherwise it is just a new call button.
-                            classes['fa-bookmark-o'] = true
-                        }
                     } else {
-                        classes['ongoing-call'] = true
-                        classes.active = call.active
+                        if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
+                            classes['state-hangup'] = true
+                        } else {
+                            classes['state-active'] = true
+                        }
+
                         if (call.transfer.type === 'accept') classes.hint = true
-                        if (call.hold.active) {
-                            classes['fa-pause'] = true
-                        } else classes['icon-phone'] = true
                     }
                 }
                 return classes

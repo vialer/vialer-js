@@ -12,13 +12,6 @@ module.exports = (app) => {
                 return classes
             },
         },
-        mounted: function() {
-            // Make sure there is always a Call object available when
-            // viewing the calls component.
-            if (Object.keys(this.calls).length === 0) {
-                app.emit('bg:calls:call_create', {number: null, start: null})
-            }
-        },
         render: templates.calls.r,
         staticRenderFns: templates.calls.s,
         store: {

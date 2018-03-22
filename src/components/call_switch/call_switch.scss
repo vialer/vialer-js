@@ -12,9 +12,7 @@
         justify-content: center;
         width: $spacer * 5;
 
-        svg {
-            fill: $white;
-        }
+        svg {fill: $white;}
 
 
         // Create a new call. Make the button for adding a new call and
@@ -46,38 +44,34 @@
             &:hover {
                 background: rgba(255, 255, 255, 0.2);
 
-                svg {
-                    fill: $white;
-                }
+                svg {fill: $white;}
             }
 
             &.active {
                 background: rgba(255, 255, 255, 0.2);
 
-                svg {
-                    fill: $white;
-                }
-
-
-                &:hover {
-                    background: $red-color;
-                }
+                svg {fill: $white;}
+                &:hover {background: $red-color;}
             }
         }
-
-
 
         &:hover,
         &.active {
-            background: $white;
-            color: $brand-variation-color;
             cursor: pointer;
 
-            svg {
-                fill: $brand-variation-color;
-            }
+            &.state-active {
+                background: $white;
+                color: $brand-variation-color;
 
+                svg {fill: $brand-variation-color;}
+            }
         }
+
+        &.state-hangup {
+            background: $red-color;
+            color: $white;
+        }
+
 
     }
 }
