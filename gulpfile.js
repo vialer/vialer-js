@@ -191,29 +191,24 @@ gulp.task('build-clean', 'Clear the build directory', async() => {
 }, {options: taskOptions.all})
 
 
-gulp.task('build-dist', 'Make an optimized build suitable for distribution.', async(done) => {
+gulp.task('build-dist', 'Make an optimized build suitable for distribution.', ['build'], (done) => {
     const buildDir = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET)
     const distDir = path.join(__dirname, 'dist', settings.BRAND_TARGET)
-    await mkdirp(distDir)
-    let distName
-    if (settings.BUILD_TARGET === 'electron') {
-        distName = `${settings.BRAND_TARGET}-${settings.BUILD_PLATFORM}-${settings.BUILD_ARCH}-${settings.PACKAGE.version}.zip`
-    } else distName = `${settings.BRAND_TARGET}-${settings.BUILD_TARGET}-${settings.PACKAGE.version}.zip`
+    mkdirp(distDir).then(() => {
+        let distName = helpers.distributionName(settings.BRAND_TARGET)
 
-    // Not using Gulp's Vinyl-based zip, because of a symlink issue that prevents
-    // the MacOS build to be zipped properly. See https://github.com/gulpjs/gulp/issues/1427
-    const output = fs.createWriteStream(path.join(distDir, distName))
-    const archive = archiver('zip', {zlib: {level: 6}})
+        // Not using Gulp's Vinyl-based zip, because of a symlink issue that prevents
+        // the MacOS build to be zipped properly. See https://github.com/gulpjs/gulp/issues/1427
+        const output = fs.createWriteStream(path.join(distDir, distName))
+        const archive = archiver('zip', {zlib: {level: 6}})
 
-    output.on('close', function() {
-        gutil.log(archive.pointer() + ' total bytes archived')
-    })
-    // good practice to catch this error explicitly
-    archive.on('error', function(_err) {throw _err})
-    archive.on('warning', function(_err) {if (_err) throw _err})
-    archive.pipe(output)
+        output.on('close', function() {
+            gutil.log(archive.pointer() + ' total bytes archived')
+            done()
+        })
 
-    runSequence('build', async function() {
+        archive.pipe(output)
+
         if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) {
             archive.directory(buildDir, false)
             archive.finalize()

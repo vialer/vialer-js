@@ -69,7 +69,7 @@ class Helpers {
             if (buildType === 'chrome') {
                 runSequence('build-dist', async() => {
                     const api = this.settings.brands[brandName].store.chrome
-                    const zipFile = fs.createReadStream(`./dist/${brandName}/${buildType}/${distributionName}.zip`)
+                    const zipFile = fs.createReadStream(`./dist/${brandName}/${distributionName}`)
 
                     let res, token
 
@@ -147,8 +147,11 @@ class Helpers {
     * @returns {String} - The distribution name to use.
     */
     distributionName(brandName) {
-        let name = this.settings.brands[brandName].name[this.settings.DEPLOY_TARGET]
-        return `${name}-${this.settings.PACKAGE.version}`
+        let distName
+        if (this.settings.BUILD_TARGET === 'electron') {
+            distName = `${this.settings.BRAND_TARGET}-${this.settings.BUILD_PLATFORM}-${this.settings.BUILD_ARCH}-${this.settings.PACKAGE.version}.zip`
+        } else distName = `${this.settings.BRAND_TARGET}-${this.settings.BUILD_TARGET}-${this.settings.PACKAGE.version}.zip`
+        return distName
     }
 
 
