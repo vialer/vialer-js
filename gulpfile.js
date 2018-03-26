@@ -293,7 +293,7 @@ gulp.task('docs', 'Generate docs.', (done) => {
 
 
 gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
-    return gulp.src(`${settings.BRAND_TARGET}/${settings.BUILD_DIR}/docs/**/*`).pipe(ghPages())
+    return gulp.src(path.join(settings.BUILD_DIR, 'docs', '**','*')).pipe(ghPages())
 })
 
 
