@@ -1,17 +1,19 @@
-/**
-* @module ModuleUI
-*/
 const Module = require('../lib/module')
 
 
 /**
-* The UI module handles state and the global properties of the
-* User-interface.
+* This module is responsible for handling all UI-related state and
+* respond with UI-specific calls to watchers. UI changes may
+* be related to WebExtension-, Electron- or WebView-specific actions
+* @module ModuleUI
 */
 class ModuleUI extends Module {
-
-    constructor(...args) {
-        super(...args)
+    /**
+    * Setup some menubar and click-to-dial icon related properties.
+    * @param {AppBackground} app - The background application.
+    */
+    constructor(app) {
+        super(app)
         this.animationStep = 0
         this.animations = {
             ringing: {
@@ -21,12 +23,47 @@ class ModuleUI extends Module {
                 intervalId: null,
             },
         }
-        // Used to restore the label message state when a tab refreshes
-        // and a call is still ongoing.
+        // Used to restore the Click-to-dial icon label message when
+        // a tab refreshes and a call is still ongoing.
         this.lastLabelMessage = null
     }
 
 
+    /**
+    * Add an animating dot to the menubar by using the setIcon
+    * method for the menubar as a way to set animation frames.
+    * @param {String} name - One of the animation presets defined in `this.animations`.
+    */
+    __menubarAnimation(name) {
+        // Clear all previously set animations.
+        if (!name) {
+            for (let _name of Object.keys(this.animations)) {
+                if (this.animations[_name].intervalId) {
+                    clearInterval(this.animations[_name].intervalId)
+                }
+            }
+            return
+        }
+        let animation = this.animations[name]
+        animation.intervalId = window.setInterval(() => {
+            browser.browserAction.setIcon({path: `img/menubar-ringing-${this.animations[name].frame}.png`})
+            if (animation.direction === 1) {
+                animation.frame += 1
+                // Reverse the direction on the last frame.
+                if (animation.frame === (animation.frames - 1)) animation.direction = -animation.direction
+            } else {
+                animation.frame -= 1
+                // Reverse the direction on the first frame.
+                if (animation.frame === 0) animation.direction = -animation.direction
+            }
+        }, 100)
+    }
+
+
+    /**
+    * Initialize the UI module's store.
+    * @returns {Object} The module's store properties.
+    */
     _initialState() {
         return {
             layer: 'login',
@@ -58,31 +95,24 @@ class ModuleUI extends Module {
     }
 
 
+    /**
+    * Deal with menubar icon changes made to the store in
+    * an environment-specific way.
+    * @returns {Object} The store properties to watch.
+    */
     _watchers() {
         return {
-            /**
-            * Deal with all menubar icon changes for extensions.
-            * TODO: Add logic for Electron icon changes.
-            * @param {String} newVal - The new menubar icon value.
-            * @param {String} oldVal - The old menubar icon value.
-            */
             'store.ui.menubar.default': (newVal, oldVal) => {
                 if (this.app.env.isExtension) {
                     browser.browserAction.setIcon({path: `img/menubar-${newVal}.png`})
                 }
             },
-            /**
-            * Overrides the default menubar and restores the default
-            * when it is unset.
-            * @param {String} newVal - The new menubar event icon value.
-            * @param {String} oldVal - The old menubar event icon value.
-            */
             'store.ui.menubar.event': (newVal, oldVal) => {
                 if (this.app.env.isExtension) {
-                    this.menubarAnimation()
+                    this.__menubarAnimation()
                     if (newVal) {
                         if (newVal === 'ringing') {
-                            this.menubarAnimation('ringing')
+                            this.__menubarAnimation('ringing')
                         } else if (newVal === 'calling') {
                             browser.browserAction.setIcon({path: 'img/menubar-ringing-4.png'})
                         } else {
@@ -167,32 +197,6 @@ class ModuleUI extends Module {
                 }
             })
         }
-    }
-
-
-    menubarAnimation(name) {
-        // Clear all previously set animations.
-        if (!name) {
-            for (let _name of Object.keys(this.animations)) {
-                if (this.animations[_name].intervalId) {
-                    clearInterval(this.animations[_name].intervalId)
-                }
-            }
-            return
-        }
-        let animation = this.animations[name]
-        animation.intervalId = window.setInterval(() => {
-            browser.browserAction.setIcon({path: `img/menubar-ringing-${this.animations[name].frame}.png`})
-            if (animation.direction === 1) {
-                animation.frame += 1
-                // Reverse the direction on the last frame.
-                if (animation.frame === (animation.frames - 1)) animation.direction = -animation.direction
-            } else {
-                animation.frame -= 1
-                // Reverse the direction on the first frame.
-                if (animation.frame === 0) animation.direction = -animation.direction
-            }
-        }, 100)
     }
 }
 

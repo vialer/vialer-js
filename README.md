@@ -4,8 +4,8 @@ features a modular call-handling core, with implementations of a free SIP
 softphone(`CallSIP`) and an optional proprietary calling API(`CallConnectAB`)
 for the [VoIPGRID platform](https://voipgrid.nl/). `CallSIP` implements a
 SIP-over-websocket softphone (using SIP.js) with all features you would expect
-like on-hold, blind & attended transfer, dealing with multiple calls and
-click-to-dial in browser tabs.
+from a softphone like on-hold, blind & attended transfer, dealing with multiple
+calls and click-to-dial in browser tabs.
 
 The code is written to be compliant with the WebExtension standard, so it runs
 by default as a browser plugin, but can just as easily run inside the context of
@@ -21,7 +21,7 @@ for detailed information on how to install Vialer-js from source.
 
 # Building from source
 ## Requirements
-* Node.js 8.0.0 or higher
+* Node.js 9.0.0 or higher
 * Npm 5 or higher
 * Electron executable for the desktop version (optional)
 

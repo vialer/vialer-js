@@ -1,20 +1,25 @@
-/**
-* @module ModuleUser
-*/
 const Module = require('../lib/module')
 
 
 /**
-* The User module is still bound to the VoIPGRID API.
+* The User module deals with everything that requires some
+* form of authentication. It is currently very tighly coupled
+* with the VoIPGRID vendor, but in theory should be able to deal
+* with other authentication backends.
+* @module ModuleUser
 */
 class ModuleUser extends Module {
-
-    constructor(...args) {
-        super(...args)
+    /**
+    * Setup events that can be called upon from `AppForeground`.
+    * The update-token event is called each time when a user
+    * opens a vendor platform url through `openPlatformUrl`.
+    * @param {AppBackground} app - The background application.
+    */
+    constructor(app) {
+        super(app)
 
         this.app.on('bg:user:login', ({username, password}) => this.login(username, password))
         this.app.on('bg:user:logout', this.logout.bind(this))
-
         this.app.on('bg:user:unlock', ({password}) => {
             this.app.__unlockVault(this.app.state.user.username, password)
         })
@@ -26,6 +31,10 @@ class ModuleUser extends Module {
     }
 
 
+    /**
+    * Initialize the User module's store.
+    * @returns {Object} The module's store properties.
+    */
     _initialState() {
         return {
             authenticated: false,
@@ -42,6 +51,11 @@ class ModuleUser extends Module {
     }
 
 
+    /**
+    * Retrieve the autologin token for the user. This token is
+    * used to login automatically when the user opens a link
+    * to the vendor portal.
+    */
     async _platformData() {
         const res = await this.app.api.client.get('api/autologin/token/')
         this.app.setState({user: {platform: {tokens: {portal: res.data.token}}}})

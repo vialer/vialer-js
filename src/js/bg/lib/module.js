@@ -1,5 +1,5 @@
 /**
-* Generic handling for each module.
+* Generic base class for each module.
 */
 class Module extends EventEmitter {
     constructor(app) {

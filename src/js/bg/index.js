@@ -1,33 +1,42 @@
+/**
+* @namespace AppBackground
+*/
 const Api = require('./lib/api')
 const App = require('../lib/app')
 const Crypto = require('./lib/crypto')
+const env = require('../lib/env')({role: 'bg'})
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
 
 
-let env = JSON.parse(JSON.stringify(require('../lib/env')))
-env.role.bg = true
-
-
 /**
-* The Vialer-js background is a separate process that
-* continues running after the popup (frontend) is closed.
-* As a webview, the background is just as volatile as
-* the foreground.
+* The Vialer-js `AppBackground` is a separate running script.
+* Functionality that is considered to be part of the backend
+* is placed in this context because this process keeps running
+* after the AppForeground (the popup) is closed (at least, when running
+* the application as WebExtension). In that sense, this is a typical
+* client-server model. When running as a webview, the background is just
+* as volatile as the foreground, but the same concept can be used nevertheless.
 */
 class AppBackground extends App {
-
-    constructor(options) {
-        options.env = env
-        super(options)
+    /**
+    * @param {Object} opts - Options to initialize AppBackground with.
+    * @param {Object} opts.env - The environment sniffer.
+    */
+    constructor(opts) {
+        super(opts)
 
         this.crypto = new Crypto(this)
         this.timer = new Timer(this)
         this.utils = require('../lib/utils')
 
-        // Send this script's state back to the requesting script.
-        this.on('bg:get_state', (data) => {
-            data.callback(JSON.stringify(this.state))
+        // Send the background script's state to the requesting event.
+        this.on('bg:get_state', ({callback}) => {
+            // Race to the __ready flag from AppForeground.
+            // Add a one-time event if AppBackground is not yet ready, which
+            // releases the callback.
+            if (this.__ready) callback(JSON.stringify(this.state))
+            this.once('bg:get_state_ready', () => callback(JSON.stringify(this.state)))
         })
         this.on('bg:refresh_api_data', this._platformData.bind(this))
         this.on('bg:set_state', this.__mergeState.bind(this))
@@ -105,7 +114,24 @@ class AppBackground extends App {
             this.__factoryDefaults({message, title: this.$t('Database schema changed')})
         }
 
-        this.emit('ready')
+        // From here on, a request to bg:get_state will be
+        // dealed with properly. Finish the callback wheb
+        // an AppForeground state request is pending.
+        this.__ready = true
+        this.emit('bg:get_state_ready')
+    }
+
+
+    /**
+    * Load API data, setup the API and connect to the SIP backend.
+    * Only execute this when the user is authenticated.
+    */
+    __initServices() {
+        this.logger.info(`${this}init authenticated services`)
+        this.api.setupClient(this.state.user.username, this.state.user.password)
+        this._platformData()
+        this.modules.calls.connect()
+        this.setState({ui: {menubar: {default: 'active', event: null}}})
     }
 
 
@@ -125,12 +151,10 @@ class AppBackground extends App {
         super.__initStore()
 
         Object.assign(this.state, this._initialState())
-        // Avaid allowing the unencrypted store to override state
+        // Avoid allowing the unencrypted store to override state
         // properties from the encrypted store.
         const unencryptedState = this.store.get('state.unencrypted')
-        if (typeof unencryptedState === 'object') {
-            this.__mergeDeep(this.state, unencryptedState)
-        }
+        if (typeof unencryptedState === 'object') this.__mergeDeep(this.state, unencryptedState)
 
         const encryptedState = this.store.get('state.encrypted')
         if (encryptedState) {
@@ -163,25 +187,11 @@ class AppBackground extends App {
 
         this.initViewModel(watchers)
         // (!) State is reactive from here on.
-
         this.setState({ui: {menubar: {default: menubarIcon}}})
 
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()
         }
-    }
-
-
-    /**
-    * Load API data, setup the API and connect to the SIP backend.
-    * Only execute this when the user is authenticated.
-    */
-    __initServices() {
-        this.logger.info(`${this}init authenticated services`)
-        this.api.setupClient(this.state.user.username, this.state.user.password)
-        this._platformData()
-        this.modules.calls.connect()
-        this.setState({ui: {menubar: {default: 'active', event: null}}})
     }
 
 
@@ -269,27 +279,24 @@ class AppBackground extends App {
 }
 
 
-function initApp(options) {
-    options.modules = [
-        {Module: require('./modules/app'), name: 'app'},
-        {Module: require('./modules/availability'), name: 'availability'},
-        {Module: require('./modules/calls'), name: 'calls'},
-        {Module: require('./modules/contacts'), name: 'contacts'},
-        {Module: require('./modules/settings'), name: 'settings'},
-        {Module: require('./modules/queues'), name: 'queues'},
-        {Module: require('./modules/ui'), name: 'ui'},
-        {Module: require('./modules/user'), name: 'user'},
-    ]
+if (!global.app) global.app = {}
+let options = {modules: [
+    {Module: require('./modules/app'), name: 'app'},
+    {Module: require('./modules/availability'), name: 'availability'},
+    {Module: require('./modules/calls'), name: 'calls'},
+    {Module: require('./modules/contacts'), name: 'contacts'},
+    {Module: require('./modules/settings'), name: 'settings'},
+    {Module: require('./modules/queues'), name: 'queues'},
+    {Module: require('./modules/ui'), name: 'ui'},
+    {Module: require('./modules/user'), name: 'user'},
+]}
 
-    // Extension-specific functionality lives in a separate module.
-    if (env.isExtension) {
-        options.modules.push({Module: require('./modules/extension'), name: 'extension'})
-    }
-    return new AppBackground(options)
+// Conditionally load ModuleExtension.
+if (env.isExtension) {
+    options.modules.push({Module: require('./modules/extension'), name: 'extension'})
 }
 
+global.app.bg = new AppBackground(options)
 
-if (!global.app) global.app = {}
-global.app.bg = initApp({name: 'bg'})
 
-module.exports = initApp
+module.exports = AppBackground

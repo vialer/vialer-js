@@ -1,19 +1,17 @@
-/**
-* @module ModuleQueues
-*/
 const Module = require('../lib/module')
 
 
 /**
-* VoIPGRID platform queues module.
+* This is a VoIPGRID vendor-specific module, responsible for
+* updating information about calling queues.
+* @module ModuleQueues
 */
 class ModuleQueues extends Module {
-
     /**
-    * @param {ClickToDialApp} app - The application object.
+    * @param {AppBackground} app - The background application.
     */
-    constructor(...args) {
-        super(...args)
+    constructor(app) {
+        super(app)
 
         this.app.timer.registerTimer('bg:queues:size', () => {this._platformData(true)})
         this.app.on('bg:queues:selected', ({queue}) => {
@@ -67,6 +65,16 @@ class ModuleQueues extends Module {
     }
 
 
+    queueMenubarIcon(size) {
+        let queueState = 'queue'
+        if (!isNaN(size)) {
+            if (size < 10) queueState = `queue-${size}`
+            else queueState = 'queue-10'
+        }
+        return queueState
+    }
+
+
     /**
     * Register the queus update timer function and
     * the dynamic interval check.
@@ -96,16 +104,6 @@ class ModuleQueues extends Module {
 
     toString() {
         return `${this.app}[queues] `
-    }
-
-
-    queueMenubarIcon(size) {
-        let queueState = 'queue'
-        if (!isNaN(size)) {
-            if (size < 10) queueState = `queue-${size}`
-            else queueState = 'queue-10'
-        }
-        return queueState
     }
 }
 

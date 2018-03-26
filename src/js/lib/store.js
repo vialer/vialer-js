@@ -23,6 +23,7 @@ class MemoryStore {
 
 /**
 * A simple localstorage store.
+* @memberof Skeleton
 */
 class Store {
 

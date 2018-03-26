@@ -1,7 +1,3 @@
-/**
-* @module ModuleCalls
-*/
-const callFactory = require('./call/factory')
 const transform = require('sdp-transform')
 const Module = require('../../lib/module')
 
@@ -12,14 +8,16 @@ const Module = require('../../lib/module')
 * and breaking down calls. The user interface mostly emits events,
 * because the state logic involved depends on the calls and their
 * state.
+* @module ModuleCalls
 */
 class ModuleCalls extends Module {
     /**
-    * @param {App} app - The application object.
+    * @param {AppBackground} app - The background application.
     */
-    constructor(...args) {
-        super(...args)
+    constructor(app) {
+        super(app)
 
+        this.callFactory = require('./call/factory')
         this.lib = require('sip.js')
         // Keeps track of calls. Keys match Sip.js session keys.
         this.calls = {}
@@ -59,7 +57,7 @@ class ModuleCalls extends Module {
             } else {
                 // Both a 'regular' new call and an attended transfer call will
                 // create or get a new Call and activate it.
-                let call = this._emptyCall(type, number)
+                let call = this._emptyCall({number, type})
 
                 // Sync the state back to the foreground.
                 if (start) call.start()
@@ -202,6 +200,12 @@ class ModuleCalls extends Module {
     }
 
 
+    /**
+    * Setup the initial UA options. This depends for instance
+    * on whether the application will be using the softphone
+    * to connect to the backend with or the vendor portal user.
+    * @returns {Object} UA options that are passed to Sip.js
+    */
     __uaOptions() {
         const settings = this.app.state.settings
         // For webrtc this is a voipaccount, otherwise an email address.
@@ -247,11 +251,12 @@ class ModuleCalls extends Module {
     * Check if there is a `new` call ready to be used. Requires some
     * bookkeeping because of the settings that can change in the
     * meanwhile.
-    * @param {String} type - The type of call to produce.
-    * @param {String} [number] - The number to call to.
-    * @returns {Call} - A new Call object or an existing Call object with status `new`.
+    * @param {Object} opts - Options to pass.
+    * @param {String} [opts.type] - The type of call to find.
+    * @param {String} [opts.number] - The number to call to.
+    * @returns {Call} - A new or existing Call with status `new`.
     */
-    _emptyCall(type, number = null) {
+    _emptyCall({number = null, type}) {
         let call
 
         // See if we can reuse an existing `new` Call object.
@@ -288,18 +293,32 @@ class ModuleCalls extends Module {
         }
 
         if (!call) {
-            call = callFactory(this, number, {}, type)
+            call = this.callFactory(this, number, {}, type)
         }
         this.calls[call.id] = call
         // Set the number and propagate the call state to the foreground.
         call.state.number = number
         call.setState(call.state)
+
+        // Sync the store's reactive properties to the foreground.
+        if (!this.app.state.calls.calls[call.id]) {
+            Vue.set(this.app.state.calls.calls, call.id, call.state)
+            this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${call.id}`, state: call.state})
+        }
+
         // Always set the number in the local state.
         this.app.logger.debug(`${this}_emptyCall ${call.constructor.name} instance`)
         return call
     }
 
 
+    /**
+    * Reformat the SDP of the {@link https://sipjs.com/api/0.9.0/sessionDescriptionHandler/|SessionDescription}
+    * when setting up a connection, so we can force opus or G722 codec to be
+    * the preference of the backend.
+    * @param {SessionDescription} sessionDescription - A Sip.js SessionDescription handler.
+    * @returns {SessionDescription} A SessionDescription with a modfied sdp object.
+    */
     _formatSdp(sessionDescription) {
         const selectedCodec = this.app.state.settings.webrtc.codecs.selected.name
 
@@ -371,61 +390,6 @@ class ModuleCalls extends Module {
         return userAgent
     }
 
-    /**
-    * A loosely coupled Call action handler. Operates on all current Calls.
-    * Supported actions are:
-    *   `accept-new`: Accepts an incoming call or switch to the new call dialog.
-    *   `deline-hangup`: Declines an incoming call or an active call.
-    *   `hold-active`: Toggle hold on the active call.
-    * @param {String} action - The action; `accept-new` or `decline`.
-    */
-    callAction(action) {
-        let inviteCall = null
-
-        for (const callId of Object.keys(this.calls)) {
-            // Don't select a call that is already closing
-            if (this.calls[callId].state.status === 'invite') inviteCall = this.calls[callId]
-        }
-
-        if (action === 'accept-new') {
-            if (inviteCall) inviteCall.accept()
-            else {
-                const call = this._emptyCall()
-                this.activateCall(call, true)
-                this.app.setState({ui: {layer: 'calls'}})
-            }
-        } else if (action === 'decline-hangup') {
-            // Ongoing Calls can also be terminated.
-            let activeCall = this.activeCall()
-            if (inviteCall) inviteCall.terminate()
-            else if (activeCall) activeCall.terminate()
-        } else if (action === 'hold-active') {
-            let activeCall = this.activeCall()
-            // Make sure the action isn't provoked on a closing call.
-            if (activeCall && activeCall.state.status === 'accepted') {
-                if (activeCall.state.hold.active) activeCall.unhold()
-                else activeCall.hold()
-            }
-        }
-    }
-
-
-    /**
-    * @param {Boolean} ongoing - Whether to check if the call is ongoing or not.
-    * @returns {Call|null} - the current active ongoing call or null.
-    */
-    activeCall(ongoing = false) {
-        let activeCall = null
-        for (const callId of Object.keys(this.calls)) {
-            // Don't select a call that is already closing
-            if (this.calls[callId].state.active) {
-                if (!ongoing) activeCall = this.calls[callId]
-                else if (this.calls[callId].state.status === 'accepted') activeCall = this.calls[callId]
-            }
-        }
-        return activeCall
-    }
-
 
     /**
     * Set the active state on the target call, un-hold the call and
@@ -472,6 +436,62 @@ class ModuleCalls extends Module {
         }
 
         return call
+    }
+
+
+    /**
+    * @param {Boolean} ongoing - Whether to check if the call is ongoing or not.
+    * @returns {Call|null} - the current active ongoing call or null.
+    */
+    activeCall(ongoing = false) {
+        let activeCall = null
+        for (const callId of Object.keys(this.calls)) {
+            // Don't select a call that is already closing
+            if (this.calls[callId].state.active) {
+                if (!ongoing) activeCall = this.calls[callId]
+                else if (this.calls[callId].state.status === 'accepted') activeCall = this.calls[callId]
+            }
+        }
+        return activeCall
+    }
+
+
+    /**
+    * A loosely coupled Call action handler. Operates on all current Calls.
+    * Supported actions are:
+    *   `accept-new`: Accepts an incoming call or switch to the new call dialog.
+    *   `deline-hangup`: Declines an incoming call or an active call.
+    *   `hold-active`: Toggle hold on the active call.
+    * @param {String} action - The action; `accept-new` or `decline`.
+    */
+    callAction(action) {
+        let inviteCall = null
+
+        for (const callId of Object.keys(this.calls)) {
+            // Don't select a call that is already closing
+            if (this.calls[callId].state.status === 'invite') inviteCall = this.calls[callId]
+        }
+
+        if (action === 'accept-new') {
+            if (inviteCall) inviteCall.accept()
+            else {
+                const call = this._emptyCall()
+                this.activateCall(call, true)
+                this.app.setState({ui: {layer: 'calls'}})
+            }
+        } else if (action === 'decline-hangup') {
+            // Ongoing Calls can also be terminated.
+            let activeCall = this.activeCall()
+            if (inviteCall) inviteCall.terminate()
+            else if (activeCall) activeCall.terminate()
+        } else if (action === 'hold-active') {
+            let activeCall = this.activeCall()
+            // Make sure the action isn't provoked on a closing call.
+            if (activeCall && activeCall.state.status === 'accepted') {
+                if (activeCall.state.hold.active) activeCall.unhold()
+                else activeCall.hold()
+            }
+        }
     }
 
 
@@ -534,13 +554,16 @@ class ModuleCalls extends Module {
             }
             // A declined Call will still be initialized, but as a silent
             // Call, meaning it won't notify the user about it.
-            const call = callFactory(this, session, {silent: !acceptCall}, 'CallSIP')
+            const call = this.callFactory(this, session, {silent: !acceptCall}, 'CallSIP')
             this.calls[call.id] = call
             call.start()
 
             if (!acceptCall) {
                 this.app.logger.info(`${this}decline incoming call`)
                 call.terminate()
+            } else {
+                Vue.set(this.app.state.calls.calls, call.id, call.state)
+                this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${call.id}`, state: call.state})
             }
         })
 

@@ -1,12 +1,17 @@
-/**
-* @module ModuleApp
-*/
 const Module = require('../lib/module')
 
+/**
+* Application background module takes care of all
+* generic state concerning the app, notifications and
+* vendor-specific handling.
+* @module ModuleApp
+*/
 class ModuleApp extends Module {
-
-    constructor(...args) {
-        super(...args)
+    /**
+    * @param {AppBackground} app - The background application.
+    */
+    constructor(app) {
+        super(app)
 
         if (this.app.env.isBrowser) {
             window.addEventListener('offline', (e) => {

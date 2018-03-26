@@ -1,19 +1,17 @@
-/**
-* @module ModuleSettings
-*/
 const Module = require('../lib/module')
 
 
 /**
-* Vialer-js settings module for `AppBackground`.
+* This module takes care of dealing with all
+* settings and responding to changes to it.
+* @module ModuleSettings
 */
 class ModuleSettings extends Module {
-
-    constructor(...args) {
-        super(...args)
-    }
-
-
+    /**
+    * All application runtime settings are defined here. Build-time settings
+    * go in the ``~/.vialer-jsrc` file.
+    * @returns {Object} The initial store for this module.
+    */
     _initialState() {
         return {
             click2dial: {
@@ -78,6 +76,12 @@ class ModuleSettings extends Module {
     }
 
 
+    /**
+    * Respond to changes in settings, like storing the Vault key,
+    * send a telemetry event when Telemetry is switched on or off,
+    * toggle the Click-to-dial icon observer, etc..
+    * @returns {Object} The store properties to watch.
+    */
     _watchers() {
         return {
             'store.settings.click2dial.enabled': (newVal, oldVal) => {

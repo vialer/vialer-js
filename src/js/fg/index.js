@@ -1,38 +1,27 @@
+/**
+* @namespace AppForeground
+*/
 const App = require('../lib/app')
-
-
-let env = JSON.parse(JSON.stringify(require('../lib/env')))
-env.role.fg = true
+const env = require('../lib/env')({role: 'fg'})
 
 
 /**
-* Main user interface implementation for web.
+* HTML User Interface that interacts with AppBackground to
+* render its state.
 */
 class AppForeground extends App {
+    /**
+    * Set some application events, initialize Vue components and
+    * fire up the store.
+    * @param {Object} opts - Options to initialize AppForeground with.
+    * @param {Object} opts.env - The environment sniffer.
+    */
+    constructor(opts) {
+        super(opts)
 
-    constructor(options) {
-        options.env = env
-        super(options)
-
-        // Distinguish between the popout(tab) and popup view.
-        let searchParams = this.utils.parseSearch(location.search)
-
-        if (env.isExtension) {
-            if (searchParams.popout) {
-                $('html').classList.add('popout')
-                env.role.popout = true
-            } else $('html').classList.add('popup')
-        } else if (searchParams.webview) $('html').classList.add('webview')
-        else if (env.isElectron) $('html').classList.add('electron')
-
-        this.env = env
-
+        // Create a remote notification.
         this.on('fg:notify', (message) => this.vm.$notify(message))
-
-        /**
-        * Syncs state from the background to the foreground
-        * while keeping Vue's reactivity system happy.
-        */
+        // Make state modifications from AppBackground.
         this.on('fg:set_state', this.__mergeState.bind(this))
 
         Vue.component('Availability', require('../../components/availability')(this))
@@ -57,6 +46,10 @@ class AppForeground extends App {
     }
 
 
+    /**
+    * Initialize the store by asking AppBackground for the
+    * current state.
+    */
     __initStore() {
         super.__initStore()
         // Initialize with the initial state from the background.
@@ -68,17 +61,11 @@ class AppForeground extends App {
                 // webview mode as well for consistency's sake.
                 this.state = JSON.parse(state)
 
-                // Extension has a popout mode, where the plugin is opened
-                // in a tab. Set a flag if this is the case.
-                let searchParams = this.utils.parseSearch(location.search)
-                if (searchParams.popout) this.state.env.isPopout = true
-                else this.state.env.isPopout = false
-
                 this.initViewModel()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
                 this.setState({ui: {visible: true}})
                 if (this.env.isExtension) {
-                    // Kkeep track of the popup's visibility status by
+                    // Keep track of the popup's visibility status by
                     // opening a long-lived connection to the background.
                     chrome.runtime.connect({name: 'vialer-js'})
                 }
@@ -99,51 +86,14 @@ class AppForeground extends App {
 }
 
 
-function initApp(initParams) {
-    initParams.modules = []
-    const app = new AppForeground(initParams)
-
-    if (app.env.isChrome) $('html').classList.add('chrome')
-    if (app.env.isEdge) $('html').classList.add('edge')
-    if (app.env.isFirefox) $('html').classList.add('firefox')
-    if (app.env.isExtension) $('html').classList.add('extension')
-
-    if (app.env.isMacOS) {
-        // Forces height recalculation of the popup in Chrome OSX.
-        // See: https://bugs.chromium.org/p/chromium/issues/detail?id=307912
-        setTimeout(() => {
-            const style = document.querySelector('#app').style
-            setTimeout(() => {
-                style.opacity = 1
-            })
-        }, 200)
-    }
-
-    return app
-}
-
-// For extensions, this is an executable endpoint.
 if (!global.app) global.app = {}
-if (env.isExtension) global.app.fg = initApp({name: 'fg'})
-else {
-    // Expect background app here.
-    global.app.bg.on('ready', () => {
-        global.app.fg = initApp({apps: {bg: global.app.bg}, name: 'fg'})
-        // Set content height for electron.
-        if (global.app.bg.env.isElectron) {
-            electron.ipcRenderer.send('resize-window', {
-                height: document.body.clientHeight,
-                width: document.body.clientWidth,
-            })
+let options = {modules: []}
 
-            resizeSensor(document.body, (e) => {
-                electron.ipcRenderer.send('resize-window', {
-                    height: document.body.clientHeight,
-                    width: document.body.clientWidth,
-                })
-            })
-        }
-    })
-}
+// Outside WebExtension mode, both scripts are running in the same
+// browser context. In that case, the AppBackground instance is
+// passed to the AppForeground direcly.
+if (!env.isExtension) options.apps = {bg: global.app.bg}
+global.app.fg = new AppForeground(options)
 
-module.exports = initApp
+
+module.exports = AppForeground

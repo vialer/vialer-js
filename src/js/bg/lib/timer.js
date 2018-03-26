@@ -1,17 +1,5 @@
 let registeredTimers = {}
 
-/**
-* Calculate a jitter from interval.
-* @param {Number} interval - The interval in ms to calculate jitter for.
-* @param {Number} percentage - The jitter range in percentage.
-* @returns {Number} The calculated jitter in ms.
-*/
-function jitter(interval, percentage) {
-    let min = 0 - Math.ceil(interval * (percentage / 100))
-    let max = Math.floor(interval * (percentage / 100))
-    return Math.floor(Math.random() * (max - min)) + min
-}
-
 
 /**
 * This timer keeps track of all used timers inside this plugin and can
@@ -23,6 +11,20 @@ class Timer {
         this.app = app
         this.registeredTimers = registeredTimers
     }
+
+
+    /**
+    * Calculate a jitter from interval.
+    * @param {Number} interval - The interval in ms to calculate jitter for.
+    * @param {Number} percentage - The jitter range in percentage.
+    * @returns {Number} The calculated jitter in ms.
+    */
+    __jitter(interval, percentage) {
+        let min = 0 - Math.ceil(interval * (percentage / 100))
+        let max = Math.floor(interval * (percentage / 100))
+        return Math.floor(Math.random() * (max - min)) + min
+    }
+
 
     getRegisteredTimer(timerId) {
         if (registeredTimers.hasOwnProperty(timerId)) {
@@ -43,7 +45,7 @@ class Timer {
         if (retry.interval * 2 < retry.limit) retry.interval = retry.interval * 2
         else retry.interval = retry.limit
 
-        retry.timeout = retry.interval + jitter(retry.interval, 30)
+        retry.timeout = retry.interval + this.__jitter(retry.interval, 30)
         return retry
     }
 
@@ -60,13 +62,6 @@ class Timer {
                 interval: null,
                 timeout: null,
             },
-        }
-    }
-
-
-    unregisterTimer(timerId) {
-        if (this.getRegisteredTimer(timerId)) {
-            delete registeredTimers[timerId]
         }
     }
 
@@ -137,6 +132,14 @@ class Timer {
     }
 
 
+    stopAllTimers() {
+        for (const timerId of Object.keys(this.registeredTimers)) {
+            this.app.logger.debug(`${this}remove remaining timer '${timerId}'`)
+            this.stopTimer(timerId)
+        }
+    }
+
+
     stopTimer(timerId) {
         if (this.getRegisteredTimer(timerId)) {
             if (registeredTimers[timerId].timer.interval) {
@@ -155,16 +158,15 @@ class Timer {
     }
 
 
-    stopAllTimers() {
-        for (const timerId of Object.keys(this.registeredTimers)) {
-            this.app.logger.debug(`${this}remove remaining timer '${timerId}'`)
-            this.stopTimer(timerId)
-        }
+    toString() {
+        return `${this.app}[timer] `
     }
 
 
-    toString() {
-        return `${this.app}[timer] `
+    unregisterTimer(timerId) {
+        if (this.getRegisteredTimer(timerId)) {
+            delete registeredTimers[timerId]
+        }
     }
 
 

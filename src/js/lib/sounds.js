@@ -1,10 +1,19 @@
 /**
+* @namespace Sounds
+*/
+
+/**
 * Phone tone generators.
 * based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 */
+/** @memberof Sounds */
 let context = null
 
 
+/**
+* Generate a european Busy tone.
+* @memberof Sounds
+*/
 class BusyTone {
 
     constructor() {
@@ -59,6 +68,10 @@ class BusyTone {
 }
 
 
+/**
+* Generate a DTMF tone.
+* @memberof Sounds
+*/
 class DtmfTone {
 
     constructor() {
@@ -121,6 +134,7 @@ class DtmfTone {
 
 /**
 * Ring-back tone generator for UK and Europe regions.
+* @memberof Sounds
 */
 class RingbackTone {
 
@@ -256,6 +270,7 @@ class RingTone extends EventEmitter {
 * instantaneous and time-decaying volumes available for inspection.
 * It also reports on the fraction of samples that were at or near
 * the top of the measurement range.
+* @memberof Sounds
 */
 class SoundMeter {
 
@@ -290,6 +305,5 @@ class SoundMeter {
         this.script.disconnect()
     }
 }
-
 
 module.exports = {BusyTone, DtmfTone, RingbackTone, RingTone, SoundMeter}

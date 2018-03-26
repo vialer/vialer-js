@@ -1,9 +1,17 @@
-// Actions shared across components. Don't modify state local component
-// state from here.
-module.exports = function(app) {
+/**
+* @module helpers
+*/
+
+/**
+* Actions shared across components. Don't modify state
+* local component state from here.
+* @param {App} app - The application object.
+* @returns {Object} - The application's common helpers.
+*/
+function Helpers(app) {
 
     const closingStatus = ['rejected_a', 'rejected_b', 'bye']
-
+    /** @memberof App */
     let helpers = {}
 
     helpers.activeCall = function() {
@@ -73,6 +81,13 @@ module.exports = function(app) {
     }
 
 
+    /**
+    * Flag used to check whether some call actions can be shown.
+    * This is done by checking if there are Calls that don't have
+    * state `accepted` or `new`. In that case, the call action should
+    * be disabled.
+    * @returns {Boolean} - Whether
+    */
     helpers.callsReady = function() {
         let ready = true
         const callIds = Object.keys(app.state.calls.calls)
@@ -104,6 +119,7 @@ module.exports = function(app) {
             },
         }
     }
+
 
     helpers.sharedMethods = function() {
         return {
@@ -150,18 +166,20 @@ module.exports = function(app) {
         }
     }
 
+
+    /**
+    * Shared computed properties for Vue components.
+    * Be aware that using these properties also require
+    * your Vue components to provide all the expected
+    * properties from the store.
+    * @returns {Object} - Commonly used shared properties.
+    */
     helpers.sharedComputed = function() {
         return {
             activeCall: helpers.activeCall,
             callingDisabled: helpers.callingDisabled,
             callOngoing: helpers.callOngoing,
             callsReady: helpers.callsReady,
-            /**
-            * Translate a Call status string to a human-readable text.
-            * (!)Don't forget to update this function when changes are made
-            * to the internal Call state data-structure.
-            * @returns {String} - A human-readably translated Call status.
-            */
             callStatus: function() {
                 const translations = helpers.getTranslations().call
                 if (this.call.status === 'accepted') {
@@ -196,10 +214,6 @@ module.exports = function(app) {
                 formattedTime += `${this.seconds.toString()}`
                 return formattedTime
             },
-            /**
-            * Returns non-call specific transfer status for components to use.
-            * @returns {Boolean|String} - The transfer status: false, 'ongoing' or 'select'.
-            */
             transferStatus: function() {
                 let transferStatus = false
                 const calls = this.$store.calls.calls
@@ -236,3 +250,6 @@ module.exports = function(app) {
 
     return helpers
 }
+
+
+module.exports = Helpers

@@ -1,3 +1,6 @@
+/**
+* @namespace Skeleton
+*/
 const Logger = require('./logger')
 const Store = require('./store')
 

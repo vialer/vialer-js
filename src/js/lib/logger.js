@@ -2,6 +2,7 @@
  * A thin wrapper around the native console that makes it possible to set
  * loglevels. Use source blacklisting and sourcemaps to get to the
  * original error.
+ * @memberof Skeleton
  */
 class Logger {
 
@@ -34,12 +35,6 @@ class Logger {
     }
 
 
-    info(...args) {
-        if (this.level >= this.levels.info) {
-            console.info(...args)
-        }
-    }
-
     group(name) {
         console.group(name)
     }
@@ -47,6 +42,13 @@ class Logger {
 
     groupEnd() {
         console.groupEnd()
+    }
+
+
+    info(...args) {
+        if (this.level >= this.levels.info) {
+            console.info(...args)
+        }
     }
 
 

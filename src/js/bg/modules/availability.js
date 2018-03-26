@@ -1,19 +1,16 @@
-/**
-* @module ModuleAvailability
-*/
 const Module = require('../lib/module')
 
 
 /**
 * VoIPGRID platform availability module.
+* @module ModuleAvailability
 */
 class ModuleAvailability extends Module {
-
     /**
-    * @param {ClickToDialApp} app - The application object.
+    * @param {AppBackground} app - The background application.
     */
-    constructor(...args) {
-        super(...args)
+    constructor(app) {
+        super(app)
         /**
         * Notify the VoIPGRID API about the availability change and set
         * the background state to the new situation.
@@ -112,14 +109,12 @@ class ModuleAvailability extends Module {
     }
 
 
+    /**
+    * Setup availability-specific store watchers.
+    * @returns {Object} Properties that need to be watched.
+    */
     _watchers() {
         return {
-            /**
-            * Deal with all menubar icon changes for dnd.
-            * TODO: Add logic for Electron icon changes.
-            * @param {String} newVal - The new dnd icon value.
-            * @param {String} oldVal - The old dnd icon value.
-            */
             'store.availability.dnd': (newVal, oldVal) => {
                 if (this.app.env.isExtension) {
                     // Dnd is set. Set the menubar to inactive.

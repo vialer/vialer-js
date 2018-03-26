@@ -1,16 +1,22 @@
-/**
-* @module ModuleContacts
-*/
 const ContactSip = require('./contact/sip')
 const Module = require('../../lib/module')
 
 
+/**
+* The Contacts module is currently vendor-specific,
+* but is supposed to be a generic way of dealing with
+* a user's contact-options. Therefor a Contact can have
+* multiple endpoints, which are ways to contact the Contact.
+* An endpoint can be a CallSip or other class inheriting from
+* the base Call class.
+* @module ModuleContacts
+*/
 class ModuleContacts extends Module {
     /**
-    * @param {ClickToDialApp} app - The application object.
+    * @param {AppBackground} app - The background application.
     */
-    constructor(...args) {
-        super(...args)
+    constructor(app) {
+        super(app)
 
         this.contacts = {}
     }

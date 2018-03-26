@@ -1,40 +1,14 @@
 const Presence = require('./index')
 const SUBSCRIBE_DELAY = 150
 
+
+/**
+* Presence implementation for SIP.
+*/
 class PresenceSip extends Presence {
 
     constructor(contact, calls) {
         super(contact, calls)
-        this.subscription = null
-    }
-
-
-    /**
-    * Subscribe to the SIP server. Use a subscription delay
-    * to prevent the server from being hammered.
-    * @returns {Promise} - Resolves when ready.
-    */
-    subscribe() {
-        return new Promise((resolve, reject) => {
-            this.subscription = this.calls.ua.subscribe(`${this.contact.state.id}@voipgrid.nl`, 'dialog')
-            this.subscription.on('notify', (notification) => {
-                const status = this.statusFromDialog(notification)
-                this.contact.setState({status: status})
-                setTimeout(() => {
-                    resolve(this.contact)
-                }, SUBSCRIBE_DELAY)
-            })
-        })
-    }
-
-
-    /**
-    * Stop listening for subscriber events from the SIP server and remove
-    * the cached subscriber state.
-    * @param {Number} accountId - The accountId to deregister.
-    */
-    unsubscribe() {
-        if (this.subscription) this.subscription.unsubscribe()
         this.subscription = null
     }
 
@@ -45,7 +19,7 @@ class PresenceSip extends Presence {
     * @param {Request} notification - A SIP.js Request object.
     * @returns {String} - The state of the account.
     */
-    statusFromDialog(notification) {
+    _statusFromDialog(notification) {
         let parser = new DOMParser()
         let xmlDoc = parser ? parser.parseFromString(notification.request.body, 'text/xml') : null
         let dialogNode = xmlDoc ? xmlDoc.getElementsByTagName('dialog-info')[0] : null
@@ -77,6 +51,36 @@ class PresenceSip extends Presence {
             }
         }
         return state
+    }
+
+
+    /**
+    * Subscribe to the SIP server. Use a subscription delay
+    * to prevent the server from being hammered.
+    * @returns {Promise} - Resolves when ready.
+    */
+    subscribe() {
+        return new Promise((resolve, reject) => {
+            this.subscription = this.calls.ua.subscribe(`${this.contact.state.id}@voipgrid.nl`, 'dialog')
+            this.subscription.on('notify', (notification) => {
+                const status = this._statusFromDialog(notification)
+                this.contact.setState({status: status})
+                setTimeout(() => {
+                    resolve(this.contact)
+                }, SUBSCRIBE_DELAY)
+            })
+        })
+    }
+
+
+    /**
+    * Stop listening for subscriber events from the SIP server and remove
+    * the cached subscriber state.
+    * @param {Number} accountId - The accountId to deregister.
+    */
+    unsubscribe() {
+        if (this.subscription) this.subscription.unsubscribe()
+        this.subscription = null
     }
 }
 

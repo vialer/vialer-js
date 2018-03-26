@@ -2,6 +2,18 @@
 
 // Specific main panel styling per environment.
 html {
+    // Default mode as a menubar popup.
+    &.popup {
+        .component-main {width: $max-popup-width;}
+
+        .panel {
+            // The minimal height should allow all sidebar icons to show.
+            max-height: calc(600px - #{$spacer * 5});
+            min-height: 260px;
+        }
+    }
+
+    // The popup running in a tab.
     &.popout {
         .component-main {max-width: $max-popup-width;}
 
@@ -12,16 +24,7 @@ html {
         }
     }
 
-    &.popup {
-        .component-main {max-width: $max-popup-width;}
-
-        .panel {
-            // The minimal height should allow all sidebar icons to show.
-            max-height: calc(600px - #{$spacer * 5});
-            min-height: 260px;
-        }
-    }
-
+    // The popup running in its own window.
     &.webview {
         .component-main {max-width: $max-popup-width;}
 
@@ -30,6 +33,7 @@ html {
         }
     }
 
+    // Electron-specific styling.
     &.electron {
         // Hide the vertical scrollbar.
         overflow-y: hidden;

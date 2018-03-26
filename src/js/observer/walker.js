@@ -1,55 +1,53 @@
 /**
-* @module Observer
-*/
-
-/**
-* Using an object to check if tagName is disallowed is faster when using
-* `tagName in {}` than using `Array.indexOf(tagname)`.
-* @returns {Object} - List of disallowed html tags.
-*/
-let getBlockedTagNames = function() {
-    // tag list based on:
-    // eslint-disable-next-line max-len
-    // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/HTML5_element_list
-    const tags = [
-        'TITLE', 'BASE', 'LINK', 'META', 'STYLE', 'SCRIPT', 'TEMPLATE', 'PRE', 'FIGURE',
-        'DATA', 'TIME', 'CODE', 'VAR', 'SAMP', 'KBD', 'SUB', 'SUP', 'RUBY', 'RT', 'RP',
-        'BDI', 'BR', 'WBR', 'IMG', 'EMBED', 'OBJECT', 'PARAM', 'VIDEO', 'AUDIO', 'SOURCE',
-        'TRACK', 'CANVAS', 'MAP', 'AREA', 'SVG', 'MATH', 'INPUT', 'BUTTON', 'SELECT',
-        'DATALIST', 'OPTGROUP', 'OPTION', 'TEXTAREA', 'KEYGEN', 'PROGRESS', 'METER',
-        'DETAILS', 'SUMMARY', 'MENUITEM', 'MENU',
-    ]
-
-    let disallowed = {}
-    tags.forEach((i) => {disallowed[i] = null})
-    return disallowed
-}
-
-/**
-* Role list based on: http://www.w3.org/TR/wai-aria/roles#landmark_roles
-* @returns {Object} - List of disallowed html tags.
-*/
-let getBlockedRoles = function() {
-    const roles = [
-        'button', 'checkbox', 'command', 'input', 'radio', 'range',
-        'slider', 'option', 'search', 'textbox', 'timer',
-    ]
-
-    let disallowed = {}
-    roles.forEach((i) => {disallowed[i] = null})
-    return disallowed
-}
-
-
-/**
 * Walk the DOM.
+* @memberof AppObserver
 */
 class Walker {
 
     constructor(app) {
         this.app = app
-        this.blockedRoles = getBlockedRoles()
-        this.blockedTagNames = getBlockedTagNames()
+        this.blockedRoles = this.getBlockedRoles()
+        this.blockedTagNames = this.getBlockedTagNames()
+    }
+
+
+    /**
+    * Role list based on: http://www.w3.org/TR/wai-aria/roles#landmark_roles
+    * @returns {Object} - List of disallowed html tags.
+    */
+    getBlockedRoles() {
+        const roles = [
+            'button', 'checkbox', 'command', 'input', 'radio', 'range',
+            'slider', 'option', 'search', 'textbox', 'timer',
+        ]
+
+        let disallowed = {}
+        roles.forEach((i) => {disallowed[i] = null})
+        return disallowed
+    }
+
+
+    /**
+    * Using an object to check if tagName is disallowed is faster when using
+    * `tagName in {}` than using `Array.indexOf(tagname)`.
+    * @returns {Object} - List of disallowed html tags.
+    */
+    getBlockedTagNames() {
+        // tag list based on:
+        // eslint-disable-next-line max-len
+        // https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5/HTML5_element_list
+        const tags = [
+            'TITLE', 'BASE', 'LINK', 'META', 'STYLE', 'SCRIPT', 'TEMPLATE', 'PRE', 'FIGURE',
+            'DATA', 'TIME', 'CODE', 'VAR', 'SAMP', 'KBD', 'SUB', 'SUP', 'RUBY', 'RT', 'RP',
+            'BDI', 'BR', 'WBR', 'IMG', 'EMBED', 'OBJECT', 'PARAM', 'VIDEO', 'AUDIO', 'SOURCE',
+            'TRACK', 'CANVAS', 'MAP', 'AREA', 'SVG', 'MATH', 'INPUT', 'BUTTON', 'SELECT',
+            'DATALIST', 'OPTGROUP', 'OPTION', 'TEXTAREA', 'KEYGEN', 'PROGRESS', 'METER',
+            'DETAILS', 'SUMMARY', 'MENUITEM', 'MENU',
+        ]
+
+        let disallowed = {}
+        tags.forEach((i) => {disallowed[i] = null})
+        return disallowed
     }
 
 

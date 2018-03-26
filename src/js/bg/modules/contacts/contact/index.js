@@ -1,3 +1,7 @@
+/**
+* The Contact base class is used to do the bookkeeping
+* for setting Contact-related state.
+*/
 class Contact {
 
     constructor(app, data) {

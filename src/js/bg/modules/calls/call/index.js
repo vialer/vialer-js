@@ -61,12 +61,6 @@ class Call {
             rejected_a: 'rejected_a',
             rejected_b: 'rejected_b',
         }
-
-        // Sync the store's reactive properties to the foreground.
-        if (!this.silent) {
-            Vue.set(this.app.state.calls.calls, this.id, this.state)
-            this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${this.id}`, state: this.state})
-        }
     }
 
 

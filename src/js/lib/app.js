@@ -1,26 +1,36 @@
+/**
+* @namespace App
+*/
 const Skeleton = require('./skeleton')
+const Utils = require('./utils')
 
 
 /**
-* The App class is a less light-weight version of the Skeleton.
-* It is extended with UI-specific libraries and should only
-* be used for the background and the foreground(popup) script.
+* The App class extends from the `Skeleton` class and adds
+* optional modules, viewmodel and state handling and
+* translations.
 */
 class App extends Skeleton {
 
     constructor(options) {
         super(options)
 
+        this.env = options.env
+
         // Component helpers.
         this.helpers = require('./helpers')(this)
-        this.utils = require('./utils')
+        this.utils = new Utils()
 
         this._modules = options.modules
         this.modules = {}
+        /** @memberof App */
         this.sounds = require('./sounds')
 
-        if (this.env.role.bg) this._emitTarget = 'fg'
-        else if (this.env.role.fg) this._emitTarget = 'bg'
+        // Use shorthand naming for the event target, because
+        // the script context is part of the event name as a
+        // convention.
+        if (this.constructor.name === 'AppBackground') this._emitTarget = 'fg'
+        else if (this.constructor.name === 'AppForeground') this._emitTarget = 'bg'
     }
 
 
@@ -38,11 +48,23 @@ class App extends Skeleton {
     }
 
 
+    /**
+    * Check if a variable is an object.
+    * @param {Array|null|Number|Object} item - The object to check. Can be of any type.
+    * @returns {Boolean} Whether the variable is an object or not.
+    */
     __isObject(item) {
         return (item && typeof item === 'object' && !Array.isArray(item))
     }
 
 
+    /**
+    * A recursive method to merges two or more objects together. Existing
+    * values from target are overwritten by sources.
+    * @param {Object} target - The store or a fragment of it.
+    * @param {...*} sources - One or more objects to merge to target.
+    * @returns {Function} - The result of this method.
+    */
     __mergeDeep(target, ...sources) {
         if (!sources.length) return target
         const source = sources.shift()
@@ -84,7 +106,7 @@ class App extends Skeleton {
             }
         }
 
-        if (persist && this.name === 'bg') {
+        if (persist && this.constructor.name === 'AppBackground') {
             // Background is leading and is the only one that
             // writes to storage using encryption.
             if (encrypt) {

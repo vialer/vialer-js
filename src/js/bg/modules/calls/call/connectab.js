@@ -106,15 +106,15 @@ class CallConnectAB extends Call {
     }
 
 
-    start() {
-        this._outgoing()
-    }
-
-
     /**
     * We cannot hold a ConnectAB Call; this is just a stub.
     */
     hold() {}
+
+
+    start() {
+        this._outgoing()
+    }
 
 
     /**

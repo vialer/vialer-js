@@ -2,11 +2,12 @@ const axios = require('axios')
 
 
 /**
-* Talks to the VoIPGRID API.
+* Responsible for setting up the [Axios](https://github.com/axios/axios)
+* client for the API calls to the vendor backend.
 */
 class Api {
     /**
-    * @param {ClickToDialApp} app - The application object.
+    * @param {AppBackground} app - The background application object.
     */
     constructor(app) {
         this.app = app

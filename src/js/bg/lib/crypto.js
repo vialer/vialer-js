@@ -139,6 +139,22 @@ class Crypto {
 
 
     /**
+    * Export an AES-GCM CryptoKey to a base-64 encoded string.
+    * @param {CryptoKey} aesKey - An AES-GCM CryptoKey to convert.
+    * @returns {Promise} - Resolves with a base-64 representation of an AES-GCM
+    * CryptoKey.
+    */
+    async __exportAESKey(aesKey) {
+        // Export the AES key, so we can see if they look the same.
+        const keydata = await crypto.subtle.exportKey('raw', aesKey)
+        //returns the exported key data
+        let base64Keydata = this.__dataArrayToBase64(keydata)
+        this.app.logger.info(`${this}export aes-gcm sessionkey`)
+        return base64Keydata
+    }
+
+
+    /**
     * Export an ECDH private key to a base-64 encoded string.
     * @param {CryptoKey} privateKey - The private key to export.
     * @returns {Promise} - Resolves with a base-64 encoded pkcs8 private key.
@@ -160,22 +176,6 @@ class Crypto {
         const keydata = await crypto.subtle.exportKey('spki', publicKey)
         let base64Keydata = this.__dataArrayToBase64(keydata)
         this.app.logger.debug(`${this}exported public key`)
-        return base64Keydata
-    }
-
-
-    /**
-    * Export an AES-GCM CryptoKey to a base-64 encoded string.
-    * @param {CryptoKey} aesKey - An AES-GCM CryptoKey to convert.
-    * @returns {Promise} - Resolves with a base-64 representation of an AES-GCM
-    * CryptoKey.
-    */
-    async __exportAESKey(aesKey) {
-        // Export the AES key, so we can see if they look the same.
-        const keydata = await crypto.subtle.exportKey('raw', aesKey)
-        //returns the exported key data
-        let base64Keydata = this.__dataArrayToBase64(keydata)
-        this.app.logger.info(`${this}export aes-gcm sessionkey`)
         return base64Keydata
     }
 

@@ -1,10 +1,10 @@
-/** @module Observer */
-
+/**
+* @namespace AppObserver
+*/
+// Provide some third-party dependencies from vendor.js
+global.EventEmitter = require('eventemitter3')
 global.$ = document.querySelector.bind(document)
 global.$$ = document.querySelectorAll.bind(document)
-
-global.EventEmitter = require('eventemitter3')
-
 
 const Skeleton = require('../lib/skeleton')
 const Walker = require('./walker')
@@ -18,9 +18,12 @@ const utils = require('../lib/utils')
 * affect browsing performance too much.
 */
 class AppObserver extends Skeleton {
-
-    constructor(...args) {
-        super(...args)
+    /**
+    * @param {Object} opts - Options to initialize AppBackground with.
+    * @param {Object} opts.env - The environment sniffer.
+    */
+    constructor(opts) {
+        super(opts)
 
         this.parsers = require('./parsers')
         this.walker = new Walker(this)
@@ -328,10 +331,5 @@ class AppObserver extends Skeleton {
 }
 
 
-let env = JSON.parse(JSON.stringify(require('../lib/env')))
-env.role.fg = true
-
-global.app = new AppObserver({
-    env: env,
-    name: 'observer',
-})
+let env = require('../lib/env')({role: 'observer'})
+global.app = new AppObserver({env})

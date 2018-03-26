@@ -12,7 +12,7 @@ const SipCall = require('./sip')
 * @param {String} callType - Force to create a type of Call.
 * @returns {Call} - A type of Call, currently `SIP` or `Connectab`.
 */
-function callFactory(module, callTarget = null, callOptions = {}, callType = null) {
+module.exports = function callFactory(module, callTarget = null, callOptions = {}, callType = null) {
     const app = module.app
     // Return a specific type of Call when requested.
     let call = null
@@ -40,5 +40,3 @@ function callFactory(module, callTarget = null, callOptions = {}, callType = nul
     if (call) return call
     throw 'Factory couldn\'t produce a valid Call target!'
 }
-
-module.exports = callFactory

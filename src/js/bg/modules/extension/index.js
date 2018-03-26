@@ -3,12 +3,18 @@ const Tabs = require('./tabs')
 
 
 /**
-* Root class for all extension-related logic.
+* Extension-specific background module takes care of dealing
+* with WebExtension-specific functionality.
+* @module ModuleExtension
 */
-class Extension extends Module {
-
-    constructor(...args) {
-        super(...args)
+class ModuleExtension extends Module {
+    /**
+    * Add listeners for update/install actions and
+    * setup keyboard events.
+    * @param {AppBackground} app - The background application.
+    */
+    constructor(app) {
+        super(app)
 
         this._installUpdate()
         this._keyboardShortcuts()
@@ -47,8 +53,8 @@ class Extension extends Module {
 
 
     /**
-    * Add keyboard commands for the webextension. See manifest.json
-    * for the keyboard shortcuts.
+    * Add keyboard commands. See `manifest.json`
+    * for the supported keyboard shortcuts.
     */
     _keyboardShortcuts() {
         browser.commands.onCommand.addListener((command) => {
@@ -68,10 +74,14 @@ class Extension extends Module {
     }
 
 
+    /**
+    * Setup a browser Tabs handler after the background
+    * application signalled it is ready.
+    */
     _ready() {
         this.tabs = new Tabs(this.app)
     }
 
 }
 
-module.exports = Extension
+module.exports = ModuleExtension

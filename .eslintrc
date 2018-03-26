@@ -135,7 +135,6 @@
         "prefer-const": 0,
         "no-warning-comments": [0, { "terms": ["todo", "fixme", "xxx"], "location": "start" }],
         "no-with": 2,
-
         "array-bracket-spacing": [0, "never"],
         "accessor-pairs": 0,
         "block-scoped-var": 0,
@@ -187,17 +186,33 @@
         "semi": 0,
         "semi-spacing": [2, {"before": false, "after": true}],
         "sort-class-members/sort-class-members": [2, {
-        "order": [
-                "constructor",
-                "[conventional-private-properties]",
-                "[conventional-private-methods]",
-                "[static-properties]",
-                "[static-methods]",
-                "[properties]",
-                "[methods]",
-                "[everything-else]"
+            "order": [
+                    "constructor",
+                    "[static-properties]",
+                    "[static-methods]",
+                    "[conventional-private-properties]",
+                    "[conventional-private-methods]",
+                    "[properties]",
+                    "[methods]",
+                    "[everything-else]"
             ],
+            groups: {
+                methods: [
+                    {
+                        sort: 'alphabetical',
+                        type: 'method'
+                    }
+                ],
+                "conventional-private-methods": [
+                    {
+                        name: '/_.+/',
+                        sort: 'alphabetical',
+                        type: 'method',
+                    }
+                ]
+            },
             "accessorPairPositioning": "getThenSet",
+            "stopAfterFirstProblem": true
         }],
         "sort-keys": [2, "asc", {"natural": true, "caseSensitive": false}],
         "sort-vars": [2, {"ignoreCase": true}],

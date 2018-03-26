@@ -1,6 +1,7 @@
 /**
 * Tabs is a webextension-only class, so no need to
 * check for environment conditions here.
+* @memberof AppBackground
 */
 class Tabs {
     constructor(app) {
@@ -64,21 +65,6 @@ class Tabs {
     }
 
 
-    tabIconsEnabled(tab) {
-        if (!this.app.state.user.authenticated) return false
-        if (!this.app.state.settings.click2dial.enabled) return false
-        // Test if one of the blacklisted sites matches.
-        let allowedUrl = true
-        for (let blacklistRegex of this.app.state.settings.click2dial.blacklist) {
-            if (new RegExp(blacklistRegex).test(tab.url)) {
-                allowedUrl = false
-                break
-            }
-        }
-        return allowedUrl
-    }
-
-
     /**
     * This will toggle Click-to-dial icons and the
     * accompanying DOM observer in each tab on or off.
@@ -97,6 +83,21 @@ class Tabs {
                 }
             })
         })
+    }
+
+
+    tabIconsEnabled(tab) {
+        if (!this.app.state.user.authenticated) return false
+        if (!this.app.state.settings.click2dial.enabled) return false
+        // Test if one of the blacklisted sites matches.
+        let allowedUrl = true
+        for (let blacklistRegex of this.app.state.settings.click2dial.blacklist) {
+            if (new RegExp(blacklistRegex).test(tab.url)) {
+                allowedUrl = false
+                break
+            }
+        }
+        return allowedUrl
     }
 }
 
