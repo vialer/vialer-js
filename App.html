@@ -2,7 +2,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Class: App | Vialer-js</title>
+    <title>Namespace: App | Vialer-js</title>
     <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="styles/main.css">
 
@@ -28,7 +28,7 @@
             <h1><a href="index.html" class="link">Vialer-js</a></h1>
             <span class="version">
             
-                v2.0.15
+                v3.0.91
             
             </span>
         </div>
@@ -45,7 +45,11 @@
         
 
         <div class="scroll">
-        <div class="nav-api hidden"><h3>Global</h3><ul><li class="nav-item"><a href="global.html#jitter">jitter</a></li><li class="nav-item"><a href="global.html#VialerApp">VialerApp</a></li></ul></div><div class="nav-manuals hidden"><h3>Manuals</h3><ul class="nav-items"><li class="nav-item">
+        <div class="nav-manuals hidden"><h3>Manuals</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-branding.html">Branding</a>
+                <div class="nav-item-sub hidden" id="branding_sub"></div>
+            </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="tutorial-deployment.html">Deployment</a>
                 <div class="nav-item-sub hidden" id="deployment_sub"></div>
@@ -55,132 +59,216 @@
                 <div class="nav-item-sub hidden" id="development_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="tutorial-install.html">Installation</a>
+                <a href="tutorial-install.html">Building</a>
                 <div class="nav-item-sub hidden" id="install_sub"></div>
             </li></ul></div><div class="nav-api hidden"><h3>Modules</h3><ul class="nav-items"><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Availability.html">Availability</a>
-                <div class="nav-item-sub hidden" id="module_Availability_sub"></div>
+                <a href="module-env.html">env</a>
+                <div class="nav-item-sub hidden" id="module_env_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-env.html#~getEnvironment">getEnvironment</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Contacts.html">Contacts</a>
-                <div class="nav-item-sub hidden" id="module_Contacts_sub"></div>
+                <a href="module-helpers.html">helpers</a>
+                <div class="nav-item-sub hidden" id="module_helpers_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-helpers.html#~Helpers">Helpers</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Dialer.html">Dialer</a>
-                <div class="nav-item-sub hidden" id="module_Dialer_sub"></div>
+                <a href="module-ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="module_ModuleApp_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Observer.html">Observer</a>
-                <div class="nav-item-sub hidden" id="module_Observer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer.html#~getBlockedRoles">getBlockedRoles</a></a></li><li class="sub-nav-item"><a href="module-Observer.html#~getBlockedTagNames">getBlockedTagNames</a></a></li></ul></div>
+                <a href="module-ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="module_ModuleAvailability_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Queues.html">Queues</a>
-                <div class="nav-item-sub hidden" id="module_Queues_sub"></div>
+                <a href="module-ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Ui.html">Ui</a>
-                <div class="nav-item-sub hidden" id="module_Ui_sub"></div>
+                <a href="module-ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-User.html">User</a>
-                <div class="nav-item-sub hidden" id="module_User_sub"></div>
+                <a href="module-ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="module_ModuleExtension_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="module_ModuleQueues_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleSettings.html">ModuleSettings</a>
+                <div class="nav-item-sub hidden" id="module_ModuleSettings_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUI_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUser_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Namespaces</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#.helpers">helpers</a></a></li><li class="sub-nav-item"><a href="App.html#.this.sounds">this.sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="App.html#__isObject">__isObject</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item"><a href="App.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="App.html#initI18n">initI18n</a></a></li><li class="sub-nav-item"><a href="App.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="AppBackground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.html#__factoryDefaults">__factoryDefaults</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initServices">__initServices</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__logoutState">__logoutState</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__unlockVault">__unlockVault</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_restoreState">_restoreState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppForeground.html#__initStore">__initStore</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppObserver.html">AppObserver</a>
+                <div class="nav-item-sub hidden" id="AppObserver_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.html">Sounds</a>
+                <div class="nav-item-sub hidden" id="Sounds_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="Sounds.html#.context">context</a></a></li></ul></div>
             </li></ul></div><div class="nav-api hidden"><h3>Classes</h3><ul class="nav-items"><li class="nav-item">
-                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="Actions.html">Actions</a>
-                <div class="nav-item-sub hidden" id="Actions_sub"></div>
-            </li><li class="nav-item">
-                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="Analytics.html">Analytics</a>
-                <div class="nav-item-sub hidden" id="Analytics_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Analytics.html#trackClickToDial">trackClickToDial</a></a></li></ul></div>
-            </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="Api.html">Api</a>
                 <div class="nav-item-sub hidden" id="Api_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Api.html#setupClient">setupClient</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="App.html">App</a>
-                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="App.html#getPlatformUrl">getPlatformUrl</a></a></li><li class="sub-nav-item"><a href="App.html#getWebsocketUrl">getWebsocketUrl</a></a></li><li class="sub-nav-item"><a href="App.html#reloadModules">reloadModules</a></a></li><li class="sub-nav-item"><a href="App.html#resetModules">resetModules</a></a></li><li class="sub-nav-item"><a href="App.html#restoreModules">restoreModules</a></a></li><li class="sub-nav-item"><a href="App.html#version">version</a></a></li></ul></div>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#.helpers">helpers</a></a></li><li class="sub-nav-item"><a href="App.html#.this.sounds">this.sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="App.html#__isObject">__isObject</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item"><a href="App.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="App.html#initI18n">initI18n</a></a></li><li class="sub-nav-item"><a href="App.html#setState">setState</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="CallStatusApp.html">CallStatusApp</a>
-                <div class="nav-item-sub hidden" id="CallStatusApp_sub"></div>
+                <a href="App.Utils.html">Utils</a>
+                <div class="nav-item-sub hidden" id="App_Utils_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.Utils.html#sanitizeNumber">sanitizeNumber</a></a></li><li class="sub-nav-item"><a href="App.Utils.html#stringifySearch">stringifySearch</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="Logger.html">Logger</a>
-                <div class="nav-item-sub hidden" id="Logger_sub"></div>
+                <a href="AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="AppBackground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.html#__factoryDefaults">__factoryDefaults</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initServices">__initServices</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__logoutState">__logoutState</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__unlockVault">__unlockVault</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_restoreState">_restoreState</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Availability-AvailabilityActions.html">AvailabilityActions</a>
-                <div class="nav-item-sub hidden" id="module_Availability_AvailabilityActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Availability-AvailabilityActions.html#_background">_background</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityActions.html#_popup">_popup</a></a></li></ul></div>
+                <a href="AppBackground.Tabs.html">Tabs</a>
+                <div class="nav-item-sub hidden" id="AppBackground_Tabs_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.Tabs.html#contextMenuItems">contextMenuItems</a></a></li><li class="sub-nav-item"><a href="AppBackground.Tabs.html#signalIcons">signalIcons</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Availability-AvailabilityModule.html">AvailabilityModule</a>
-                <div class="nav-item-sub hidden" id="module_Availability_AvailabilityModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#_load">_load</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#_restore">_restore</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#availabilityOptions">availabilityOptions</a></a></li><li class="sub-nav-item"><a href="module-Availability-AvailabilityModule.html#toggleAvailabilitySelect">toggleAvailabilitySelect</a></a></li></ul></div>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppForeground.html#__initStore">__initStore</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Contacts-ContactsActions.html">ContactsActions</a>
-                <div class="nav-item-sub hidden" id="module_Contacts_ContactsActions_sub"></div>
+                <a href="AppObserver.html">AppObserver</a>
+                <div class="nav-item-sub hidden" id="AppObserver_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Contacts-ContactsModule.html">ContactsModule</a>
-                <div class="nav-item-sub hidden" id="module_Contacts_ContactsModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Contacts-ContactsModule.html#_load">_load</a></a></li><li class="sub-nav-item"><a href="module-Contacts-ContactsModule.html#_restore">_restore</a></a></li></ul></div>
+                <a href="AppObserver.Walker.html">Walker</a>
+                <div class="nav-item-sub hidden" id="AppObserver_Walker_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.Walker.html#getBlockedRoles">getBlockedRoles</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#getBlockedTagNames">getBlockedTagNames</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#isBlockedElement">isBlockedElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#skipNode">skipNode</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#walkTheDOM">walkTheDOM</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Dialer-DialerActions.html">DialerActions</a>
-                <div class="nav-item-sub hidden" id="module_Dialer_DialerActions_sub"></div>
+                <a href="Call.html">Call</a>
+                <div class="nav-item-sub hidden" id="Call_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Call.html#_incoming">_incoming</a></a></li><li class="sub-nav-item"><a href="Call.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item"><a href="Call.html#_start">_start</a></a></li><li class="sub-nav-item"><a href="Call.html#_stop">_stop</a></a></li><li class="sub-nav-item"><a href="Call.html#setState">setState</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Dialer-DialerModule.html">DialerModule</a>
-                <div class="nav-item-sub hidden" id="module_Dialer_DialerModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#addContextMenuItem">addContextMenuItem</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#dial">dial</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#sanitizeNumber">sanitizeNumber</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#showCallstatus">showCallstatus</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#switchObserver">switchObserver</a></a></li><li class="sub-nav-item"><a href="module-Dialer-DialerModule.html#trimNumber">trimNumber</a></a></li></ul></div>
+                <a href="CallConnectAB.html">CallConnectAB</a>
+                <div class="nav-item-sub hidden" id="CallConnectAB_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="CallConnectAB.html#_callStatus">_callStatus</a></a></li><li class="sub-nav-item"><a href="CallConnectAB.html#hold">hold</a></a></li><li class="sub-nav-item"><a href="CallConnectAB.html#unhold">unhold</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Observer-ObserverModule.html">ObserverModule</a>
-                <div class="nav-item-sub hidden" id="module_Observer_ObserverModule_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#ctdNode">ctdNode</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#iconElement">iconElement</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#restorePhonenumbers">restorePhonenumbers</a></a></li><li class="sub-nav-item"><a href="module-Observer-ObserverModule.html#stopObserver">stopObserver</a></a></li></ul></div>
+                <a href="CallSIP.html">CallSIP</a>
+                <div class="nav-item-sub hidden" id="CallSIP_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="CallSIP.html#_incoming">_incoming</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#accept">accept</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#terminate">terminate</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Observer-Walker.html">Walker</a>
-                <div class="nav-item-sub hidden" id="module_Observer_Walker_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Observer-Walker.html#isBlockedElement">isBlockedElement</a></a></li><li class="sub-nav-item"><a href="module-Observer-Walker.html#skipNode">skipNode</a></a></li><li class="sub-nav-item"><a href="module-Observer-Walker.html#walkTheDOM">walkTheDOM</a></a></li></ul></div>
+                <a href="Contact.html">Contact</a>
+                <div class="nav-item-sub hidden" id="Contact_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Contact.html#setState">setState</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Queues-QueuesActions.html">QueuesActions</a>
-                <div class="nav-item-sub hidden" id="module_Queues_QueuesActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Queues-QueuesActions.html#_background">_background</a></a></li><li class="sub-nav-item"><a href="module-Queues-QueuesActions.html#_popup">_popup</a></a></li></ul></div>
+                <a href="Crypto.html">Crypto</a>
+                <div class="nav-item-sub hidden" id="Crypto_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Crypto.html#__base64ToDataArray">__base64ToDataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArray">__dataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToBase64">__dataArrayToBase64</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToHex">__dataArrayToHex</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToString">__dataArrayToString</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__deriveAESKeyFromECDH">__deriveAESKeyFromECDH</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportAESKey">__exportAESKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportPrivateKey">__exportPrivateKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportPublicKey">__exportPublicKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__hashString">__hashString</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__importPrivateKey">__importPrivateKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__importPublicKey">__importPublicKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__stringToDataArray">__stringToDataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#_generateVaultKey">_generateVaultKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#_importVaultKey">_importVaultKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#decrypt">decrypt</a></a></li><li class="sub-nav-item"><a href="Crypto.html#encrypt">encrypt</a></a></li><li class="sub-nav-item"><a href="Crypto.html#loadIdentity">loadIdentity</a></a></li><li class="sub-nav-item"><a href="Crypto.html#storeVault">storeVault</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Queues-QueuesModule.html">QueuesModule</a>
-                <div class="nav-item-sub hidden" id="module_Queues_QueuesModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Queues-QueuesModule.html#setQueueSizesTimer">setQueueSizesTimer</a></a></li><li class="sub-nav-item"><a href="module-Queues-QueuesModule.html#updateQueues">updateQueues</a></a></li></ul></div>
+                <a href="MemoryStore.html">MemoryStore</a>
+                <div class="nav-item-sub hidden" id="MemoryStore_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Ui-UiActions.html">UiActions</a>
-                <div class="nav-item-sub hidden" id="module_Ui_UiActions_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Ui-UiActions.html#_checkCloseMainPanel">_checkCloseMainPanel</a></a></li></ul></div>
+                <a href="Module.html">Module</a>
+                <div class="nav-item-sub hidden" id="Module_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-Ui-UiModule.html">UiModule</a>
-                <div class="nav-item-sub hidden" id="module_Ui_UiModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-Ui-UiModule.html#busyWidget">busyWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#closeWidget">closeWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#getWidget">getWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#isWidgetOpen">isWidgetOpen</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#login">login</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#openWidget">openWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#refreshWidgets">refreshWidgets</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetLoginButton">resetLoginButton</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetWidget">resetWidget</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#resetWidgetState">resetWidgetState</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#restoreWidgetState">restoreWidgetState</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#showPopup">showPopup</a></a></li><li class="sub-nav-item"><a href="module-Ui-UiModule.html#unauthorizeWidget">unauthorizeWidget</a></a></li></ul></div>
+                <a href="module-ModuleApp-ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="module_ModuleApp_ModuleApp_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-User-UserActions.html">UserActions</a>
-                <div class="nav-item-sub hidden" id="module_User_UserActions_sub"></div>
+                <a href="module-ModuleAvailability-ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="module_ModuleAvailability_ModuleAvailability_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleAvailability-ModuleAvailability.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="module-ModuleAvailability-ModuleAvailability.html#_watchers">_watchers</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="module-User-UserModule.html">UserModule</a>
-                <div class="nav-item-sub hidden" id="module_User_UserModule_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-User-UserModule.html#login">login</a></a></li></ul></div>
+                <a href="module-ModuleCalls-ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_ModuleCalls_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#__setTransferState">__setTransferState</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#__uaOptions">__uaOptions</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_emptyCall">_emptyCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_formatSdp">_formatSdp</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_userAgent">_userAgent</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#activateCall">activateCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#activeCall">activeCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#callAction">callAction</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#connect">connect</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#deleteCall">deleteCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#disconnect">disconnect</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="Sip.html">Sip</a>
-                <div class="nav-item-sub hidden" id="Sip_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Sip.html#connect">connect</a></a></li><li class="sub-nav-item"><a href="Sip.html#disconnect">disconnect</a></a></li><li class="sub-nav-item"><a href="Sip.html#initStack">initStack</a></a></li><li class="sub-nav-item"><a href="Sip.html#sipStatusEvent">sipStatusEvent</a></a></li><li class="sub-nav-item"><a href="Sip.html#subscribeEvent">subscribeEvent</a></a></li><li class="sub-nav-item"><a href="Sip.html#subscribePresence">subscribePresence</a></a></li><li class="sub-nav-item"><a href="Sip.html#unsubscribePresence">unsubscribePresence</a></a></li><li class="sub-nav-item"><a href="Sip.html#updatePresence">updatePresence</a></a></li></ul></div>
+                <a href="module-ModuleContacts-ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_ModuleContacts_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleContacts-ModuleContacts.html#_platformData">_platformData</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleExtension-ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="module_ModuleExtension_ModuleExtension_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_installUpdate">_installUpdate</a></a></li><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_keyboardShortcuts">_keyboardShortcuts</a></a></li><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_ready">_ready</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleQueues-ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="module_ModuleQueues_ModuleQueues_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleQueues-ModuleQueues.html#setQueueSizesTimer">setQueueSizesTimer</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUI-ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUI_ModuleUI_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#__menubarAnimation">__menubarAnimation</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_restoreState">_restoreState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_watchers">_watchers</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#notification">notification</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUser-ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUser_ModuleUser_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#login">login</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#logout">logout</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Presence.html">Presence</a>
+                <div class="nav-item-sub hidden" id="Presence_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="PresenceSip.html">PresenceSip</a>
+                <div class="nav-item-sub hidden" id="PresenceSip_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="PresenceSip.html#_statusFromDialog">_statusFromDialog</a></a></li><li class="sub-nav-item"><a href="PresenceSip.html#subscribe">subscribe</a></a></li><li class="sub-nav-item"><a href="PresenceSip.html#unsubscribe">unsubscribe</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="RingTone.html">RingTone</a>
+                <div class="nav-item-sub hidden" id="RingTone_sub"></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="Skeleton.html">Skeleton</a>
-                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#_init">_init</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#getEnvironment">getEnvironment</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
-                <a href="Store.html">Store</a>
-                <div class="nav-item-sub hidden" id="Store_sub"></div>
+                <a href="Skeleton.Logger.html">Logger</a>
+                <div class="nav-item-sub hidden" id="Skeleton_Logger_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.Store.html">Store</a>
+                <div class="nav-item-sub hidden" id="Skeleton_Store_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.Store.html#clear">clear</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.BusyTone.html">BusyTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_BusyTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.DtmfTone.html">DtmfTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_DtmfTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.RingbackTone.html">RingbackTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_RingbackTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.SoundMeter.html">SoundMeter</a>
+                <div class="nav-item-sub hidden" id="Sounds_SoundMeter_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Telemetry.html">Telemetry</a>
+                <div class="nav-item-sub hidden" id="Telemetry_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Telemetry.html#event">event</a></a></li><li class="sub-nav-item"><a href="Telemetry.html#getClientId">getClientId</a></a></li></ul></div>
             </li><li class="nav-item">
                 <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
                 <a href="Timer.html">Timer</a>
-                <div class="nav-item-sub hidden" id="Timer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Timer.html#increaseTimeout">increaseTimeout</a></a></li><li class="sub-nav-item"><a href="Timer.html#setTimeout">setTimeout</a></a></li></ul></div>
+                <div class="nav-item-sub hidden" id="Timer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Timer.html#__jitter">__jitter</a></a></li><li class="sub-nav-item"><a href="Timer.html#increaseTimeout">increaseTimeout</a></a></li><li class="sub-nav-item"><a href="Timer.html#setTimeout">setTimeout</a></a></li></ul></div>
             </li></ul></div>
         </div>
     </nav>
@@ -188,7 +276,7 @@
     <div class="content">
         <ul class="breadcrumbs">
             <li><a href="index.html">Docs</a> »</li>
-            <li>Class: App</li>
+            <li>Namespace: App</li>
         </ul>
         <hr>
         
@@ -199,10 +287,6 @@
     
         <h2>App</h2>
         
-            <div class="class-description"><p>This is the main entry point for the Firefox web extension,
-the Chrome web extension and the Electron desktop app. It is used
-by the extension scripts for background(bg) and popup(ui).</p></div>
-        
     
 </header>
 
@@ -211,50 +295,92 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
     
         
 
-<dt>
-
-    
-    <h2 class="subsection-title constructor"><i class="fa fa-terminal"></i>Constructor</h2>
-    
-
-    <h4 class="name" id="App">
-        <span class="type-signature"></span>new App<span class="signature">()</span>
-                   <span class="type-signature"></span>
         
-        <span class="source">
-            <a href="lib_app.js.html#line15"><i class="source fa fa-file-code-o"></i></a>
-        </span>
-    </h4>
+
+
+<dl class="details">
 
     
 
     
 
     
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+        
+
+<dl>
+    
+        <dt>
+            <h4 class="name">
+                <a href="App.Utils.html">Utils</a>
+                <div class="container-source members">
+                    <code><a href="App.Utils.html">App.Utils</a></code>
+                </div>
+            </h4>
+        </dt>
+        
+    
+</dl>
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title"><i class="fa fa-cube"></i>Members</h3>
+
+        <dl>
+            
+
+<dt>
+<h4 class="name" id=".helpers">
+    <span class="type-signature"><span class="icon green">static</span> </span>helpers<span class="type-signature"></span>
+    
+    <a href="lib_helpers.js.html#line15">Source </a>
+    
+</h4>
+
 
 </dt>
-
 <dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
     
 
     
@@ -296,10 +422,29 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
     
 
+    
 </dd>
 
+        
+            
+
+<dt>
+<h4 class="name" id=".this.sounds">
+    <span class="type-signature"><span class="icon green">static</span> </span>this.sounds<span class="type-signature"></span>
     
-    </div>
+    <a href="lib_app.js.html#line27">Source </a>
+    
+</h4>
+
+
+</dt>
+<dd>
+    
+
+    
+
+
+<dl class="details">
 
     
 
@@ -307,10 +452,38 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
     
 
-     
+    
 
     
 
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+    
+</dd>
+
+        </dl>
     
 
     
@@ -323,12 +496,12 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
     
 
-    <h4 class="name" id="_init">
-        <span class="type-signature"></span>_init<span class="signature">()</span>
+    <h4 class="name" id="__initStore">
+        <span class="type-signature"></span>__initStore<span class="signature">()</span>
                    <span class="type-signature"></span>
         
         <span class="source">
-            <a href="lib_app.js.html#line151"><i class="source fa fa-file-code-o"></i></a>
+            <a href="lib_app.js.html#line44"><i class="source fa fa-file-code-o"></i></a>
         </span>
     </h4>
 
@@ -343,7 +516,11 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 <dd>
     
     <div class="description">
-        <p>Setup the SIP stack, before loading any modules.</p>
+        <p>Application parts using this class should provide their own
+initStore implementation. The foreground script for instance
+gets its state from the background, while the background
+gets its state from localstorage or from a
+hardcoded default fallback.</p>
     </div>
     
 
@@ -415,12 +592,12 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
     
 
-    <h4 class="name" id="getPlatformUrl">
-        <span class="type-signature"></span>getPlatformUrl<span class="signature">()</span>
-                   <span class="type-signature"> &rarr; {String}</span>
+    <h4 class="name" id="__isObject">
+        <span class="type-signature"></span>__isObject<span class="signature">(item)</span>
+                   <span class="type-signature"> &rarr; {Boolean}</span>
         
         <span class="source">
-            <a href="lib_app.js.html#line59"><i class="source fa fa-file-code-o"></i></a>
+            <a href="lib_app.js.html#line56"><i class="source fa fa-file-code-o"></i></a>
         </span>
     </h4>
 
@@ -435,237 +612,7 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 <dd>
     
     <div class="description">
-        <p>Get platform URL from storage or set default.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">String</span>
-
-
-
-
-
-- <ul>
-<li>The cleaned up API endpoint url.</li>
-</ul>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-
-    
-
-    <h4 class="name" id="getWebsocketUrl">
-        <span class="type-signature"></span>getWebsocketUrl<span class="signature">()</span>
-                   <span class="type-signature"> &rarr; {String}</span>
-        
-        <span class="source">
-            <a href="lib_app.js.html#line81"><i class="source fa fa-file-code-o"></i></a>
-        </span>
-    </h4>
-
-    
-
-    
-
-    
-
-</dt>
-
-<dd>
-    
-    <div class="description">
-        <p>Get realm websocket URL from brand settings or set default.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <div class="container-returns">
-        <h5>Returns:</h5>
-        
-                
-
-
-
-<span class="param-type">String</span>
-
-
-
-
-
-- <ul>
-<li>The websocket URL.</li>
-</ul>
-
-
-
-
-            
-    </div>
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-
-    
-
-    <h4 class="name" id="reloadModules">
-        <span class="type-signature"></span>reloadModules<span class="signature">(update)</span>
-                   <span class="type-signature"></span>
-        
-        <span class="source">
-            <a href="lib_app.js.html#line98"><i class="source fa fa-file-code-o"></i></a>
-        </span>
-    </h4>
-
-    
-
-    
-
-    
-
-</dt>
-
-<dd>
-    
-    <div class="description">
-        <p>Reload all modules that have this method implemented.</p>
+        <p>Check if a variable is an object.</p>
     </div>
     
 
@@ -701,13 +648,22 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
         <tr>
             
-                <td class="name"><code>update</code></td>
+                <td class="name"><code>item</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Boolean</span>
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">null</span>
+|
+
+<span class="param-type">Number</span>
+|
+
+<span class="param-type">Object</span>
 
 
             
@@ -717,7 +673,7 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
             
 
-            <td class="description last"><p>Module indicator to update instead of (re)load.</p></td>
+            <td class="description last"><p>The object to check. Can be of any type.</p></td>
         </tr>
 
     
@@ -738,6 +694,27 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
     
 
     
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">Boolean</span>
+
+
+
+
+
+- <p>Whether the variable is an object or not.</p>
+
+
+
+
+            
+    </div>
+    
 
     
 
@@ -787,12 +764,12 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
     
 
-    <h4 class="name" id="resetModules">
-        <span class="type-signature"></span>resetModules<span class="signature">()</span>
-                   <span class="type-signature"></span>
+    <h4 class="name" id="__mergeDeep">
+        <span class="type-signature"></span>__mergeDeep<span class="signature">(target, &hellip;sources)</span>
+                   <span class="type-signature"> &rarr; {function}</span>
         
         <span class="source">
-            <a href="lib_app.js.html#line127"><i class="source fa fa-file-code-o"></i></a>
+            <a href="lib_app.js.html#line68"><i class="source fa fa-file-code-o"></i></a>
         </span>
     </h4>
 
@@ -807,7 +784,217 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 <dd>
     
     <div class="description">
-        <p>Reset all modules that have this method implemented.</p>
+        <p>A recursive method to merges two or more objects together. Existing
+values from target are overwritten by sources.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>target</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The store or a fragment of it.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sources</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>One or more objects to merge to target.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-returns">
+        <h5>Returns:</h5>
+        
+                
+
+
+
+<span class="param-type">function</span>
+
+
+
+
+
+- <ul>
+<li>The result of this method.</li>
+</ul>
+
+
+
+
+            
+    </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+
+    
+
+    <h4 class="name" id="__mergeState">
+        <span class="type-signature"><span class="icon green">async</span> </span>__mergeState<span class="signature">()</span>
+                   <span class="type-signature"></span>
+        
+        <span class="source">
+            <a href="lib_app.js.html#line91"><i class="source fa fa-file-code-o"></i></a>
+        </span>
+    </h4>
+
+    
+
+    
+
+    
+
+</dt>
+
+<dd>
+    
+    <div class="description">
+        <p>Vue-friendly object merging. The <code>path</code> is used to assist
+Vue's reactivity system to catch up with the changes.</p>
     </div>
     
 
@@ -879,12 +1066,12 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 
     
 
-    <h4 class="name" id="restoreModules">
-        <span class="type-signature"></span>restoreModules<span class="signature">()</span>
-                   <span class="type-signature"></span>
+    <h4 class="name" id="_initialState">
+        <span class="type-signature"></span>_initialState<span class="signature">()</span>
+                   <span class="type-signature"> &rarr; {Object}</span>
         
         <span class="source">
-            <a href="lib_app.js.html#line114"><i class="source fa fa-file-code-o"></i></a>
+            <a href="lib_app.js.html#line142"><i class="source fa fa-file-code-o"></i></a>
         </span>
     </h4>
 
@@ -899,101 +1086,8 @@ by the extension scripts for background(bg) and popup(ui).</p></div>
 <dd>
     
     <div class="description">
-        <p>Restore all modules that have this method implemented.</p>
-    </div>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-    
-
-</dd>
-
-            
-                
-
-<dt>
-
-    
-
-    <h4 class="name" id="version">
-        <span class="type-signature"></span>version<span class="signature">()</span>
-                   <span class="type-signature"> &rarr; {String}</span>
-        
-        <span class="source">
-            <a href="lib_app.js.html#line143"><i class="source fa fa-file-code-o"></i></a>
-        </span>
-    </h4>
-
-    
-
-    
-
-    
-
-</dt>
-
-<dd>
-    
-    <div class="description">
-        <p>Small helper that returns the version of the app.
-The version is inserted at buildtime from the
-package.json file.</p>
+        <p>Provide the initial application state when no state is
+available in localstorage.</p>
     </div>
     
 
@@ -1023,14 +1117,14 @@ package.json file.</p>
 
 
 
-<span class="param-type">String</span>
+<span class="param-type">Object</span>
 
 
 
 
 
 - <ul>
-<li>The current app's version.</li>
+<li>The initial Vue-stash structure.</li>
 </ul>
 
 
@@ -1038,6 +1132,263 @@ package.json file.</p>
 
             
     </div>
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+
+    
+
+    <h4 class="name" id="initI18n">
+        <span class="type-signature"></span>initI18n<span class="signature">()</span>
+                   <span class="type-signature"></span>
+        
+        <span class="source">
+            <a href="lib_app.js.html#line157"><i class="source fa fa-file-code-o"></i></a>
+        </span>
+    </h4>
+
+    
+
+    
+
+    
+
+</dt>
+
+<dd>
+    
+    <div class="description">
+        <p>Create a I18n stash store and pass it to the I18n plugin.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+            
+                
+
+<dt>
+
+    
+
+    <h4 class="name" id="setState">
+        <span class="type-signature"></span>setState<span class="signature">(state, options)</span>
+                   <span class="type-signature"></span>
+        
+        <span class="source">
+            <a href="lib_app.js.html#line197"><i class="source fa fa-file-code-o"></i></a>
+        </span>
+    </h4>
+
+    
+
+    
+
+    
+
+</dt>
+
+<dd>
+    
+    <div class="description">
+        <p>Set the background state and propagate it to the other end.</p>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+    <div class="container-params">
+        <h5>Parameters:</h5>
+        
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>state</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The state to update.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Whether to persist the changed state to localStorage.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     

@@ -1,24 +1,7 @@
-# Build from source
-## Requirements
-* Node.js 8.0.0 or higher
-* Npm 5 or higher
-* Electron executable for the desktop version (optional)
-
-First checkout the project and install its dependencies from npm:
-```bash
-git clone git@github.com:VoIPGRID/vialer-js.git
-cd vialer-js
-npm i -g gulp web-ext
-npm i
-# Set the default branding file.
-cp ./src/brand.json.example ./src/brand.json
-```
-
-
 ## Chrom(e/ium) WebExtension
 ```bash
-# Development build. The target may be omitted for chrom(e/ium).
-gulp build --target chrome
+# Development build. brand and target are defaults:
+gulp build --brand vialer --target chrome
 # Or make a production build:
 NODE_ENV=production gulp build
 ```
@@ -29,11 +12,8 @@ load the extension in a new Chromium/Chrome browser profile using an npm script:
 ```bash
 npm run test_chrome
 npm run test_chromium
-```
-You can also drag-and-drop a zip file on the extension page, when you made a
-distribution zip in `dist/chrome` using:
-
-```bash
+# You can also drag-and-drop a zip file on the extension page, after you made a
+# distribution zip in `dist/chrome` using:
 gulp build-dist
 ```
 
@@ -47,8 +27,7 @@ gulp build --target firefox
 # Or make a production build:
 NODE_ENV=production gulp build --target firefox
 ```
-
-Navigate to `about:debugging`. Switch `Enable add-on debugging` on. Select
+Navigate to `about:debugging` and switch `Enable add-on debugging` on. Select
 `Load Temporary Add-on` and point it to the `manifest.json` in the `build/firefox`
 directory. Alternatively, you can run Firefox with the addon temporarily loaded
 using web-ext in a new profile with:
@@ -59,7 +38,7 @@ There is no way to install unsigned xpi/zip files like with Chrome. The signed
 and published Firefox xpi can be installed directly though.
 
 
-## Electron desktop
+## Electron app
 Vialer-js can run as a desktop app using Electron, although this
 version is still **experimental** and not (yet) officially supported.
 You're free to give it a spin though! It requires Electron to be installed

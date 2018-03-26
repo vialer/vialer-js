@@ -1,4 +1,4 @@
-# Development
+# Using gulp
 Use the gulp watch method to work on the plugin like:
 
 ```bash
@@ -8,18 +8,17 @@ gulp watch --target electron # when working on Electron
 ```
 
 After every filechange, the plugin will be automatically rebuilt. However,
-the plugin won't be automatically reloaded in the browser.
-
-You can trigger the Chrome plugin to reload from `chrome://extensions/`.
-This sometimes fails to properly reload all scripts. Use the [extension reloader](https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid)
+the plugin won't be automatically reloaded in the browser. You can trigger the
+Chrome plugin to reload from `chrome://extensions/`. This sometimes fails to
+ properly reload all scripts. Use the [extension reloader](https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid)
 to force a reload each time. Keep in mind that you still have to close/open a
 tab in case you want the tab & observer scripts to reload.
 
 Web-ext for Firefox reloads the plugin automatically after each change, so
-you don't have to force a reload in the browser. This process can be a little
-error-prone. Also, the Firefox debugger lacks specific debugging consoles for
-each running script, making it less suitable for generic non-browser-vendor
-specific development.
+you don't have to force a reload in the browser. This process is error-prone.
+Also, the Firefox debugger lacks most of the debugging consoles for
+each running script, making it far less suitable for generic
+non-browser-vendor specific development.
 
 For Electron, there is currently no way to autoreload.
 

@@ -1,0 +1,747 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Source: bg/lib/crypto.js | Vialer-js</title>
+    <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/main.css">
+
+    
+</head>
+<body>
+<div class="main-container">
+    <input type="checkbox" id="nav-trigger" class="nav-trigger">
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+    <label for="nav-trigger" class="overlay"></label>
+    <nav class="lnb" id="lnb">
+        <div class="nav-search js-search">
+            <div class="logo" style="width: 72px; height: 72px">
+                <img src="logo-64.png" width="100%" height="100%">
+            </div>
+            <input type="text" placeholder="Search docs">
+            <ul class="searched-list"></ul>
+        </div>
+
+        <div class="nav-main">
+            <h1><a href="index.html" class="link">Vialer-js</a></h1>
+            <span class="version">
+            
+                v3.0.91
+            
+            </span>
+        </div>
+
+        
+        <ol class="nav-tab">
+            <li id="api-tab">
+                <a href="#api"><h4>Code</h4></a>
+            </li>
+            <li id="manuals-tab">
+                <a href="#manuals"><h4>Manuals</h4></a>
+            </li>
+        </ol>
+        
+
+        <div class="scroll">
+        <div class="nav-manuals hidden"><h3>Manuals</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-branding.html">Branding</a>
+                <div class="nav-item-sub hidden" id="branding_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-deployment.html">Deployment</a>
+                <div class="nav-item-sub hidden" id="deployment_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-development.html">Development</a>
+                <div class="nav-item-sub hidden" id="development_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-install.html">Building</a>
+                <div class="nav-item-sub hidden" id="install_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Modules</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-env.html">env</a>
+                <div class="nav-item-sub hidden" id="module_env_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-env.html#~getEnvironment">getEnvironment</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-helpers.html">helpers</a>
+                <div class="nav-item-sub hidden" id="module_helpers_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-helpers.html#~Helpers">Helpers</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="module_ModuleApp_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="module_ModuleAvailability_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="module_ModuleExtension_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="module_ModuleQueues_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleSettings.html">ModuleSettings</a>
+                <div class="nav-item-sub hidden" id="module_ModuleSettings_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUI_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUser_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Namespaces</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#.helpers">helpers</a></a></li><li class="sub-nav-item"><a href="App.html#.this.sounds">this.sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="App.html#__isObject">__isObject</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item"><a href="App.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="App.html#initI18n">initI18n</a></a></li><li class="sub-nav-item"><a href="App.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="AppBackground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.html#__factoryDefaults">__factoryDefaults</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initServices">__initServices</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__logoutState">__logoutState</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__unlockVault">__unlockVault</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_restoreState">_restoreState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppForeground.html#__initStore">__initStore</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppObserver.html">AppObserver</a>
+                <div class="nav-item-sub hidden" id="AppObserver_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.html">Sounds</a>
+                <div class="nav-item-sub hidden" id="Sounds_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="Sounds.html#.context">context</a></a></li></ul></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Classes</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Api.html">Api</a>
+                <div class="nav-item-sub hidden" id="Api_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Api.html#setupClient">setupClient</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#.helpers">helpers</a></a></li><li class="sub-nav-item"><a href="App.html#.this.sounds">this.sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="App.html#__isObject">__isObject</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item"><a href="App.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="App.html#initI18n">initI18n</a></a></li><li class="sub-nav-item"><a href="App.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.Utils.html">Utils</a>
+                <div class="nav-item-sub hidden" id="App_Utils_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.Utils.html#sanitizeNumber">sanitizeNumber</a></a></li><li class="sub-nav-item"><a href="App.Utils.html#stringifySearch">stringifySearch</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="AppBackground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.html#__factoryDefaults">__factoryDefaults</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initServices">__initServices</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__logoutState">__logoutState</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__unlockVault">__unlockVault</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_restoreState">_restoreState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.Tabs.html">Tabs</a>
+                <div class="nav-item-sub hidden" id="AppBackground_Tabs_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.Tabs.html#contextMenuItems">contextMenuItems</a></a></li><li class="sub-nav-item"><a href="AppBackground.Tabs.html#signalIcons">signalIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppForeground.html#__initStore">__initStore</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppObserver.html">AppObserver</a>
+                <div class="nav-item-sub hidden" id="AppObserver_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppObserver.Walker.html">Walker</a>
+                <div class="nav-item-sub hidden" id="AppObserver_Walker_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.Walker.html#getBlockedRoles">getBlockedRoles</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#getBlockedTagNames">getBlockedTagNames</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#isBlockedElement">isBlockedElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#skipNode">skipNode</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#walkTheDOM">walkTheDOM</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Call.html">Call</a>
+                <div class="nav-item-sub hidden" id="Call_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Call.html#_incoming">_incoming</a></a></li><li class="sub-nav-item"><a href="Call.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item"><a href="Call.html#_start">_start</a></a></li><li class="sub-nav-item"><a href="Call.html#_stop">_stop</a></a></li><li class="sub-nav-item"><a href="Call.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="CallConnectAB.html">CallConnectAB</a>
+                <div class="nav-item-sub hidden" id="CallConnectAB_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="CallConnectAB.html#_callStatus">_callStatus</a></a></li><li class="sub-nav-item"><a href="CallConnectAB.html#hold">hold</a></a></li><li class="sub-nav-item"><a href="CallConnectAB.html#unhold">unhold</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="CallSIP.html">CallSIP</a>
+                <div class="nav-item-sub hidden" id="CallSIP_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="CallSIP.html#_incoming">_incoming</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#accept">accept</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#terminate">terminate</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Contact.html">Contact</a>
+                <div class="nav-item-sub hidden" id="Contact_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Contact.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Crypto.html">Crypto</a>
+                <div class="nav-item-sub hidden" id="Crypto_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Crypto.html#__base64ToDataArray">__base64ToDataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArray">__dataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToBase64">__dataArrayToBase64</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToHex">__dataArrayToHex</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToString">__dataArrayToString</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__deriveAESKeyFromECDH">__deriveAESKeyFromECDH</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportAESKey">__exportAESKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportPrivateKey">__exportPrivateKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportPublicKey">__exportPublicKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__hashString">__hashString</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__importPrivateKey">__importPrivateKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__importPublicKey">__importPublicKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__stringToDataArray">__stringToDataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#_generateVaultKey">_generateVaultKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#_importVaultKey">_importVaultKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#decrypt">decrypt</a></a></li><li class="sub-nav-item"><a href="Crypto.html#encrypt">encrypt</a></a></li><li class="sub-nav-item"><a href="Crypto.html#loadIdentity">loadIdentity</a></a></li><li class="sub-nav-item"><a href="Crypto.html#storeVault">storeVault</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="MemoryStore.html">MemoryStore</a>
+                <div class="nav-item-sub hidden" id="MemoryStore_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Module.html">Module</a>
+                <div class="nav-item-sub hidden" id="Module_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleApp-ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="module_ModuleApp_ModuleApp_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleAvailability-ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="module_ModuleAvailability_ModuleAvailability_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleAvailability-ModuleAvailability.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="module-ModuleAvailability-ModuleAvailability.html#_watchers">_watchers</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls-ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_ModuleCalls_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#__setTransferState">__setTransferState</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#__uaOptions">__uaOptions</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_emptyCall">_emptyCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_formatSdp">_formatSdp</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_userAgent">_userAgent</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#activateCall">activateCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#activeCall">activeCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#callAction">callAction</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#connect">connect</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#deleteCall">deleteCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#disconnect">disconnect</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts-ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_ModuleContacts_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleContacts-ModuleContacts.html#_platformData">_platformData</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleExtension-ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="module_ModuleExtension_ModuleExtension_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_installUpdate">_installUpdate</a></a></li><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_keyboardShortcuts">_keyboardShortcuts</a></a></li><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_ready">_ready</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleQueues-ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="module_ModuleQueues_ModuleQueues_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleQueues-ModuleQueues.html#setQueueSizesTimer">setQueueSizesTimer</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUI-ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUI_ModuleUI_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#__menubarAnimation">__menubarAnimation</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_restoreState">_restoreState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_watchers">_watchers</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#notification">notification</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUser-ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUser_ModuleUser_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#login">login</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#logout">logout</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Presence.html">Presence</a>
+                <div class="nav-item-sub hidden" id="Presence_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="PresenceSip.html">PresenceSip</a>
+                <div class="nav-item-sub hidden" id="PresenceSip_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="PresenceSip.html#_statusFromDialog">_statusFromDialog</a></a></li><li class="sub-nav-item"><a href="PresenceSip.html#subscribe">subscribe</a></a></li><li class="sub-nav-item"><a href="PresenceSip.html#unsubscribe">unsubscribe</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="RingTone.html">RingTone</a>
+                <div class="nav-item-sub hidden" id="RingTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.Logger.html">Logger</a>
+                <div class="nav-item-sub hidden" id="Skeleton_Logger_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.Store.html">Store</a>
+                <div class="nav-item-sub hidden" id="Skeleton_Store_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.Store.html#clear">clear</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.BusyTone.html">BusyTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_BusyTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.DtmfTone.html">DtmfTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_DtmfTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.RingbackTone.html">RingbackTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_RingbackTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.SoundMeter.html">SoundMeter</a>
+                <div class="nav-item-sub hidden" id="Sounds_SoundMeter_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Telemetry.html">Telemetry</a>
+                <div class="nav-item-sub hidden" id="Telemetry_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Telemetry.html#event">event</a></a></li><li class="sub-nav-item"><a href="Telemetry.html#getClientId">getClientId</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Timer.html">Timer</a>
+                <div class="nav-item-sub hidden" id="Timer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Timer.html#__jitter">__jitter</a></a></li><li class="sub-nav-item"><a href="Timer.html#increaseTimeout">increaseTimeout</a></a></li><li class="sub-nav-item"><a href="Timer.html#setTimeout">setTimeout</a></a></li></ul></div>
+            </li></ul></div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <ul class="breadcrumbs">
+            <li><a href="index.html">Docs</a> »</li>
+            <li>Source: bg/lib/crypto.js</li>
+        </ul>
+        <hr>
+        
+
+
+
+    
+<article>
+    <pre class="prettyprint source linenums"><code>/**
+* Symmetric and assymetric WebCrypto helper class.
+* Source: https://github.com/garage11/lib11/
+*/
+class Crypto {
+    constructor(app) {
+        this.app = app
+
+        this.__cryptoParams = {
+            aes: {
+                params: {
+                    length: 256,
+                    name: 'AES-GCM',
+                },
+            },
+            ecdh: {
+                params: {
+                    name: 'ECDH',
+                    namedCurve: 'P-256',
+                },
+                uses: ['deriveKey', 'deriveBits'],
+            },
+            rsa: {
+                params: {
+                    hash: {name: 'SHA-256'},
+                    modulusLength: 2048,
+                    name: 'RSA-PSS',
+                    publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+                },
+                uses: ['sign', 'verify'],
+            },
+        }
+    }
+
+
+    /**
+    * Convert a base-64 encoded string to a DataArray.
+    * @param {String} data - The base-64 formatted string.
+    * @returns {ArrayBuffer} - A Buffer(Node) or Uint8Array(Browser).
+    */
+    __base64ToDataArray(data) {
+        if (this.app.env.isBrowser) {
+            let binaryString = atob(data)
+            let len = binaryString.length
+            let bytes = new Uint8Array(len)
+            for (let i = 0; i &lt; len; i++) {
+                bytes[i] = binaryString.charCodeAt(i)
+            }
+            return bytes.buffer
+        }
+        return new Buffer(data, 'base64')
+    }
+
+
+    /**
+    * Get a binary datatype with a set size, based on the environment.
+    * @param {Number} size - The size of the DataArray.
+    * @returns {Uint8Array|Buffer} - A Uint8Array in the browser; a Buffer in Node.js.
+    */
+    __dataArray(size) {
+        if (this.app.env.isBrowser) {
+            return new Uint8Array(size)
+        } else {
+            return new Buffer(size)
+        }
+    }
+
+
+    /**
+    * Convert an ArrayBuffer to a base-64 encoded string.
+    * @param {ArrayBuffer} data - The DataArray to convert.
+    * @returns {String} - The base-64 encoded string of the DataArray.
+    */
+    __dataArrayToBase64(data) {
+        if (this.app.env.isBrowser) {
+            let binary = ''
+            let bytes = new Uint8Array(data)
+            let len = bytes.byteLength;
+            for (let i = 0; i &lt; len; i++) {
+                binary += String.fromCharCode(bytes[i])
+            }
+            return btoa(binary)
+        }
+        return data.toString('base64')
+    }
+
+
+    /**
+    * Convert an Uint8Array to a hexadecimal encoded string.
+    * Useful to convert an ArrayBuffer hash to an id string.
+    * @param {ArrayBuffer} dataArray - The DataArray to convert.
+    * @returns {String} - A hexadecimal encoded string.
+    */
+    __dataArrayToHex(dataArray) {
+        let byteArray = new Uint8Array(dataArray)
+        let hexString = ''
+        let nextHexByte
+
+        for (let i = 0; i &lt; byteArray.byteLength; i++) {
+            nextHexByte = byteArray[i].toString(16)
+            if (nextHexByte.length &lt; 2) {
+                nextHexByte = '0' + nextHexByte
+            }
+            hexString += nextHexByte
+        }
+        return hexString
+    }
+
+
+    /**
+     * Convert an Uint8Array to a string.
+     * @param {ArrayBuffer} dataArray - The DataArray to convert.
+     * @returns {String} - The stringified DataArray.
+     */
+    __dataArrayToString(dataArray) {
+        return String.fromCharCode.apply(null, new Uint8Array(dataArray))
+    }
+
+
+    /**
+    * Derive a common AES-GCM session key from a public key and the
+    * user's private key.
+    * @param {CryptoKey} publicKey - A public key to generate the session key for.
+    * @returns {Promise} - Resolves with a AES-GCM CryptoKey that can be used for
+    * encryption and decryption between endpoints.
+    */
+    async __deriveAESKeyFromECDH(publicKey) {
+        this.app.logger.debug(`${this}deriving common aes-gcm key from ecdh secret`)
+        const sessionKey = await crypto.subtle.deriveKey({
+            name: 'ECDH',
+            namedCurve: 'P-256',
+            public: publicKey,
+        }, this.keypair.privateKey, {
+            length: 256,
+            name: 'AES-GCM',
+        }, true, ['encrypt', 'decrypt'])
+        return sessionKey
+    }
+
+
+    /**
+    * Export an AES-GCM CryptoKey to a base-64 encoded string.
+    * @param {CryptoKey} aesKey - An AES-GCM CryptoKey to convert.
+    * @returns {Promise} - Resolves with a base-64 representation of an AES-GCM
+    * CryptoKey.
+    */
+    async __exportAESKey(aesKey) {
+        // Export the AES key, so we can see if they look the same.
+        const keydata = await crypto.subtle.exportKey('raw', aesKey)
+        //returns the exported key data
+        let base64Keydata = this.__dataArrayToBase64(keydata)
+        this.app.logger.info(`${this}export aes-gcm sessionkey`)
+        return base64Keydata
+    }
+
+
+    /**
+    * Export an ECDH private key to a base-64 encoded string.
+    * @param {CryptoKey} privateKey - The private key to export.
+    * @returns {Promise} - Resolves with a base-64 encoded pkcs8 private key.
+    */
+    async __exportPrivateKey(privateKey) {
+        // Export the AES key, so we can see if they look the same.
+        const keydata = await crypto.subtle.exportKey('pkcs8', privateKey)
+        this.app.logger.debug(`${this}exported private key`)
+        return this.__dataArrayToBase64(keydata)
+    }
+
+
+    /**
+    * Export an ECDH public key to a base-64 encoded string.
+    * @param {CryptoKey} publicKey - The public key to export.
+    * @returns {Promise} - Resolves with a base-64 encoded spki public key.
+    */
+    async __exportPublicKey(publicKey) {
+        const keydata = await crypto.subtle.exportKey('spki', publicKey)
+        let base64Keydata = this.__dataArrayToBase64(keydata)
+        this.app.logger.debug(`${this}exported public key`)
+        return base64Keydata
+    }
+
+
+    /**
+    * Generate a SHA-256 checksum hash from a string.
+    * @param {String} data - The data to hash.
+    * @returns {Promise} - Resolves with the SHA-256 hash of the supplied data.
+    */
+    __hashString(data) {
+        return crypto.subtle.digest({name: 'SHA-256'}, this.__stringToDataArray(data))
+            .then(generatedIdArrayBuffer => {
+                let hash = this.__dataArrayToHex(generatedIdArrayBuffer)
+                return hash
+            })
+    }
+
+
+    /**
+    * Import a base-64 encoded ECDH private key as CryptoKey. The browser
+    * version replaces the OID for Chrome, because Chrome's BoringSSL doesn't
+    * follow the OID as set out by WebCrypto yet.
+    * @param {String} privateKey - A base-64 encoded private key.
+    * @param {Object} params - The crypto params.
+    * @param {Array} uses - What the CryptoKey should be able to do.
+    * @returns {Promise} - Resolves with a private CryptoKey.
+    */
+    __importPrivateKey(privateKey, params, uses) {
+        this.app.logger.debug(`${this}importing ${params.name} private key`)
+        if (!this.app.env.isBrowser) {
+            privateKey = new Buffer(privateKey, 'base64')
+        } else {
+            privateKey = this.__base64ToDataArray(privateKey.replace(
+                'MFYwEAYEK4EEcAYIKoZIzj0DAQcDQgAE',
+                'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE'
+            ))
+        }
+
+        return crypto.subtle.importKey('pkcs8', privateKey, params, true, uses)
+    }
+
+
+    /**
+    * Import a base-64 encoded spki public key as an ECDH CryptoKey.
+    * @param {String} publicKey - Base-64 encoded spki public key.
+    * @param {Object} params - The crypto params.
+    * @param {Array} uses - What the CryptoKey should be able to do.
+    * @returns {Promise} - Resolves with the imported public ECDH CryptoKey.
+    */
+    __importPublicKey(publicKey, params, uses = []) {
+        this.app.logger.debug(`${this}importing ${params.name} public key`)
+        let publicKeyData
+        if (!this.app.env.isBrowser) {
+            publicKeyData = new Buffer(publicKey, 'base64')
+        } else {
+            let chromeSpkiPublickey = publicKey.replace(
+                'MFYwEAYEK4EEcAYIKoZIzj0DAQcDQgAE',
+                'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE'
+            )
+            publicKeyData = this.__base64ToDataArray(chromeSpkiPublickey)
+        }
+
+        return crypto.subtle.importKey('spki', publicKeyData, params, true, uses)
+    }
+
+
+    /**
+    * Convert an ASCII string to an ArrayBuffer/Uint8Array.
+    * @param {String} data - The string to convert.
+    * @returns {ArrayBuffer|Uint8Array} - Return a Buffer in Node.js; an Uint8Array in the browser.
+    */
+    __stringToDataArray(data) {
+        if (this.app.env.isBrowser) {
+            let bytes = new Uint8Array(data.length)
+            for (let iii = 0; iii &lt; data.length; iii++) {
+                bytes[iii] = data.charCodeAt(iii)
+            }
+            return bytes
+        }
+
+        return new Buffer(data)
+    }
+
+
+    /**
+    * The session key is generated from the user's password and is
+    * cached in-memory. The user has to refill it's password as soon
+    * the plugin is restarted. All application data is decrypted using
+    * the session key.
+    * @param {String} username - Username to generate an AES key for.
+    * @param {String} password - Password to generate an AES key for.
+    * @returns {Promise} - Resolves with an AES-GCM key.
+    */
+    async _generateVaultKey(username, password) {
+        let salt
+        // The salt is bound to the username and is therefor required.
+        if (this.app.state.settings.vault &amp;&amp; this.app.state.settings.vault.salt &amp;&amp; this.app.state.user.username) {
+            salt = this.__base64ToDataArray(this.app.state.settings.vault.salt)
+        } else {
+            salt = crypto.getRandomValues(new Uint8Array(16))
+        }
+
+        this.app.setState({
+            settings: {
+                vault: {active: true, salt: this.__dataArrayToBase64(salt)},
+            },
+        }, {encrypt: false, persist: true})
+
+        this.pdkdf2Key = await crypto.subtle.importKey(
+            'raw', this.__stringToDataArray(`${username}${password}`),
+            {name: 'PBKDF2'}, false, ['deriveKey', 'deriveBits'],
+        )
+
+        // Use a decent iteration count to make the hashing mechanism slow
+        // enough, to make it less likely that the password can be brute-forced.
+        const sessionKey = await crypto.subtle.deriveKey(
+            {hash: {name: 'SHA-256'}, iterations: 500000, name: 'PBKDF2', salt},
+            this.pdkdf2Key, {length: 256, name: 'AES-GCM'}, true, ['encrypt', 'decrypt'])
+        return sessionKey
+    }
+
+
+    /**
+    * Import a base64 AES vault key. This key is stored as base64
+    * in localStorage when the user enabled it. The user is informed about
+    * the security implications.
+    * @param {String} vaultKey - Base64 encoded version of the Vault key (AES-GCM).
+    */
+    async _importVaultKey(vaultKey) {
+        try {
+            this.sessionKey = await crypto.subtle.importKey(
+                'raw', this.__base64ToDataArray(vaultKey), this.__cryptoParams.aes.params,
+                true, ['encrypt', 'decrypt'])
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+
+    /**
+    * Decrypt a cypher object with an AES-GCM session key.
+    * @param {CryptoKey} sessionKey - The AES-GCM CryptoKey to decrypt a message with.
+    * @param {Object} ciphertext - The cipher object.
+    * @param {Object} [ciphertext.additionalData] - Additional authenticated data.
+    * @param {Object} [ciphertext.cipher] - The actual encrypted payload.
+    * @param {Object} [ciphertext.iv] - The initialization vector.
+    * @returns {Promise} - Resolves with the decrypted plaintext message.
+    */
+    async decrypt(sessionKey, ciphertext) {
+        let decrypted = await crypto.subtle.decrypt({
+            additionalData: this.__base64ToDataArray(ciphertext.additionalData),
+            iv: this.__base64ToDataArray(ciphertext.iv),
+            name: 'AES-GCM',
+            tagLength: 128,
+        }, sessionKey, this.__base64ToDataArray(ciphertext.cipher))
+
+        return this.__dataArrayToString(decrypted)
+    }
+
+
+    /**
+    * Encrypt a plaintext string with AES-GCM.
+    * @param {CryptoKey} sessionKey - An AES-GCM key used to encrypt session data with.
+    * @param {String} plaintext - The message data to encrypt.
+    * @param {String} additionalData - Additional AES-GCM data that must be verifiable.
+    * @returns {Promise} - Resolves with an AES cipher data object.
+    */
+    async encrypt(sessionKey, plaintext, additionalData = null) {
+        const iv = crypto.getRandomValues(this.__dataArray(16))
+        if (additionalData) additionalData = this.__stringToDataArray(additionalData)
+        else additionalData = this.__dataArray(0)
+        const encrypted = await crypto.subtle.encrypt(
+            {additionalData, iv, name: 'AES-GCM', tagLength: 128},
+            sessionKey, this.__stringToDataArray(plaintext))
+        return {
+            additionalData: this.__dataArrayToBase64(additionalData),
+            cipher: this.__dataArrayToBase64(encrypted),
+            iv: this.__dataArrayToBase64(iv),
+        }
+    }
+
+
+    /**
+    * An identity is foremost a sessionkey that is used to encrypt
+    * locally stored data with. It can also provide means to setup a secure
+    * communication channel with between two endpoints. In that case a transient
+    * ECDH key and a static RSA-PSS key is used to negotiate a PFS secret key
+    * between the two endpoints.
+    * @param {String} username - The username to unlock local data with.
+    * @param {String} password - The password to unlock local data with.
+    * @param {Boolean} e2e - Whether to create an asymmetric encryption key.
+    */
+    async loadIdentity(username, password, e2e = false) {
+        try {
+            this.sessionKey = await this._generateVaultKey(username, password)
+        } catch (err) {
+            console.error('ERROR:', err)
+            throw err
+        }
+
+        if (!e2e) return
+
+        const rsa = this.app.store.get('rsa')
+        if (!rsa) {
+            try {
+                this.rsa = await crypto.subtle.generateKey(this.__cryptoParams.rsa.params, true, this.__cryptoParams.rsa.uses)
+            } catch (err) {
+                console.error(err)
+            }
+
+            let [privateKey, publicKey] = await Promise.all([
+                this.__exportPrivateKey(this.rsa.privateKey),
+                this.__exportPublicKey(this.rsa.publicKey),
+            ])
+
+            const rsaEncrypted = await this.encrypt(this.sessionKey, JSON.stringify({privateKey, publicKey}))
+            this.app.store.set('rsa', rsaEncrypted)
+        } else {
+            try {
+                let decryptedRsa = JSON.parse(await this.decrypt(this.sessionKey, rsa))
+                let [privateKey, publicKey] = await Promise.all([
+                    this.__importPrivateKey(decryptedRsa.privateKey, this.__cryptoParams.rsa.params, ['sign']),
+                    this.__importPublicKey(decryptedRsa.publicKey, this.__cryptoParams.rsa.params, ['verify']),
+                ])
+                this.rsa = {privateKey, publicKey}
+            } catch (err) {
+                console.error(`${this}unable to decrypt rsa identity`)
+            }
+        }
+    }
+
+
+    /**
+    * Persist the encryption key to the unencrypted part
+    * of the store, so the plugin can automatically unlock.
+    * This is a tradeoff between usability and security.
+    */
+    async storeVault() {
+        const sessionKey = await this.__exportAESKey(this.sessionKey)
+        this.app.setState({settings: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
+    }
+
+
+    toString() {
+        return `${this.app}[crypto] `
+    }
+
+}
+
+module.exports = Crypto
+</code></pre>
+</article>
+
+
+
+
+
+        <hr>
+        <footer>
+            <strong>&copy; Devhouse Spindle</strong><br/>
+            Documented with <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+        </footer>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+
+window.isApi = true
+window.isManual = false
+window.doc = {
+    name: '',
+    longname: '',
+}
+
+if (!doc.name) isApi = false
+
+</script>
+<script src="js/rtd.js"></script>
+</body>
+</html>

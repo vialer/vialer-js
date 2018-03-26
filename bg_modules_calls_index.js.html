@@ -1,0 +1,992 @@
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Source: bg/modules/calls/index.js | Vialer-js</title>
+    <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/main.css">
+
+    
+</head>
+<body>
+<div class="main-container">
+    <input type="checkbox" id="nav-trigger" class="nav-trigger">
+    <label for="nav-trigger" class="navicon-button x">
+      <div class="navicon"></div>
+    </label>
+    <label for="nav-trigger" class="overlay"></label>
+    <nav class="lnb" id="lnb">
+        <div class="nav-search js-search">
+            <div class="logo" style="width: 72px; height: 72px">
+                <img src="logo-64.png" width="100%" height="100%">
+            </div>
+            <input type="text" placeholder="Search docs">
+            <ul class="searched-list"></ul>
+        </div>
+
+        <div class="nav-main">
+            <h1><a href="index.html" class="link">Vialer-js</a></h1>
+            <span class="version">
+            
+                v3.0.91
+            
+            </span>
+        </div>
+
+        
+        <ol class="nav-tab">
+            <li id="api-tab">
+                <a href="#api"><h4>Code</h4></a>
+            </li>
+            <li id="manuals-tab">
+                <a href="#manuals"><h4>Manuals</h4></a>
+            </li>
+        </ol>
+        
+
+        <div class="scroll">
+        <div class="nav-manuals hidden"><h3>Manuals</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-branding.html">Branding</a>
+                <div class="nav-item-sub hidden" id="branding_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-deployment.html">Deployment</a>
+                <div class="nav-item-sub hidden" id="deployment_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-development.html">Development</a>
+                <div class="nav-item-sub hidden" id="development_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-install.html">Building</a>
+                <div class="nav-item-sub hidden" id="install_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Modules</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-env.html">env</a>
+                <div class="nav-item-sub hidden" id="module_env_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-env.html#~getEnvironment">getEnvironment</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-helpers.html">helpers</a>
+                <div class="nav-item-sub hidden" id="module_helpers_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-helpers.html#~Helpers">Helpers</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="module_ModuleApp_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="module_ModuleAvailability_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="module_ModuleExtension_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="module_ModuleQueues_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleSettings.html">ModuleSettings</a>
+                <div class="nav-item-sub hidden" id="module_ModuleSettings_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUI_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUser_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Namespaces</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#.helpers">helpers</a></a></li><li class="sub-nav-item"><a href="App.html#.this.sounds">this.sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="App.html#__isObject">__isObject</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item"><a href="App.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="App.html#initI18n">initI18n</a></a></li><li class="sub-nav-item"><a href="App.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="AppBackground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.html#__factoryDefaults">__factoryDefaults</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initServices">__initServices</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__logoutState">__logoutState</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__unlockVault">__unlockVault</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_restoreState">_restoreState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppForeground.html#__initStore">__initStore</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppObserver.html">AppObserver</a>
+                <div class="nav-item-sub hidden" id="AppObserver_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.html">Sounds</a>
+                <div class="nav-item-sub hidden" id="Sounds_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="Sounds.html#.context">context</a></a></li></ul></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Classes</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Api.html">Api</a>
+                <div class="nav-item-sub hidden" id="Api_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Api.html#setupClient">setupClient</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#.helpers">helpers</a></a></li><li class="sub-nav-item"><a href="App.html#.this.sounds">this.sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="App.html#__isObject">__isObject</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item"><a href="App.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item"><a href="App.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="App.html#initI18n">initI18n</a></a></li><li class="sub-nav-item"><a href="App.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.Utils.html">Utils</a>
+                <div class="nav-item-sub hidden" id="App_Utils_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="App.Utils.html#sanitizeNumber">sanitizeNumber</a></a></li><li class="sub-nav-item"><a href="App.Utils.html#stringifySearch">stringifySearch</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="AppBackground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.html#__factoryDefaults">__factoryDefaults</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initServices">__initServices</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__logoutState">__logoutState</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#__unlockVault">__unlockVault</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="AppBackground.html#_restoreState">_restoreState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.Tabs.html">Tabs</a>
+                <div class="nav-item-sub hidden" id="AppBackground_Tabs_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppBackground.Tabs.html#contextMenuItems">contextMenuItems</a></a></li><li class="sub-nav-item"><a href="AppBackground.Tabs.html#signalIcons">signalIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppForeground.html#__initStore">__initStore</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppObserver.html">AppObserver</a>
+                <div class="nav-item-sub hidden" id="AppObserver_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#observePage">observePage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#processPage">processPage</a></a></li><li class="sub-nav-item"><a href="AppObserver.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppObserver.Walker.html">Walker</a>
+                <div class="nav-item-sub hidden" id="AppObserver_Walker_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="AppObserver.Walker.html#getBlockedRoles">getBlockedRoles</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#getBlockedTagNames">getBlockedTagNames</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#isBlockedElement">isBlockedElement</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#skipNode">skipNode</a></a></li><li class="sub-nav-item"><a href="AppObserver.Walker.html#walkTheDOM">walkTheDOM</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Call.html">Call</a>
+                <div class="nav-item-sub hidden" id="Call_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Call.html#_incoming">_incoming</a></a></li><li class="sub-nav-item"><a href="Call.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item"><a href="Call.html#_start">_start</a></a></li><li class="sub-nav-item"><a href="Call.html#_stop">_stop</a></a></li><li class="sub-nav-item"><a href="Call.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="CallConnectAB.html">CallConnectAB</a>
+                <div class="nav-item-sub hidden" id="CallConnectAB_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="CallConnectAB.html#_callStatus">_callStatus</a></a></li><li class="sub-nav-item"><a href="CallConnectAB.html#hold">hold</a></a></li><li class="sub-nav-item"><a href="CallConnectAB.html#unhold">unhold</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="CallSIP.html">CallSIP</a>
+                <div class="nav-item-sub hidden" id="CallSIP_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="CallSIP.html#_incoming">_incoming</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#accept">accept</a></a></li><li class="sub-nav-item"><a href="CallSIP.html#terminate">terminate</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Contact.html">Contact</a>
+                <div class="nav-item-sub hidden" id="Contact_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Contact.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Crypto.html">Crypto</a>
+                <div class="nav-item-sub hidden" id="Crypto_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Crypto.html#__base64ToDataArray">__base64ToDataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArray">__dataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToBase64">__dataArrayToBase64</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToHex">__dataArrayToHex</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__dataArrayToString">__dataArrayToString</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__deriveAESKeyFromECDH">__deriveAESKeyFromECDH</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportAESKey">__exportAESKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportPrivateKey">__exportPrivateKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__exportPublicKey">__exportPublicKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__hashString">__hashString</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__importPrivateKey">__importPrivateKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__importPublicKey">__importPublicKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#__stringToDataArray">__stringToDataArray</a></a></li><li class="sub-nav-item"><a href="Crypto.html#_generateVaultKey">_generateVaultKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#_importVaultKey">_importVaultKey</a></a></li><li class="sub-nav-item"><a href="Crypto.html#decrypt">decrypt</a></a></li><li class="sub-nav-item"><a href="Crypto.html#encrypt">encrypt</a></a></li><li class="sub-nav-item"><a href="Crypto.html#loadIdentity">loadIdentity</a></a></li><li class="sub-nav-item"><a href="Crypto.html#storeVault">storeVault</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="MemoryStore.html">MemoryStore</a>
+                <div class="nav-item-sub hidden" id="MemoryStore_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Module.html">Module</a>
+                <div class="nav-item-sub hidden" id="Module_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleApp-ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="module_ModuleApp_ModuleApp_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleAvailability-ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="module_ModuleAvailability_ModuleAvailability_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleAvailability-ModuleAvailability.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="module-ModuleAvailability-ModuleAvailability.html#_watchers">_watchers</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls-ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_ModuleCalls_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#__setTransferState">__setTransferState</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#__uaOptions">__uaOptions</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_emptyCall">_emptyCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_formatSdp">_formatSdp</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#_userAgent">_userAgent</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#activateCall">activateCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#activeCall">activeCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#callAction">callAction</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#connect">connect</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#deleteCall">deleteCall</a></a></li><li class="sub-nav-item"><a href="module-ModuleCalls-ModuleCalls.html#disconnect">disconnect</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts-ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_ModuleContacts_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleContacts-ModuleContacts.html#_platformData">_platformData</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleExtension-ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="module_ModuleExtension_ModuleExtension_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_installUpdate">_installUpdate</a></a></li><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_keyboardShortcuts">_keyboardShortcuts</a></a></li><li class="sub-nav-item"><a href="module-ModuleExtension-ModuleExtension.html#_ready">_ready</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleQueues-ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="module_ModuleQueues_ModuleQueues_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleQueues-ModuleQueues.html#setQueueSizesTimer">setQueueSizesTimer</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUI-ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUI_ModuleUI_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#__menubarAnimation">__menubarAnimation</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_restoreState">_restoreState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#_watchers">_watchers</a></a></li><li class="sub-nav-item"><a href="module-ModuleUI-ModuleUI.html#notification">notification</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUser-ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUser_ModuleUser_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#_initialState">_initialState</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#_platformData">_platformData</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#login">login</a></a></li><li class="sub-nav-item"><a href="module-ModuleUser-ModuleUser.html#logout">logout</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Presence.html">Presence</a>
+                <div class="nav-item-sub hidden" id="Presence_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="PresenceSip.html">PresenceSip</a>
+                <div class="nav-item-sub hidden" id="PresenceSip_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="PresenceSip.html#_statusFromDialog">_statusFromDialog</a></a></li><li class="sub-nav-item"><a href="PresenceSip.html#subscribe">subscribe</a></a></li><li class="sub-nav-item"><a href="PresenceSip.html#unsubscribe">unsubscribe</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="RingTone.html">RingTone</a>
+                <div class="nav-item-sub hidden" id="RingTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item"><a href="Skeleton.html#on">on</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.Logger.html">Logger</a>
+                <div class="nav-item-sub hidden" id="Skeleton_Logger_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Skeleton.Store.html">Store</a>
+                <div class="nav-item-sub hidden" id="Skeleton_Store_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Skeleton.Store.html#clear">clear</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.BusyTone.html">BusyTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_BusyTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.DtmfTone.html">DtmfTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_DtmfTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.RingbackTone.html">RingbackTone</a>
+                <div class="nav-item-sub hidden" id="Sounds_RingbackTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Sounds.SoundMeter.html">SoundMeter</a>
+                <div class="nav-item-sub hidden" id="Sounds_SoundMeter_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Telemetry.html">Telemetry</a>
+                <div class="nav-item-sub hidden" id="Telemetry_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Telemetry.html#event">event</a></a></li><li class="sub-nav-item"><a href="Telemetry.html#getClientId">getClientId</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Timer.html">Timer</a>
+                <div class="nav-item-sub hidden" id="Timer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item"><a href="Timer.html#__jitter">__jitter</a></a></li><li class="sub-nav-item"><a href="Timer.html#increaseTimeout">increaseTimeout</a></a></li><li class="sub-nav-item"><a href="Timer.html#setTimeout">setTimeout</a></a></li></ul></div>
+            </li></ul></div>
+        </div>
+    </nav>
+
+    <div class="content">
+        <ul class="breadcrumbs">
+            <li><a href="index.html">Docs</a> »</li>
+            <li>Source: bg/modules/calls/index.js</li>
+        </ul>
+        <hr>
+        
+
+
+
+    
+<article>
+    <pre class="prettyprint source linenums"><code>const transform = require('sdp-transform')
+const Module = require('../../lib/module')
+
+
+/**
+
+* The call module takes care of the plumbing involved with setting up
+* and breaking down calls. The user interface mostly emits events,
+* because the state logic involved depends on the calls and their
+* state.
+* @module ModuleCalls
+*/
+class ModuleCalls extends Module {
+    /**
+    * @param {AppBackground} app - The background application.
+    */
+    constructor(app) {
+        super(app)
+
+        this.callFactory = require('./call/factory')
+        this.lib = require('sip.js')
+        // Keeps track of calls. Keys match Sip.js session keys.
+        this.calls = {}
+        // This flag indicates whether a reconnection attempt will be
+        // made when the websocket connection is gone.
+        this.reconnect = true
+        // The default connection timeout to start with.
+        this.retryDefault = {interval: 1250, limit: 60000, timeout: 1250}
+        // Used to store retry state.
+        this.retry = Object.assign({}, this.retryDefault)
+        // // Start with a clean state.
+        this.app.setState({calls: this._defaultState()})
+
+        this.app.on('bg:calls:call_accept', ({callId}) => this.calls[callId].accept())
+        this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
+            this.activateCall(this.calls[callId], holdInactive, unholdActive)
+        })
+
+        /**
+        * The main event to create a new call with from the foreground.
+        * @param {Object} callInfo - The Call data to start the call with.
+        * @param {String} callInfo.number - The number to call.
+        * @param {String} callInfo.start - Whether to start calling right away or just create a Call instance.
+        * @param {String} callInfo.type - Defines the Call implementation. Leave empty to use the one supported
+        *                                 by the application settings.
+        */
+        this.app.on('bg:calls:call_create', ({callback, number, start, type}) => {
+            // Always sanitize the number.
+            number = this.app.utils.sanitizeNumber(number)
+
+            let activeCall = this.activeCall(true)
+            if (activeCall &amp;&amp; activeCall.state.transfer.active &amp;&amp; activeCall.state.transfer.type === 'blind') {
+                // Directly transfer the number to the currently activated
+                // call when the active call has blind transfer mode set.
+                this.app.telemetry.event('call[sip]', 'transfer', 'blind')
+                activeCall.transfer(number)
+            } else {
+                // Both a 'regular' new call and an attended transfer call will
+                // create or get a new Call and activate it.
+                let call = this._emptyCall({number, type})
+
+                // Sync the state back to the foreground.
+                if (start) call.start()
+                this.__setTransferState()
+                // A newly created call is always activated unless
+                // there is another call already ringing.
+                if (!Object.keys(this.calls).find((i) => ['create', 'invite'].includes(this.calls[i].state.status))) {
+                    this.activateCall(call, true, true)
+                }
+
+                if (callback) callback({call: call.state})
+            }
+        })
+
+        this.app.on('bg:calls:call_delete', ({callId}) => {
+            if (this.calls[callId]) this.deleteCall(this.calls[callId])
+            else this.app.logger.debug(`${this}trying to delete non-existent Call with id ${callId}`)
+        })
+        this.app.on('bg:calls:call_start', (callState) => {
+            this.calls[callState.id].setState(callState)
+            this.calls[callState.id].start()
+            this.app.setState({ui: {layer: 'calls'}})
+        })
+
+        this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
+        this.app.on('bg:calls:connect', () => this.connect())
+        this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
+
+        this.app.on('bg:calls:dtmf', ({callId, key}) => this.calls[callId].session.dtmf(key))
+        this.app.on('bg:calls:hold_toggle', ({callId}) => {
+            const call = this.calls[callId]
+            if (!call.state.hold.active) {
+                call.hold()
+            } else {
+                // Unhold while the call's transfer is active must also
+                // undo the previously set transfer state on this call and
+                // on others.
+                if (call.state.transfer.active) {
+                    // Unset the transfer state when it was active during an unhold.
+                    this.__setTransferState(call, !call.state.transfer.active)
+                }
+                this.activateCall(call, true, true)
+            }
+        })
+
+
+        /**
+        * @param {String} callId - The call id of the call to transfer to.
+        */
+        this.app.on('bg:calls:transfer_finalize', ({callId}) => {
+            // Find origin.
+            let sourceCall
+            for (const _callId of Object.keys(this.calls)) {
+                if (this.calls[_callId].state.transfer.active) {
+                    sourceCall = this.calls[_callId]
+                }
+            }
+            this.app.telemetry.event('call[sip]', 'transfer', 'attended')
+            sourceCall.transfer(this.calls[callId])
+        })
+
+
+        /**
+         * Toggle hold for the call that needs to be transferred. Set
+         * transfer mode to active for this call.
+         */
+        this.app.on('bg:calls:transfer_toggle', ({callId}) => {
+            const sourceCall = this.calls[callId]
+            this.__setTransferState(sourceCall, !sourceCall.state.transfer.active)
+        })
+    }
+
+    /**
+    * Set the transfer state of a source call and update the transfer state of
+    * other calls. This method doesn't change the intended transfer status
+    * when no source Call is passed along. It just update outdated call state
+    * in that case.
+    * @param {Call} [sourceCall] - The call to update the calls status for.
+    * @param {Boolean} active - The transfer status to switch or update to.
+    */
+    __setTransferState(sourceCall = {id: null}, active) {
+        const callIds = Object.keys(this.calls)
+        // Look for an active transfer call when the source call isn't
+        // passed as a parameter.
+        if (!sourceCall.id) {
+            for (let _callId of callIds) {
+                if (this.calls[_callId].state.transfer.active) {
+                    sourceCall = this.calls[_callId]
+                    // In this case we are not toggling the active status;
+                    // just updating the status of other calls.
+                    active = true
+                    break
+                }
+            }
+        }
+
+        // Still no sourceCall. There is no transfer active at the moment.
+        // Force all calls to deactivate their transfer.
+        if (!sourceCall.id) active = false
+
+        if (active) {
+            // Enable transfer mode.
+            if (sourceCall.id) {
+                // Always disable the keypad, set the sourceCall on-hold and
+                // switch to the default `attended` mode when activating
+                // transfer mode on a call.
+                sourceCall.setState({keypad: {active: false}, transfer: {active: true, type: 'attended'}})
+                sourceCall.hold()
+            }
+            // Set attended status on other calls.
+            for (let _callId of callIds) {
+                const _call = this.calls[_callId]
+                if (_callId !== sourceCall.id) {
+                    _call.setState({transfer: {active: false, type: 'accept'}})
+                    // Hold all other ongoing calls.
+                    if (!['new', 'create', 'invite'].includes(_call.state.status) &amp;&amp; !_call.state.hold) {
+                        _call.hold()
+                    }
+                }
+            }
+        } else {
+            // Disable transfer mode.
+            if (sourceCall.id) {
+                sourceCall.setState({transfer: {active: false, type: 'attended'}})
+                sourceCall.unhold()
+            }
+            // Set the correct state of all other calls; se the transfer
+            // type to accept and disable transfer modus..
+            for (let _callId of callIds) {
+                const _call = this.calls[_callId]
+                if (_callId !== sourceCall.id) {
+                    this.calls[_callId].setState({transfer: {active: false, type: null}})
+                    // Make sure all other ongoing calls stay on hold.
+                    if (!['new', 'create', 'invite'].includes(_call.state.status) &amp;&amp; !_call.state.hold) {
+                        _call.hold()
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+    * Setup the initial UA options. This depends for instance
+    * on whether the application will be using the softphone
+    * to connect to the backend with or the vendor portal user.
+    * @returns {Object} UA options that are passed to Sip.js
+    */
+    __uaOptions() {
+        const settings = this.app.state.settings
+        // For webrtc this is a voipaccount, otherwise an email address.
+        let options = {
+            log: {
+                builtinEnabled: true,
+                level: 'error',
+            },
+            sessionDescriptionHandlerFactoryOptions: {
+                constraints: {
+                    audio: true,
+                    video: false,
+                },
+                modifiers: [this._formatSdp.bind(this)],
+            },
+            traceSip: false,
+            userAgentString: this._userAgent(),
+            wsServers: [`wss://${settings.sipEndpoint}`],
+        }
+
+        // Log in with the WebRTC voipaccount when it is enabled.
+        // The voipaccount should be from the same client as the logged-in
+        // user, or subscribe information won't work.
+        if (settings.webrtc.enabled &amp;&amp; (settings.webrtc.account.selected.username &amp;&amp; settings.webrtc.account.selected.password)) {
+            options.authorizationUser = settings.webrtc.account.selected.username
+            options.password = settings.webrtc.account.selected.password
+            options.register = true
+            options.uri = `sip:${settings.webrtc.account.selected.username}@voipgrid.nl`
+        } else {
+            // Login with platform email without SIP register.
+            options.authorizationUser = this.app.state.user.username
+            // Use the platform user token when logging in; not the password.
+            options.password = this.app.state.user.platform.tokens.sip
+            options.register = false
+            options.uri = `sip:${this.app.state.user.username}`
+        }
+
+        return options
+    }
+
+
+    /**
+    * Check if there is a `new` call ready to be used. Requires some
+    * bookkeeping because of the settings that can change in the
+    * meanwhile.
+    * @param {Object} opts - Options to pass.
+    * @param {String} [opts.type] - The type of call to find.
+    * @param {String} [opts.number] - The number to call to.
+    * @returns {Call} - A new or existing Call with status `new`.
+    */
+    _emptyCall({number = null, type}) {
+        let call
+
+        // See if we can reuse an existing `new` Call object.
+        for (const callId of Object.keys(this.calls)) {
+            if (this.calls[callId].state.status !== 'new') continue
+
+            if (type) {
+                // Otherwise we just check if the call matches the
+                // expected type.
+                if (this.calls[callId].constructor.name !== type) {
+                    this.deleteCall(this.calls[callId])
+                } else {
+                    call = this.calls[callId]
+                }
+            } else {
+                // When an empty call already exists, it must
+                // adhere to the current WebRTC-SIP/ConnectAB settings
+                // if the Call type is not explicitly passed.
+                if (this.app.state.settings.webrtc.enabled) {
+                    if (this.calls[callId].constructor.name === 'CallConnectAB') {
+                        this.deleteCall(this.calls[callId])
+                    } else {
+                        call = this.calls[callId]
+                    }
+                } else {
+                    if (this.calls[callId].constructor.name === 'CallSIP') {
+                        this.deleteCall(this.calls[callId])
+                    } else call = this.calls[callId]
+                }
+            }
+
+            if (this.calls[callId]) call = this.calls[callId]
+            break
+        }
+
+        if (!call) {
+            call = this.callFactory(this, number, {}, type)
+        }
+        this.calls[call.id] = call
+        // Set the number and propagate the call state to the foreground.
+        call.state.number = number
+        call.setState(call.state)
+
+        // Sync the store's reactive properties to the foreground.
+        if (!this.app.state.calls.calls[call.id]) {
+            Vue.set(this.app.state.calls.calls, call.id, call.state)
+            this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${call.id}`, state: call.state})
+        }
+
+        // Always set the number in the local state.
+        this.app.logger.debug(`${this}_emptyCall ${call.constructor.name} instance`)
+        return call
+    }
+
+
+    /**
+    * Reformat the SDP of the {@link https://sipjs.com/api/0.9.0/sessionDescriptionHandler/|SessionDescription}
+    * when setting up a connection, so we can force opus or G722 codec to be
+    * the preference of the backend.
+    * @param {SessionDescription} sessionDescription - A Sip.js SessionDescription handler.
+    * @returns {SessionDescription} A SessionDescription with a modfied sdp object.
+    */
+    _formatSdp(sessionDescription) {
+        const selectedCodec = this.app.state.settings.webrtc.codecs.selected.name
+
+        // (!) The `opus` codec must always be in the sdp.
+        let allowedCodecs = ['telephone-event', 'opus']
+        if (selectedCodec !== 'opus') allowedCodecs.push(selectedCodec)
+
+        let sdpObj = transform.parse(sessionDescription.sdp);
+        let rtp = {media: []}
+        let payloads = []
+        let fmtps = []
+        for (let codec of sdpObj.media[0].rtp) {
+            if (allowedCodecs.includes(codec.codec)) {
+                rtp.media.push(codec)
+                payloads.push(codec.payload)
+            }
+        }
+
+        for (let fmtp of sdpObj.media[0].fmtp) {
+            if (payloads.includes(fmtp.payload)) {
+                fmtps.push(fmtp)
+            }
+        }
+        sdpObj.media[0].rtp = rtp.media
+        sdpObj.media[0].payloads = payloads.join(' ')
+        sdpObj.media[0].fmtp = fmtps
+
+        sessionDescription.sdp = transform.write(sdpObj)
+        return Promise.resolve(sessionDescription)
+    }
+
+
+    _initialState() {
+        return {
+            calls: {},
+            ua: {
+                state: null,
+            },
+        }
+    }
+
+
+    _restoreState(moduleStore) {
+        moduleStore.calls = {}
+    }
+
+
+    /**
+    * Build the useragent string to identify Vialer-js with.
+    * The format is `Vialer-js/&lt;VERSION> (&lt;OS/&lt;ENV>) &lt;Vendor>`
+    * @returns {String} - Useragent string.
+    */
+    _userAgent() {
+        const env = this.app.env
+        // Don't use dynamic extension state here as version.
+        // Vialer-js may run outside of an extension's (manifest)
+        // context. Also don't use template literals, because envify
+        // can't deal with string replacement otherwise.
+        let userAgent = 'Vialer-js/' + process.env.VERSION + ' '
+        if (env.isLinux) userAgent += '(Linux/'
+        else if (env.isMacOS) userAgent += '(MacOS/'
+        else if (env.isWindows) userAgent += '(Windows/'
+
+        if (env.isChrome) userAgent += 'Chrome'
+        if (env.isElectron) userAgent += 'Electron'
+        else if (env.isFirefox) userAgent += 'Firefox'
+        else if (env.isEdge) userAgent += 'Edge'
+        userAgent += `) ${this.app.state.app.vendor.name}`
+        return userAgent
+    }
+
+
+    /**
+    * Set the active state on the target call, un-hold the call and
+    * put all other calls on-hold.
+    * @param {Call} [call] - A Call to activate.
+    * @param {Boolean} [holdOthers] - Unhold the call on activation.
+    * @param {Boolean} [unholdOwn] - Unhold the call on activation.
+    * @returns {Call|Boolean} - The Call or false.
+    */
+    activateCall(call, holdOthers = true, unholdOwn = false) {
+        const callIds = Object.keys(this.calls)
+
+        if (!call) {
+            // Activate the first found ongoing call when no call is given.
+            for (const callId of callIds) {
+                // Don't select a call that is already closing.
+                if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                    call = this.calls[callId]
+                }
+            }
+
+            if (!call) {
+                this.app.logger.debug(`${this}no call to activate!`)
+                return false
+            }
+        }
+        for (const callId of Object.keys(this.calls)) {
+            let _call = this.calls[callId]
+            // A call that is closing. Don't bother changing hold
+            // and active state properties.
+            if (call.id === callId) {
+                call.setState({active: true})
+                // Only unhold calls that are in the right state.
+                if (unholdOwn &amp;&amp; _call.state.status === 'accepted') {
+                    _call.unhold()
+                }
+            } else {
+                _call.setState({active: false})
+                // Only hold calls that are in the right state.
+                if (holdOthers &amp;&amp; _call.state.status === 'accepted') {
+                    _call.hold()
+                }
+            }
+        }
+
+        return call
+    }
+
+
+    /**
+    * @param {Boolean} ongoing - Whether to check if the call is ongoing or not.
+    * @returns {Call|null} - the current active ongoing call or null.
+    */
+    activeCall(ongoing = false) {
+        let activeCall = null
+        for (const callId of Object.keys(this.calls)) {
+            // Don't select a call that is already closing
+            if (this.calls[callId].state.active) {
+                if (!ongoing) activeCall = this.calls[callId]
+                else if (this.calls[callId].state.status === 'accepted') activeCall = this.calls[callId]
+            }
+        }
+        return activeCall
+    }
+
+
+    /**
+    * A loosely coupled Call action handler. Operates on all current Calls.
+    * Supported actions are:
+    *   `accept-new`: Accepts an incoming call or switch to the new call dialog.
+    *   `deline-hangup`: Declines an incoming call or an active call.
+    *   `hold-active`: Toggle hold on the active call.
+    * @param {String} action - The action; `accept-new` or `decline`.
+    */
+    callAction(action) {
+        let inviteCall = null
+
+        for (const callId of Object.keys(this.calls)) {
+            // Don't select a call that is already closing
+            if (this.calls[callId].state.status === 'invite') inviteCall = this.calls[callId]
+        }
+
+        if (action === 'accept-new') {
+            if (inviteCall) inviteCall.accept()
+            else {
+                const call = this._emptyCall()
+                this.activateCall(call, true)
+                this.app.setState({ui: {layer: 'calls'}})
+            }
+        } else if (action === 'decline-hangup') {
+            // Ongoing Calls can also be terminated.
+            let activeCall = this.activeCall()
+            if (inviteCall) inviteCall.terminate()
+            else if (activeCall) activeCall.terminate()
+        } else if (action === 'hold-active') {
+            let activeCall = this.activeCall()
+            // Make sure the action isn't provoked on a closing call.
+            if (activeCall &amp;&amp; activeCall.state.status === 'accepted') {
+                if (activeCall.state.hold.active) activeCall.unhold()
+                else activeCall.hold()
+            }
+        }
+    }
+
+
+    /**
+    * Initialize the SIPJS UserAgent and register its events.
+    */
+    connect() {
+        // Reconnect when already connected.
+        if (this.ua &amp;&amp; this.ua.isConnected()) {
+            this.disconnect(true)
+            return
+        }
+
+        // Login with the WebRTC account or platform account.
+        let uaOptions = this.__uaOptions()
+        if (!uaOptions.authorizationUser || !uaOptions.password) {
+            this.app.logger.warn(`${this}cannot connect without username and password`)
+        }
+
+        this.app.setState({calls: {ua: {state: 'disconnected'}}})
+        this.ua = new this.lib.UA(uaOptions)
+
+
+        /**
+        * An incoming call. Call-waiting is not implemented.
+        * A new incoming call on top of a call that is already
+        * ongoing will be silently terminated.
+        */
+        this.ua.on('invite', (session) => {
+            const callIds = Object.keys(this.calls)
+            const callOngoing = this.app.helpers.callOngoing()
+            const closingCalls = this.app.helpers.callsClosing()
+            const dnd = this.app.state.availability.dnd
+            const microphoneAccess = this.app.state.settings.webrtc.permission
+
+            let acceptCall = true
+            if (dnd || !microphoneAccess) acceptCall = false
+
+            if (callOngoing) {
+                // All ongoing calls are closing. It is save to accept the call.
+                if (callIds.length === closingCalls.length) {
+                    acceptCall = true
+                } else {
+                    const notClosingCalls = callIds.filter((i) => !closingCalls.includes(i))
+                    const notClosingNotNewCalls = notClosingCalls.filter((i) => this.calls[i].state.status !== 'new')
+
+                    if (notClosingNotNewCalls.length) acceptCall = false
+                    else acceptCall = true
+                }
+            }
+
+            if (acceptCall) {
+                this.app.logger.info(`${this}accept incoming call.`)
+                // An ongoing call may be a closing call. In that case we first
+                // remove all the closing calls before starting the new one.
+                for (const callId of closingCalls) {
+                    this.app.logger.info(`${this}deleting closing call ${callId}.`)
+                    this.deleteCall(this.calls[callId])
+                }
+            }
+            // A declined Call will still be initialized, but as a silent
+            // Call, meaning it won't notify the user about it.
+            const call = this.callFactory(this, session, {silent: !acceptCall}, 'CallSIP')
+            this.calls[call.id] = call
+            call.start()
+
+            if (!acceptCall) {
+                this.app.logger.info(`${this}decline incoming call`)
+                call.terminate()
+            } else {
+                Vue.set(this.app.state.calls.calls, call.id, call.state)
+                this.app.emit('fg:set_state', {action: 'insert', path: `calls/calls/${call.id}`, state: call.state})
+            }
+        })
+
+
+        this.ua.on('registered', () => {
+            this.app.setState({calls: {ua: {state: 'registered'}}})
+            this.app.logger.info(`${this}ua registered`)
+        })
+
+
+        this.ua.on('unregistered', () => {
+            this.app.setState({calls: {ua: {state: 'unregistered'}}})
+            this.app.logger.info(`${this}ua unregistered`)
+        })
+
+
+        this.ua.on('connected', () => {
+            this.app.setState({calls: {ua: {state: 'connected'}}})
+            this.app.logger.info(`${this}ua connected`)
+        })
+
+
+        this.ua.on('disconnected', () => {
+            // Don't use SIPJS simpler reconnect logic, which doesn't have
+            // jitter and an increasing timeout.
+            this.ua.stop()
+            this.app.setState({calls: {ua: {state: 'disconnected'}}})
+            this.app.logger.info(`${this}ua disconnected`)
+
+            if (this.reconnect) {
+                // Increase the timeout in case the user doesn't have
+                // a connection and to circumvent hammering the websocket
+                // backend.
+                this.app.logger.debug(`${this}ua reconnecting in ${this.retry.timeout} ms`)
+                setTimeout(() => this.connect(), this.retry.timeout)
+                this.retry = this.app.timer.increaseTimeout(this.retry)
+            } else {
+                this.retry = this.retryDefault
+            }
+        })
+
+
+        this.ua.on('registrationFailed', (reason) => {
+            this.app.setState({calls: {ua: {state: 'registration_failed'}}})
+        })
+    }
+
+
+    /**
+    * Take care of cleaning up an ending call.
+    * @param {Call} call - The call object to remove.
+    */
+    deleteCall(call) {
+        // This call is being cleaned up; move to a different call
+        // when this call was the active call.
+        if (call.state.active) {
+            let activeCall = null
+            let fallbackCall = null
+            for (const callId of Object.keys(this.calls)) {
+                // We are not going to activate the Call we are deleting.
+                if (callId === call.id) continue
+
+                // Prefer not to switch to a call that is already closing.
+                if (['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                    // The fallback Call is a non-specific closing call.
+                    if (this.calls[callId]) fallbackCall = this.calls[callId]
+                } else {
+                    activeCall = this.calls[callId]
+                    break
+                }
+
+            }
+            // Just select the first closing Call in case all of them are closing.
+            if (!activeCall &amp;&amp; fallbackCall) activeCall = fallbackCall
+            this.activateCall(activeCall, true, false)
+        }
+
+        // Finally delete the call and its references.
+        Vue.delete(this.app.state.calls.calls, call.id)
+        delete this.calls[call.id]
+
+        this.app.emit('fg:set_state', {action: 'delete', path: `calls/calls/${call.id}`})
+    }
+
+
+    /**
+    * Graceful stop, do not reconnect automatically.
+    * @param {Boolean} reconnect - Whether try to reconnect.
+    */
+    disconnect(reconnect = true) {
+        this.reconnect = reconnect
+        // Directly try to reconnect.
+        if (reconnect) this.retry.timeout = 0
+        if (this.ua &amp;&amp; this.ua.isConnected()) {
+            this.ua.stop()
+            this.app.logger.debug(`${this}ua disconnected`)
+        }
+    }
+
+
+    toString() {
+        return `${this.app}[calls] `
+    }
+
+}
+
+module.exports = ModuleCalls
+</code></pre>
+</article>
+
+
+
+
+
+        <hr>
+        <footer>
+            <strong>&copy; Devhouse Spindle</strong><br/>
+            Documented with <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+        </footer>
+    </div>
+</div>
+
+<script src="js/jquery.min.js"></script>
+<script>
+
+window.isApi = true
+window.isManual = false
+window.doc = {
+    name: '',
+    longname: '',
+}
+
+if (!doc.name) isApi = false
+
+</script>
+<script src="js/rtd.js"></script>
+</body>
+</html>
