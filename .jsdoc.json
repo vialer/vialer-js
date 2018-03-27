@@ -4,7 +4,11 @@
         "dictionaries": ["jsdoc"]
     },
     "source": {
-        "includePattern": ".js$"
+        "includePattern": ".js$",
+        "exclude": [
+            "./node_modules",
+            "./build"
+        ]
     },
     "plugins": [
         "plugins/markdown"
@@ -27,8 +31,8 @@
         "footerText": "&copy; Devhouse Spindle",
         "useCollapsibles": true,
         "tabNames": {
-            "api": "Code",
-            "tutorials": "Manuals"
+            "api": "Explore code",
+            "tutorials": "Getting started"
         }
     },
     "opts": {

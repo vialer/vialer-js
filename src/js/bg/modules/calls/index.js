@@ -1,14 +1,17 @@
+/**
+* The Call module takes care of the plumbing involved with setting up
+* and breaking down Calls. `AppForeground` interacts with this module
+* by emitting events. The Calls module maintains the state bookkeeping
+* of all the tracked Calls.
+* @module ModuleCalls
+*/
 const transform = require('sdp-transform')
 const Module = require('../../lib/module')
 
 
 /**
-
-* The call module takes care of the plumbing involved with setting up
-* and breaking down calls. The user interface mostly emits events,
-* because the state logic involved depends on the calls and their
-* state.
-* @module ModuleCalls
+* Main entrypoint for Calls.
+* @memberof AppBackground.modules
 */
 class ModuleCalls extends Module {
     /**
@@ -17,7 +20,7 @@ class ModuleCalls extends Module {
     constructor(app) {
         super(app)
 
-        this.callFactory = require('./call/factory')
+        this.callFactory = require('./call/factory')(this.app)
         this.lib = require('sip.js')
         // Keeps track of calls. Keys match Sip.js session keys.
         this.calls = {}
@@ -28,8 +31,6 @@ class ModuleCalls extends Module {
         this.retryDefault = {interval: 1250, limit: 60000, timeout: 1250}
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
-        // // Start with a clean state.
-        this.app.setState({calls: this._defaultState()})
 
         this.app.on('bg:calls:call_accept', ({callId}) => this.calls[callId].accept())
         this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
@@ -293,7 +294,7 @@ class ModuleCalls extends Module {
         }
 
         if (!call) {
-            call = this.callFactory(this, number, {}, type)
+            call = this.callFactory(number, {}, type)
         }
         this.calls[call.id] = call
         // Set the number and propagate the call state to the foreground.
@@ -351,6 +352,10 @@ class ModuleCalls extends Module {
     }
 
 
+    /**
+    * Initializes the module's store.
+    * @returns {Object} The module's store properties.
+    */
     _initialState() {
         return {
             calls: {},
@@ -361,6 +366,10 @@ class ModuleCalls extends Module {
     }
 
 
+    /**
+    * Restore stored dumped state from localStorage.
+    * @param {Object} moduleStore - Root property for this module.
+    */
     _restoreState(moduleStore) {
         moduleStore.calls = {}
     }
@@ -554,7 +563,7 @@ class ModuleCalls extends Module {
             }
             // A declined Call will still be initialized, but as a silent
             // Call, meaning it won't notify the user about it.
-            const call = this.callFactory(this, session, {silent: !acceptCall}, 'CallSIP')
+            const call = this.callFactory(session, {silent: !acceptCall}, 'CallSIP')
             this.calls[call.id] = call
             call.start()
 
@@ -664,6 +673,10 @@ class ModuleCalls extends Module {
     }
 
 
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
         return `${this.app}[calls] `
     }

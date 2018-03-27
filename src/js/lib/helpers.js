@@ -1,20 +1,24 @@
-/**
-* @module helpers
-*/
+/** @memberof lib */
 
 /**
 * Actions shared across components. Don't modify state
 * local component state from here.
+*/
+
+/**
+* Closure method that makes the app context available
+* to all inner methods.
 * @param {App} app - The application object.
 * @returns {Object} - The application's common helpers.
+* @memberof App
 */
-function Helpers(app) {
+function helpers(app) {
 
     const closingStatus = ['rejected_a', 'rejected_b', 'bye']
-    /** @memberof App */
-    let helpers = {}
 
-    helpers.activeCall = function() {
+    let _helpers = {}
+
+    _helpers.activeCall = function() {
         let activeCall = null
         for (const id of Object.keys(this.calls)) {
             if (this.calls[id].active) activeCall = this.calls[id]
@@ -38,7 +42,7 @@ function Helpers(app) {
     * of components.
     * @returns {Boolean} - Whether calling options are disabled.
     */
-    helpers.callingDisabled = function() {
+    _helpers.callingDisabled = function() {
         let _disabled = false
         if (app.state.settings.webrtc.enabled) {
             if (!app.state.settings.webrtc.permission) _disabled = true
@@ -56,7 +60,7 @@ function Helpers(app) {
     * in a closing state.
     * @returns {Array} - Closing Call ids.
     */
-    helpers.callsClosing = function() {
+    _helpers.callsClosing = function() {
         const calls = app.state.calls.calls
         return Object.keys(calls).filter((i) => closingStatus.includes(calls[i].status))
     }
@@ -67,7 +71,7 @@ function Helpers(app) {
     * in the process of being closed.
     * @returns {Boolean} - Whether one or more calls is active.
     */
-    helpers.callOngoing = function() {
+    _helpers.callOngoing = function() {
         const calls = app.state.calls.calls
         const callIds = Object.keys(calls)
 
@@ -88,7 +92,7 @@ function Helpers(app) {
     * be disabled.
     * @returns {Boolean} - Whether
     */
-    helpers.callsReady = function() {
+    _helpers.callsReady = function() {
         let ready = true
         const callIds = Object.keys(app.state.calls.calls)
         for (let callId of callIds) {
@@ -100,7 +104,7 @@ function Helpers(app) {
     }
 
 
-    helpers.getTranslations = function() {
+    _helpers.getTranslations = function() {
         const $t = app.$t
         return {
             call: {
@@ -121,7 +125,7 @@ function Helpers(app) {
     }
 
 
-    helpers.sharedMethods = function() {
+    _helpers.sharedMethods = function() {
         return {
             closeOverlay: function() {
                 app.setState({ui: {overlay: null}}, {encrypt: false, persist: true})
@@ -174,14 +178,14 @@ function Helpers(app) {
     * properties from the store.
     * @returns {Object} - Commonly used shared properties.
     */
-    helpers.sharedComputed = function() {
+    _helpers.sharedComputed = function() {
         return {
-            activeCall: helpers.activeCall,
-            callingDisabled: helpers.callingDisabled,
-            callOngoing: helpers.callOngoing,
-            callsReady: helpers.callsReady,
+            activeCall: _helpers.activeCall,
+            callingDisabled: _helpers.callingDisabled,
+            callOngoing: _helpers.callOngoing,
+            callsReady: _helpers.callsReady,
             callStatus: function() {
-                const translations = helpers.getTranslations().call
+                const translations = _helpers.getTranslations().call
                 if (this.call.status === 'accepted') {
                     if (this.call.hold.active) return translations.accepted.hold
                     return translations.accepted[this.call.type]
@@ -230,7 +234,7 @@ function Helpers(app) {
     }
 
 
-    helpers.validators = {
+    _helpers.validators = {
         // Regex source: https://github.com/johnotander/domain-regex/blob/master/index.js
         domain: function(e) {
             e = e ? e : ''
@@ -244,12 +248,12 @@ function Helpers(app) {
     /**
     * Set user state to unauthenticated and notify the background.
     */
-    helpers.logout = function() {
+    _helpers.logout = function() {
         app.emit('bg:user:logout')
     }
 
-    return helpers
+    return _helpers
 }
 
 
-module.exports = Helpers
+module.exports = helpers

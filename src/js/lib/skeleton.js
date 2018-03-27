@@ -1,18 +1,21 @@
-/**
-* @namespace Skeleton
-*/
 const Logger = require('./logger')
-const Store = require('./store')
-
+const Utils = require('./utils')
 
 /**
 * This is the minimal class that all runnable parts of the Vialer-js
-* application inherit from(tab, contentscript, background, popup/out).
-* It sets some basic properties that can be reused, like a logger, store,
+* application inherit from(background, foreground and contentscript).
+* It sets some basic properties that can be reused, like a logger,
 * an IPC eventemitter and some environmental properties.
+* @memberof app
 */
 class Skeleton extends EventEmitter {
-
+    /**
+    * Minimal environment-specific setup for any part of a
+    * WebExtension or webpage.
+    * @param {Object} options - The options to pass.
+    * @param {Object} options.env - The sniffed environment.
+    * @param {Object} [options.apps] - Used when running all scripts in the same execution context.
+    */
     constructor(options) {
         super()
 
@@ -25,11 +28,9 @@ class Skeleton extends EventEmitter {
         // by the EventEmitter.
         if (options.apps) this.apps = options.apps
         this._listeners = 0
-        this.utils = require('./utils')
+        this.utils = new Utils()
 
-        this.name = options.name
         this.logger = new Logger(this)
-        this.store = new Store(this)
 
         if (this.env.isExtension) {
             this.ipcListener()
@@ -112,8 +113,8 @@ class Skeleton extends EventEmitter {
         if (!this.env.isExtension || noIpc) {
             if (this.verbose) this.logger.debug(`${this}emit local event '${event}'`)
             if (this.apps) {
-                for (const appName of Object.keys(this.apps)) {
-                    this.apps[appName].emit(event, data)
+                for (const name of Object.keys(this.apps)) {
+                    this.apps[name].emit(event, data)
                 }
             }
             super.emit(event, data)
@@ -168,8 +169,12 @@ class Skeleton extends EventEmitter {
     }
 
 
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
-        return `[${this.name}] `
+        return `[${this.constructor.name}] `
     }
 }
 

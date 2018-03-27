@@ -1,10 +1,15 @@
+/**
+* VoIPGRID-platform specific functionality. This is especially useful
+* to manage call queues/callgroups. It shows the available queues
+* and how many callers are in the queue.
+* @module ModuleQueues
+*/
 const Module = require('../lib/module')
 
 
 /**
-* This is a VoIPGRID vendor-specific module, responsible for
-* updating information about calling queues.
-* @module ModuleQueues
+* Main entrypoint for Queues.
+* @memberof AppBackground.modules
 */
 class ModuleQueues extends Module {
     /**
@@ -13,7 +18,7 @@ class ModuleQueues extends Module {
     constructor(app) {
         super(app)
 
-        this.app.timer.registerTimer('bg:queues:size', () => {this._platformData(true)})
+        this.app.timer.registerTimer('bg:queues:size', () => {this._platformData(false)})
         this.app.on('bg:queues:selected', ({queue}) => {
             this.app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
 
@@ -26,6 +31,10 @@ class ModuleQueues extends Module {
     }
 
 
+    /**
+    * Initializes the module's store.
+    * @returns {Object} The module's store properties.
+    */
     _initialState() {
         return {
             queues: [],
@@ -35,15 +44,25 @@ class ModuleQueues extends Module {
     }
 
 
+    /**
+    * Adjust the queue-size timer when the WebExtension
+    * popup opens or closes.
+    * @param {String} type - Whether the popup is set to `close` or `open`.`
+    */
     _onPopupAction(type) {
         this.setQueueSizesTimer()
     }
 
 
-    async _platformData(silent = false) {
+    /**
+    * Load information about queue callgroups from the
+    * VoIPGRID platform.
+    * @param {Boolean} empty - Whether to empty the queues list and set the state to `loading`.
+    */
+    async _platformData(empty = true) {
         // Only when authenticated.
         if (!this.app.state.user.authenticated) return
-        if (!silent) this.app.setState({queues: {queues: [], state: 'loading'}})
+        if (empty) this.app.setState({queues: {queues: [], state: 'loading'}})
 
         const res = await this.app.api.client.get('api/queuecallgroup/')
         let queues = res.data.objects
@@ -65,10 +84,15 @@ class ModuleQueues extends Module {
     }
 
 
-    queueMenubarIcon(size) {
+    /**
+    * Converts a queue size to a menubar icon state.
+    * @param {String|Number} queueSize - The queue size as returned from the VoIPGRID API.
+    * @returns {String} - The menubar state, which is linked to a .png filename.
+    */
+    queueMenubarIcon(queueSize) {
         let queueState = 'queue'
-        if (!isNaN(size)) {
-            if (size < 10) queueState = `queue-${size}`
+        if (!isNaN(queueSize)) {
+            if (queueSize < 10) queueState = `queue-${queueSize}`
             else queueState = 'queue-10'
         }
         return queueState
@@ -102,6 +126,10 @@ class ModuleQueues extends Module {
     }
 
 
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
         return `${this.app}[queues] `
     }

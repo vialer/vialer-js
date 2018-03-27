@@ -14,7 +14,11 @@ module.exports = (app) => {
         }
     }
 
-    return {
+
+    /**
+    * @memberof fg.components
+    */
+    const Settings = {
         data: function() {
             return {
                 inputDevice: {
@@ -181,4 +185,6 @@ module.exports = (app) => {
             },
         },
     }
+
+    return Settings
 }

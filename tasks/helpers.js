@@ -1,3 +1,4 @@
+/** @memberof Gulp */
 const {_extend} = require('util')
 
 const addsrc = require('gulp-add-src')
@@ -40,6 +41,7 @@ let BUNDLERS = {bg: null, fg: null, tab: null}
 * This helper class is here, so the main gulpfile won't get
 * beyond 500 lines. Generally implement custom logic here,
 * and call it from the main gulpfile.
+* @memberof Gulp
 */
 class Helpers {
 

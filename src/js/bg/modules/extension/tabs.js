@@ -1,13 +1,14 @@
 /**
 * Tabs is a webextension-only class, so no need to
 * check for environment conditions here.
-* @memberof AppBackground
+* @memberof app.modules.extension
 */
 class Tabs {
     constructor(app) {
         this.app = app
 
         // Change the contextmenu items on these events.
+        /** @event Hurl#snowball */
         this.app.on('bg:user:login', () => this.contextMenuItems())
         this.app.on('bg:user:logout', () => browser.contextMenus.removeAll())
 

@@ -1,16 +1,21 @@
-const Module = require('../lib/module')
-
-
 /**
 * This module takes care of dealing with all
 * settings and responding to changes to it.
 * @module ModuleSettings
 */
+const Module = require('../lib/module')
+
+
+/**
+* Main entrypoint for Settings.
+* @memberof AppBackground.modules
+*/
 class ModuleSettings extends Module {
     /**
-    * All application runtime settings are defined here. Build-time settings
-    * go in the ``~/.vialer-jsrc` file.
-    * @returns {Object} The initial store for this module.
+    * Initializes the module's store.
+    * All application runtime settings are defined here. Build-time
+    * settings go in the ``~/.vialer-jsrc` file.
+    * @returns {Object} The module's store properties.
     */
     _initialState() {
         return {

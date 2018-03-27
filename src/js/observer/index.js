@@ -1,5 +1,9 @@
 /**
-* @namespace AppObserver
+* The AppTab is injected in ALL browser tab frames, because it has to
+* be able to add click-to-dial icons to every phonenumber it finds.
+* This script needs to be as lightweight as possible, so it doesn't
+* affect browsing performance too much.
+* @namespace AppTab
 */
 // Provide some third-party dependencies from vendor.js
 global.EventEmitter = require('eventemitter3')
@@ -12,20 +16,19 @@ const utils = require('../lib/utils')
 
 
 /**
-* The ObserverFrame is injected in ALL browser tab frames, because it has to
-* be able to add click-to-dial icons to every phonenumber it finds.
-* This script needs to be as lightweight as possible, so it doesn't
-* affect browsing performance too much.
+* Main entrypoint for AppTab.
+* @extends Skeleton
 */
-class AppObserver extends Skeleton {
+class AppTab extends Skeleton {
     /**
-    * @param {Object} opts - Options to initialize AppBackground with.
+    * @param {Object} opts - Options to pass.
     * @param {Object} opts.env - The environment sniffer.
     */
     constructor(opts) {
         super(opts)
-
+        /** @memberof obs */
         this.parsers = require('./parsers')
+        /** @memberof obs */
         this.walker = new Walker(this)
         // Search and insert icons after mutations.
         this.observer = null
@@ -332,4 +335,7 @@ class AppObserver extends Skeleton {
 
 
 let env = require('../lib/env')({role: 'observer'})
-global.app = new AppObserver({env})
+global.tab = new AppTab({env})
+
+
+module.exports = AppTab

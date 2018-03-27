@@ -1,11 +1,15 @@
+/**
+* Extension-specific background module takes care of dealing
+* with WebExtension-specific functionality.
+* @module ModuleExtension
+*/
 const Module = require('../../lib/module')
 const Tabs = require('./tabs')
 
 
 /**
-* Extension-specific background module takes care of dealing
-* with WebExtension-specific functionality.
-* @module ModuleExtension
+* Main entrypoint for Extension.
+* @memberof AppBackground.modules
 */
 class ModuleExtension extends Module {
     /**

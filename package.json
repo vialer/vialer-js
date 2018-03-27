@@ -71,6 +71,7 @@
     "gulp-tape": "0.0.10",
     "gulp-uglify": "^3.0.0",
     "jsdoc": "^3.5.4",
+    "jsdoc-memberof-namespace": "^2.2.0",
     "jsdoc-rtd": "^1.0.15",
     "mkdirp": "^0.5.1",
     "rc": "^1.2.1",

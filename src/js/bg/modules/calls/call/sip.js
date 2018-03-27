@@ -1,3 +1,6 @@
+/**
+* @module ModuleCalls
+*/
 const Call = require('./index')
 
 /**
@@ -6,15 +9,15 @@ const Call = require('./index')
 */
 class CallSIP extends Call {
 
-    constructor(module, target, options) {
-        super(module, target, options)
+    constructor(app, target, options) {
+        super(app, target, options)
 
         this._sessionOptions = {media: {}}
         if (!target || ['string', 'number'].includes(typeof target)) {
-            module.app.__mergeDeep(this.state, {keypad: {mode: 'call'}, number: target, status: 'new', type: 'outgoing'})
+            app.__mergeDeep(this.state, {keypad: {mode: 'call'}, number: target, status: 'new', type: 'outgoing'})
         } else {
             // Passing in a session means an outgoing call.
-            module.app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, status: 'invite', type: 'incoming'})
+            app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, status: 'invite', type: 'incoming'})
             this.session = target
         }
     }

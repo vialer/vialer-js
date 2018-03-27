@@ -1,12 +1,16 @@
-const Module = require('../lib/module')
-
-
 /**
 * The User module deals with everything that requires some
 * form of authentication. It is currently very tighly coupled
 * with the VoIPGRID vendor, but in theory should be able to deal
 * with other authentication backends.
 * @module ModuleUser
+*/
+const Module = require('../lib/module')
+
+
+/**
+* Main entrypoint for User.
+* @memberof AppBackground.modules
 */
 class ModuleUser extends Module {
     /**
@@ -32,7 +36,7 @@ class ModuleUser extends Module {
 
 
     /**
-    * Initialize the User module's store.
+    * Initializes the module's store.
     * @returns {Object} The module's store properties.
     */
     _initialState() {
@@ -168,6 +172,10 @@ class ModuleUser extends Module {
     }
 
 
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
         return `${this.app}[user] `
     }

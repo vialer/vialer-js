@@ -19,7 +19,10 @@ module.exports = function(app) {
         },
     })
 
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const Notifications = {
         methods: {
             classes: function(block, notification) {
                 let cssClasses = {}
@@ -37,4 +40,6 @@ module.exports = function(app) {
             notifications: 'app.notifications',
         },
     }
+
+    return Notifications
 }

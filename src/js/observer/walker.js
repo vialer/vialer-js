@@ -1,6 +1,6 @@
 /**
 * Walk the DOM.
-* @memberof AppObserver
+* @memberof tab
 */
 class Walker {
 

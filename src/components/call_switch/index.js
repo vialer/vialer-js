@@ -1,6 +1,8 @@
 module.exports = (app) => {
-
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const CallSwitch = {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
             activateOrDeleteCall: function(call) {
@@ -47,14 +49,6 @@ module.exports = (app) => {
                     return text
                 }
             },
-            /**
-            * Add CSS classes for the callswitcher based on the Call status.
-            * (!)Don't forget to update this function when changes are made
-            * to the internal Call state data-structure.
-            * @param {Call} call - Call state to generate CSS classes for.
-            * @param {String} block - HTML element block to generate CSS classes for.
-            * @returns {Object} - The CSS classes to render.
-            */
             classes: function(call, block) {
                 let classes = {}
                 if (block === 'call-button') {
@@ -73,11 +67,6 @@ module.exports = (app) => {
                 }
                 return classes
             },
-            /**
-            * A new call can only be created when there are no other
-            * calls with the `new` status.
-            * @returns {Boolean} - Whether it should be possible to create a new call.
-            */
             newCallAllowed: function() {
                 let available = true
                 for (let callId of Object.keys(this.calls)) {
@@ -95,4 +84,6 @@ module.exports = (app) => {
             user: 'user',
         },
     }
+
+    return CallSwitch
 }

@@ -1,9 +1,16 @@
+/**
+* VoIPGRID-platform specific functionality. Within the platform, it is
+* possible to set a user's availability. This has effect when the
+* user is part of a dialplan and can be used to dynamically switch
+* between endpoints.
+* @module ModuleAvailability
+*/
 const Module = require('../lib/module')
 
 
 /**
-* VoIPGRID platform availability module.
-* @module ModuleAvailability
+* Main entrypoint for Availability.
+* @memberof AppBackground.modules
 */
 class ModuleAvailability extends Module {
     /**
@@ -40,6 +47,12 @@ class ModuleAvailability extends Module {
     }
 
 
+    /**
+    * Initializes the module's store.
+    * Notice that the `sud` property is used to keep track of the
+    * selecteduserdestination API endpoint reference.
+    * @returns {Object} The module's store properties.
+    */
     _initialState() {
         return {
             available: false,
@@ -111,7 +124,7 @@ class ModuleAvailability extends Module {
 
     /**
     * Setup availability-specific store watchers.
-    * @returns {Object} Properties that need to be watched.
+    * @returns {Object} - Properties that need to be watched.
     */
     _watchers() {
         return {
@@ -126,6 +139,11 @@ class ModuleAvailability extends Module {
         }
     }
 
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
         return `${this.app}[availability] `
     }

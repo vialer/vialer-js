@@ -16,7 +16,10 @@ module.exports = (app) => {
     document.addEventListener('mouseup', stopKeypress)
     document.addEventListener('touchend', stopKeypress)
 
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const CallKeypad = {
         computed: Object.assign({
             matchedContact: function() {
                 let _number = String(this.number)
@@ -104,4 +107,6 @@ module.exports = (app) => {
             },
         },
     }
+
+    return CallKeypad
 }

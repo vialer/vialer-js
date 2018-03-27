@@ -1,11 +1,26 @@
 /**
-* Common Call class for Click-to-dial and WebRTC calling.
+* @module ModuleCalls
+*/
+
+/**
+* Base Call class that each implementation of a Call must use.
+* Currently used by CallConnectAB and CallSIP.
 */
 class Call {
+    /**
+    * Initialize a new Call object by setting up some Call sounds
+    * and set initial state. This state is shared by the UI of
+    * AppForeground and the backend of AppBackground.
+    * @param {AppBackground} app - The background application.
+    * @param {String} target - A target endpoint to call. Typically a number.
+    * @param {Object} options - Call options to pass.
+    * @param {Boolean} options.active - Whether this Call should be activated in the UI.
+    * @param {Boolean} options.silent - Whether to setup a Call without disturbing the UI.
+    */
+    constructor(app, target, {active, silent} = {}) {
+        this.app = app
+        this.module = app.modules.calls
 
-    constructor(module, target, {active, silent} = {}) {
-        this.module = module
-        this.app = this.module.app
         this.ua = this.module.ua
         this.silent = silent
 
@@ -17,7 +32,21 @@ class Call {
         this.ringbackTone = new this.app.sounds.RingbackTone()
 
         this.id = this.generateUUID()
-
+        /**
+        * @property {Object} state - Reactive computed properties from Vue-stash.
+        * @property {Boolean} state.active - Whether the Call shows in the UI or not.
+        * @property {String} state.class - Used to identify the Call type with.
+        * @property {String} state.displayName - The name to show when calling.
+        * @property {Object} state.hangup - Specifies the hangup feature of a Call.
+        * @property {Object} state.hold - Specifies the hold feature of a Call.
+        * @property {String} state.id - The generated UUID of the Call.
+        * @property {Object} state.keypad - Whether the type of Call supports a keypad feature.
+        * @property {String} state.number - The Call's endpoint identifier.
+        * @property {String} state.status - A Call state identifier as described in `this._statusMap`.
+        * @property {Object} state.timer - Keeps track of the Call time.
+        * @property {Object} state.transfer - Specifies the transfer feature of a Call.
+        * @property {String} state.type - Either `incoming` or `outgoing`.
+        */
         this.state = {
             active: false,
             class: this.constructor.name,
@@ -89,33 +118,12 @@ class Call {
 
 
     /**
-    * Generic UI and state-related logic for an outgoing call.
+    * Add two video elements to the DOM of AppBackground and ask for
+    * permission to the microphone. In a WebExtension, addding the video
+    * elements to the background script DOM allows us to keep the Call
+    * stream active after the popup is closed.
+    * @returns {Promise} - Resolves with the local audio stream.
     */
-    _outgoing() {
-        // Try to fill in the displayName from contacts.
-        const contacts = this.app.state.contacts.contacts
-        let displayName = ''
-        for (const id of Object.keys(contacts)) {
-            if (contacts[id].number === parseInt(this.number)) {
-                displayName = contacts[id].name
-            }
-        }
-
-        if (!this.silent) {
-            // Always set this call to be the active call as soon a new
-            // connection has been made.
-            this.module.activateCall(this, true)
-            let message = ''
-            if (displayName) message = `${this.state.number}: ${displayName}`
-            else message = this.state.number
-            this.app.modules.ui.notification({message, number: this.state.number, title: this.translations.create})
-        }
-
-        this.setState({displayName: displayName, status: this._statusMap.create})
-        this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
-    }
-
-
     async _initMedia() {
         // Append the AV-elements in the background DOM, so the audio
         // can continue to play when the popup closes.
@@ -146,11 +154,39 @@ class Call {
 
 
     /**
+    * Some UI state plumbing to setup an outgoing Call.
+    */
+    _outgoing() {
+        // Try to fill in the displayName from contacts.
+        const contacts = this.app.state.contacts.contacts
+        let displayName = ''
+        for (const id of Object.keys(contacts)) {
+            if (contacts[id].number === parseInt(this.number)) {
+                displayName = contacts[id].name
+            }
+        }
+
+        if (!this.silent) {
+            // Always set this call to be the active call as soon a new
+            // connection has been made.
+            this.module.activateCall(this, true)
+            let message = ''
+            if (displayName) message = `${this.state.number}: ${displayName}`
+            else message = this.state.number
+            this.app.modules.ui.notification({message, number: this.state.number, title: this.translations.create})
+        }
+
+        this.setState({displayName: displayName, status: this._statusMap.create})
+        this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
+    }
+
+
+    /**
     * Handle logic when a call is started; both incoming and outgoing.
-    * @param {Object} opts - Options to pass to _start.
-    * @param {Number} opts.timeout - Postpones resetting the call state.
-    * @param {Boolean} opts.force - Force showing a notification.
-    * @param {String} [opts.message] - Force a notification message.
+    * @param {Object} options - Options to pass to _start.
+    * @param {Number} options.timeout - Postpones resetting the call state.
+    * @param {Boolean} options.force - Force showing a notification.
+    * @param {String} [options.message] - Force a notification message.
     */
     _start({force = false, message = ''}) {
         if (!message) {
@@ -179,10 +215,10 @@ class Call {
     * before calling cleanup. The timeout is meant to postpone
     * resetting the state, so the user has a hint of what
     * happened in between.
-    * @param {Object} opts - Options to pass to _stop.
-    * @param {Boolean} opts.force - Force showing a notification.
-    * @param {String} [opts.message] - Force a notification message.
-    * @param {Number} opts.timeout - Postpones resetting the call state.
+    * @param {Object} options - Options to pass to _stop.
+    * @param {Boolean} options.force - Force showing a notification.
+    * @param {String} [options.message] - Force a notification message.
+    * @param {Number} options.timeout - Postpones resetting the call state.
     */
     _stop({force = false, message = '', timeout = 3000}) {
         if (!message) {
@@ -201,7 +237,8 @@ class Call {
             }
         }
 
-        this.stopTimer()
+        // Stop the Call interval timer.
+        clearInterval(this.timerId)
         this.app.setState({ui: {menubar: {event: null}}})
         this.setState({keypad: {active: false}})
 
@@ -228,6 +265,10 @@ class Call {
     }
 
 
+    /**
+    * Compact way to generate a UUID for a Call.
+    * @returns {String} - A RFC4122 version 4 compliant UUID.
+    */
     generateUUID() {
         var d = new Date().getTime()
         var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -240,9 +281,8 @@ class Call {
 
 
     /**
-    * Keep the state local to this class, unless the
-    * call's id is known. Then we can keep track
-    * of the call from Vue.
+    * Convenient version of setState that keeps the state local
+    * to  a Call instance.
     * @param {Object} state - The state to update.
     */
     setState(state) {
@@ -255,11 +295,10 @@ class Call {
     }
 
 
-    stopTimer() {
-        clearInterval(this.timerId)
-    }
-
-
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
         return `${this.app}[call] [${this.id}] `
     }

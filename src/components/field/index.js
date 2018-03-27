@@ -1,11 +1,8 @@
 module.exports = (app) => {
-    const template = templates.field
-
     /**
-     * @memberof module:general
-     * @namespace
-     */
-    return {
+    * @memberof fg.components
+    */
+    const Field = {
         computed: {
             /**
              * Validation flag being used to conditionally render
@@ -176,7 +173,9 @@ module.exports = (app) => {
             type: String,
             validation: Object,
         },
-        render: template.r,
-        staticRenderFns: template.s,
+        render: templates.field.r,
+        staticRenderFns: templates.field.s,
     }
+
+    return Field
 }

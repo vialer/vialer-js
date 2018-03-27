@@ -1,6 +1,8 @@
 module.exports = (app) => {
-
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const Queues = {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
             classesQueue: function(queue) {
@@ -28,4 +30,6 @@ module.exports = (app) => {
             user: 'user',
         },
     }
+
+    return Queues
 }
