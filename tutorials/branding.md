@@ -1,4 +1,4 @@
-# Prerequisites
+## Prerequisites
 The following prerequisites apply when you want to release a branded version
 of Vialer-js:
 
@@ -28,9 +28,9 @@ of Vialer-js:
 * Google Analytics ID
 
 
-# Deployment process
+## Deployment process
 
-## Auto-deploy with Vialer-js releases
+### Auto-deploy with Vialer-js releases
 Please [contact us](http://voipgrid.nl/contact/) if you want a branded plugin to be
 deployed together with the Vialer-js release process. We need the following
 information to be able to deploy your brand:
@@ -39,7 +39,7 @@ information to be able to deploy your brand:
 * Your [Mozilla store](https://addons.mozilla.org/developers/addons) addon item should have our developers as collaborators listed.
 
 
-## Manual deployment
+### Manual deployment
 * Add your brand, e.g. `yourbrand` in the `brands` section of .vialer-jsrc by modifying the `vialer` brand or by adding the
 brand config next to the Vialer config. Make sure this is valid JSON.
 * Modify the color palette of `yourbrand` to match your brand's color-scheme.
