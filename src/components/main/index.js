@@ -1,6 +1,8 @@
 module.exports = (app) => {
-
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const Main = {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
             classes: function(block) {
@@ -28,4 +30,6 @@ module.exports = (app) => {
             user: 'user',
         },
     }
+
+    return Main
 }

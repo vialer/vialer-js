@@ -2,7 +2,10 @@ module.exports = (app) => {
 
     const v = Vuelidate.validators
 
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const Login = {
         computed: {
             greeting: function() {
                 let hours = new Date().getHours()
@@ -49,4 +52,7 @@ module.exports = (app) => {
             },
         },
     }
+
+
+    return Login
 }

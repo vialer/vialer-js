@@ -1,11 +1,15 @@
-const Module = require('../lib/module')
-
-
 /**
 * This module is responsible for handling all UI-related state and
 * respond with UI-specific calls to watchers. UI changes may
 * be related to WebExtension-, Electron- or WebView-specific actions
 * @module ModuleUI
+*/
+const Module = require('../lib/module')
+
+
+/**
+* Main entrypoint for UI.
+* @memberof AppBackground.modules
 */
 class ModuleUI extends Module {
     /**
@@ -61,7 +65,7 @@ class ModuleUI extends Module {
 
 
     /**
-    * Initialize the UI module's store.
+    * Initializes the module's store.
     * @returns {Object} The module's store properties.
     */
     _initialState() {
@@ -83,9 +87,9 @@ class ModuleUI extends Module {
 
 
     /**
-    * Set the default restored state on the webextension menubar.
+    * Restore stored dumped state from localStorage.
     * The menubar should be inactive without any overriding events.
-    * @param {Object} moduleStore - The root key of the restored store module.
+    * @param {Object} moduleStore - Root property for this module.
     */
     _restoreState(moduleStore) {
         moduleStore.menubar = {

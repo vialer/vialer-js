@@ -1,6 +1,8 @@
 module.exports = (app, actions) => {
-
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const Availability = {
         computed: app.helpers.sharedComputed(),
         methods: app.helpers.sharedMethods(),
         render: templates.availability.r,
@@ -55,4 +57,6 @@ module.exports = (app, actions) => {
             },
         },
     }
+
+    return Availability
 }

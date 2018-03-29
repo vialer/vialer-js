@@ -1,6 +1,8 @@
 module.exports = (app) => {
-
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const MainMenubar = {
         computed: app.helpers.sharedComputed(),
         methods: {
             classes: function(block) {
@@ -40,4 +42,6 @@ module.exports = (app) => {
             layer: 'ui.layer',
         },
     }
+
+    return MainMenubar
 }

@@ -1,7 +1,3 @@
-const ContactSip = require('./contact/sip')
-const Module = require('../../lib/module')
-
-
 /**
 * The Contacts module is currently vendor-specific,
 * but is supposed to be a generic way of dealing with
@@ -10,6 +6,14 @@ const Module = require('../../lib/module')
 * An endpoint can be a CallSip or other class inheriting from
 * the base Call class.
 * @module ModuleContacts
+*/
+const ContactSip = require('./contact/sip')
+const Module = require('../../lib/module')
+
+
+/**
+* Main entrypoint for Contacts.
+* @memberof AppBackground.modules
 */
 class ModuleContacts extends Module {
     /**
@@ -22,6 +26,10 @@ class ModuleContacts extends Module {
     }
 
 
+    /**
+    * Initializes the module's store.
+    * @returns {Object} The module's store properties.
+    */
     _initialState() {
         return {
             contacts: {},
@@ -54,7 +62,6 @@ class ModuleContacts extends Module {
         let contacts = res.data.objects.filter((c) => (c.account_id !== ownAccountId))
 
         this.app.setState({contacts: {status: null}})
-
         this.app.logger.debug(`${this}retrieved ${contacts.length} contacts`)
 
         for (let contactData of contacts) {
@@ -69,11 +76,19 @@ class ModuleContacts extends Module {
     }
 
 
+    /**
+    * Restore stored dumped state from localStorage.
+    * @param {Object} moduleStore - Root property for this module.
+    */
     _restoreState(moduleStore) {
         moduleStore.contacts = {}
     }
 
 
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
         return `${this.app}[contacts] `
     }

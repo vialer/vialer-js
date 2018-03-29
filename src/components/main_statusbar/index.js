@@ -1,6 +1,8 @@
 module.exports = (app) => {
-
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const MainStatusbar = {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
             logout: app.helpers.logout,
@@ -39,4 +41,6 @@ module.exports = (app) => {
             vendor: 'app.vendor',
         },
     }
+
+    return MainStatusbar
 }

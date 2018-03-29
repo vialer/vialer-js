@@ -3,6 +3,10 @@
 * Source: https://github.com/garage11/lib11/
 */
 class Crypto {
+    /**
+    * Setup some crypto algorithm parameters.
+    * @param {AppBackground} app - The background application.
+    */
     constructor(app) {
         this.app = app
 
@@ -419,6 +423,10 @@ class Crypto {
     }
 
 
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
     toString() {
         return `${this.app}[crypto] `
     }

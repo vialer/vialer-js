@@ -1,4 +1,4 @@
-# Release process
+## Release process
 The Vialer-js deploy process makes a distinction between a beta release and
 a public release. The beta version and the public version are two separate
 (Firefox/Chrome) store entries. Semver (x.x.x) is used with the following
@@ -89,7 +89,7 @@ unzip *.xpi -d /tmp/vialer-js-xpi-unzipped  # download xpi and unzip
 unzip sources.zip -d /tmp/vialer-js-sources-unzipped  # download sources and unzip		
 cd /tmp/vialer-js-sources-unzipped		
 npm i		
-cp .vialer-jsrc.example .vialer-jsrc	
+cp .vialer-jsrc.example .vialer-jsrc
 NODE_ENV=production gulp build --target firefox		
 cd -		
 diff -r /tmp/vialer-js-xpi-unzipped /tmp/vialer-js-sources-unzipped/build/firefox		

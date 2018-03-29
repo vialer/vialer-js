@@ -1,29 +1,33 @@
-/**
-* @namespace App
-*/
 const Skeleton = require('./skeleton')
-const Utils = require('./utils')
 
 
 /**
 * The App class extends from the `Skeleton` class and adds
 * optional modules, viewmodel and state handling and
 * translations.
+* @extends Skeleton
 */
 class App extends Skeleton {
 
     constructor(options) {
         super(options)
-
+        /**
+        * Environment sniffer.
+        */
         this.env = options.env
 
-        // Component helpers.
         this.helpers = require('./helpers')(this)
-        this.utils = new Utils()
 
         this._modules = options.modules
+
+        /**
+        * Contains all registered App modules.
+        */
         this.modules = {}
-        /** @memberof App */
+        /**
+        * Sounds that are used in the application. They can both
+        * be triggered from `AppForeground` and `AppBackground`.
+        */
         this.sounds = require('./sounds')
 
         // Use shorthand naming for the event target, because
@@ -42,6 +46,13 @@ class App extends Skeleton {
     * hardcoded default fallback.
     */
     __initStore() {
+        /**
+        * The state is a reactive store that is used to respond
+        * to changes in data. The UI totally depends on the store
+        * to render the appropriate views, but also data responds
+        * to changes with the use of watchers.
+        * @memberof App
+        */
         this.state = {
             env: this.env,
         }
@@ -86,9 +97,15 @@ class App extends Skeleton {
 
     /**
     * Vue-friendly object merging. The `path` is used to assist
-    * Vue's reactivity system to catch up with the changes.
+    * Vue's reactivity system to catch up with changes.
+    * @param {Object} options - Options to pass.
+    * @param {String} options.action - The merge action: insert|merge|delete|replace.
+    * @param {Boolean} [options.encrypt=true] - Whether to persist to the encrypted part of the store.
+    * @param {String} options.path - Path to the store parts to merge into.
+    * @param {String} [options.persist=false] - Whether to persist this state change.
+    * @param {Object} state - An object to merge into the store.
     */
-    async __mergeState({action, encrypt = true, path, persist, state}) {
+    __mergeState({action, encrypt = true, path, persist = false, state}) {
         if (!path) this.__mergeDeep(this.state, state)
         else {
             path = path.split('/')
@@ -105,39 +122,36 @@ class App extends Skeleton {
                 Vue.set(_ref, path[path.length - 1], state)
             }
         }
-
-        if (persist && this.constructor.name === 'AppBackground') {
-            // Background is leading and is the only one that
-            // writes to storage using encryption.
-            if (encrypt) {
-                const encryptedState = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(this.state))
-                this.store.set('state.encrypted', encryptedState)
-            } else {
-                let stateClone = this.store.get('state.unencrypted')
-                if (!stateClone) stateClone = {}
-                this.__mergeDeep(stateClone, state)
-                this.store.set('state.unencrypted', stateClone)
-            }
-        }
     }
 
 
-    __setFromPath(obj, is, value) {
-        if (is.length === 1) {
-            if (!obj[is[0]]) Vue.set(obj, is[0], value)
-            return obj[is[0]]
-        } else if (is.length === 0) {
+    /**
+    * Set a nested property's value from a string pointing
+    * to the reference. To set the value of `foo` in `path.to.foo`,
+    * set the path to `/path/to/foo`, give the reference object and
+    * its value.
+    * @param {Object} obj - Reference object to modify.
+    * @param {String} path - URL notation to a nested property.
+    * @param {*} value - The value to assign to the nested property.
+    * @returns {Function|Object} - Recursive until the property is set. Then returns the reference object.
+    */
+    __setFromPath(obj, path, value) {
+        if (path.length === 1) {
+            if (!obj[path[0]]) Vue.set(obj, path[0], value)
+            return obj[path[0]]
+        } else if (path.length === 0) {
             return obj
         } else {
-            return this.__setFromPath(obj[is[0]], is.slice(1), value)
+            return this.__setFromPath(obj[path[0]], path.slice(1), value)
         }
     }
 
 
     /**
-    * Provide the initial application state when no state is
-    * available in localstorage.
-    * @returns {Object} - The initial Vue-stash structure.
+    * Initializes each module's store and combines the result
+    * in a global state object, which is converted to
+    * reactive getters/setters by Vue-stash.
+    * @returns {Object} The module's store properties.
     */
     _initialState() {
         let state = {}
@@ -152,10 +166,11 @@ class App extends Skeleton {
 
 
     /**
-    * Create a I18n stash store and pass it to the I18n plugin.
+    * Initialize multi-language support. An I18nStore is mounted
+    * to the store. Translations can be dynamically added.
     */
     initI18n() {
-        const i18nStore = new I18nStore(this.store)
+        const i18nStore = new I18nStore(this.state)
         Vue.use(i18n, i18nStore)
         let selectedLanguage = this.state.settings.language.selected.id
         for (const translation of Object.keys(translations)) {
@@ -167,21 +182,17 @@ class App extends Skeleton {
     }
 
 
+    /**
+    * Initialize Vue with the Vue-stash store, the
+    * root rendering component and gathered watchers
+    * from modules.
+    * @param {Object} watchers - Store properties to watch for changes.
+    */
     initViewModel(watchers) {
         this.initI18n()
         this.vm = new Vue({
             data: {
                 store: this.state,
-            },
-            mounted: () => {
-                // Chrome OSX height calculation bug, see:
-                // https://bugs.chromium.org/p/chromium/issues/detail?id=428044
-                if (this.env.isMacOS) {
-                    document.body.style.display = 'none'
-                    setTimeout(() => {
-                        document.body.style.display = 'block'
-                    }, 200)
-                }
             },
             render: h => h(require('../../components/main')(this)),
             watch: watchers,

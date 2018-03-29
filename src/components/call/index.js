@@ -1,6 +1,8 @@
 module.exports = (app) => {
-
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const Call = {
         computed: Object.assign({
             // If the current call is in transfer mode.
             callCanTerminate: function() {
@@ -83,4 +85,6 @@ module.exports = (app) => {
             calls: 'calls.calls',
         },
     }
+
+    return Call
 }

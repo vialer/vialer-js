@@ -1,18 +1,16 @@
 /**
-* @namespace Sounds
+* @module Sounds
 */
 
 /**
 * Phone tone generators.
 * based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 */
-/** @memberof Sounds */
 let context = null
 
 
 /**
 * Generate a european Busy tone.
-* @memberof Sounds
 */
 class BusyTone {
 
@@ -70,7 +68,6 @@ class BusyTone {
 
 /**
 * Generate a DTMF tone.
-* @memberof Sounds
 */
 class DtmfTone {
 
@@ -132,9 +129,9 @@ class DtmfTone {
     }
 }
 
+
 /**
 * Ring-back tone generator for UK and Europe regions.
-* @memberof Sounds
 */
 class RingbackTone {
 
@@ -228,7 +225,7 @@ class RingbackTone {
 
 
 /**
-* Play an pre-delivered ogg-file as ringtone.
+* Play a pre-delivered ogg-file as ringtone.
 */
 class RingTone extends EventEmitter {
 

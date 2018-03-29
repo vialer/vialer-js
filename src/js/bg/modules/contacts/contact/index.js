@@ -1,12 +1,30 @@
 /**
+* @module ModuleContacts
+*/
+
+/**
 * The Contact base class is used to do the bookkeeping
 * for setting Contact-related state.
 */
 class Contact {
-
-    constructor(app, data) {
+    /**
+    * @param {AppBackground} app - The background application.
+    * @param {Object} state - The initial properties of a Contact.
+    */
+    constructor(app, state) {
         this.app = app
         this._trackState = false
+
+        if (state.sipreginfo) this.registered = true
+
+        this.state = {
+            id: state.account_id,
+            name: state.callerid_name,
+            number: state.internal_number,
+            status: state.sipreginfo ? 'unavailable' : 'unregistered',
+            userAgent: state.sipreginfo ? state.sipreginfo.useragent : this.app.$t('Not available'),
+        }
+        this.setState(this.state)
     }
 
 

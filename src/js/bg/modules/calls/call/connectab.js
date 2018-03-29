@@ -1,3 +1,6 @@
+/**
+* @module ModuleCalls
+*/
 const Call = require('./index')
 
 /**
@@ -8,11 +11,11 @@ const Call = require('./index')
 */
 class CallConnectAB extends Call {
 
-    constructor(module, target, options) {
-        super(module, target, options)
+    constructor(app, target, options) {
+        super(app, target, options)
 
         // ConnectAB is a remote call which doesn't have controls in the plugin.
-        module.app.__mergeDeep(this.state, {
+        app.__mergeDeep(this.state, {
             hangup: {disabled: true},
             hold: {disabled: true}, // No hold functionality.
             keypad: {disabled: true, mode: 'call'}, // No DTMF keypay.

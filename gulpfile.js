@@ -1,3 +1,8 @@
+/**
+* Gulp buildsystem. Takes care of tasks like bundling JavaScript,
+* deploying to stores, transpiling SCSS, minifying, concatting,
+* copying assets around, and more.
+*/
 const {_extend, promisify} = require('util')
 const archiver = require('archiver')
 const fs = require('fs')
@@ -14,7 +19,7 @@ const fuet = require('gulp-fuet')
 const ghPages = require('gulp-gh-pages')
 const gulp = require('gulp-help')(require('gulp'), {})
 const gutil = require('gulp-util')
-const Helpers = require('./gulp/helpers')
+const Helpers = require('./tasks/helpers')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
 const insert = require('gulp-insert')
@@ -41,7 +46,7 @@ settings.BUILD_DIR = process.env.BUILD_DIR || path.join('./', 'build')
 settings.BUILD_PLATFORM = argv.platform ? argv.platform : 'linux' // all, or one or more of: darwin, linux, mas, win32
 settings.BRAND_TARGET = argv.brand ? argv.brand : 'vialer'
 settings.BUILD_TARGET = argv.target ? argv.target : 'chrome'
-settings.BUILD_TARGETS = ['chrome', 'electron', 'edge', 'firefox', 'node', 'webview']
+settings.BUILD_TARGETS = ['chrome', 'docs', 'electron', 'edge', 'firefox', 'node', 'webview']
 
 // Exit when the build target is not in the allowed list.
 if (!settings.BUILD_TARGETS.includes(settings.BUILD_TARGET)) {
@@ -99,17 +104,15 @@ for (let brand in settings.brands) {
 }
 // Initialize the helpers, which make this file less dense.
 const helpers = new Helpers(settings)
-
-
 const WATCHLINKED = argv.linked ? argv.linked : false
-const WITHDOCS = argv.docs ? argv.docs : false
+
 
 let taskOptions = {}
 if (settings.VERBOSE) {
     taskOptions = {
         all: {
             'brand=vialer': '',
-            'target=chrome': 'chrome|electron|firefox|node|webview',
+            'target=chrome': 'chrome|docs|electron|firefox|node|webview',
         },
         brandOnly: {
             'brand=vialer': '',
@@ -157,7 +160,9 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
 gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
     // Refresh the brand content with each build.
     let targetTasks
-    if (settings.BUILD_TARGET === 'electron') targetTasks = ['js-electron']
+    if (settings.BUILD_TARGET === 'docs') {
+        return runSequence(['docs'], done)
+    } else if (settings.BUILD_TARGET === 'electron') targetTasks = ['js-electron']
     else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg']
     else if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg', 'js-app-observer', 'manifest']
 
@@ -282,7 +287,7 @@ gulp.task('deploy-brands-targets', 'Deploy all brands to all supported target st
 
 
 gulp.task('docs', 'Generate docs.', (done) => {
-    let execCommand = `node ${settings.NODE_PATH}/jsdoc/jsdoc.js ./src/js -R ./README.md -c ./.jsdoc.json -d ${settings.BUILD_DIR}/docs --package ./package.json`
+    let execCommand = `node ${settings.NODE_PATH}/jsdoc/jsdoc.js ./ -R ./README.md -c ./.jsdoc.json -d ${settings.BUILD_DIR}/docs --package ./package.json`
     childExec(execCommand, undefined, (err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
         if (stdout) gutil.log(stdout)
@@ -293,7 +298,7 @@ gulp.task('docs', 'Generate docs.', (done) => {
 
 
 gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
-    return gulp.src(path.join(settings.BUILD_DIR, 'docs', '**','*')).pipe(ghPages())
+    return gulp.src(path.join(settings.BUILD_DIR, 'docs', '**', '*')).pipe(ghPages())
 })
 
 
@@ -491,9 +496,10 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
     helpers.startDevServer()
 
     // Watch files related to working on the documentation.
-    if (WITHDOCS) {
-        gutil.log('Watching documentation')
+    if (settings.BUILD_TARGET === 'docs') {
+        gutil.log('Watching docs')
         gulp.watch([
+            path.join(__dirname, 'src', '**', '*.js'),
             path.join(__dirname, '.jsdoc.json'),
             path.join(__dirname, 'README.md'),
             path.join(__dirname, 'docs', 'manuals', '**'),
@@ -507,17 +513,21 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         // Node development doesn't require transpilation.
         gulp.watch([path.join(__dirname, 'src', 'js', '**', '*.js')], ['test'])
     } else {
-
         gulp.watch([
             path.join(__dirname, 'src', 'components', '**', '*.js'),
             path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
             path.join(__dirname, 'src', 'js', 'fg', '**', '*.js'),
-        ], WITHDOCS ? ['js-app-fg', 'docs'] : ['js-app-fg'])
+        ], ['js-app-fg'])
 
         gulp.watch([
             path.join(__dirname, 'src', 'js', 'bg', '**', '*.js'),
             path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
-        ], WITHDOCS ? ['js-app-bg', 'docs'] : ['js-app-bg'])
+        ], ['js-app-bg'])
+
+        gulp.watch([
+            path.join(__dirname, 'src', 'js', 'observer', '**', '*.js'),
+            path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
+        ], ['js-app-observer'])
 
         if (settings.BUILD_TARGET === 'electron') {
             gulp.watch([path.join(__dirname, 'src', 'js', 'main.js')], ['js-electron'])

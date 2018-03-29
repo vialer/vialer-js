@@ -1,10 +1,16 @@
-const Module = require('../lib/module')
-
 /**
-* Application background module takes care of all
+* The Application background module takes care of all
 * generic state concerning the app, notifications and
 * vendor-specific handling.
 * @module ModuleApp
+*/
+const Module = require('../lib/module')
+
+
+/**
+* Main entrypoint for App.
+* @memberof AppBackground.modules
+* @extends Module
 */
 class ModuleApp extends Module {
     /**
@@ -24,6 +30,10 @@ class ModuleApp extends Module {
     }
 
 
+    /**
+    * Initializes the module's store.
+    * @returns {Object} The module's store properties.
+    */
     _initialState() {
         return {
             installed: true,
@@ -52,6 +62,10 @@ class ModuleApp extends Module {
     }
 
 
+    /**
+    * Restore stored dumped state from localStorage.
+    * @param {Object} moduleStore - Root property for this module.
+    */
     _restoreState(moduleStore) {
         moduleStore.notifications = []
     }

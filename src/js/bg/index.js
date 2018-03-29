@@ -1,10 +1,12 @@
 /**
+* The Background app namespace.
 * @namespace AppBackground
 */
 const Api = require('./lib/api')
 const App = require('../lib/app')
 const Crypto = require('./lib/crypto')
 const env = require('../lib/env')({role: 'bg'})
+const Store = require('./lib/store')
 const Telemetry = require('./lib/telemetry')
 const Timer = require('./lib/timer')
 
@@ -17,18 +19,21 @@ const Timer = require('./lib/timer')
 * the application as WebExtension). In that sense, this is a typical
 * client-server model. When running as a webview, the background is just
 * as volatile as the foreground, but the same concept can be used nevertheless.
+* @memberof app
 */
 class AppBackground extends App {
     /**
     * @param {Object} opts - Options to initialize AppBackground with.
     * @param {Object} opts.env - The environment sniffer.
+    * @namespace AppBackground.modules
     */
     constructor(opts) {
         super(opts)
+        /**  */
+        this.store = new Store(this)
 
         this.crypto = new Crypto(this)
         this.timer = new Timer(this)
-        this.utils = require('../lib/utils')
 
         // Send the background script's state to the requesting event.
         this.on('bg:get_state', ({callback}) => {
@@ -219,6 +224,28 @@ class AppBackground extends App {
 
 
     /**
+    * App state merge with additional state storage.
+    * @param {Object} options - Options to pass to App's `__mergeState` method.
+    */
+    async __mergeState(options) {
+        super.__mergeState(options)
+        if (options.persist) {
+            // Background is leading and is the only one that
+            // writes to storage using encryption.
+            if (options.encrypt) {
+                const encryptedState = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(this.state))
+                this.store.set('state.encrypted', encryptedState)
+            } else {
+                let stateClone = this.store.get('state.unencrypted')
+                if (!stateClone) stateClone = {}
+                this.__mergeDeep(stateClone, options.state)
+                this.store.set('state.unencrypted', stateClone)
+            }
+        }
+    }
+
+
+    /**
     * Unlock the encrypted store while the application is already running.
     * @param {String} username - The username to unlock the store with.
     * @param {String} password - The password to unlock the store with.
@@ -278,9 +305,7 @@ class AppBackground extends App {
     }
 }
 
-
-if (!global.app) global.app = {}
-let options = {modules: [
+let options = {env, modules: [
     {Module: require('./modules/app'), name: 'app'},
     {Module: require('./modules/availability'), name: 'availability'},
     {Module: require('./modules/calls'), name: 'calls'},
@@ -296,7 +321,7 @@ if (env.isExtension) {
     options.modules.push({Module: require('./modules/extension'), name: 'extension'})
 }
 
-global.app.bg = new AppBackground(options)
+global.bg = new AppBackground(options)
 
 
 module.exports = AppBackground

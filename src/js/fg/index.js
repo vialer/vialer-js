@@ -1,4 +1,5 @@
 /**
+* The Foreground app namespace.
 * @namespace AppForeground
 */
 const App = require('../lib/app')
@@ -8,6 +9,7 @@ const env = require('../lib/env')({role: 'fg'})
 /**
 * HTML User Interface that interacts with AppBackground to
 * render its state.
+* @extends App
 */
 class AppForeground extends App {
     /**
@@ -24,23 +26,32 @@ class AppForeground extends App {
         // Make state modifications from AppBackground.
         this.on('fg:set_state', this.__mergeState.bind(this))
 
-        Vue.component('Availability', require('../../components/availability')(this))
-        Vue.component('Call', require('../../components/call')(this))
-        Vue.component('CallKeypad', require('../../components/call_keypad')(this))
-        Vue.component('Calls', require('../../components/calls')(this))
-        Vue.component('CallSwitch', require('../../components/call_switch')(this))
-        Vue.component('Contacts', require('../../components/contacts')(this))
-        Vue.component('Field', require('../../components/field')(this))
-        Vue.component('Login', require('../../components/login')(this))
-        Vue.component('MainCallBar', require('../../components/main_callbar')(this))
-        Vue.component('MainMenuBar', require('../../components/main_menubar')(this))
-        Vue.component('MainStatusBar', require('../../components/main_statusbar')(this))
-        Vue.component('Notifications', require('../../components/notifications')(this))
-        Vue.component('Settings', require('../../components/settings')(this))
-        Vue.component('Telemetry', require('../../components/telemetry')(this))
-        Vue.component('Unlock', require('../../components/unlock')(this))
-        Vue.component('Queues', require('../../components/queues')(this))
-        Vue.component('About', require('../../components/about')(this))
+        /**
+        * @namespace AppForeground.components
+        */
+        this.components = {
+            About: require('../../components/about'),
+            Availability: require('../../components/availability'),
+            Call: require('../../components/call'),
+            CallKeypad: require('../../components/call_keypad'),
+            Calls: require('../../components/calls'),
+            CallSwitch: require('../../components/call_switch'),
+            Contacts: require('../../components/contacts'),
+            Field: require('../../components/field'),
+            Login: require('../../components/login'),
+            MainCallBar: require('../../components/main_callbar'),
+            MainMenuBar: require('../../components/main_menubar'),
+            MainStatusBar: require('../../components/main_statusbar'),
+            Notifications: require('../../components/notifications'),
+            Queues: require('../../components/queues'),
+            Settings: require('../../components/settings'),
+            Telemetry: require('../../components/telemetry'),
+            Unlock: require('../../components/unlock'),
+        }
+
+        for (const name of Object.keys(this.components)) {
+            Vue.component(name, this.components[name](this))
+        }
 
         this.__initStore()
     }
@@ -86,14 +97,13 @@ class AppForeground extends App {
 }
 
 
-if (!global.app) global.app = {}
-let options = {modules: []}
+let options = {env, modules: []}
 
 // Outside WebExtension mode, both scripts are running in the same
 // browser context. In that case, the AppBackground instance is
 // passed to the AppForeground direcly.
-if (!env.isExtension) options.apps = {bg: global.app.bg}
-global.app.fg = new AppForeground(options)
+if (!env.isExtension) options.apps = {bg: global.bg}
+global.fg = new AppForeground(options)
 
 
 module.exports = AppForeground

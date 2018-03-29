@@ -1,3 +1,6 @@
+/**
+* @module ModuleContacts
+*/
 const Presence = require('./index')
 const SUBSCRIBE_DELAY = 150
 

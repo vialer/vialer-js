@@ -24,15 +24,6 @@ html {
         }
     }
 
-    // The popup running in its own window.
-    &.webview {
-        .component-main {max-width: $max-popup-width;}
-
-        .panel {
-            height: calc(100vh - #{$spacer * 5});
-        }
-    }
-
     // Electron-specific styling.
     &.electron {
         // Hide the vertical scrollbar.

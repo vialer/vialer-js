@@ -10,7 +10,10 @@ module.exports = (app) => {
         }
     }
 
-    return {
+    /**
+    * @memberof fg.components
+    */
+    const Contact = {
         computed: Object.assign({
             filteredContacts: function() {
                 let searchQuery = this.search.input.toLowerCase()
@@ -40,4 +43,6 @@ module.exports = (app) => {
             user: 'user',
         },
     }
+
+    return Contact
 }
