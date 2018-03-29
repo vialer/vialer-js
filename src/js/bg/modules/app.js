@@ -18,15 +18,6 @@ class ModuleApp extends Module {
     */
     constructor(app) {
         super(app)
-
-        if (this.app.env.isBrowser) {
-            window.addEventListener('offline', (e) => {
-                this.app.setState({app: {online: false}})
-            })
-            window.addEventListener('online', (e) => {
-                this.app.setState({app: {online: true}})
-            })
-        }
     }
 
 
@@ -62,12 +53,38 @@ class ModuleApp extends Module {
     }
 
 
+    _ready() {
+        // Start responding to network changes.
+        if (this.app.env.isBrowser) {
+            this.app.setState({app: {online: navigator.onLine}})
+
+            window.addEventListener('offline', (e) => {
+                this.app.logger.info(`${this}switched to offline modus`)
+                this.app.setState({app: {online: false}})
+            })
+            window.addEventListener('online', (e) => {
+                this.app.logger.info(`${this}switched to online modus`)
+                this.app.setState({app: {online: true}})
+            })
+        }
+    }
+
+
     /**
     * Restore stored dumped state from localStorage.
     * @param {Object} moduleStore - Root property for this module.
     */
     _restoreState(moduleStore) {
         moduleStore.notifications = []
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return `${this.app}[app] `
     }
 }
 

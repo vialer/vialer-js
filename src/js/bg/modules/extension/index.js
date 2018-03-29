@@ -1,6 +1,8 @@
 /**
 * Extension-specific background module takes care of dealing
-* with WebExtension-specific functionality.
+* with WebExtension specifics like handling install/update
+* actions, interacting with `AppTab` and setup keyboard
+* shortcuts.
 * @module ModuleExtension
 */
 const Module = require('../../lib/module')

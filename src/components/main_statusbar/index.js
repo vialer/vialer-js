@@ -15,16 +15,23 @@ module.exports = (app) => {
                 let title = ''
                 if (block === 'indicator') {
                     title += `${this.$t('Status:')} `
-                    if (this.ua.state === 'disconnected') title += this.$t('disconnected')
-                    else if (this.ua.state === 'connected') {
+                    if (['disconnected', 'reconnect'].includes(this.ua.status)) {
+                        title += this.$t('no connection')
+                        // Give an indication why we are not connected.
+                        if (!this.app.online) {
+                            title += ` (${this.$t('offline')})`
+                        }
+                    } else if (this.ua.status === 'connected') {
                         title += `${this.$t('connected')} (${this.$t('ConnectAB')})`
-                    } else if (this.ua.state === 'registered') {
+                    } else if (this.ua.status === 'registered') {
                         title += this.$t('registered')
                         if (!this.settings.webrtc.permission) {
                             title += ` (${this.$t('no microphone access')})`
                         } else if (this.dnd) title += ` (${this.$t('Do not Disturb')})`
                         else title += ` (${this.$t('WebRTC')})`
-                    } else if (this.ua.state === 'registration_failed') title += this.$t('registration failed')
+                    } else if (this.ua.status === 'registration_failed') {
+                        title += this.$t('registration failed')
+                    }
                 }
                 return title
             },
@@ -32,6 +39,7 @@ module.exports = (app) => {
         render: templates.main_statusbar.r,
         staticRenderFns: templates.main_statusbar.s,
         store: {
+            app: 'app',
             dnd: 'availability.dnd',
             env: 'env',
             layer: 'ui.layer',

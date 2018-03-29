@@ -48,7 +48,7 @@
             </div>
             <div class="notification-box troubleshoot" v-else-if="settings.webrtc.enabled">
                 <header>
-                    <svgicon name="warning"/><span>{{$t('Troubleshooting')}}</span>
+                    <svgicon name="info"/><span>{{`${$t('VoIP account')} ${$t('checklist')}`}}</span>
                 </header>
                 <ul>
                     <!-- Reference to the popout mode from the popup modus only-->

@@ -4,16 +4,23 @@
 
         <p class="welcome-message">
             {{$t('Welcome to your')}} {{app.name}}.<br/>
-            {{$t('Please enter your {appName} credentials below to proceed.', {appName: app.name})}}
+            <span v-if="app.online">
+                {{$t('Please enter your {appName} credentials below to proceed.', {appName: app.name})}}
+            </span>
+            <span class="has-text-danger" v-else>
+                {{$t('You are currently offline. Please connect to the internet first.')}}
+            </span>
         </p>
     </header>
 
     <Field name="username" type="text"
+        :disabled="!app.online"
         :autofocus="true" :label="$t('Username')" :model.sync="user.username"
         :placeholder="$t('Enter your email address')"
         :validation="$v.user.username"/>
 
     <Field name="password" type="password"
+        :disabled="!app.online"
         :label="$t('Password')" :model.sync="user.password"
         :placeholder="$t('Enter your password')"
         :validation="$v.user.password"/>

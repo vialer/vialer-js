@@ -46,10 +46,10 @@ function helpers(app) {
         let _disabled = false
         if (app.state.settings.webrtc.enabled) {
             if (!app.state.settings.webrtc.permission) _disabled = true
-            else if (!(app.state.calls.ua.state === 'registered')) _disabled = true
+            else if (!(app.state.calls.ua.status === 'registered')) _disabled = true
         } else {
             // ConnectAB mode.
-            if (!app.state.calls.ua.state === 'connected') _disabled = true
+            if (!app.state.calls.ua.status === 'connected') _disabled = true
         }
         return _disabled
     }

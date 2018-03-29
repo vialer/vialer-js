@@ -118,7 +118,6 @@ class ModuleUser extends Module {
 
         this.app.setState({user: {authenticated: true, username}}, {encrypt: false, persist: true})
 
-
         let startLayer
         if (this.app.state.app.installed) {
             // On install, go to the settings page.

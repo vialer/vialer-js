@@ -2,6 +2,7 @@
     <div :class="classes('number-input')" v-if="display === 'dense'">
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="pressKey()" @keydown="pressKey($event.key)"
+            :disabled="callingDisabled"
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
             v-on:keyup.enter="createCall(number)"/>
 
@@ -11,6 +12,7 @@
     <div :class="classes('number-input')" v-else-if="display === 'touch'">
         <input type="text" ref="input" autofocus placeholder="..."
             @keyup="pressKey()" @keydown="pressKey($event.key)"
+            :disabled="callingDisabled"
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
             v-on:keyup.enter="createCall(number)"/>
 

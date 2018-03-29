@@ -67,12 +67,12 @@ class AppBackground extends App {
 
 
     async __init() {
-        // Initialize all modules.
+        this.api = new Api(this)
+
+        // Start by initializing all modules.
         for (let module of this._modules) {
             this.modules[module.name] = new module.Module(this)
         }
-        // Initialize a new or existing encrypted store.
-        this.api = new Api(this)
 
         await this.__initStore()
 
@@ -80,25 +80,6 @@ class AppBackground extends App {
 
         if (this.env.isExtension) {
             this.setState({ui: {visible: false}})
-            // Triggered when the popup opens.
-            browser.runtime.onConnect.addListener((port) => {
-                this.setState({ui: {visible: true}})
-                for (let moduleName of Object.keys(this.modules)) {
-                    if (this.modules[moduleName]._onPopupAction) {
-                        this.modules[moduleName]._onPopupAction('open')
-                    }
-                }
-
-                // Triggered when the popup closes.
-                port.onDisconnect.addListener((msg) => {
-                    this.setState({ui: {visible: false}})
-                    for (let moduleName of Object.keys(this.modules)) {
-                        if (this.modules[moduleName]._onPopupAction) {
-                            this.modules[moduleName]._onPopupAction('close')
-                        }
-                    }
-                })
-            })
         } else {
             // There is no concept of a popup without an extension.
             // However, we still trigger the event to start timers
@@ -151,7 +132,7 @@ class AppBackground extends App {
     async __initStore() {
         // Changing the menubar icon depends on a state watcher, which requires
         // Vue to be already initialized in order to pick up changes.
-        let menubarIcon = 'inactive'
+        let initialAppState = 'inactive'
 
         super.__initStore()
 
@@ -161,29 +142,40 @@ class AppBackground extends App {
         const unencryptedState = this.store.get('state.unencrypted')
         if (typeof unencryptedState === 'object') this.__mergeDeep(this.state, unencryptedState)
 
-        const encryptedState = this.store.get('state.encrypted')
-        if (encryptedState) {
-            if (this.state.settings.vault.active) {
-                // See if we can decipher the stored encrypted state when
-                // there is an active vault, a key and an encrypted store.
-                if (this.state.settings.vault.key) {
+        if (this.state.settings.vault.active) {
+            // See if we can decipher the stored encrypted state when
+            // there is an active vault, a key and an encrypted store.
+            if (this.state.settings.vault.key) {
+                const encryptedState = this.store.get('state.encrypted')
+                if (encryptedState) {
                     await this.crypto._importVaultKey(this.state.settings.vault.key)
                     const decryptedState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, this.store.get('state.encrypted')))
                     this.setState(this._restoreState(decryptedState))
                     // Authenticated again. Kickstart services.
                     this.__initServices()
                 } else {
-                    menubarIcon = 'lock-on'
-                    this.setState({ui: {layer: 'unlock'}, user: {authenticated: false}}, {encrypt: false, persist: true})
+                    this.logger.debug(`${this}relogin - a key is available, but no vault found in store`)
+                    // There is a vault key, but no vault to open. Relogin.
+                    this.setState({
+                        settings: {vault: {unlocked: false}},
+                        ui: {layer: 'login'}, user: {authenticated: false},
+                    }, {encrypt: false, persist: true})
                 }
             } else {
-                this.setState({ui: {layer: 'login'}, user: {authenticated: false}}, {encrypt: false, persist: true})
+                // Active vault, but no key. Ask the user for the key.
+                initialAppState = 'lock-on'
+                this.setState({ui: {layer: 'unlock'}, user: {authenticated: false}}, {encrypt: false, persist: true})
             }
+        } else {
+            this.setState({
+                settings: {vault: {unlocked: false}},
+                ui: {layer: 'login'}, user: {authenticated: false},
+            }, {encrypt: false, persist: true})
         }
 
-        let watchers = {}
         // Each module can define watchers on store attributes, which makes
         // it easier to centralize data-related logic.
+        let watchers = {}
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._watchers) {
                 Object.assign(watchers, this.modules[module]._watchers())
@@ -192,8 +184,9 @@ class AppBackground extends App {
 
         this.initViewModel(watchers)
         // (!) State is reactive from here on.
-        this.setState({ui: {menubar: {default: menubarIcon}}})
+        this.setState({ui: {menubar: {default: initialAppState}}})
 
+        // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()
         }
@@ -224,21 +217,22 @@ class AppBackground extends App {
 
 
     /**
-    * App state merge with additional state storage.
-    * @param {Object} options - Options to pass to App's `__mergeState` method.
+    * App state merge operation with additional optional
+    * state storage for `AppBackground`.
+    * @param {Object} options - See the parameter description of super.
     */
-    async __mergeState(options) {
-        super.__mergeState(options)
-        if (options.persist) {
+    async __mergeState({action = null, encrypt = true, path = null, persist = false, state}) {
+        super.__mergeState({action, encrypt, path, persist, state})
+        if (persist) {
             // Background is leading and is the only one that
             // writes to storage using encryption.
-            if (options.encrypt) {
+            if (encrypt) {
                 const encryptedState = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(this.state))
                 this.store.set('state.encrypted', encryptedState)
             } else {
                 let stateClone = this.store.get('state.unencrypted')
                 if (!stateClone) stateClone = {}
-                this.__mergeDeep(stateClone, options.state)
+                this.__mergeDeep(stateClone, state)
                 this.store.set('state.unencrypted', stateClone)
             }
         }
@@ -262,7 +256,6 @@ class AppBackground extends App {
             this.setState({settings: {vault: {active: true, unlocked: true}}, user: {authenticated: true}}, {encrypt: false, persist: true})
             this.__initServices()
         } catch (err) {
-            console.log(err)
             this.setState({user: {authenticated: false}}, {encrypt: false, persist: true})
             const message = this.$t('Failed to unlock. Please check your password.')
             this.emit('fg:notify', {icon: 'warning', message, type: 'danger'})

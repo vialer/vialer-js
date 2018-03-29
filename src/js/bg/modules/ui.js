@@ -30,6 +30,28 @@ class ModuleUI extends Module {
         // Used to restore the Click-to-dial icon label message when
         // a tab refreshes and a call is still ongoing.
         this.lastLabelMessage = null
+
+        // A connection between the popup script and the background
+        // is made. A new connection means the popup just opened, while
+        // a closing connecting means that the popup closed.
+        browser.runtime.onConnect.addListener((port) => {
+            this.app.setState({ui: {visible: true}})
+            for (let moduleName of Object.keys(this.app.modules)) {
+                if (this.app.modules[moduleName]._onPopupAction) {
+                    this.app.modules[moduleName]._onPopupAction('open')
+                }
+            }
+
+            // Triggered when the popup closes.
+            port.onDisconnect.addListener((msg) => {
+                this.app.setState({ui: {visible: false}})
+                for (let moduleName of Object.keys(this.app.modules)) {
+                    if (this.app.modules[moduleName]._onPopupAction) {
+                        this.app.modules[moduleName]._onPopupAction('close')
+                    }
+                }
+            })
+        })
     }
 
 

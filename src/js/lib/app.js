@@ -70,8 +70,9 @@ class App extends Skeleton {
 
 
     /**
-    * A recursive method to merges two or more objects together. Existing
-    * values from target are overwritten by sources.
+    * A recursive method that merges two or more objects with
+    * nested objects together. Existing values from target are
+    * overwritten by sources.
     * @param {Object} target - The store or a fragment of it.
     * @param {...*} sources - One or more objects to merge to target.
     * @returns {Function} - The result of this method.
@@ -99,13 +100,13 @@ class App extends Skeleton {
     * Vue-friendly object merging. The `path` is used to assist
     * Vue's reactivity system to catch up with changes.
     * @param {Object} options - Options to pass.
-    * @param {String} options.action - The merge action: insert|merge|delete|replace.
+    * @param {String} [options.action] - The merge action: insert|merge|delete|replace.
     * @param {Boolean} [options.encrypt=true] - Whether to persist to the encrypted part of the store.
     * @param {String} options.path - Path to the store parts to merge into.
     * @param {String} [options.persist=false] - Whether to persist this state change.
     * @param {Object} state - An object to merge into the store.
     */
-    __mergeState({action, encrypt = true, path, persist = false, state}) {
+    __mergeState({action = null, encrypt = true, path = null, persist = false, state}) {
         if (!path) this.__mergeDeep(this.state, state)
         else {
             path = path.split('/')

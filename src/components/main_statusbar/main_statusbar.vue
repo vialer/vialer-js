@@ -7,10 +7,10 @@
     <div class="status-left" v-else>
         <span class="status-indicator tooltip tooltip-right" :data-tooltip="titles('indicator')">
             <svgicon class="dnd" name="dnd" v-if="dnd"/>
-            <svgicon class="disconnected" name="disconnected" v-else-if="ua.state === 'disconnected'"/>
-            <svgicon class="registration-failed" name="disconnected" v-else-if="ua.state === 'registration_failed'"/>
-            <svgicon class="connected" name="user" v-else-if="ua.state === 'connected'"/>
-            <template v-else-if="ua.state === 'registered'">
+            <svgicon class="disconnected" name="disconnected" v-else-if="['disconnected', 'reconnect'].includes(ua.status)"/>
+            <svgicon class="registration-failed" name="disconnected" v-else-if="ua.status === 'registration_failed'"/>
+            <svgicon class="connected" name="user" v-else-if="ua.status === 'connected'"/>
+            <template v-else-if="ua.status === 'registered'">
                 <svgicon class="registered" name="softphone" v-if="this.settings.webrtc.permission"/>
                 <svgicon class="microphone-denied" name="mute" v-else></svgicon>
             </template>

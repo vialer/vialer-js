@@ -360,7 +360,7 @@ class ModuleCalls extends Module {
         return {
             calls: {},
             ua: {
-                state: null,
+                status: 'inactive',
             },
         }
     }
@@ -397,6 +397,77 @@ class ModuleCalls extends Module {
         else if (env.isEdge) userAgent += 'Edge'
         userAgent += `) ${this.app.state.app.vendor.name}`
         return userAgent
+    }
+
+
+    /**
+    * Delegate call-related actions.
+    * @returns {Object} - Properties that need to be watched.
+    */
+    _watchers() {
+        return {
+            /**
+            * Respond to network changes.
+            * @param {Boolean} isOnline - Whether we are online now.
+            * @param {Boolean} wasOnline - Whether we were online.
+            */
+            'store.app.online': (isOnline, wasOnline) => {
+                if (!isOnline) {
+                    this.app.setState({calls: {ua: {status: 'disconnected'}}})
+                } else {
+                    // We are online again.
+                    this.retry = Object.assign({}, this.retryDefault)
+                    this.app.setState({calls: {ua: {status: 'reconnect'}}})
+                }
+            },
+            /**
+            * Watch for changes in UA status. The following statuses
+            * (in logical order) are used: `inactive`, `disconnected`, `connected`,
+            * `registered`, `registration_failed`.
+            * @param {String} newUAStatus - What the UA status has become.
+            * @param {String} oldUAStatus - What the UA status was.
+            */
+            'store.calls.ua.status': (newUAStatus, oldUAStatus) => {
+                let platformStatusbar
+                if (this.app.env.isExtension) platformStatusbar = browser.browserAction.setIcon
+                else {
+                    // This is just an empty placeholder for other platforms
+                    // like Electron for now.
+                    platformStatusbar = function() {}
+                }
+
+                if (['inactive', 'reconnect'].includes(newUAStatus)) {
+                    platformStatusbar({path: 'img/menubar-inactive.png'})
+                    // A reconnect request can be made by setting the ua status
+                    // to reconnect.
+                    if (newUAStatus === 'reconnect') {
+                        // Reconnection logic is performed only here; other parts
+                        // of the app just assume that a reconnect is needed,
+                        // no matter what state the user is in.
+                        if (this.app.state.user.authenticated) {
+                            this.app.logger.debug(`${this}ua reconnecting in ${this.retry.timeout} ms`)
+                            setTimeout(() => this.connect(), this.retry.timeout)
+                            this.retry = this.app.timer.increaseTimeout(this.retry)
+                        } else {
+                            this.app.logger.debug(`${this}not reconnecting, because user is not authenticated`)
+                        }
+                    }
+                } else {
+                    if (this.app.state.settings.webrtc.enabled) {
+                        if (newUAStatus === 'registered') platformStatusbar({path: 'img/menubar-active.png'})
+                        else platformStatusbar({path: 'img/menubar-unavailable.png'})
+                    } else {
+                        // ConnectAB only connects to a SIP backend.
+                        if (newUAStatus === 'connected') platformStatusbar({path: 'img/menubar-active.png'})
+                        else {
+                            // The `registered` status is also considered to be incorrect
+                            // with ConnectAB.
+                            browser.browserAction.setIcon({path: 'img/menubar-unavailable.png'})
+                        }
+                    }
+                }
+            },
+        }
     }
 
 
@@ -520,7 +591,7 @@ class ModuleCalls extends Module {
             this.app.logger.warn(`${this}cannot connect without username and password`)
         }
 
-        this.app.setState({calls: {ua: {state: 'disconnected'}}})
+        this.app.setState({calls: {ua: {status: 'disconnected'}}})
         this.ua = new this.lib.UA(uaOptions)
 
 
@@ -578,20 +649,22 @@ class ModuleCalls extends Module {
 
 
         this.ua.on('registered', () => {
-            this.app.setState({calls: {ua: {state: 'registered'}}})
+            this.app.setState({calls: {ua: {status: 'registered'}}})
             this.app.logger.info(`${this}ua registered`)
         })
 
 
         this.ua.on('unregistered', () => {
-            this.app.setState({calls: {ua: {state: 'unregistered'}}})
-            this.app.logger.info(`${this}ua unregistered`)
+            this.app.setState({calls: {ua: {status: 'connected'}}})
+            this.app.logger.info(`${this}ua unregistered, switch back to connected status`)
         })
 
 
         this.ua.on('connected', () => {
-            this.app.setState({calls: {ua: {state: 'connected'}}})
+            this.app.setState({calls: {ua: {status: 'connected'}}})
             this.app.logger.info(`${this}ua connected`)
+            // Reset the retry interval timer..
+            this.retry = Object.assign({}, this.retryDefault)
         })
 
 
@@ -599,24 +672,21 @@ class ModuleCalls extends Module {
             // Don't use SIPJS simpler reconnect logic, which doesn't have
             // jitter and an increasing timeout.
             this.ua.stop()
-            this.app.setState({calls: {ua: {state: 'disconnected'}}})
-            this.app.logger.info(`${this}ua disconnected`)
-
             if (this.reconnect) {
-                // Increase the timeout in case the user doesn't have
-                // a connection and to circumvent hammering the websocket
-                // backend.
-                this.app.logger.debug(`${this}ua reconnecting in ${this.retry.timeout} ms`)
-                setTimeout(() => this.connect(), this.retry.timeout)
-                this.retry = this.app.timer.increaseTimeout(this.retry)
+                this.app.setState({calls: {ua: {status: 'reconnect'}}})
+                this.app.logger.debug(`${this}ua disconnected (reconnection attempt)`)
             } else {
-                this.retry = this.retryDefault
+                // Reset the retry interval timeout.
+                this.retry = Object.assign({}, this.retryDefault)
+                this.app.setState({calls: {ua: {status: 'inactive'}}})
+                this.app.logger.debug(`${this}ua disconnected (not reconnecting)`)
             }
+
         })
 
 
         this.ua.on('registrationFailed', (reason) => {
-            this.app.setState({calls: {ua: {state: 'registration_failed'}}})
+            this.app.setState({calls: {ua: {status: 'registration_failed'}}})
         })
     }
 
@@ -680,7 +750,6 @@ class ModuleCalls extends Module {
     toString() {
         return `${this.app}[calls] `
     }
-
 }
 
 module.exports = ModuleCalls
