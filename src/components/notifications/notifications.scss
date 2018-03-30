@@ -4,12 +4,12 @@
     left: 0;
     position: fixed;
     top: $spacer * 5;
-    width: 100%;
+    width: $max-popup-width;
     z-index: 100000;
 
     &.sidebar {
         left: $spacer * 5;
-        width: calc(100% - #{$spacer * 5});
+        width: calc(#{$max-popup-width} - #{$spacer * 5});
     }
 
     .notification {

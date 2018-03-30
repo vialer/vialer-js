@@ -18,6 +18,25 @@ class ModuleApp extends Module {
     */
     constructor(app) {
         super(app)
+
+        // Start responding to network changes.
+        window.addEventListener('offline', (e) => {
+            this.app.logger.info(`${this}switched to offline modus`)
+            this.app.setState({app: {online: false}})
+        })
+        window.addEventListener('online', (e) => {
+            this.app.logger.info(`${this}switched to online modus`)
+            this.app.setState({app: {online: true}})
+        })
+    }
+
+
+    _checkConnectivity() {
+        if (this.app.env.isBrowser) {
+            return navigator.onLine
+        } else {
+            return true
+        }
     }
 
 
@@ -30,7 +49,7 @@ class ModuleApp extends Module {
             installed: true,
             name: process.env.APP_NAME,
             notifications: [],
-            online: true,
+            online: this._checkConnectivity(),
             updated: false,
             vendor: {
                 name: process.env.VENDOR_NAME,
@@ -53,38 +72,13 @@ class ModuleApp extends Module {
     }
 
 
-    _ready() {
-        // Start responding to network changes.
-        if (this.app.env.isBrowser) {
-            this.app.setState({app: {online: navigator.onLine}})
-
-            window.addEventListener('offline', (e) => {
-                this.app.logger.info(`${this}switched to offline modus`)
-                this.app.setState({app: {online: false}})
-            })
-            window.addEventListener('online', (e) => {
-                this.app.logger.info(`${this}switched to online modus`)
-                this.app.setState({app: {online: true}})
-            })
-        }
-    }
-
-
     /**
     * Restore stored dumped state from localStorage.
     * @param {Object} moduleStore - Root property for this module.
     */
     _restoreState(moduleStore) {
         moduleStore.notifications = []
-    }
-
-
-    /**
-    * Generate a representational name for this module. Used for logging.
-    * @returns {String} - An identifier for this module.
-    */
-    toString() {
-        return `${this.app}[app] `
+        moduleStore.online = this._checkConnectivity()
     }
 }
 

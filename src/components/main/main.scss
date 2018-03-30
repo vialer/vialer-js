@@ -4,32 +4,30 @@
 html {
     // Default mode as a menubar popup.
     &.popup {
-        .component-main {width: $max-popup-width;}
-
         .panel {
-            // The minimal height should allow all sidebar icons to show.
-            max-height: calc(600px - #{$spacer * 5});
+            max-height: $max-popup-height;
+            // The minimal height should allow all sidebar icons
+            // to be invisible in a WebExtension popup.
             min-height: 260px;
         }
     }
 
     // The popup running in a tab.
     &.popout {
-        .component-main {max-width: $max-popup-width;}
-
         .panel {
-            height: calc(100vh - #{$spacer * 5});
+            max-height: calc(100vh - #{$spacer * 5});
             // The minimal height should allow all sidebar icons to show.
             min-height: 260px;
         }
     }
 
-    // Electron-specific styling.
+    // Electron-specific scrollable styling.
     &.electron {
         // Hide the vertical scrollbar.
         overflow-y: hidden;
 
         .panel {
+            // Limit the height that the desktop window can scroll to.
             max-height: 600px;
             overflow-y: auto;
         }
@@ -37,6 +35,7 @@ html {
 }
 
 .component-main {
+    max-width: $max-popup-width;
     position: relative;
 
     .overlay {

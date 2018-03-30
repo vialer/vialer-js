@@ -44,7 +44,9 @@ function helpers(app) {
     */
     _helpers.callingDisabled = function() {
         let _disabled = false
-        if (app.state.settings.webrtc.enabled) {
+
+        if (!app.state.app.online) _disabled = true
+        else if (app.state.settings.webrtc.enabled) {
             if (!app.state.settings.webrtc.permission) _disabled = true
             else if (!(app.state.calls.ua.status === 'registered')) _disabled = true
         } else {
@@ -110,8 +112,8 @@ function helpers(app) {
             call: {
                 accepted: {
                     hold: $t('On hold'),
-                    incoming: $t('Incoming call...'),
-                    outgoing: $t('Outgoing call...'),
+                    incoming: $t('Incoming call'),
+                    outgoing: $t('Outgoing call'),
                 },
                 bye: $t('Call ended'),
                 create: $t('Setting up call'),

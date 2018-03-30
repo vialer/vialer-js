@@ -97,6 +97,14 @@
                 position: absolute;
                 right: 10px;
 
+                &.disabled {
+                    opacity: 0.5;
+
+                    &:hover {
+                        cursor: not-allowed;
+                    }
+                }
+
                 svg {
                     height: 1.8rem;
                     width: 1.8rem;

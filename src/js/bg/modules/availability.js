@@ -80,12 +80,10 @@ class ModuleAvailability extends Module {
     */
     async _platformData() {
         const res = await this.app.api.client.get('api/userdestination/')
-
-        if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
-            this.app.logger.warn(`${this}unauthorized availability request`)
+        if (this.app.api.NOTOK_STATUS.includes(res.status)) {
+            this.app.logger.warn(`${this}platform data request failed (${res.status})`)
             return
         }
-
 
         // Lets format the data in a select-friendly way.
         const userdestination = res.data.objects[0]

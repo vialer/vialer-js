@@ -29,7 +29,7 @@ class AppBackground extends App {
     */
     constructor(opts) {
         super(opts)
-        /**  */
+
         this.store = new Store(this)
 
         this.crypto = new Crypto(this)
@@ -77,21 +77,6 @@ class AppBackground extends App {
         await this.__initStore()
 
         this.telemetry = new Telemetry(this)
-
-        if (this.env.isExtension) {
-            this.setState({ui: {visible: false}})
-        } else {
-            // There is no concept of a popup without an extension.
-            // However, we still trigger the event to start timers
-            // and such that rely on the event.
-            this.setState({ui: {visible: true}})
-            for (let moduleName of Object.keys(this.modules)) {
-                if (this.modules[moduleName]._onPopupAction) {
-                    this.modules[moduleName]._onPopupAction('open')
-                }
-            }
-        }
-
         // Clear all state if the schema changed after a plugin update.
         // This is done here because of translations, which are only available
         // after initializing Vue.
@@ -113,10 +98,13 @@ class AppBackground extends App {
     * Only execute this when the user is authenticated.
     */
     __initServices() {
-        this.logger.info(`${this}init authenticated services`)
+        this.logger.info(`${this}init connectivity services`)
         this.api.setupClient(this.state.user.username, this.state.user.password)
-        this._platformData()
-        this.modules.calls.connect()
+        if (this.state.app.online) {
+            this._platformData()
+            this.modules.calls.connect()
+        }
+
         this.setState({ui: {menubar: {default: 'active', event: null}}})
     }
 
@@ -132,8 +120,7 @@ class AppBackground extends App {
     async __initStore() {
         // Changing the menubar icon depends on a state watcher, which requires
         // Vue to be already initialized in order to pick up changes.
-        let initialAppState = 'inactive'
-
+        let menubarState = 'inactive'
         super.__initStore()
 
         Object.assign(this.state, this._initialState())
@@ -142,6 +129,7 @@ class AppBackground extends App {
         const unencryptedState = this.store.get('state.unencrypted')
         if (typeof unencryptedState === 'object') this.__mergeDeep(this.state, unencryptedState)
 
+
         if (this.state.settings.vault.active) {
             // See if we can decipher the stored encrypted state when
             // there is an active vault, a key and an encrypted store.
@@ -149,12 +137,11 @@ class AppBackground extends App {
                 const encryptedState = this.store.get('state.encrypted')
                 if (encryptedState) {
                     await this.crypto._importVaultKey(this.state.settings.vault.key)
-                    const decryptedState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, this.store.get('state.encrypted')))
-                    this.setState(this._restoreState(decryptedState))
-                    // Authenticated again. Kickstart services.
+                    await this._restoreState()
+                    // Kickstart services; application is ready again.
                     this.__initServices()
                 } else {
-                    this.logger.debug(`${this}relogin - a key is available, but no vault found in store`)
+                    this.logger.debug(`${this}relogin required - a key is available, but no vault found in store`)
                     // There is a vault key, but no vault to open. Relogin.
                     this.setState({
                         settings: {vault: {unlocked: false}},
@@ -163,8 +150,8 @@ class AppBackground extends App {
                 }
             } else {
                 // Active vault, but no key. Ask the user for the key.
-                initialAppState = 'lock-on'
-                this.setState({ui: {layer: 'unlock'}, user: {authenticated: false}}, {encrypt: false, persist: true})
+                menubarState = 'lock-on'
+                this.setState({ui: {layer: 'unlock'}, user: {authenticated: false}})
             }
         } else {
             this.setState({
@@ -184,7 +171,7 @@ class AppBackground extends App {
 
         this.initViewModel(watchers)
         // (!) State is reactive from here on.
-        this.setState({ui: {menubar: {default: initialAppState}}})
+        this.setState({ui: {menubar: {default: menubarState}}})
 
         // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
@@ -210,9 +197,10 @@ class AppBackground extends App {
             settings: {
                 webrtc: _state.settings.webrtc,
             },
-            ui: {layer: 'login'},
             user: {password: ''},
         }, {persist: true})
+
+        this.setState({ui: {layer: 'login'}}, {encrypt: false, persist: true})
     }
 
 
@@ -227,8 +215,18 @@ class AppBackground extends App {
             // Background is leading and is the only one that
             // writes to storage using encryption.
             if (encrypt) {
-                const encryptedState = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(this.state))
-                this.store.set('state.encrypted', encryptedState)
+                let cipherDataBefore = this.store.get('state.encrypted')
+                let stateClone
+
+                if (cipherDataBefore) {
+                    stateClone = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, cipherDataBefore))
+                } else {
+                    stateClone = {}
+                }
+
+                this.__mergeDeep(stateClone, state)
+                const cipherDataAfter = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(stateClone))
+                this.store.set('state.encrypted', cipherDataAfter)
             } else {
                 let stateClone = this.store.get('state.unencrypted')
                 if (!stateClone) stateClone = {}
@@ -247,11 +245,8 @@ class AppBackground extends App {
     async __unlockVault(username, password) {
         try {
             await this.crypto.loadIdentity(username, password)
-            const decryptedState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, this.store.get('state.encrypted')))
-            decryptedState.user.password = password
-            this.setState(decryptedState)
             // Clean the state after retrieving a state dump from the store.
-            this._restoreState(this.state)
+            await this._restoreState()
             // And we're authenticated again!
             this.setState({settings: {vault: {active: true, unlocked: true}}, user: {authenticated: true}}, {encrypt: false, persist: true})
             this.__initServices()
@@ -279,22 +274,46 @@ class AppBackground extends App {
 
 
     /**
-    * The stored state is like a dump of the last known
-    * application state. When booting the application, the
-    * restoreState method corrects initial values that may
-    * have to be reset before making store reactive.
-    * @param {Store} store - A raw object that will be the store.
-    * @returns {Object} - The cleaned up initial state.
+    * The stored state are two separated serialized JSON objects.
+    * One is for encrypted data, and the other for unencrypted data.
+    * When the application needs to get its state together, this method
+    * will restore the combined state from storage with some
+    * module-specific state that needs to be (re)set when the
+    * application state is being restored.
     */
-    _restoreState(store) {
-        store.notifications = []
+    async _restoreState() {
+        let cipherData = this.store.get('state.encrypted')
+        let decryptedState
+
+        if (cipherData) {
+            decryptedState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, cipherData))
+        } else decryptedState = {}
+
+        let unencryptedState = this.store.get('state.unencrypted')
+        if (!unencryptedState) unencryptedState = {}
+
+        let state = {}
+        this.__mergeDeep(state, decryptedState, unencryptedState)
+
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._restoreState) {
-                this.modules[module]._restoreState(store[module])
+                // Nothing persistent in this module yet. Assume an empty
+                // object to start with.
+                if (!state[module]) state[module] = {}
+                this.modules[module]._restoreState(state[module])
             }
         }
 
-        return store
+        this.setState(state)
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return '[bg] '
     }
 }
 

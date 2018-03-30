@@ -16,7 +16,7 @@
         <div class="panel" :class="classes('panel')">
             <template v-if="!user.authenticated">
                 <Login v-if="layer === 'login'" class="panel-content"/>
-                <Unlock v-else-if="layer === 'unlock'" class="panel-content"d/>
+                <Unlock v-else-if="layer === 'unlock'" class="panel-content"/>
             </template>
             <template v-else>
                 <MainMenuBar/>

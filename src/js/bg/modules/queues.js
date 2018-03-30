@@ -60,11 +60,18 @@ class ModuleQueues extends Module {
     * @param {Boolean} empty - Whether to empty the queues list and set the state to `loading`.
     */
     async _platformData(empty = true) {
-        // Only when authenticated.
-        if (!this.app.state.user.authenticated) return
+        // API retrieval possibility check is already performed at
+        // the application level, but is also required here because
+        // of the repeated timer function.
+        if (!this.app.state.user.authenticated || !this.app.state.app.online) return
         if (empty) this.app.setState({queues: {queues: [], state: 'loading'}})
 
         const res = await this.app.api.client.get('api/queuecallgroup/')
+        if (this.app.api.NOTOK_STATUS.includes(res.status)) {
+            this.app.logger.warn(`${this}platform data request failed (${res.status})`)
+            return
+        }
+
         let queues = res.data.objects
 
         for (const queue of queues) {

@@ -4,7 +4,7 @@ module.exports = (app) => {
     */
     const MainMenubar = {
         computed: app.helpers.sharedComputed(),
-        methods: {
+        methods: Object.assign({
             classes: function(block) {
                 let classes = {}
                 // We assume here that a block is always an option. Change
@@ -25,16 +25,7 @@ module.exports = (app) => {
                 return classes
             },
             logout: app.helpers.logout,
-            setLayer: function(layerName) {
-                this.layer = layerName
-                app.emit('bg:set_state', {
-                    persist: true,
-                    state: {
-                        ui: this.$store.ui,
-                    },
-                })
-            },
-        },
+        }, app.helpers.sharedMethods()),
         render: templates.main_menubar.r,
         staticRenderFns: templates.main_menubar.s,
         store: {

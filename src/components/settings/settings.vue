@@ -164,7 +164,7 @@
             :help="$t('Automatically unlock after a browser restart.')"/>
 
         <div class="notification-box info" v-if="settings.vault.store">
-            <header><svgicon name="lock-off"/><span>{{$t('Data security warning')}}</span></header>
+            <header><svgicon name="lock-off"/><span>{{$t('Data security')}}</span></header>
             <ul>
                 <li>{{$t('Your data and credentials are stored encrypted in the browser by a password-generated key.')}}
                     {{$t('This key is intentionally not stored anywhere, to make it unlikely that your credentials are looked at without knowing the password.')}}

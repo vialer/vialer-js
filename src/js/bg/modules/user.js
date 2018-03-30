@@ -74,10 +74,10 @@ class ModuleUser extends Module {
     * @param {String} password - Password to login with.
     */
     async login(username, password) {
-        this.app.setState({user: {password, username}})
         this.app.api.setupClient(username, password)
         const res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
+        // A login failure. Give the user feedback about what went wrong.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             let message
             const icon = 'warning', type = 'warning'
@@ -102,8 +102,7 @@ class ModuleUser extends Module {
 
         let user = res.data
         user.realName = [user.first_name, user.preposition, user.last_name].filter((i) => i !== '').join(' ')
-
-        // Only platform client users cannot use platform telephony features.
+        // Only platform client users are able to use vendor platform telephony features.
         if (!user.client) {
             this.logout()
             return
@@ -160,8 +159,12 @@ class ModuleUser extends Module {
         // and after unlocking the vault. Logout may be called from
         // the the lock screen. At this moment, the encrypted state
         // can't be persisted.
-        this.app.setState({ui: {layer: 'login'}, user: {password: ''}}, this.app.state.user.authenticated ? {persist: true} : {})
-        this.app.setState({settings: {vault: {active: false, unlocked: false}}, user: {authenticated: false}}, {encrypt: false, persist: true})
+        this.app.setState({user: {password: ''}}, this.app.state.user.authenticated ? {persist: true} : {})
+        this.app.setState({
+            settings: {vault: {active: false, unlocked: false}},
+            ui: {layer: 'login'},
+            user: {authenticated: false},
+        }, {encrypt: false, persist: true})
         // Remove credentials from basic auth.
         this.app.api.setupClient()
         // Disconnect without reconnect attempt.

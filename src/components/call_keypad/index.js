@@ -69,6 +69,7 @@ module.exports = (app) => {
                 if (this.mode === 'dtmf') app.emit('bg:calls:dtmf', {callId: this.call.id, key})
             },
             removeLastNumber: function() {
+                if (this.callingDisabled) return
                 if (this.number) this.$emit('update:model', this.number.substring(0, this.number.length - 1))
             },
         }, app.helpers.sharedMethods()),

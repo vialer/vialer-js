@@ -7,6 +7,7 @@ module.exports = (app) => {
         methods: Object.assign({
             logout: app.helpers.logout,
             refreshApiData: function() {
+                if (!this.app.online) return
                 this.$notify({icon: 'refresh', message: `${app.$t('Reloaded application data')}...`, type: 'success'})
                 app.emit('bg:refresh_api_data')
                 app.emit('bg:calls:disconnect', {reconnect: true})

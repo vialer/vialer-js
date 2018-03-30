@@ -43,19 +43,18 @@ class ModuleContacts extends Module {
 
 
     /**
-    * Retrieve all contacts frm the VoIPGRID platform API.
+    * Retrieve all contacts from the vendor platform API.
     * @param {Boolean} refresh - True when the plugin is forced to refresh.
     */
     async _platformData() {
         this.app.setState({}, {action: 'replace', path: 'contacts/contacts'})
-        this.app.setState({contacts: {contacts: {}, status: 'loading'}})
         const res = await this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
-            if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
-                this.app.setState({contacts: {widget: {status: 'unauthorized'}}})
-            }
+            this.app.logger.warn(`${this}platform data request failed (${res.status})`)
             return
         }
+
+        this.app.setState({contacts: {contacts: {}, status: 'loading'}})
 
         // Remove the user's own account from the list.
         const ownAccountId = parseInt(this.app.state.settings.webrtc.account.selected.username)
@@ -81,7 +80,10 @@ class ModuleContacts extends Module {
     * @param {Object} moduleStore - Root property for this module.
     */
     _restoreState(moduleStore) {
-        moduleStore.contacts = {}
+        Object.assign(moduleStore, {
+            contacts: {},
+            status: 'ready',
+        })
     }
 
 

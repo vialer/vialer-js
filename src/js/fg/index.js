@@ -7,8 +7,8 @@ const env = require('../lib/env')({role: 'fg'})
 
 
 /**
-* HTML User Interface that interacts with AppBackground to
-* render its state.
+* Reactive HTML User Interface that interacts with
+* AppBackground to render its state.
 * @extends App
 */
 class AppForeground extends App {
@@ -93,6 +93,15 @@ class AppForeground extends App {
                 }
             },
         })
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return '[fg] '
     }
 }
 

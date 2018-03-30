@@ -16,7 +16,9 @@
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
             v-on:keyup.enter="createCall(number)"/>
 
-        <i class="correct" v-if="mode === 'call'" @click="removeLastNumber"><svgicon name="correct"/></i>
+        <i class="correct" :class="{disabled: callingDisabled}" v-if="mode === 'call'" @click="removeLastNumber">
+            <svgicon name="correct"/>
+        </i>
     </div>
 
     <div class="contacts-match" v-if="mode === 'call'">

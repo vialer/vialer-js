@@ -58,8 +58,8 @@ class AppElectron {
         ipcMain.on('resize-window', (event, data) => {
             const currentSize = this.mainWindow.getContentSize()
             if (data.height !== currentSize[1]) {
-                if (data.height > 800) data.height = 800
-                this.mainWindow.setContentSize(500, data.height, false)
+                if (data.height > 600) data.height = 600
+                this.mainWindow.setSize(500, data.height, true)
             }
         })
 

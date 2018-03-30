@@ -87,6 +87,14 @@
             line-height: $spacer * 5;
             padding: 0 $spacer;
 
+            &.disabled {
+                opacity: 0.3;
+
+                &:hover {
+                    cursor: default;
+                }
+            }
+
             &.active,
             &:hover {
                 background: $white;

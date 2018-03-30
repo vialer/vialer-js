@@ -58,7 +58,7 @@ module.exports = (app) => {
                 app.emit('bg:calls:connect')
             },
             setTab: function(name) {
-                app.setState({ui: {tabs: {settings: {active: name}}}}, {persist: true})
+                app.setState({ui: {tabs: {settings: {active: name}}}}, {encrypt: false, persist: true})
             },
         }, app.helpers.sharedMethods()),
         mounted: async function() {

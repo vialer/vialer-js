@@ -65,10 +65,11 @@ class ModuleSettings extends Module {
                 },
                 codecs: {
                     options: [
-                        {id: 1, name: 'opus'},
+                        // FIXME: Temporarily disabled due to vendor backend problems
+                        // {id: 1, name: 'opus'},
                         {id: 2, name: 'G722'},
                     ],
-                    selected: {id: 1, name: 'opus'},
+                    selected: {id: 1, name: 'G722'},
                 },
                 enabled: false,
                 permission: false, // The microphone permission.

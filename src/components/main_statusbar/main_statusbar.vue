@@ -35,7 +35,7 @@
             <svgicon class="settings" name="settings"/>
         </div>
 
-        <div class="option" v-if="user.authenticated" @click="refreshApiData">
+        <div class="option" v-if="user.authenticated" :class="{disabled: !app.online}" @click="refreshApiData">
             <svgicon class="refresh" name="refresh"/>
         </div>
 
