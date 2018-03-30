@@ -34,10 +34,10 @@ class ModuleExtension extends Module {
         browser.runtime.onInstalled.addListener((details) => {
             // Note that console logging doesn't work within this event.
             if (details.reason === 'install') {
-                this.app.state.app.installed = true
                 this.app.setState({
                     app: {
                         installed: true,
+                        updated: false,
                         version: {
                             current: chrome.runtime.getManifest().version,
                         },
@@ -46,6 +46,7 @@ class ModuleExtension extends Module {
             } else if (details.reason === 'update') {
                 this.app.setState({
                     app: {
+                        installed: false,
                         updated: true,
                         version: {
                             current: chrome.runtime.getManifest().version,

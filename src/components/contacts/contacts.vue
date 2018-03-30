@@ -28,7 +28,7 @@
                 <svgicon class="spinner" name="spinner"/>
             </div>
             <div class="info">
-                <div class="name">{{$t('Loading')}}...</div>
+                <div class="name">{{$t('Loading contacts')}}...</div>
             </div>
         </li>
         <!-- No search results -->

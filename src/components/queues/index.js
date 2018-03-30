@@ -26,7 +26,7 @@ module.exports = (app) => {
         store: {
             queues: 'queues.queues',
             selected: 'queues.selected',
-            state: 'queues.state',
+            status: 'queues.status',
             user: 'user',
         },
     }

@@ -31,21 +31,24 @@ module.exports = (app) => {
             },
             classes: function(block) {
                 let classes = {}
-                if (block === 'component') {
+
+                if (block === 'attended-button') {
+                    classes.active = (this.call.transfer.type === 'attended')
+                } else if (block === 'component') {
                     if (this.callOngoing) {
                         classes['call-ongoing'] = true
                     }
                 } else if (block === 'dialpad-button') {
                     classes.active = this.call.keypad.active && this.call.keypad.mode === 'dtmf'
                     classes.disabled = this.call.keypad.disabled || this.call.transfer.active
-                } else if (block === 'attended-button') {
-                    classes.active = (this.call.transfer.type === 'attended')
                 } else if (block === 'blind-button') {
                     classes.active = (this.call.transfer.type === 'blind')
                     classes.disabled = (this.transferStatus !== 'select')
                 } else if (block === 'hold-button') {
                     classes.active = this.call.hold.active
                     classes.disabled = this.call.hold.disabled
+                } else if (block === 'mute-button') {
+                    classes.active = this.call.mute.active
                 } else if (block === 'transfer-button') {
                     classes.active = this.call.transfer.active
                     classes.disabled = this.call.transfer.disabled
@@ -62,7 +65,11 @@ module.exports = (app) => {
                 const keypadOn = (!this.call.keypad.active || this.call.keypad.mode !== 'dtmf')
                 app.setState(
                     {keypad: {active: keypadOn, display: 'touch', mode: 'dtmf'}},
-                    {path: `calls/calls/${this.call.id}`})
+                    {path: `calls/calls/${this.call.id}`}
+                )
+            },
+            muteToggle: function() {
+                app.emit('bg:calls:mute_toggle', {callId: this.call.id})
             },
             transferFinalize: function() {
                 app.emit('bg:calls:transfer_finalize', {callId: this.call.id})

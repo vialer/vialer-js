@@ -67,7 +67,7 @@ module.exports = (app) => {
 
             if (!soundMeter) soundMeter = await microphoneCheck()
             if (soundMeter) {
-                app.state.settings.webrtc.permission = true
+                app.state.settings.webrtc.media.permission = true
                 this.soundMeterInterval = setInterval(() => {
                     window.requestAnimationFrame(() => {
                         Vue.set(this.sound, 'inputLevel', soundMeter.slow)
@@ -76,7 +76,7 @@ module.exports = (app) => {
             } else {
                 // Still no soundMeter? Something terrible happened
                 // and we can't use WebRTC now.
-                app.state.settings.webrtc.permission = false
+                app.state.settings.webrtc.media.permission = false
             }
 
             // Query devices and fill the store with them. This is
@@ -175,12 +175,12 @@ module.exports = (app) => {
             'settings.webrtc.permission': async function(newVal, oldVal) {
                 if (!soundMeter) soundMeter = await microphoneCheck()
                 if (soundMeter) {
-                    this.settings.webrtc.permission = true
+                    this.settings.webrtc.media.permission = true
                     this.soundMeterInterval = setInterval(() => {
                         Vue.set(this.sound, 'inputLevel', soundMeter.instant)
                     }, 25)
                 } else {
-                    this.settings.webrtc.permission = false
+                    this.settings.webrtc.media.permission = false
                 }
             },
         },

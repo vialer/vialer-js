@@ -64,7 +64,7 @@ class ModuleQueues extends Module {
         // the application level, but is also required here because
         // of the repeated timer function.
         if (!this.app.state.user.authenticated || !this.app.state.app.online) return
-        if (empty) this.app.setState({queues: {queues: [], state: 'loading'}})
+        if (empty) this.app.setState({queues: {queues: [], status: 'loading'}})
 
         const res = await this.app.api.client.get('api/queuecallgroup/')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
@@ -86,7 +86,7 @@ class ModuleQueues extends Module {
             }
         }
 
-        this.app.setState({queues: {queues: queues, state: null}}, {persist: true})
+        this.app.setState({queues: {queues: queues, status: null}}, {persist: true})
         this.setQueueSizesTimer()
     }
 

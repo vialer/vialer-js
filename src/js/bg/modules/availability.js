@@ -114,8 +114,8 @@ class ModuleAvailability extends Module {
             settings: {webrtc: {account: {options: platformAccounts}}},
         }, {persist: true})
 
-        // Set an icon depending on whether the user is available.
-        if (selected.id) this.app.setState({ui: {menubar: {default: 'active'}}})
+        // Set an available icon when the user is available.
+        if (selected.id && !this.app.state.availability.dnd) this.app.setState({ui: {menubar: {default: 'active'}}})
         else this.app.setState({ui: {menubar: {default: 'unavailable'}}})
     }
 

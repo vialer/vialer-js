@@ -105,7 +105,7 @@ class AppBackground extends App {
             this.modules.calls.connect()
         }
 
-        this.setState({ui: {menubar: {default: 'active', event: null}}})
+        this.setState({ui: {menubar: {event: null}}})
     }
 
 
@@ -138,6 +138,7 @@ class AppBackground extends App {
                 if (encryptedState) {
                     await this.crypto._importVaultKey(this.state.settings.vault.key)
                     await this._restoreState()
+                    menubarState = this.state.ui.menubar.default
                     // Kickstart services; application is ready again.
                     this.__initServices()
                 } else {

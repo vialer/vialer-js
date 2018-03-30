@@ -105,6 +105,20 @@ class ModuleCalls extends Module {
         })
 
 
+        this.app.on('bg:calls:mute_toggle', ({callId}) => {
+            const call = this.calls[callId]
+
+            const localTrack = call.stream.getTracks()[0]
+            if (!call.state.mute.active) {
+                call.setState({mute: {active: true}})
+                localTrack.muted = true
+            } else {
+                call.setState({mute: {active: false}})
+                localTrack.muted = false
+            }
+        })
+
+
         /**
         * @param {String} callId - The call id of the call to transfer to.
         */
@@ -425,37 +439,31 @@ class ModuleCalls extends Module {
                 }
             },
             /**
-            * Watch for changes in UA status. The following statuses
-            * (in logical order) are used: `inactive`, `disconnected`, `connected`,
-            * `registered`, `registration_failed`.
+            * Watch for changes in UA status and update the menubar
+            * status accordingly. The menubar states are slightly
+            * different from the UA states, because there are conditions
+            * involved, besides the UA's.
             * @param {String} newUAStatus - What the UA status has become.
             * @param {String} oldUAStatus - What the UA status was.
             */
             'store.calls.ua.status': (newUAStatus, oldUAStatus) => {
-                let platformStatusbar
-                if (this.app.env.isExtension) platformStatusbar = browser.browserAction.setIcon
-                else {
-                    // This is just an empty placeholder for other platforms
-                    // like Electron for now.
-                    platformStatusbar = function() {}
+                let menubarState = newUAStatus
+
+                if (!this.app.state.user.authenticated) {
+                    menubarState = 'inactive'
+                } else if (newUAStatus === 'disconnected') menubarState = 'disconnected'
+                else if (this.app.state.settings.webrtc.enabled) {
+                    if (newUAStatus === 'registered') {
+                        if (this.app.state.availability.dnd) menubarState = 'unavailable'
+                        else menubarState = 'active'
+                    } else menubarState = 'disconnected'
+                } else {
+                    // ConnectAB only connects to a SIP backend.
+                    if (newUAStatus === 'connected') menubarState = 'active'
+                    else menubarState = 'disconnected'
                 }
 
-                if (newUAStatus === 'inactive') {
-                    platformStatusbar({path: 'img/menubar-inactive.png'})
-                } else {
-                    if (this.app.state.settings.webrtc.enabled) {
-                        if (newUAStatus === 'registered') platformStatusbar({path: 'img/menubar-active.png'})
-                        else platformStatusbar({path: 'img/menubar-unavailable.png'})
-                    } else {
-                        // ConnectAB only connects to a SIP backend.
-                        if (newUAStatus === 'connected') platformStatusbar({path: 'img/menubar-active.png'})
-                        else {
-                            // The `registered` status is also considered to be incorrect
-                            // with ConnectAB.
-                            platformStatusbar({path: 'img/menubar-unavailable.png'})
-                        }
-                    }
-                }
+                this.app.setState({ui: {menubar: {default: menubarState}}}, {encrypt: false, persist: true})
             },
         }
     }
@@ -594,7 +602,7 @@ class ModuleCalls extends Module {
             const callOngoing = this.app.helpers.callOngoing()
             const closingCalls = this.app.helpers.callsClosing()
             const dnd = this.app.state.availability.dnd
-            const microphoneAccess = this.app.state.settings.webrtc.permission
+            const microphoneAccess = this.app.state.settings.webrtc.media.permission
 
             let acceptCall = true
             if (dnd || !microphoneAccess) acceptCall = false

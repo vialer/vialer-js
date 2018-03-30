@@ -5,10 +5,12 @@ html {
     // Default mode as a menubar popup.
     &.popup {
         .panel {
-            max-height: $max-popup-height;
+            // The popup's scrollbar is set on the contentarea beneath
+            // the top statusbar, which is $spacer * 5 pixels.
+            max-height: calc(#{$max-popup-height} - #{$spacer * 5});
             // The minimal height should allow all sidebar icons
             // to be invisible in a WebExtension popup.
-            min-height: 260px;
+            min-height: $min-popup-height;
         }
     }
 
@@ -17,7 +19,7 @@ html {
         .panel {
             max-height: calc(100vh - #{$spacer * 5});
             // The minimal height should allow all sidebar icons to show.
-            min-height: 260px;
+            min-height: $min-popup-height;
         }
     }
 
@@ -28,15 +30,15 @@ html {
 
         .panel {
             // Limit the height that the desktop window can scroll to.
-            max-height: 600px;
+            max-height: $max-popup-height;
             overflow-y: auto;
         }
     }
 }
 
 .component-main {
-    max-width: $max-popup-width;
     position: relative;
+    width: $max-popup-width;
 
     .overlay {
         animation: grow .3s ease-in-out;

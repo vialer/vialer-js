@@ -22,12 +22,12 @@
             </div>
         </li>
 
-        <li class="list-item queue" v-if="state === 'loading'">
+        <li class="list-item queue" v-if="status === 'loading'">
             <div class="status-icon">
                 <svgicon class="spinner" name="spinner"/>
             </div>
             <div class="info">
-                <div class="name">{{$t('Loading')}}...</div>
+                <div class="name">{{$t('Loading queue callgroups')}}...</div>
             </div>
         </li>
         <li class="list-item queue" v-else-if="!queues.length">

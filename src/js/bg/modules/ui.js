@@ -107,7 +107,8 @@ class ModuleUI extends Module {
 
                 // Triggered when the popup closes.
                 port.onDisconnect.addListener((msg) => {
-                    this.app.setState({ui: {visible: false}})
+                    // Remove any overlay when the popup closes.
+                    this.app.setState({ui: {overlay: null, visible: false}})
                     for (let moduleName of Object.keys(this.app.modules)) {
                         if (this.app.modules[moduleName]._onPopupAction) {
                             this.app.modules[moduleName]._onPopupAction('close')

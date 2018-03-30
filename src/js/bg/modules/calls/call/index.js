@@ -66,6 +66,9 @@ class Call {
                 mode: 'dtmf', // 'call' or 'dtmf'
                 number: null,
             },
+            mute: {
+                active: false,
+            },
             number: null,
             status: null,
             timer: {
@@ -146,7 +149,8 @@ class Call {
             if (sinks.input.id) this.remoteVideo.setSinkId(sinks.input.id)
             if (sinks.output.id) await this.remoteVideo.setSinkId(sinks.output.id)
         } catch (err) {
-            this.app.emit('fg:notify', {icon: 'warning', message: this.app.$t('Failed to set input or output device.'), type: 'danger'})
+            const message = this.app.$t('Failed to set input or output device.')
+            this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
         }
 
         return navigator.mediaDevices.getUserMedia({audio: true})
@@ -199,7 +203,8 @@ class Call {
         this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})
 
         if (!this.silent) {
-            this.app.modules.ui.notification({force, message, number: this.state.number, title: this.translations.accepted[this.state.type]})
+            const title = this.translations.accepted[this.state.type]
+            this.app.modules.ui.notification({force, message, number: this.state.number, title})
         }
 
         this.app.setState({ui: {menubar: {event: 'calling'}}})
@@ -231,9 +236,11 @@ class Call {
 
         if (force || !this.silent) {
             if (this.state.status === 'rejected_b') {
-                this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title: this.translations.rejected_b})
+                const title = this.translations.rejected_b
+                this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title})
             } else {
-                this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title: this.translations.bye})
+                const title = this.translations.bye
+                this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title})
             }
         }
 
@@ -291,7 +298,7 @@ class Call {
         // Allows calls to come in without troubling the UI.
         if (this.silent) return
 
-        this.app.emit('fg:set_state', {action: 'merge', path: `calls/calls/${this.id}`, state: state})
+        this.app.emit('fg:set_state', {action: 'merge', path: `calls/calls/${this.id}`, state})
     }
 
 

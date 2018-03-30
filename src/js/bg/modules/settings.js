@@ -72,7 +72,9 @@ class ModuleSettings extends Module {
                     selected: {id: 1, name: 'G722'},
                 },
                 enabled: false,
-                permission: false, // The microphone permission.
+                media: {
+                    permission: false, // The microphone permission.
+                },
                 sinks: {
                     input: {id: '', name: ''},
                     output: {id: '', name: ''},

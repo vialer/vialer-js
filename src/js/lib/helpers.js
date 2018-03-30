@@ -47,7 +47,7 @@ function helpers(app) {
 
         if (!app.state.app.online) _disabled = true
         else if (app.state.settings.webrtc.enabled) {
-            if (!app.state.settings.webrtc.permission) _disabled = true
+            if (!app.state.settings.webrtc.media.permission) _disabled = true
             else if (!(app.state.calls.ua.status === 'registered')) _disabled = true
         } else {
             // ConnectAB mode.

@@ -15,15 +15,12 @@ class App extends Skeleton {
         * Environment sniffer.
         */
         this.env = options.env
-
         this.helpers = require('./helpers')(this)
-
-        this._modules = options.modules
-
         /**
         * Contains all registered App modules.
         */
         this.modules = {}
+        this._modules = options.modules
         /**
         * Sounds that are used in the application. They can both
         * be triggered from `AppForeground` and `AppBackground`.
@@ -202,7 +199,9 @@ class App extends Skeleton {
 
 
     /**
-    * Set the background state and propagate it to the other end.
+    * Set the state within the own running script context
+    * and then propagate the state to the other logical
+    * endpoint for syncing.
     * @param {Object} state - The state to update.
     * @param {Boolean} options - Whether to persist the changed state to localStorage.
     */

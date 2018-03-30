@@ -101,15 +101,15 @@
         <!-- Microphone permission switch -->
         <div class="field">
             <Field name="webrtc_permission" type="checkbox" :disabled="true" class="webrtc-switch"
-                :label="$t('Microphone access')" :model.sync="settings.webrtc.permission" />
+                :label="$t('Microphone access')" :model.sync="settings.webrtc.media.permission" />
 
             <!-- Additional help to guide the user to the browser permission settings. -->
-            <em class="help" v-if="settings.webrtc.permission">
+            <em class="help" v-if="settings.webrtc.media.permission">
                 {{$t('The softphone has access to your microphone.')}}
             </em>
 
             <!-- Give the user instructions how to enable the microphone in the popout -->
-            <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.permission && env.isPopout">
+            <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.media.permission && env.isPopout">
                 <header>
                     <svgicon name="warning"/><span>{{$t('The softphone doesn\'t have access to your microphone!')}}</span>
                 </header>
@@ -125,7 +125,7 @@
                 </ul>
             </div>
 
-            <a class="microphone-popout button is-danger" v-else-if="!settings.webrtc.permission && !env.isPopout" @click="openPopoutView">
+            <a class="microphone-popout button is-danger" v-else-if="!settings.webrtc.media.permission && !env.isPopout" @click="openPopoutView">
                 <span class="icon is-small">
                     <svgicon name="microphone"/>
                 </span>
@@ -134,9 +134,9 @@
         </div>
 
         <!-- Input volume meter check -->
-        <div class="field" v-if="settings.webrtc.permission">
+        <div class="field" v-if="settings.webrtc.media.permission">
             <label for="platform_url" class="label">{{$t('Microphone level')}}</label>
-            <em class="help" v-if="settings.webrtc.permission">
+            <em class="help" v-if="settings.webrtc.media.permission">
                 {{$t('Check the volume meter for your microphone responsiveness.')}}
             </em>
             <br/>

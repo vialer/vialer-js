@@ -127,10 +127,11 @@ class ModuleUser extends Module {
             this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: user.realName}), type: 'success'})
         }
 
-        this.app.setState({ui: {layer: startLayer, menubar: {default: 'active'}}}, {encrypt: false, persist: true})
         this.app.setState({
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},
+            ui: {layer: startLayer, menubar: {default: 'active'}}}, {encrypt: false, persist: true})
+        this.app.setState({
             user: {
                 client_id: user.client.replace(/[^\d.]/g, ''),
                 id: user.id,

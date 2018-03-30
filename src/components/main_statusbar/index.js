@@ -26,7 +26,7 @@ module.exports = (app) => {
                         title += `${this.$t('connected')} (${this.$t('ConnectAB')})`
                     } else if (this.ua.status === 'registered') {
                         title += this.$t('registered')
-                        if (!this.settings.webrtc.permission) {
+                        if (!this.settings.webrtc.media.permission) {
                             title += ` (${this.$t('no microphone access')})`
                         } else if (this.dnd) title += ` (${this.$t('Do not Disturb')})`
                         else title += ` (${this.$t('WebRTC')})`

@@ -71,6 +71,8 @@ class AppForeground extends App {
                 // serialize data between scripts, so this is done in
                 // webview mode as well for consistency's sake.
                 this.state = JSON.parse(state)
+                // (!) Don't inherit the env of the background script.
+                this.state.env = this.env
 
                 this.initViewModel()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
@@ -84,12 +86,12 @@ class AppForeground extends App {
                 if (!this.env.isFirefox) {
                     navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
                         this.localStream = stream
-                        this.state.settings.webrtc.permission = true
+                        this.state.settings.webrtc.media.permission = true
                     }).catch((err) => {
-                        this.state.settings.webrtc.permission = false
+                        this.state.settings.webrtc.media.permission = false
                     })
                 } else {
-                    this.state.settings.webrtc.permission = false
+                    this.state.settings.webrtc.media.permission = false
                 }
             },
         })

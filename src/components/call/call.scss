@@ -34,7 +34,7 @@
         width: 100%;
 
         .rounded-button-with-text {
-            padding: $spacer;
+            padding: $spacer / 2;
             text-align: center;
 
             .rounded-button {
@@ -61,6 +61,11 @@
                         background: none;
                     }
                 }
+            }
+
+            p {
+                font-size: 0.9rem;
+                font-weight: 500;
             }
         }
 

@@ -9,6 +9,14 @@
 
     <!-- Call options like transfer ops, on-hold and keypad -->
     <div class="call-options" v-if="['accepted'].includes(call.status)">
+        <div class="rounded-button-with-text">
+            <div class="rounded-button" @click="muteToggle" :class="classes('mute-button')">
+                <svgicon name="mute"/>
+            </div>
+            <p>{{$t('mute')}}</p>
+        </div>
+
+
         <div class="rounded-button-with-text" v-if="call.transfer.type !== 'accept'">
             <div class="rounded-button" @click="transferToggle" :class="classes('transfer-button')">
                 <svgicon name="transfer"/>

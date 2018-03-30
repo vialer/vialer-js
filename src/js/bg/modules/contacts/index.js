@@ -48,13 +48,14 @@ class ModuleContacts extends Module {
     */
     async _platformData() {
         this.app.setState({}, {action: 'replace', path: 'contacts/contacts'})
+        this.app.setState({contacts: {status: 'loading'}})
         const res = await this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             this.app.logger.warn(`${this}platform data request failed (${res.status})`)
             return
         }
 
-        this.app.setState({contacts: {contacts: {}, status: 'loading'}})
+
 
         // Remove the user's own account from the list.
         const ownAccountId = parseInt(this.app.state.settings.webrtc.account.selected.username)
