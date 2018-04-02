@@ -58,7 +58,6 @@ class CallSIP extends Call {
             }
 
             this.setState({status: 'bye'})
-            this.localVideo.srcObject = null
             this._stop({message: this.translations[this.state.status]})
         })
 
@@ -78,9 +77,6 @@ class CallSIP extends Call {
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
             this.app.telemetry.event('call[sip]', 'outgoing', 'accepted')
-            this.localVideo.srcObject = this.stream
-            this.localVideo.play()
-            this.localVideo.muted = true
 
             this.pc = this.session.sessionDescriptionHandler.peerConnection
             this.remoteStream = new MediaStream()
@@ -111,7 +107,6 @@ class CallSIP extends Call {
         this.session.on('refer', (target) => this.session.bye())
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (e) => {
-            this.localVideo.srcObject = null
             this.setState({status: 'bye'})
             this._stop({message: this.translations[this.state.status]})
         })

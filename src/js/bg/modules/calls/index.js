@@ -107,14 +107,14 @@ class ModuleCalls extends Module {
 
         this.app.on('bg:calls:mute_toggle', ({callId}) => {
             const call = this.calls[callId]
+            const rtpSenderTrack = call.pc.getSenders()[0].track
 
-            const localTrack = call.stream.getTracks()[0]
             if (!call.state.mute.active) {
                 call.setState({mute: {active: true}})
-                localTrack.muted = true
+                rtpSenderTrack.enabled = false
             } else {
                 call.setState({mute: {active: false}})
-                localTrack.muted = false
+                rtpSenderTrack.enabled = true
             }
         })
 

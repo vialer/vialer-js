@@ -130,16 +130,12 @@ class Call {
     async _initMedia() {
         // Append the AV-elements in the background DOM, so the audio
         // can continue to play when the popup closes.
-        if (document.querySelector('.local') && document.querySelector('.remote')) {
+        if (document.querySelector('.remote')) {
             // Reuse existing media elements.
-            this.localVideo = document.querySelector('.local')
             this.remoteVideo = document.querySelector('.remote')
         } else {
-            this.localVideo = document.createElement('video')
             this.remoteVideo = document.createElement('video')
-            this.localVideo.classList.add('local')
             this.remoteVideo.classList.add('remote')
-            document.body.prepend(this.localVideo)
             document.body.prepend(this.remoteVideo)
         }
 
