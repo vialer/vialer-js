@@ -1,12 +1,13 @@
 {
   "name": "vialer-js",
   "productName": "vialer-js",
-  "version": "3.0.91",
+  "version": "3.0.100",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
     "node": ">=8.0.0"
   },
   "scripts": {
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "test": "echo \"Error: no test specified\" && exit 1",
     "release": "standard-version"
   },

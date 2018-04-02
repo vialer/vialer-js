@@ -1,67 +1,116 @@
-# Changelog
+<a name="3.0.100"></a>
+## [3.0.100](https://github.com/voipgrid/vialer-js/compare/v2.2.0...v3.0.100) (2018-04-02)
 
-## Version 2.2.0
-* Fix for click2dial icons being disabled by default
-* Analytics tracking code per build target. Fixes Firefox analytics not showing any activity anymore.
-* Telemetry opt-in modal and option in settings page. Fixes amo-editor issue for Firefox.
-* Custom analytics data and beacon request instead of script injection. Fixes amo-editor issue for Firefox.
-* Fix call number contextmenu registered multiple times.
-* Cleanup analytics/telemetry code. Added telemetry opt-in event.
 
-## Version 2.1.0
-* Replaced SipML5 with SIP.js. This should fix reoccuring connectivity issues and will make it easier to implement SIP register.
-* Restructered JavaScript project files and build. This makes it easier for developers to understand and find the appropriate code.
-* Several fixes and improvements for multi-brand deployment. This makes it easier to deploy a new version for multiple brands at once.
-* Cleanup button-logic, added generic state-handler for it. Button in settings and for login now use the same state handling.
-* Added branding colors to buttons and popup widget header. Login and Save button in options now show in branded colors.
-* Chrome has a CSS animation for collapse/expand popup accordeon.
-* Remember email address between sessions.
-* Fix for autologin url token. Fixes an edge-case where the settings page was incorrectly opened.
+### Bug Fixes
 
-## Version 2.0.17
-* [108](https://github.com/VoIPGRID/vialer-js/issues/108) Changed event-based reconnection mechanism to
-  scheduler-based to address reconnection issue.
-* [110](https://github.com/VoIPGRID/vialer-js/issues/110) Added branded build and deployment. Added beta deployments.
+* add same logic for tel: links. ([8c85d4f](https://github.com/voipgrid/vialer-js/commit/8c85d4f))
+* adding logic to deal with disabled icons from the number of calls active. ([9c310fc](https://github.com/voipgrid/vialer-js/commit/9c310fc))
+* adding svg icons, buildstep and updated styling. ([4781760](https://github.com/voipgrid/vialer-js/commit/4781760))
+* always update token before performing autologin. ([50d09e0](https://github.com/voipgrid/vialer-js/commit/50d09e0))
+* better environment detection for css. ([aed8127](https://github.com/voipgrid/vialer-js/commit/aed8127))
+* build fixes for electron & firefox. Added Electron packaging. ([4a79417](https://github.com/voipgrid/vialer-js/commit/4a79417))
+* changing availability switch now propagates placeholder changes properly. ([4918fd0](https://github.com/voipgrid/vialer-js/commit/4918fd0))
+* cleanup connection state handling. ([e9f945d](https://github.com/voipgrid/vialer-js/commit/e9f945d))
+* Cleanup helpers, cleanup component store mounts, added app store property, added vendor-specific builds. Added app name. Initial work to style the login page. ([808aa57](https://github.com/voipgrid/vialer-js/commit/808aa57))
+* cleanup label styling. ([873acaf](https://github.com/voipgrid/vialer-js/commit/873acaf))
+* cleanup notification after timeout. ([da6e366](https://github.com/voipgrid/vialer-js/commit/da6e366))
+* cleanup observer, replace remaining $.each with iterator. ([24df3c0](https://github.com/voipgrid/vialer-js/commit/24df3c0))
+* cleanup redundant font stuff, streamline svg build with a temp dir. Split svg icons in generic and brand-specific. ([b366585](https://github.com/voipgrid/vialer-js/commit/b366585))
+* cleanup restoreState and handle changing internet connection. ([ce599d7](https://github.com/voipgrid/vialer-js/commit/ce599d7))
+* contacts unavailable styling, keyboard focus keypad, menubar icon height, forget pw link. ([4d25024](https://github.com/voipgrid/vialer-js/commit/4d25024))
+* electron build-dist variable assignment. ([1fadd0a](https://github.com/voipgrid/vialer-js/commit/1fadd0a))
+* github pages deploy task. ([03e1a2b](https://github.com/voipgrid/vialer-js/commit/03e1a2b))
+* import bulma-switch directive. ([18c769e](https://github.com/voipgrid/vialer-js/commit/18c769e))
+* initial work on microphone control. ([635cad7](https://github.com/voipgrid/vialer-js/commit/635cad7))
+* log skipped calls. ([a893b9a](https://github.com/voipgrid/vialer-js/commit/a893b9a))
+* make component element display:block. ([d959ae8](https://github.com/voipgrid/vialer-js/commit/d959ae8))
+* Obey click2dial setting. ([5d5b277](https://github.com/voipgrid/vialer-js/commit/5d5b277))
+* osx styling layout. ([fd35940](https://github.com/voipgrid/vialer-js/commit/fd35940))
+* pin vue version. ([bc69de6](https://github.com/voipgrid/vialer-js/commit/bc69de6))
+* remove async from build-dist. bump schema. ([1e7cdb4](https://github.com/voipgrid/vialer-js/commit/1e7cdb4))
+* remove redundant tab script. Add disabled styling. ([c1649e1](https://github.com/voipgrid/vialer-js/commit/c1649e1))
+* remove remaining jquery isArray check. ([4c904d9](https://github.com/voipgrid/vialer-js/commit/4c904d9))
+* remove remaining logging. ([f9051bc](https://github.com/voipgrid/vialer-js/commit/f9051bc))
+* sentence with portal variable now has `the` before it. ([3c3307a](https://github.com/voipgrid/vialer-js/commit/3c3307a))
+* simplify active call selection. ([12c281e](https://github.com/voipgrid/vialer-js/commit/12c281e))
+* telemetry text changes, keypad disable condition fixes, voipaccount select visibility condition fix. ([15db226](https://github.com/voipgrid/vialer-js/commit/15db226))
+* unify call translations and messages. ([08e6aa1](https://github.com/voipgrid/vialer-js/commit/08e6aa1))
+* update docs & deps. ([77358c8](https://github.com/voipgrid/vialer-js/commit/77358c8))
+* update documenation and cleanup code. ([820ebe6](https://github.com/voipgrid/vialer-js/commit/820ebe6))
+* update documentation for bus session. ([f841b13](https://github.com/voipgrid/vialer-js/commit/f841b13))
+* use component tag as custom outer element for components. ([a33bc56](https://github.com/voipgrid/vialer-js/commit/a33bc56))
+* use correct camera disabled icon. ([9bd0845](https://github.com/voipgrid/vialer-js/commit/9bd0845))
+* VIALJS-31 - apply CSS-grid styling. ([76b4992](https://github.com/voipgrid/vialer-js/commit/76b4992))
+* VIALJS-33 add jsdoc strings to methods, classes, cleanup doc output. ([bd8380d](https://github.com/voipgrid/vialer-js/commit/bd8380d))
+* VIALJS-52 call state stability fixes. Call state icon differentiation. Contacts sorting. ([bf44a69](https://github.com/voipgrid/vialer-js/commit/bf44a69))
+* vue template versioning for real. ([fbd32f2](https://github.com/voipgrid/vialer-js/commit/fbd32f2))
+* vue-svgicon from local packages. ([4488112](https://github.com/voipgrid/vialer-js/commit/4488112))
 
-## Version 2.0.16
-* Tweak websocket reconnection issue
 
-## Version 2.0.15
-* Fix invalid call to modules.
+### Features
 
-## Version 2.0.14
-* Fixed websocket reconnection issue.
+* add alpha build target. make buildname customizable. remove invalid stunserver config. ([9a81678](https://github.com/voipgrid/vialer-js/commit/9a81678))
+* Add vendor support email option. More styling login component. Added svg logo and modified build. ([24afcce](https://github.com/voipgrid/vialer-js/commit/24afcce))
+* add websocket retry delay, add presence throttle, moved app state to separate module, add online/offline state. ([a7b24f1](https://github.com/voipgrid/vialer-js/commit/a7b24f1))
+* Added Telemetry component and events. ([212f49d](https://github.com/voipgrid/vialer-js/commit/212f49d))
+* codec selection and functionality to make use of the new Opus feature in the VG backend. ([ae45988](https://github.com/voipgrid/vialer-js/commit/ae45988))
+* deal with empty VoIP-account select. Added empty field option. Added notification box for empty situation. ([c57697b](https://github.com/voipgrid/vialer-js/commit/c57697b))
+* Disable keypad when Calling conditions are not met. ([3ab92fb](https://github.com/voipgrid/vialer-js/commit/3ab92fb))
+* initial unittests and isomorphic setup. ([60ecb89](https://github.com/voipgrid/vialer-js/commit/60ecb89))
+* mute rtp sender (mute microphone). ([f019219](https://github.com/voipgrid/vialer-js/commit/f019219))
+* onboarding; select voipaccount from available accounts, set installed flag, reorder settings. ([e068fb8](https://github.com/voipgrid/vialer-js/commit/e068fb8))
+* removed jquery from vendor. replaced all selectors with querySelector. Fix calling through contextmenu. ([8d66983](https://github.com/voipgrid/vialer-js/commit/8d66983))
+* replace all font icons with svg component. modified styling to resemble mockup new style. ([09f3ef2](https://github.com/voipgrid/vialer-js/commit/09f3ef2))
+* replace open popup with hold shortcut(ctrl-shift-x). ([464ff60](https://github.com/voipgrid/vialer-js/commit/464ff60))
+* settings and login field validation. ([5b9e2fc](https://github.com/voipgrid/vialer-js/commit/5b9e2fc))
+* unified notification for click-to-dial label notifications. ([75b9021](https://github.com/voipgrid/vialer-js/commit/75b9021))
+* VIALJS-40 about page component including support. ([75547fa](https://github.com/voipgrid/vialer-js/commit/75547fa))
 
-## Version 2.0.13
-* [101](https://github.com/VoIPGRID/vialer-js/issues/101): Add db schema check to account for old localstorage data.
-  User will automatically be logged out if the db schema in the application doesn't match with the one in localstorage.
-  Also does a better property check on contacts list, notifications and queues list.
 
-## Version 2.0.12
-* The name and branding of the Click-to-dial/VoIPGRID  browser plugin has been changed to Vialer
-* Presence information is synced more reliably to the UI
-* Cleaned up styling, improved styling consistency, new icons and Roboto font
-* Styled settings page
-* Automatic logout after changing platform url when logged in
-* Cleaned up popout view, changed flexbox layout
-* Changing the platform url while being logged in, will show a warning and log the user out after save
-* Queues list will show an empty list initially
-* Queue updates are done with 1 API call instead of 1 request per queue
-* Cleaned up callstatus status poller and notifications. Notification and Callstatus now inform earlier on
-* Callstatus iframe now takes the whole page width/height. Not possible to click on items behind the overlay anymore
-* Repeated timer functions are now handled async
-* Widget open state is not affected anymore by refreshing the popout
-* Disable call options when a call is in progress
-* Phone icon used in context menu
-* Popout favicon forced to Vialer logo (Firefox doesn't have a logo there)
-* Fix opacity notification icon
-* A red notification icon is used when a call fails
 
-Changes invisible to users:
-* Refactored codebase
-* Rewrote to use chrome namespace; plugin can now be deployed as Firefox and Chrome plugin
-* Improved logging
-* Simplified Eventemitter API to deal with IPC messaging
-* Experimental Electron build
-* Gulp buildsystem, simplified development and deployment
-* The repository has been changed to https://github.com/VoIPGRID/vialer-js
+<a name="2.2.0"></a>
+# [2.2.0](https://github.com/voipgrid/vialer-js/compare/v2.1.0...v2.2.0) (2018-01-09)
+
+
+
+<a name="2.1.0"></a>
+# [2.1.0](https://github.com/voipgrid/vialer-js/compare/v2.0.16...v2.1.0) (2017-12-04)
+
+
+
+<a name="2.0.16"></a>
+## [2.0.16](https://github.com/voipgrid/vialer-js/compare/v2.0.15...v2.0.16) (2017-10-26)
+
+
+
+<a name="2.0.15"></a>
+## [2.0.15](https://github.com/voipgrid/vialer-js/compare/v2.0.14...v2.0.15) (2017-10-25)
+
+
+
+<a name="2.0.14"></a>
+## [2.0.14](https://github.com/voipgrid/vialer-js/compare/v2.0.13...v2.0.14) (2017-10-25)
+
+
+
+<a name="2.0.13"></a>
+## [2.0.13](https://github.com/voipgrid/vialer-js/compare/v2.0.12...v2.0.13) (2017-10-24)
+
+
+
+<a name="2.0.12"></a>
+## [2.0.12](https://github.com/voipgrid/vialer-js/compare/v2.0.7...v2.0.12) (2017-10-23)
+
+
+
+<a name="2.0.7"></a>
+## [2.0.7](https://github.com/voipgrid/vialer-js/compare/2.0.6...v2.0.7) (2017-10-12)
+
+
+
+<a name="2.0.6"></a>
+## 2.0.6 (2017-10-12)
+
+
+
