@@ -1,9 +1,30 @@
-<a name="3.0.100"></a>
-## [3.0.100](https://github.com/voipgrid/vialer-js/compare/v2.2.0...v3.0.100) (2018-04-02)
+<a name="3.0.104"></a>
+## [3.0.104](https://github.com/voipgrid/vialer-js/compare/v3.0.103...v3.0.104) (2018-04-03)
 
 
 ### Bug Fixes
 
+* do not depend on constructor names, since they will change after minification. ([725e2a4](https://github.com/voipgrid/vialer-js/commit/725e2a4))
+
+
+
+<a name="3.0.103"></a>
+## [3.0.103](https://github.com/voipgrid/vialer-js/compare/v3.0.102...v3.0.103) (2018-04-02)
+
+
+### Bug Fixes
+
+* bump db scheme. ([a064b55](https://github.com/voipgrid/vialer-js/commit/a064b55))
+
+
+
+<a name="3.0.102"></a>
+## [3.0.102](https://github.com/voipgrid/vialer-js/compare/v2.2.0...v3.0.102) (2018-04-02)
+
+
+### Bug Fixes
+
+* add package-lock.json ([268ac68](https://github.com/voipgrid/vialer-js/commit/268ac68))
 * add same logic for tel: links. ([8c85d4f](https://github.com/voipgrid/vialer-js/commit/8c85d4f))
 * adding logic to deal with disabled icons from the number of calls active. ([9c310fc](https://github.com/voipgrid/vialer-js/commit/9c310fc))
 * adding svg icons, buildstep and updated styling. ([4781760](https://github.com/voipgrid/vialer-js/commit/4781760))
