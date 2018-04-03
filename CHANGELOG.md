@@ -1,3 +1,13 @@
+<a name="3.0.105"></a>
+## [3.0.105](https://github.com/voipgrid/vialer-js/compare/v3.0.104...v3.0.105) (2018-04-03)
+
+
+### Bug Fixes
+
+* remove localVideo leftovers. ([2608e6a](https://github.com/voipgrid/vialer-js/commit/2608e6a))
+
+
+
 <a name="3.0.104"></a>
 ## [3.0.104](https://github.com/voipgrid/vialer-js/compare/v3.0.103...v3.0.104) (2018-04-03)
 
