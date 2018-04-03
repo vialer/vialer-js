@@ -260,10 +260,6 @@ class Call {
 
     accept() {
         if (!(this.state.type === 'incoming')) throw 'session must be incoming type'
-        this.localVideo.srcObject = this.stream
-        this.localVideo.play()
-        this.localVideo.muted = true
-
         this.remoteStream = new MediaStream()
     }
 
