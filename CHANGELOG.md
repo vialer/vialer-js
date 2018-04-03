@@ -1,3 +1,13 @@
+<a name="3.0.106"></a>
+## [3.0.106](https://github.com/voipgrid/vialer-js/compare/v3.0.105...v3.0.106) (2018-04-03)
+
+
+### Bug Fixes
+
+* use utils namespace from skeleton. ([c3ee763](https://github.com/voipgrid/vialer-js/commit/c3ee763))
+
+
+
 <a name="3.0.105"></a>
 ## [3.0.105](https://github.com/voipgrid/vialer-js/compare/v3.0.104...v3.0.105) (2018-04-03)
 
