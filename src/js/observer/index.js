@@ -12,7 +12,6 @@ global.$$ = document.querySelectorAll.bind(document)
 
 const Skeleton = require('../lib/skeleton')
 const Walker = require('./walker')
-const utils = require('../lib/utils')
 
 
 /**
@@ -148,7 +147,7 @@ class AppTab extends Skeleton {
     * @returns {Node} - Newly created p element.
     */
     createNumberIconElement(number) {
-        number = utils.sanitizeNumber(number)
+        number = this.utils.sanitizeNumber(number)
         let icon = document.createElement('ctdicon')
         icon.classList.add('ctd-icon', `ctd-icon-${number}`)
         icon.setAttribute('data-number', number)
@@ -233,7 +232,7 @@ class AppTab extends Skeleton {
                 const matches = parser.parse(nodeData)
                 if (matches.length) {
                     if (!parser.isBlockingNode(currentNode.previousElementSibling) &&
-                            !parser.isBlockingNode(currentNode.parentNode.previousElementSibling)) {
+                        !parser.isBlockingNode(currentNode.parentNode.previousElementSibling)) {
 
                         matches.reverse().forEach((match) => {
                             const numberIconElement = this.createNumberIconElement(match.number)
