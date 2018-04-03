@@ -1,3 +1,13 @@
+<a name="3.0.107"></a>
+## [3.0.107](https://github.com/voipgrid/vialer-js/compare/v3.0.106...v3.0.107) (2018-04-03)
+
+
+### Bug Fixes
+
+* less obtrusive styling of tab icons. ([6370e5c](https://github.com/voipgrid/vialer-js/commit/6370e5c))
+
+
+
 <a name="3.0.106"></a>
 ## [3.0.106](https://github.com/voipgrid/vialer-js/compare/v3.0.105...v3.0.106) (2018-04-03)
 
