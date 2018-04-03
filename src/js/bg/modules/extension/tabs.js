@@ -8,7 +8,7 @@ class Tabs {
         this.app = app
 
         // Change the contextmenu items on these events.
-        /** @event Hurl#snowball */
+        /** @event bg:user:login */
         this.app.on('bg:user:login', () => this.contextMenuItems())
         this.app.on('bg:user:logout', () => browser.contextMenus.removeAll())
 

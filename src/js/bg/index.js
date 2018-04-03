@@ -35,13 +35,14 @@ class AppBackground extends App {
         this.crypto = new Crypto(this)
         this.timer = new Timer(this)
 
+        this.__ready = false
         // Send the background script's state to the requesting event.
         this.on('bg:get_state', ({callback}) => {
             // Race to the __ready flag from AppForeground.
             // Add a one-time event if AppBackground is not yet ready, which
             // releases the callback.
             if (this.__ready) callback(JSON.stringify(this.state))
-            this.once('bg:get_state_ready', () => callback(JSON.stringify(this.state)))
+            else this.once('bg:get_state_ready', () => callback(JSON.stringify(this.state)))
         })
         this.on('bg:refresh_api_data', this._platformData.bind(this))
         this.on('bg:set_state', this.__mergeState.bind(this))
@@ -212,29 +213,29 @@ class AppBackground extends App {
     */
     async __mergeState({action = null, encrypt = true, path = null, persist = false, state}) {
         super.__mergeState({action, encrypt, path, persist, state})
-        if (persist) {
-            // Background is leading and is the only one that
-            // writes to storage using encryption.
-            if (encrypt) {
-                let cipherDataBefore = this.store.get('state.encrypted')
-                let stateClone
+        if (!persist) return
 
-                if (cipherDataBefore) {
-                    stateClone = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, cipherDataBefore))
-                } else {
-                    stateClone = {}
-                }
+        // Background is leading and is the only one that
+        // writes to storage using encryption.
+        if (encrypt) {
+            let cipherDataBefore = this.store.get('state.encrypted')
+            let stateClone
 
-                this.__mergeDeep(stateClone, state)
-                const cipherDataAfter = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(stateClone))
-                this.store.set('state.encrypted', cipherDataAfter)
+            if (cipherDataBefore) {
+                stateClone = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, cipherDataBefore))
             } else {
-                let stateClone = this.store.get('state.unencrypted')
-                if (!stateClone) stateClone = {}
-                this.__mergeDeep(stateClone, state)
-                this.store.set('state.unencrypted', stateClone)
+                stateClone = {}
             }
+            this.__mergeDeep(stateClone, state)
+            const cipherDataAfter = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(stateClone))
+            this.store.set('state.encrypted', cipherDataAfter)
+        } else {
+            let stateClone = this.store.get('state.unencrypted')
+            if (!stateClone) stateClone = {}
+            this.__mergeDeep(stateClone, state)
+            this.store.set('state.unencrypted', stateClone)
         }
+
     }
 
 

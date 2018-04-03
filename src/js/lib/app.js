@@ -30,8 +30,9 @@ class App extends Skeleton {
         // Use shorthand naming for the event target, because
         // the script context is part of the event name as a
         // convention.
-        if (this.constructor.name === 'AppBackground') this._emitTarget = 'fg'
-        else if (this.constructor.name === 'AppForeground') this._emitTarget = 'bg'
+        if (this.env.role.bg) this._emitTarget = 'fg'
+        else if (this.env.role.fg) this._emitTarget = 'bg'
+        else throw new Error(`invalid app role: ${this.env.role}`)
     }
 
 
@@ -207,7 +208,7 @@ class App extends Skeleton {
     */
     setState(state, {action, encrypt, path, persist} = {}) {
         if (!action) action = 'merge'
-        // Merge state in the context of the exeucting script.
+        // Merge state in the context of the executing script.
         this.__mergeState({action, encrypt, path, persist, state})
         // Sync the state to the other script context(bg/fg).
         // Make sure that we don't pass a state reference over the

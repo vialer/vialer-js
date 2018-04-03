@@ -32,18 +32,30 @@ class ModuleCalls extends Module {
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
 
+        /**
+         * Accept an incoming Call.
+         * @event module:ModuleCalls#bg:calls:call_accept
+         * @property {callId} callId - Id of the Call object to accept.
+         */
         this.app.on('bg:calls:call_accept', ({callId}) => this.calls[callId].accept())
+        /**
+         * Set this Call to be the visible Call.
+         * @event bg:calls:call_activate
+         * @property {callId} callId - Id of the Call object to activate.
+         * @property {Boolean} holdInactive - Whether to hold the other Calls.
+         * @property {Boolean} unholdActive - Whether to unhold the activated Call.
+         */
         this.app.on('bg:calls:call_activate', ({callId, holdInactive, unholdActive}) => {
             this.activateCall(this.calls[callId], holdInactive, unholdActive)
         })
 
         /**
-        * The main event to create a new call with from the foreground.
-        * @param {Object} callInfo - The Call data to start the call with.
-        * @param {String} callInfo.number - The number to call.
-        * @param {String} callInfo.start - Whether to start calling right away or just create a Call instance.
-        * @param {String} callInfo.type - Defines the Call implementation. Leave empty to use the one supported
-        *                                 by the application settings.
+        * Create - and optionally start - a new Call. This is the main
+        * event used to start a call with.
+        * @event module:ModuleCalls#bg:calls:call_create
+        * @property {String} callInfo.number - The number to call.
+        * @property {String} callInfo.start - Start calling right away or just create a Call instance.
+        * @property {String} callInfo.type - Class name of the Call implementation, e.g. a `CallSIP` instance.
         */
         this.app.on('bg:calls:call_create', ({callback, number, start, type}) => {
             // Always sanitize the number.
@@ -73,17 +85,28 @@ class ModuleCalls extends Module {
             }
         })
 
+
+        /**
+        * Delete a Call instance. Only use this to cancel a new
+        * unactivated Call. Use {@linkcode module:ModuleCalls#bg:calls:call_terminate|bg:calls:call_terminate}
+        * to end a call.
+        * @event module:ModuleCalls#bg:calls:call_delete
+        * @property {callId} callId - Id of the Call object to delete.
+        * @see module:ModuleCalls#bg:calls:call_terminate
+        */
         this.app.on('bg:calls:call_delete', ({callId}) => {
             if (this.calls[callId]) this.deleteCall(this.calls[callId])
             else this.app.logger.debug(`${this}trying to delete non-existent Call with id ${callId}`)
         })
-        this.app.on('bg:calls:call_start', (callState) => {
-            this.calls[callState.id].setState(callState)
-            this.calls[callState.id].start()
-            this.app.setState({ui: {layer: 'calls'}})
-        })
 
+
+        /**
+        * Terminate/Hangup an active Call.
+        * @event module:ModuleCalls#bg:calls:call_terminate
+        * @property {callId} callId - Id of the Call object to delete.
+        */
         this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
+
         this.app.on('bg:calls:connect', () => this.connect())
         this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
 
