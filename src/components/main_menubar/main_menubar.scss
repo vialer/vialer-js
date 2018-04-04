@@ -22,8 +22,7 @@
             transition: all 250ms ease-in-out;
 
             svg {
-                height: $spacer * 3;
-                width: $spacer * 3;
+                @include icon-size($spacer * 3);
             }
 
             &.availability {
@@ -38,6 +37,22 @@
                 &.unavailable {
                     path[pid="0"] {fill: $red-color;}
                     path[pid="1"] {fill: $white;}
+                }
+            }
+
+            // Unread red-dot on top of the recent icon.
+            &.unread {
+                position: relative;
+
+                &::after {
+                    @include icon-size(14px);
+                    background: $red-color;
+                    border-radius: 50%;
+                    content: "";
+                    position: absolute;
+                    right: 4px;
+                    top: 13px;
+                    z-index: 10;
                 }
             }
 

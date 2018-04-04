@@ -39,6 +39,7 @@ class CallSIP extends Call {
         })
 
         this.session.on('rejected', (e) => {
+            this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
             this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
 
             // `e.method` is CANCEL when the incoming caller hung up.
@@ -112,6 +113,7 @@ class CallSIP extends Call {
         })
 
         this.session.on('rejected', (e) => {
+            this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
             this.app.telemetry.event('call[sip]', 'outgoing', 'rejected')
             this.busyTone.play()
 
@@ -187,7 +189,9 @@ class CallSIP extends Call {
             // Decrease the stop event delay, because the user is already
             // aware of the intend to end the call.
             this.setState({status: 'rejected_a'})
-            this._stop({message: this.translations[this.state.status], timeout: 1500})
+            // The session's closing events will not be called, so manually
+            // trigger the Call to stop here.
+            this._stop()
         } else {
             // Calls with other statuses need some more work to end.
             try {
@@ -204,7 +208,6 @@ class CallSIP extends Call {
             } catch (err) {
                 this.app.logger.warn(`${this}unable to close the session properly.`)
             }
-            this._stop({message: this.translations[this.state.status]})
         }
     }
 

@@ -26,9 +26,9 @@ module.exports = (app) => {
                 } else if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
                     return 'hang-up'
                 } else {
-                    if (call.status === 'invite') return 'incoming-call'
-                    else if (call.status === 'create') return 'outgoing-call'
-                    else if (call.hold.active) return 'on-hold'
+                    if (call.hold.active) return 'on-hold'
+                    if (call.type === 'incoming') return 'incoming-call'
+                    else if (call.type === 'outgoing') return 'outgoing-call'
                     return 'phone'
                 }
             },
@@ -56,7 +56,9 @@ module.exports = (app) => {
                     if (call.status === 'new') {
                         classes['new-call'] = true
                     } else {
-                        if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
+                        if (['create', 'invite'].includes(call.status)) {
+                            classes['state-accept'] = true
+                        } else if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
                             classes['state-hangup'] = true
                         } else {
                             classes['state-active'] = true

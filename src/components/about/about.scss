@@ -1,3 +1,4 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 .component-about {
@@ -12,9 +13,8 @@
             text-align: center;
 
             .version-logo {
-                height: $spacer * 5;
+                @include icon-size($spacer * 5);
                 margin-bottom: $spacer;
-                width: $spacer * 5;
             }
 
             .version-name {
@@ -38,9 +38,8 @@
             width: 50%;
 
             .support-icon {
-                height: $spacer * 3;
+                @include icon-size($spacer * 3);
                 margin-bottom: $spacer * 2;
-                width: $spacer * 3;
             }
 
             .support-title {

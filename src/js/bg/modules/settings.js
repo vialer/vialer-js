@@ -65,15 +65,20 @@ class ModuleSettings extends Module {
                 },
                 codecs: {
                     options: [
-                        // FIXME: Temporarily disabled due to vendor backend problems
-                        // {id: 1, name: 'opus'},
-                        {id: 2, name: 'G722'},
+                        {id: 1, name: 'G722'},
                     ],
                     selected: {id: 1, name: 'G722'},
                 },
                 enabled: false,
                 media: {
-                    permission: false, // The microphone permission.
+                    permission: false,
+                    type: {
+                        options: [
+                            {id: 'AUDIO_NOPROCESSING', name: 'Audio without processing'},
+                            {id: 'AUDIO_PROCESSING', name: 'Audio with processing'},
+                        ],
+                        selected: {id: 'AUDIO_NOPROCESSING', name: 'Audio without processing'},
+                    },
                 },
                 sinks: {
                     input: {id: '', name: ''},

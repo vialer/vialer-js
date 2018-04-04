@@ -6,11 +6,10 @@
 .component-call-switch {
 
     .call {
+        @include icon-size($spacer * 5);
         align-items: center;
         display: flex;
-        height: $spacer * 5;
         justify-content: center;
-        width: $spacer * 5;
 
         svg {fill: $white;}
 
@@ -67,11 +66,14 @@
             }
         }
 
+        &.state-accept {
+            background: lighten($green-color, 20%);
+            color: $white;
+        }
+
         &.state-hangup {
             background: $red-color;
             color: $white;
         }
-
-
     }
 }

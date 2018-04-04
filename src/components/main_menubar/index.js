@@ -11,7 +11,9 @@ module.exports = (app) => {
                 // this logic if other kind of blocks are required.
                 classes.active = (this.layer === block)
 
-                if (block === 'availability') {
+                if (block === 'activity') {
+                    classes.unread = this.unread
+                } else if (block === 'availability') {
                     if (this.available) classes.available = true
                     else classes.unavailable = true
                 } else if (block === 'calls') {
@@ -31,6 +33,7 @@ module.exports = (app) => {
         store: {
             available: 'availability.available',
             layer: 'ui.layer',
+            unread: 'activity.unread',
         },
     }
 

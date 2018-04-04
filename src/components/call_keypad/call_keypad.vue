@@ -7,7 +7,7 @@
             v-on:keyup.enter="createCall(number)"/>
 
         <i class="icon icon-small" v-if="mode === 'call'" :class="{'disabled': !number}"
-            v-on:keyup.enter="keypadAction" @click="createCall(number)"><svgicon name="transfer"/></i>
+            v-on:keyup.enter="keypadAction" @click="createCall(number)"><icon name="transfer"/></i>
     </div>
     <div :class="classes('number-input')" v-else-if="display === 'touch'">
         <input type="text" ref="input" autofocus placeholder="..."
@@ -17,12 +17,12 @@
             v-on:keyup.enter="createCall(number)"/>
 
         <i class="correct" :class="{disabled: callingDisabled}" v-if="mode === 'call'" @click="removeLastNumber">
-            <svgicon name="correct"/>
+            <icon name="correct"/>
         </i>
     </div>
 
     <div class="contacts-match" v-if="mode === 'call'">
-        <span v-if="matchedContact">{{matchedContact.number}} - {{matchedContact.name}}</span>
+        <span v-if="matchedContact">{{matchedContact.endpoint.number}} - {{matchedContact.contact.name}}</span>
     </div>
 
     <div class="keys" v-if="display === 'touch'" v-on:keyup.enter="createCall(number)" :class="{disabled: callingDisabled}">
@@ -50,7 +50,7 @@
     <!-- Dial actions when not used in combination with a call. -->
     <div class="call-actions touch" v-if="mode === 'call' && display === 'touch'">
         <div class="rounded-button action dial" @click="createCall(number)" :class="{'disabled': !number || callingDisabled}">
-            <svgicon name="phone"/>
+            <icon name="phone"/>
         </div>
     </div>
 </component>

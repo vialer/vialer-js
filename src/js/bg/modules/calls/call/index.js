@@ -31,7 +31,7 @@ class Call {
         this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
         this.ringbackTone = new this.app.sounds.RingbackTone()
 
-        this.id = this.generateUUID()
+        this.id = shortid.generate()
         /**
         * @property {Object} state - Reactive computed properties from Vue-stash.
         * @property {Boolean} state.active - Whether the Call shows in the UI or not.
@@ -149,7 +149,7 @@ class Call {
             this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
         }
 
-        return navigator.mediaDevices.getUserMedia({audio: true})
+        return navigator.mediaDevices.getUserMedia(this.app._getUserMediaFlags())
     }
 
 
@@ -221,7 +221,7 @@ class Call {
     * @param {String} [options.message] - Force a notification message.
     * @param {Number} options.timeout - Postpones resetting the call state.
     */
-    _stop({force = false, message = '', timeout = 3000}) {
+    _stop({force = false, message = '', timeout = 3000} = {}) {
         if (!message) {
             message = this.state.number
             if (this.state.displayName) message += `:${this.state.displayName}`
@@ -239,6 +239,13 @@ class Call {
                 this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title})
             }
         }
+
+        // An ongoing call is closed. Signal listeners like activity
+        // about it.
+        if (this.state.status === 'bye') {
+            this.app.emit('bg:calls:call_ended', {call: this.state}, true)
+        }
+
 
         // Stop the Call interval timer.
         clearInterval(this.timerId)
@@ -265,21 +272,6 @@ class Call {
 
 
     /**
-    * Compact way to generate a UUID for a Call.
-    * @returns {String} - A RFC4122 version 4 compliant UUID.
-    */
-    generateUUID() {
-        var d = new Date().getTime()
-        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = (d + Math.random() * 16) % 16 | 0
-            d = Math.floor(d / 16)
-            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16)
-        })
-        return uuid
-    }
-
-
-    /**
     * Convenient version of setState that keeps the state local
     * to  a Call instance.
     * @param {Object} state - The state to update.
@@ -290,7 +282,7 @@ class Call {
         // Allows calls to come in without troubling the UI.
         if (this.silent) return
 
-        this.app.emit('fg:set_state', {action: 'merge', path: `calls/calls/${this.id}`, state})
+        this.app.emit('fg:set_state', {action: 'upsert', path: `calls.calls.${this.id}`, state})
     }
 
 

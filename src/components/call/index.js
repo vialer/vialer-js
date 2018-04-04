@@ -65,7 +65,7 @@ module.exports = (app) => {
                 const keypadOn = (!this.call.keypad.active || this.call.keypad.mode !== 'dtmf')
                 app.setState(
                     {keypad: {active: keypadOn, display: 'touch', mode: 'dtmf'}},
-                    {path: `calls/calls/${this.call.id}`}
+                    {path: `calls.calls.${this.call.id}`}
                 )
             },
             muteToggle: function() {
@@ -76,7 +76,7 @@ module.exports = (app) => {
             },
             transferMode: function(type) {
                 if (this.transferStatus !== 'select') return
-                app.setState({transfer: {type}}, {path: `calls/calls/${this.call.id}`})
+                app.setState({transfer: {type}}, {path: `calls.calls.${this.call.id}`})
             },
             transferToggle: function() {
                 if (this.call.transfer.disabled) return

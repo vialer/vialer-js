@@ -15,7 +15,7 @@
     </div>
 
     <div class="notification-box info">
-        <header><svgicon name="info"/><span>{{$t('Changing the availability of your {user}', {user: `${vendor.name} ${$t('user')}`})}}</span></header>
+        <header><icon name="info"/><span>{{$t('Changing the availability of your {user}', {user: `${vendor.name} ${$t('user')}`})}}</span></header>
         <ul v-if="destinations.length">
             <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
             <li>{{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to manage your {target}', {target: $t('availability')})}}.
@@ -27,7 +27,7 @@
                 {{$t('You user doesn\'t have any destinations yet. User destinations are required, before you can change your availability.')}}
                 {{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.
             </li>
-            <li>{{$t('Use the')}} <svgicon name='refresh'></svgicon> {{$t('refresh option to reflect changes from the')}} {{vendor.portal.name}}.</li>
+            <li>{{$t('Use the')}} <icon name='refresh'></icon> {{$t('refresh option to reflect changes from the')}} {{vendor.portal.name}}.</li>
         </ul>
     </div>
 

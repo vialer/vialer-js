@@ -15,16 +15,16 @@
             </div>
 
             <div class="queues-options list-item-options">
-                <svgicon name="check" class="icon-selected-queue" v-if="selected.id == queue.id"/>
+                <icon name="check" class="icon-selected-queue" v-if="selected.id == queue.id"/>
                 <div class="rounded-button" v-on:click.once="createCall(queue.internal_number)" v-if="transferStatus === 'select' && !numbersOngoing.includes(queue.internal_number)">
-                    <svgicon name="transfer"/>
+                    <icon name="transfer"/>
                 </div>
             </div>
         </li>
 
         <li class="list-item queue" v-if="status === 'loading'">
             <div class="status-icon">
-                <svgicon class="spinner" name="spinner"/>
+                <icon class="spinner" name="spinner"/>
             </div>
             <div class="info">
                 <div class="name">{{$t('Loading queue callgroups')}}...</div>
@@ -43,7 +43,7 @@
     <!-- Fill up some space by suggesting to add another queue -->
     <div class="notification-box info" v-if="queues.length <= 1">
         <header>
-            <svgicon name="info"/>
+            <icon name="info"/>
             <span>{{$t('Adding more queue callgroups')}}</span>
         </header>
         <div class="description">

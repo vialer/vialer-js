@@ -3,6 +3,11 @@
 * @memberof App
 */
 class Utils {
+    copyObject(obj) {
+        return JSON.parse(JSON.stringify(obj))
+    }
+
+
     /**
     * Clear a phonenumber from special characters like `+`, `*` and `*`.
     * @param {String} number - Number to clean.
@@ -13,6 +18,24 @@ class Utils {
         number = number.replace(/[^\d|!*|!#]/g, '')
         return number
     }
+
+
+    /**
+    * Generic sort function on multiple keys.
+    * @param {Array} keys - Order of keys to search in.
+    * @param {Number} order - The order to sort.
+    * @returns {Function} - The sorting function.
+    */
+    sortByMultipleKey(keys, order = 1) {
+        return (a, b) => {
+            if (keys.length === 0) return 0
+            var key = keys[0]
+            if (a[key] < b[key]) return -order
+            else if (a[key] > b[key]) return order
+            else return this.sortByMultipleKey(keys.slice(1))(a, b)
+        }
+    }
+
 
     /**
     * Convert a simple key/value object to a querystring.

@@ -111,19 +111,43 @@ function helpers(app) {
         return {
             call: {
                 accepted: {
-                    hold: $t('On hold'),
-                    incoming: $t('Incoming call'),
-                    outgoing: $t('Outgoing call'),
+                    hold: $t('on hold'),
+                    incoming: $t('calling'),
+                    outgoing: $t('calling'),
                 },
-                bye: $t('Call ended'),
-                create: $t('Setting up call'),
-                dialing_a: $t('Dialing phone A'),
-                dialing_b: $t('Dialing phone B'),
-                invite: $t('You are being called'),
-                rejected_a: $t('You disconnected'),
-                rejected_b: $t('Callee is busy'),
+                bye: $t('call ended'),
+                create: $t('setting up call'),
+                dialing_a: $t('dialing phone A'),
+                dialing_b: $t('dialing phone B'),
+                invite: $t('incoming call'),
+                rejected_a: $t('you disconnected'),
+                rejected_b: $t('callee is busy'),
             },
         }
+    }
+
+    /**
+        * Find the contact related to a calling number.
+        * @param {String} number - The number to look for.
+        * @param {Boolean} partial - Return the first matching number.
+        * @returns {Object|null} - Contact and Endpoint Id or null.
+        */
+    _helpers.matchContact = function(number, partial = false) {
+        const contacts = app.state.contacts.contacts
+        for (const contactId of Object.keys(contacts)) {
+            for (const endpointId of Object.keys(contacts[contactId].endpoints)) {
+                const endpoint = contacts[contactId].endpoints[endpointId]
+                if (partial) {
+                    if (String(endpoint.number).includes(number)) {
+                        return {contact: contacts[contactId].id, endpoint: endpoint.id}
+                    }
+                } else {
+                    if (String(endpoint.number) === number) return {contact: contacts[contactId].id, endpoint: endpoint.id}
+                }
+            }
+        }
+
+        return null
     }
 
 
@@ -168,6 +192,10 @@ function helpers(app) {
             },
             setOverlay: function(layerName) {
                 app.setState({ui: {overlay: layerName}}, {encrypt: false, persist: true})
+            },
+            setTab: function(category, name, condition = true) {
+                if (!condition) return
+                app.setState({ui: {tabs: {[category]: {active: name}}}}, {encrypt: false, persist: true})
             },
         }
     }
@@ -214,10 +242,10 @@ function helpers(app) {
             },
             sessionTime: function() {
                 let formattedTime
-                if (this.minutes.toString().length <= 1) formattedTime = '0'
-                formattedTime += `${this.minutes.toString()}:`
-                if (this.seconds.toString().length <= 1) formattedTime += '0'
-                formattedTime += `${this.seconds.toString()}`
+                if (this.minutes <= 9) formattedTime = `0${this.minutes}`
+                else formattedTime = `${this.minutes}`
+                if (this.seconds <= 9) formattedTime = `${formattedTime}:0${this.seconds}`
+                else formattedTime = `${formattedTime}:${this.seconds}`
                 return formattedTime
             },
             transferStatus: function() {

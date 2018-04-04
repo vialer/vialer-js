@@ -1,51 +1,237 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
-@keyframes ringing {
-    0% {fill: $red-color;}
-    50% {fill: $green-color;}
-    100% {fill: $red-color;}
-}
-
 .component-contacts {
-    // A single contact item in the contacts list.
-    .list-item {
-        &.contact {
-            .icon-availability {
-                height: $spacer * 2.5;
-                width: $spacer * 2.5;
 
-                &.unregistered {
-                    path[pid="0"] {fill: $grey-color-darkest;}
-                    path[pid="1"] {fill: $grey-color-light;}
+    header {
+        display: flex;
+
+        .filters {
+            font-size: 0.8rem;
+
+            .filter {
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+
+            .favorites-filter {
+                align-items: center;
+                color: $grey-color-dark;
+                display: flex;
+                font-weight: 500;
+                justify-content: center;
+                vertical-align: middle;
+
+                svg {
+                    margin-right: $spacer / 2;
                 }
 
-                &.unavailable,
-                &.no-results {
-                    path[pid="0"] {fill: $grey-color;}
-                    path[pid="1"] {fill: $white;}
-                }
+                &.active {
+                    color: #000;
 
-                &.busy {
-                    path[pid="0"] {fill: $red-color;}
-                    path[pid="1"] {fill: $white;}
-                }
-
-                &.available {
-                    path[pid="0"] {fill: $green-color;}
-                    path[pid="1"] {fill: $white;}
-                }
-
-                &.ringing {
-                    path[pid="0"] {
-                        animation: ringing 1.5s ease-in-out infinite;
-                        transition-timing-function: ease;
-                    }
-
-                    path[pid="1"] {
-                        fill: $white;
+                    svg {
+                        color: $yellow-color;
                     }
                 }
             }
         }
+    }
+
+    .contacts-options {
+        display: flex;
+
+        input {
+            margin-right: $spacer * 2;
+        }
+
+        .display-mode {
+            display: flex;
+            flex-direction: column;
+            height: 36px;
+            justify-content: center;
+            margin-right: $spacer;
+
+            &:hover {
+                cursor: pointer;
+            }
+
+            &.active {
+                svg {
+                    color: $brand-color;
+                }
+            }
+
+            svg {
+                @include icon-size($spacer * 4);
+                color: $grey-color-light;
+                padding: $spacer / 2;
+            }
+
+        }
+    }
+
+
+    .contacts-list {
+        display: flex;
+        flex-flow: row wrap;
+        flex-wrap: wrap;
+
+        // The most dense mode. A Contact takes up a third of the row.
+        &.dense {
+            .contact {
+                width: 33.33333333%;
+
+                .contact-avatar {
+                    margin-right: $spacer;
+                    width: $spacer / 2;
+
+                    .placeholder {display: none;}
+
+                    .call-color-status {
+                        height: $spacer * 3;
+                        width: 100%;
+                    }
+                }
+            }
+        }
+
+        // The most expanded mode. A Contact takes up the whole row.
+        &.lean {
+            .contact {
+                width: 100%;
+
+                .contact-avatar {
+                    align-items: center;
+
+                    display: flex;
+                    height: $spacer * 6;
+                    justify-content: left;
+                    margin-right: $spacer;
+                    position: relative;
+                    width: $spacer * 6;
+
+                    .call-color-status {
+                        bottom: 0;
+                        position: absolute;
+                        right: $spacer / 4;
+                    }
+
+
+                    .placeholder {
+                        @include icon-size($spacer * 5);
+                        background: $grey-color-lighter;
+                        border-radius: 50%;
+                        color: $grey-color;
+                        padding: $spacer / 2;
+                    }
+                }
+            }
+        }
+
+        // An in-between display mode. A Contact takes up halve the row.
+        &.regular {
+            .contact {
+                width: 50%;
+
+                .contact-avatar {
+                    margin-right: $spacer / 2;
+                    padding: $spacer / 4;
+                    width: $spacer * 3;
+                }
+            }
+        }
+
+        .contact {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            margin: $spacer 0;
+            position: relative;
+
+            .contact-info {
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                // Required to have ellipsis text overflow on .name.
+                min-width: 0;
+
+                .name {
+                    flex: 1;
+                    font-weight: 500;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .description {
+                    color: $grey-color-darker;
+                    font-size: 0.9rem;
+                }
+            }
+
+            .contact-specials {
+                .favorite {
+                    color: $yellow-color;
+                }
+            }
+
+            &:hover {
+                @include item-slider-activate;
+                cursor: pointer;
+            }
+        }
+    }
+}
+
+
+svg.call-color-status {
+    @include icon-size($spacer * 2);
+
+    &.unregistered {
+        path[pid="0"] {fill: $yellow-color;}
+        path[pid="1"] {fill: $red-color;}
+    }
+
+    &.unavailable,
+    &.no-results {
+        path[pid="0"] {fill: $grey-color;}
+        path[pid="1"] {fill: $white;}
+    }
+
+    &.busy {
+        path[pid="0"] {fill: $red-color;}
+        path[pid="1"] {fill: $white;}
+    }
+
+    &.available {
+        path[pid="0"] {fill: $green-color;}
+        path[pid="1"] {fill: $white;}
+    }
+
+    &.ringing {
+        animation: ringing-svg .75s ease-in-out infinite;
+
+        path[pid="0"] {fill: $red-color;}
+        path[pid="1"] {fill: $white;}
+    }
+}
+
+div.call-color-status {
+    &.unregistered {background: $yellow-color;}
+
+    &.unavailable,
+    &.no-results {
+        &.unregistered {background: $grey-color;}
+    }
+
+    &.busy {background: $red-color;}
+
+    &.available {background: $green-color;}
+
+    &.ringing {
+        animation: ringing-element .75s ease-in-out infinite;
+        background-color: $red-color;
+        box-shadow: rgba(saturate($red-color, 20%), 0.8) 0 0 10px;
     }
 }

@@ -4,7 +4,7 @@
     <template v-else>
         <div class="overlay" v-if="overlay">
             <div class="close-button" @click="closeOverlay()">
-                <svgicon name="close"/>
+                <icon name="close"/>
             </div>
             <About v-if="overlay==='about'"/>
         </div>
@@ -26,6 +26,7 @@
                 <Queues v-else-if="layer==='queues'"/>
                 <Settings v-else-if="layer==='settings'"/>
                 <Calls v-else-if="layer==='calls'"/>
+                <Activity v-else-if="layer==='activity'"/>
             </template>
         </div>
     </template>

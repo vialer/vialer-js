@@ -15,6 +15,7 @@ class App extends Skeleton {
         * Environment sniffer.
         */
         this.env = options.env
+        this.filters = require('./filters')(this)
         this.helpers = require('./helpers')(this)
         /**
         * Contains all registered App modules.
@@ -26,13 +27,29 @@ class App extends Skeleton {
         * be triggered from `AppForeground` and `AppBackground`.
         */
         this.sounds = require('./sounds')
-
         // Use shorthand naming for the event target, because
         // the script context is part of the event name as a
         // convention.
         if (this.env.role.bg) this._emitTarget = 'fg'
         else if (this.env.role.fg) this._emitTarget = 'bg'
         else throw new Error(`invalid app role: ${this.env.role}`)
+    }
+
+
+    /**
+    * Get an object reference from a keypath.
+    * @param {Object} obj - The object to find the reference in.
+    * @param {Array} keypath - The keypath to search.
+    * @returns {*|undefined} - The reference when found, undefined otherwise.
+    */
+    __getKeyPath(obj, keypath) {
+        if (keypath.length === 1) {
+            // Arrived at the end of the keypath. Check if the property exists.
+            if (!obj || !obj.hasOwnProperty(keypath[0])) return undefined
+            return obj[keypath[0]]
+        } else {
+            return this.__getKeyPath(obj[keypath[0]], keypath.slice(1))
+        }
     }
 
 
@@ -98,27 +115,33 @@ class App extends Skeleton {
     * Vue-friendly object merging. The `path` is used to assist
     * Vue's reactivity system to catch up with changes.
     * @param {Object} options - Options to pass.
-    * @param {String} [options.action] - The merge action: insert|merge|delete|replace.
+    * @param {String} [options.action=upsert] - The merge action: upsert|delete|replace.
     * @param {Boolean} [options.encrypt=true] - Whether to persist to the encrypted part of the store.
     * @param {String} options.path - Path to the store parts to merge into.
     * @param {String} [options.persist=false] - Whether to persist this state change.
     * @param {Object} state - An object to merge into the store.
     */
-    __mergeState({action = null, encrypt = true, path = null, persist = false, state}) {
+    __mergeState({action = 'upsert', encrypt = true, path = null, persist = false, state}) {
         if (!path) this.__mergeDeep(this.state, state)
         else {
-            path = path.split('/')
-            if (action === 'insert') {
-                this.__setFromPath(this.state, path, state)
-            } else if (action === 'merge') {
-                const _ref = path.reduce((o, i)=>o[i], this.state)
-                this.__mergeDeep(_ref, state)
+            path = path.split('.')
+            if (action === 'upsert') {
+                let _ref = this.__getKeyPath(this.state, path)
+                // Needs to be created first.
+                if (typeof _ref === 'undefined') {
+                    this.__setKeyPath(this.state, path, state)
+                } else {
+                    _ref = path.reduce((o, i)=>o[i], this.state)
+                    this.__mergeDeep(_ref, state)
+                }
             } else if (action === 'delete') {
                 const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
                 Vue.delete(_ref, path[path.length - 1])
             } else if (action === 'replace') {
                 const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
                 Vue.set(_ref, path[path.length - 1], state)
+            } else {
+                throw new Error(`invalid path action for __mergeState: ${action}`)
             }
         }
     }
@@ -127,22 +150,52 @@ class App extends Skeleton {
     /**
     * Set a nested property's value from a string pointing
     * to the reference. To set the value of `foo` in `path.to.foo`,
-    * set the path to `/path/to/foo`, give the reference object and
+    * set the path to `path.to.foo`, give the reference object and
     * its value.
     * @param {Object} obj - Reference object to modify.
-    * @param {String} path - URL notation to a nested property.
-    * @param {*} value - The value to assign to the nested property.
+    * @param {Array} keypath - The keypath to set.
+    * @param {*} value - The value to assign to the keypath's final key.
     * @returns {Function|Object} - Recursive until the property is set. Then returns the reference object.
     */
-    __setFromPath(obj, path, value) {
-        if (path.length === 1) {
-            if (!obj[path[0]]) Vue.set(obj, path[0], value)
-            return obj[path[0]]
-        } else if (path.length === 0) {
-            return obj
+    __setKeyPath(obj, keypath, value) {
+        if (keypath.length === 1) {
+            // Arrived at the end of the path. Make the property reactive.
+            if (!obj[keypath[0]]) Vue.set(obj, keypath[0], value)
+            return obj[keypath[0]]
         } else {
-            return this.__setFromPath(obj[path[0]], path.slice(1), value)
+            return this.__setKeyPath(obj[keypath[0]], keypath.slice(1), value)
         }
+    }
+
+
+    /**
+    * Return the getUserMedia flags based on the user's settings.
+    * @returns {Object} - Supported flags for getUserMedia.
+    */
+    _getUserMediaFlags() {
+        this.userMediaFlags = {
+            AUDIO_NOPROCESSING: {
+                audio: {
+                    mandatory: {
+                        echoCancellation: false,
+                        googAudioMirroring: false,
+                        googAutoGainControl: false,
+                        googAutoGainControl2: false,
+                        googEchoCancellation: false,
+                        googHighpassFilter: false,
+                        googNoiseSuppression: false,
+                        googTypingNoiseDetection: false,
+                    },
+                },
+            },
+            AUDIO_PROCESSING: {
+                audio: true,
+            },
+        }
+
+
+        const userMediaFlags = this.userMediaFlags[this.state.settings.webrtc.media.type.selected.id]
+        return userMediaFlags
     }
 
 
@@ -181,6 +234,7 @@ class App extends Skeleton {
     }
 
 
+
     /**
     * Initialize Vue with the Vue-stash store, the
     * root rendering component and gathered watchers
@@ -189,6 +243,7 @@ class App extends Skeleton {
     */
     initViewModel(watchers) {
         this.initI18n()
+
         this.vm = new Vue({
             data: {
                 store: this.state,
@@ -196,6 +251,17 @@ class App extends Skeleton {
             render: h => h(require('../../components/main')(this)),
             watch: watchers,
         })
+
+        // Check media permission.
+        if (!this.env.isFirefox) {
+            navigator.mediaDevices.getUserMedia(this._getUserMediaFlags()).then((stream) => {
+                this.setState({settings: {webrtc: {media: {permission: true}}}}, {encrypt: false, persist: true})
+            }).catch((err) => {
+                this.setState({settings: {webrtc: {media: {permission: false}}}}, {encrypt: false, persist: true})
+            })
+        } else {
+            this.setState({settings: {webrtc: {media: {encrypt: false, permission: false}}}})
+        }
     }
 
 
@@ -207,7 +273,7 @@ class App extends Skeleton {
     * @param {Boolean} options - Whether to persist the changed state to localStorage.
     */
     setState(state, {action, encrypt, path, persist} = {}) {
-        if (!action) action = 'merge'
+        if (!action) action = 'upsert'
         // Merge state in the context of the executing script.
         this.__mergeState({action, encrypt, path, persist, state})
         // Sync the state to the other script context(bg/fg).

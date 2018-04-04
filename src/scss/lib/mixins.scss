@@ -42,3 +42,16 @@
         @content;
     }
 }
+
+@mixin icon-size($size) {
+    height: $size;
+    width: $size;
+}
+
+@mixin item-slider-activate {
+    .item-slider {
+        animation: slide .15s ease-in-out;
+        animation-play-state: running;
+        height: 100%;
+    }
+}

@@ -1,0 +1,93 @@
+@import "../../scss/lib/mixins";
+@import "../../scss/lib/variables";
+
+.component-activity {
+
+    .tabs-squeezed {
+        margin: 0 $spacer * 9;
+        margin-bottom: $spacer;
+        margin-top: $spacer * 3;
+    }
+
+    .reminder,
+    .recent {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: $spacer * 2;
+        position: relative;
+
+        &:hover {
+            @include item-slider-activate;
+            cursor: pointer;
+        }
+
+        .recent-icon {
+            align-items: center;
+            display: flex;
+            justify-content: left;
+            padding: $spacer;
+            position: relative;
+            width: $spacer * 6;
+            z-index: 100;
+
+            &::after {
+                @include icon-size($spacer * 4);
+                border-radius: 50%;
+                content: "";
+                left: 0;
+                position: absolute;
+                z-index: 10;
+            }
+
+            &.success {
+                &::after {
+                    background: $green-color;
+                }
+            }
+
+            &.warning {
+                &::after {
+                    background: $red-color;
+                }
+            }
+
+            svg {
+                @include icon-size($spacer * 2);
+                color: $white;
+                z-index: 100;
+            }
+        }
+
+        .recent-info {
+            flex: 1;
+
+            header {
+                color: $grey-color-darkest;
+                font-weight: 500;
+            }
+
+            footer {
+                color: $grey-color;
+                font-size: 0.8rem;
+            }
+        }
+
+        .recent-label {
+            align-items: center;
+            display: flex;
+            justify-content: left;
+            width: $spacer * 6;
+
+            span {
+                background: $red-color;
+                border-radius: $spacer * 2;
+                color: $white;
+                font-size: 0.7rem;
+                font-weight: 500;
+                padding: $spacer / 4 $spacer / 2;
+                text-transform: uppercase;
+            }
+        }
+    }
+}
