@@ -39,13 +39,22 @@ class CallSIP extends Call {
         })
 
         this.session.on('rejected', (e) => {
-            this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
-            this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
+            const reason = this._parseHeader(e.getHeader('reason'))
 
-            // `e.method` is CANCEL when the incoming caller hung up.
-            // `e` will be a SIP response 480 when the callee hung up.
-            if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
-            else this.setState({status: 'rejected_a'})
+            if (reason.get('text') === 'Call completed elsewhere') {
+                this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
+                this.setState({status: 'answered_elsewhere'})
+            } else {
+                // `Call completed elsewhere` is not considered to be
+                // a missed call and will not end up in the activity log.
+                this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
+                this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
+                // `e.method` is CANCEL when the incoming caller hung up.
+                // `e` will be a SIP response 480 when the callee hung up.
+                if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
+                else this.setState({status: 'rejected_a'})
+            }
+
             this._stop({message: this.translations[this.state.status]})
         })
 
@@ -125,6 +134,17 @@ class CallSIP extends Call {
             else this.setState({status: 'rejected_b'})
             this._stop({message: this.translations[this.state.status]})
         })
+    }
+
+
+    /**
+    * Convert a comma-separated string like:
+    * `SIP;cause=200;text="Call completed elsewhere` to a Map.
+    * @param {String} header - The header to parse.
+    * @returns {Map} - A map of key/values of the header.
+    */
+    _parseHeader(header) {
+        return new Map(header.replace(/\"/g, '').split(';').map((i) => i.split('=')))
     }
 
 

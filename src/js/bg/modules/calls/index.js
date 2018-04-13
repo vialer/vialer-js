@@ -507,7 +507,7 @@ class ModuleCalls extends Module {
             // Activate the first found ongoing call when no call is given.
             for (const callId of callIds) {
                 // Don't select a call that is already closing.
-                if (!['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                if (!['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
                     call = this.calls[callId]
                 }
             }
@@ -741,7 +741,7 @@ class ModuleCalls extends Module {
                 if (callId === call.id) continue
 
                 // Prefer not to switch to a call that is already closing.
-                if (['bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                if (['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
                     // The fallback Call is a non-specific closing call.
                     if (this.calls[callId]) fallbackCall = this.calls[callId]
                 } else {

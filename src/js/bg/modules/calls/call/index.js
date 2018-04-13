@@ -87,6 +87,7 @@ class Call {
         // should map to.
         this._statusMap = {
             accepted: 'accepted',
+            answered_elsewhere: 'answered_elsewhere',
             bye: 'bye',
             create: 'create',
             invite: 'invite',
@@ -240,12 +241,10 @@ class Call {
             }
         }
 
-        // An ongoing call is closed. Signal listeners like activity
-        // about it.
+        // An ongoing call is closed. Signal listeners like activity about it.
         if (this.state.status === 'bye') {
             this.app.emit('bg:calls:call_ended', {call: this.state}, true)
         }
-
 
         // Stop the Call interval timer.
         clearInterval(this.timerId)

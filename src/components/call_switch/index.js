@@ -23,7 +23,7 @@ module.exports = (app) => {
                 if (call.status === 'new') {
                     if (call.active) return 'close'
                     else return 'dialpad'
-                } else if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
+                } else if (['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
                     return 'hang-up'
                 } else {
                     if (call.hold.active) return 'on-hold'
@@ -58,7 +58,7 @@ module.exports = (app) => {
                     } else {
                         if (['create', 'invite'].includes(call.status)) {
                             classes['state-accept'] = true
-                        } else if (['bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
+                        } else if (['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
                             classes['state-hangup'] = true
                         } else {
                             classes['state-active'] = true

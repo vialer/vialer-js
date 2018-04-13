@@ -14,7 +14,7 @@
 */
 function helpers(app) {
 
-    const closingStatus = ['rejected_a', 'rejected_b', 'bye']
+    const closingStatus = ['answered_elsewhere', 'rejected_a', 'rejected_b', 'bye']
 
     let _helpers = {}
 
@@ -115,6 +115,7 @@ function helpers(app) {
                     incoming: $t('calling'),
                     outgoing: $t('calling'),
                 },
+                answered_elsewhere: $t('answered elsewhere'),
                 bye: $t('call ended'),
                 create: $t('setting up call'),
                 dialing_a: $t('dialing phone A'),

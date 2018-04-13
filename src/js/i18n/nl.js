@@ -12,6 +12,7 @@ global.translations.nl = {
     'Adding more queue callgroups': 'Meer wachtrij belgroepen toevoegen',
     'Allow microphone permission': 'Pas microfoon permissie aan',
     'An hour ago': 'Een uur geleden',
+    'answered elsewhere': 'opgenomen door ander',
     'Application language': 'Applicatie taal',
     'Are you available?': 'Ben je bereikbaar?',
     'Audio with processing': 'Audio met bewerking',
