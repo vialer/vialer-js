@@ -1,0 +1,474 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Module: ModuleActivity | Vialer-js</title>
+    <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/main.css">
+
+    
+</head>
+<body>
+
+    <nav class="navigation-sidebar-container">
+        <div class="navigation-sidebar">
+
+            <input type="checkbox" id="nav-trigger" class="nav-trigger">
+            <label for="nav-trigger" class="navicon-button x">
+              <div class="navicon"></div>
+            </label>
+            <label for="nav-trigger" class="overlay"></label>
+            
+            <div class="nav-search js-search">
+                <a class="nav-project-title" href="index.html" class="link">
+                    <div class="logo" style="width: 72px; height: 72px">
+                        <img src="logo-64.png" width="100%" height="100%">
+                    </div>
+                </a>
+                <div class="nav-title">
+                    <h1>Vialer-js</h1>
+                    <span class="version">
+                    
+                        v3.0.112
+                    
+                    </span>
+                </div>
+                <input type="text" placeholder="Search documentation...">
+                <ul class="searched-list"></ul>
+            </div>
+
+            
+            <div class="nav-doc-type">
+                <div class="nav-doc-item" id="manuals-tab">
+                    <a href="./">Getting started</a>
+                </div>
+                <div class="nav-doc-item" id="api-tab">
+                    <a href="#api">Explore code</a>
+                </div>
+            </div>
+            
+
+            <div class="nav-scroll-container"><div class="nav-api hidden"><h3>Global</h3><ul><li class="nav-item"><a href="global.html#callContact">callContact</a></li></ul></div><div class="nav-manuals hidden"><h3>Getting started</h3><ul class="nav-items"><li class="nav-item tutorial install">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-install.html">1. Installation</a>
+                <div class="nav-item-sub hidden" id="install_sub"></div>
+            </li><li class="nav-item tutorial development">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-development.html">2. Code development</a>
+                <div class="nav-item-sub hidden" id="development_sub"></div>
+            </li><li class="nav-item tutorial branding">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-branding.html">3. Create a brand</a>
+                <div class="nav-item-sub hidden" id="branding_sub"></div>
+            </li><li class="nav-item tutorial deployment">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tutorial-deployment.html">4. Automate deployments</a>
+                <div class="nav-item-sub hidden" id="deployment_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Namespaces</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="AppBackground_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item env"><a href="AppForeground.html#env">env</a></a></li><li class="sub-nav-item modules"><a href="AppForeground.html#modules">modules</a></a></li><li class="sub-nav-item sounds"><a href="AppForeground.html#sounds">sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __getKeyPath"><a href="AppForeground.html#__getKeyPath">__getKeyPath</a></a></li><li class="sub-nav-item __initStore"><a href="AppForeground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item __isObject"><a href="AppForeground.html#__isObject">__isObject</a></a></li><li class="sub-nav-item __mergeDeep"><a href="AppForeground.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item __mergeState"><a href="AppForeground.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item __setKeyPath"><a href="AppForeground.html#__setKeyPath">__setKeyPath</a></a></li><li class="sub-nav-item _getUserMediaFlags"><a href="AppForeground.html#_getUserMediaFlags">_getUserMediaFlags</a></a></li><li class="sub-nav-item _initialState"><a href="AppForeground.html#_initialState">_initialState</a></a></li><li class="sub-nav-item initI18n"><a href="AppForeground.html#initI18n">initI18n</a></a></li><li class="sub-nav-item initViewModel"><a href="AppForeground.html#initViewModel">initViewModel</a></a></li><li class="sub-nav-item setState"><a href="AppForeground.html#setState">setState</a></a></li><li class="sub-nav-item toString"><a href="AppForeground.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppTab.html">AppTab</a>
+                <div class="nav-item-sub hidden" id="AppTab_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item createNumberIconElement"><a href="AppTab.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item escapeHTML"><a href="AppTab.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item handleMutations"><a href="AppTab.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item insertIconInDom"><a href="AppTab.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item observePage"><a href="AppTab.html#observePage">observePage</a></a></li><li class="sub-nav-item processPage"><a href="AppTab.html#processPage">processPage</a></a></li><li class="sub-nav-item revertInsertedIcons"><a href="AppTab.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.components.html">AppForeground.components</a>
+                <div class="nav-item-sub hidden" id="AppForeground_components_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.html">AppBackground.modules</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_sub"></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Modules</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleActivity.html">ModuleActivity</a>
+                <div class="nav-item-sub hidden" id="module_ModuleActivity_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="module_ModuleApp_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="module_ModuleAvailability_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item "store.app.online""><a href="module-ModuleCalls.html#~%2522store.app.online%2522">"store.app.online"</a></a></li><li class="sub-nav-item "store.calls.ua.status""><a href="module-ModuleCalls.html#~%2522store.calls.ua.status%2522">"store.calls.ua.status"</a></a></li></ul><div class="member-type">Events</div><ul class="inner"><li class="sub-nav-item bg:calls:call_accept"><a href="module-ModuleCalls.html#event:bg:calls:call_accept">bg:calls:call_accept</a></a></li><li class="sub-nav-item bg:calls:call_activate"><a href="module-ModuleCalls.html#~event:bg:calls:call_activate">bg:calls:call_activate</a></a></li><li class="sub-nav-item bg:calls:call_create"><a href="module-ModuleCalls.html#event:bg:calls:call_create">bg:calls:call_create</a></a></li><li class="sub-nav-item bg:calls:call_delete"><a href="module-ModuleCalls.html#event:bg:calls:call_delete">bg:calls:call_delete</a></a></li><li class="sub-nav-item bg:calls:call_terminate"><a href="module-ModuleCalls.html#event:bg:calls:call_terminate">bg:calls:call_terminate</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="module_ModuleExtension_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="module_ModuleQueues_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleSettings.html">ModuleSettings</a>
+                <div class="nav-item-sub hidden" id="module_ModuleSettings_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUI_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="module_ModuleUser_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Sounds.html">Sounds</a>
+                <div class="nav-item-sub hidden" id="module_Sounds_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item context"><a href="module-Sounds.html#~context">context</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-env.html">env</a>
+                <div class="nav-item-sub hidden" id="module_env_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item env"><a href="module-env.html#~env">env</a></a></li></ul></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Classes</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Api.html">Api</a>
+                <div class="nav-item-sub hidden" id="Api_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item setupClient"><a href="Api.html#setupClient">setupClient</a></a></li><li class="sub-nav-item toString"><a href="Api.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.html">App</a>
+                <div class="nav-item-sub hidden" id="App_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item env"><a href="App.html#env">env</a></a></li><li class="sub-nav-item modules"><a href="App.html#modules">modules</a></a></li><li class="sub-nav-item sounds"><a href="App.html#sounds">sounds</a></a></li><li class="sub-nav-item this.state"><a href="App.html#.this.state">this.state</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __getKeyPath"><a href="App.html#__getKeyPath">__getKeyPath</a></a></li><li class="sub-nav-item __initStore"><a href="App.html#__initStore">__initStore</a></a></li><li class="sub-nav-item __isObject"><a href="App.html#__isObject">__isObject</a></a></li><li class="sub-nav-item __mergeDeep"><a href="App.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item __mergeState"><a href="App.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item __setKeyPath"><a href="App.html#__setKeyPath">__setKeyPath</a></a></li><li class="sub-nav-item _getUserMediaFlags"><a href="App.html#_getUserMediaFlags">_getUserMediaFlags</a></a></li><li class="sub-nav-item _initialState"><a href="App.html#_initialState">_initialState</a></a></li><li class="sub-nav-item helpers"><a href="App.html#.helpers">helpers</a></a></li><li class="sub-nav-item initI18n"><a href="App.html#initI18n">initI18n</a></a></li><li class="sub-nav-item initViewModel"><a href="App.html#initViewModel">initViewModel</a></a></li><li class="sub-nav-item setState"><a href="App.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="app.AppBackground.html">AppBackground</a>
+                <div class="nav-item-sub hidden" id="app_AppBackground_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __factoryDefaults"><a href="app.AppBackground.html#__factoryDefaults">__factoryDefaults</a></a></li><li class="sub-nav-item __initServices"><a href="app.AppBackground.html#__initServices">__initServices</a></a></li><li class="sub-nav-item __initStore"><a href="app.AppBackground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item __logoutState"><a href="app.AppBackground.html#__logoutState">__logoutState</a></a></li><li class="sub-nav-item __mergeState"><a href="app.AppBackground.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item __unlockVault"><a href="app.AppBackground.html#__unlockVault">__unlockVault</a></a></li><li class="sub-nav-item _platformData"><a href="app.AppBackground.html#_platformData">_platformData</a></a></li><li class="sub-nav-item _restoreState"><a href="app.AppBackground.html#_restoreState">_restoreState</a></a></li><li class="sub-nav-item toString"><a href="app.AppBackground.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppElectron.html">AppElectron</a>
+                <div class="nav-item-sub hidden" id="AppElectron_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppForeground.html">AppForeground</a>
+                <div class="nav-item-sub hidden" id="AppForeground_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item env"><a href="AppForeground.html#env">env</a></a></li><li class="sub-nav-item modules"><a href="AppForeground.html#modules">modules</a></a></li><li class="sub-nav-item sounds"><a href="AppForeground.html#sounds">sounds</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __getKeyPath"><a href="AppForeground.html#__getKeyPath">__getKeyPath</a></a></li><li class="sub-nav-item __initStore"><a href="AppForeground.html#__initStore">__initStore</a></a></li><li class="sub-nav-item __isObject"><a href="AppForeground.html#__isObject">__isObject</a></a></li><li class="sub-nav-item __mergeDeep"><a href="AppForeground.html#__mergeDeep">__mergeDeep</a></a></li><li class="sub-nav-item __mergeState"><a href="AppForeground.html#__mergeState">__mergeState</a></a></li><li class="sub-nav-item __setKeyPath"><a href="AppForeground.html#__setKeyPath">__setKeyPath</a></a></li><li class="sub-nav-item _getUserMediaFlags"><a href="AppForeground.html#_getUserMediaFlags">_getUserMediaFlags</a></a></li><li class="sub-nav-item _initialState"><a href="AppForeground.html#_initialState">_initialState</a></a></li><li class="sub-nav-item initI18n"><a href="AppForeground.html#initI18n">initI18n</a></a></li><li class="sub-nav-item initViewModel"><a href="AppForeground.html#initViewModel">initViewModel</a></a></li><li class="sub-nav-item setState"><a href="AppForeground.html#setState">setState</a></a></li><li class="sub-nav-item toString"><a href="AppForeground.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppTab.html">AppTab</a>
+                <div class="nav-item-sub hidden" id="AppTab_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item createNumberIconElement"><a href="AppTab.html#createNumberIconElement">createNumberIconElement</a></a></li><li class="sub-nav-item escapeHTML"><a href="AppTab.html#escapeHTML">escapeHTML</a></a></li><li class="sub-nav-item handleMutations"><a href="AppTab.html#handleMutations">handleMutations</a></a></li><li class="sub-nav-item insertIconInDom"><a href="AppTab.html#insertIconInDom">insertIconInDom</a></a></li><li class="sub-nav-item observePage"><a href="AppTab.html#observePage">observePage</a></a></li><li class="sub-nav-item processPage"><a href="AppTab.html#processPage">processPage</a></a></li><li class="sub-nav-item revertInsertedIcons"><a href="AppTab.html#revertInsertedIcons">revertInsertedIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Sounds-BusyTone.html">BusyTone</a>
+                <div class="nav-item-sub hidden" id="module_Sounds_BusyTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls-Call.html">Call</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_Call_sub"><div class="member-type">Members</div><ul class="inner"><li class="sub-nav-item state"><a href="module-ModuleCalls-Call.html#state">state</a></a></li></ul><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _incoming"><a href="module-ModuleCalls-Call.html#_incoming">_incoming</a></a></li><li class="sub-nav-item _initMedia"><a href="module-ModuleCalls-Call.html#_initMedia">_initMedia</a></a></li><li class="sub-nav-item _outgoing"><a href="module-ModuleCalls-Call.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item _start"><a href="module-ModuleCalls-Call.html#_start">_start</a></a></li><li class="sub-nav-item _stop"><a href="module-ModuleCalls-Call.html#_stop">_stop</a></a></li><li class="sub-nav-item setState"><a href="module-ModuleCalls-Call.html#setState">setState</a></a></li><li class="sub-nav-item toString"><a href="module-ModuleCalls-Call.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls-CallConnectAB.html">CallConnectAB</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_CallConnectAB_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _callStatus"><a href="module-ModuleCalls-CallConnectAB.html#_callStatus">_callStatus</a></a></li><li class="sub-nav-item hold"><a href="module-ModuleCalls-CallConnectAB.html#hold">hold</a></a></li><li class="sub-nav-item unhold"><a href="module-ModuleCalls-CallConnectAB.html#unhold">unhold</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls-CallSIP.html">CallSIP</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_CallSIP_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _incoming"><a href="module-ModuleCalls-CallSIP.html#_incoming">_incoming</a></a></li><li class="sub-nav-item _outgoing"><a href="module-ModuleCalls-CallSIP.html#_outgoing">_outgoing</a></a></li><li class="sub-nav-item _parseHeader"><a href="module-ModuleCalls-CallSIP.html#_parseHeader">_parseHeader</a></a></li><li class="sub-nav-item accept"><a href="module-ModuleCalls-CallSIP.html#accept">accept</a></a></li><li class="sub-nav-item terminate"><a href="module-ModuleCalls-CallSIP.html#terminate">terminate</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts-Contact.html">Contact</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_Contact_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item setState"><a href="module-ModuleContacts-Contact.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Crypto.html">Crypto</a>
+                <div class="nav-item-sub hidden" id="Crypto_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __base64ToDataArray"><a href="Crypto.html#__base64ToDataArray">__base64ToDataArray</a></a></li><li class="sub-nav-item __dataArray"><a href="Crypto.html#__dataArray">__dataArray</a></a></li><li class="sub-nav-item __dataArrayToBase64"><a href="Crypto.html#__dataArrayToBase64">__dataArrayToBase64</a></a></li><li class="sub-nav-item __dataArrayToHex"><a href="Crypto.html#__dataArrayToHex">__dataArrayToHex</a></a></li><li class="sub-nav-item __dataArrayToString"><a href="Crypto.html#__dataArrayToString">__dataArrayToString</a></a></li><li class="sub-nav-item __deriveAESKeyFromECDH"><a href="Crypto.html#__deriveAESKeyFromECDH">__deriveAESKeyFromECDH</a></a></li><li class="sub-nav-item __exportAESKey"><a href="Crypto.html#__exportAESKey">__exportAESKey</a></a></li><li class="sub-nav-item __exportPrivateKey"><a href="Crypto.html#__exportPrivateKey">__exportPrivateKey</a></a></li><li class="sub-nav-item __exportPublicKey"><a href="Crypto.html#__exportPublicKey">__exportPublicKey</a></a></li><li class="sub-nav-item __hashString"><a href="Crypto.html#__hashString">__hashString</a></a></li><li class="sub-nav-item __importPrivateKey"><a href="Crypto.html#__importPrivateKey">__importPrivateKey</a></a></li><li class="sub-nav-item __importPublicKey"><a href="Crypto.html#__importPublicKey">__importPublicKey</a></a></li><li class="sub-nav-item __stringToDataArray"><a href="Crypto.html#__stringToDataArray">__stringToDataArray</a></a></li><li class="sub-nav-item _generateVaultKey"><a href="Crypto.html#_generateVaultKey">_generateVaultKey</a></a></li><li class="sub-nav-item _importVaultKey"><a href="Crypto.html#_importVaultKey">_importVaultKey</a></a></li><li class="sub-nav-item decrypt"><a href="Crypto.html#decrypt">decrypt</a></a></li><li class="sub-nav-item encrypt"><a href="Crypto.html#encrypt">encrypt</a></a></li><li class="sub-nav-item loadIdentity"><a href="Crypto.html#loadIdentity">loadIdentity</a></a></li><li class="sub-nav-item storeVault"><a href="Crypto.html#storeVault">storeVault</a></a></li><li class="sub-nav-item toString"><a href="Crypto.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Sounds-DtmfTone.html">DtmfTone</a>
+                <div class="nav-item-sub hidden" id="module_Sounds_DtmfTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts-Endpoint.html">Endpoint</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_Endpoint_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item setState"><a href="module-ModuleContacts-Endpoint.html#setState">setState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts-EndpointSip.html">EndpointSip</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_EndpointSip_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Gulp.Helpers.html">Helpers</a>
+                <div class="nav-item-sub hidden" id="Gulp_Helpers_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item deploy"><a href="Gulp.Helpers.html#deploy">deploy</a></a></li><li class="sub-nav-item distributionName"><a href="Gulp.Helpers.html#distributionName">distributionName</a></a></li><li class="sub-nav-item formatScssVars"><a href="Gulp.Helpers.html#formatScssVars">formatScssVars</a></a></li><li class="sub-nav-item getManifest"><a href="Gulp.Helpers.html#getManifest">getManifest</a></a></li><li class="sub-nav-item jsEntry"><a href="Gulp.Helpers.html#jsEntry">jsEntry</a></a></li><li class="sub-nav-item scssEntry"><a href="Gulp.Helpers.html#scssEntry">scssEntry</a></a></li><li class="sub-nav-item startDevServer"><a href="Gulp.Helpers.html#startDevServer">startDevServer</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="lib.Logger.html">Logger</a>
+                <div class="nav-item-sub hidden" id="lib_Logger_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="MemoryStore.html">MemoryStore</a>
+                <div class="nav-item-sub hidden" id="MemoryStore_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Module.html">Module</a>
+                <div class="nav-item-sub hidden" id="Module_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleActivity.html">ModuleActivity</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleActivity_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleActivity.html#_initialState">_initialState</a></a></li><li class="sub-nav-item addActivity"><a href="AppBackground.modules.ModuleActivity.html#addActivity">addActivity</a></a></li><li class="sub-nav-item toString"><a href="AppBackground.modules.ModuleActivity.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleApp.html">ModuleApp</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleApp_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleApp.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _restoreState"><a href="AppBackground.modules.ModuleApp.html#_restoreState">_restoreState</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleAvailability.html">ModuleAvailability</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleAvailability_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleAvailability.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _platformData"><a href="AppBackground.modules.ModuleAvailability.html#_platformData">_platformData</a></a></li><li class="sub-nav-item _watchers"><a href="AppBackground.modules.ModuleAvailability.html#_watchers">_watchers</a></a></li><li class="sub-nav-item toString"><a href="AppBackground.modules.ModuleAvailability.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleCalls.html">ModuleCalls</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleCalls_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __setTransferState"><a href="AppBackground.modules.ModuleCalls.html#__setTransferState">__setTransferState</a></a></li><li class="sub-nav-item __uaOptions"><a href="AppBackground.modules.ModuleCalls.html#__uaOptions">__uaOptions</a></a></li><li class="sub-nav-item _formatSdp"><a href="AppBackground.modules.ModuleCalls.html#_formatSdp">_formatSdp</a></a></li><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleCalls.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _newCall"><a href="AppBackground.modules.ModuleCalls.html#_newCall">_newCall</a></a></li><li class="sub-nav-item _restoreState"><a href="AppBackground.modules.ModuleCalls.html#_restoreState">_restoreState</a></a></li><li class="sub-nav-item _userAgent"><a href="AppBackground.modules.ModuleCalls.html#_userAgent">_userAgent</a></a></li><li class="sub-nav-item _watchers"><a href="AppBackground.modules.ModuleCalls.html#_watchers">_watchers</a></a></li><li class="sub-nav-item activateCall"><a href="AppBackground.modules.ModuleCalls.html#activateCall">activateCall</a></a></li><li class="sub-nav-item activeCall"><a href="AppBackground.modules.ModuleCalls.html#activeCall">activeCall</a></a></li><li class="sub-nav-item callAction"><a href="AppBackground.modules.ModuleCalls.html#callAction">callAction</a></a></li><li class="sub-nav-item connect"><a href="AppBackground.modules.ModuleCalls.html#connect">connect</a></a></li><li class="sub-nav-item deleteCall"><a href="AppBackground.modules.ModuleCalls.html#deleteCall">deleteCall</a></a></li><li class="sub-nav-item disconnect"><a href="AppBackground.modules.ModuleCalls.html#disconnect">disconnect</a></a></li><li class="sub-nav-item toString"><a href="AppBackground.modules.ModuleCalls.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleContacts.html">ModuleContacts</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleContacts_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleContacts.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _platformData"><a href="AppBackground.modules.ModuleContacts.html#_platformData">_platformData</a></a></li><li class="sub-nav-item _restoreState"><a href="AppBackground.modules.ModuleContacts.html#_restoreState">_restoreState</a></a></li><li class="sub-nav-item _syncEndpoints"><a href="AppBackground.modules.ModuleContacts.html#_syncEndpoints">_syncEndpoints</a></a></li><li class="sub-nav-item toString"><a href="AppBackground.modules.ModuleContacts.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleExtension.html">ModuleExtension</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleExtension_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _installUpdate"><a href="AppBackground.modules.ModuleExtension.html#_installUpdate">_installUpdate</a></a></li><li class="sub-nav-item _keyboardShortcuts"><a href="AppBackground.modules.ModuleExtension.html#_keyboardShortcuts">_keyboardShortcuts</a></a></li><li class="sub-nav-item _ready"><a href="AppBackground.modules.ModuleExtension.html#_ready">_ready</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleQueues.html">ModuleQueues</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleQueues_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleQueues.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _onPopupAction"><a href="AppBackground.modules.ModuleQueues.html#_onPopupAction">_onPopupAction</a></a></li><li class="sub-nav-item _platformData"><a href="AppBackground.modules.ModuleQueues.html#_platformData">_platformData</a></a></li><li class="sub-nav-item queueMenubarIcon"><a href="AppBackground.modules.ModuleQueues.html#queueMenubarIcon">queueMenubarIcon</a></a></li><li class="sub-nav-item setQueueSizesTimer"><a href="AppBackground.modules.ModuleQueues.html#setQueueSizesTimer">setQueueSizesTimer</a></a></li><li class="sub-nav-item toString"><a href="AppBackground.modules.ModuleQueues.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleSettings.html">ModuleSettings</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleSettings_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleSettings.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _watchers"><a href="AppBackground.modules.ModuleSettings.html#_watchers">_watchers</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleUI.html">ModuleUI</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleUI_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __menubarAnimation"><a href="AppBackground.modules.ModuleUI.html#__menubarAnimation">__menubarAnimation</a></a></li><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleUI.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _ready"><a href="AppBackground.modules.ModuleUI.html#_ready">_ready</a></a></li><li class="sub-nav-item _restoreState"><a href="AppBackground.modules.ModuleUI.html#_restoreState">_restoreState</a></a></li><li class="sub-nav-item _watchers"><a href="AppBackground.modules.ModuleUI.html#_watchers">_watchers</a></a></li><li class="sub-nav-item notification"><a href="AppBackground.modules.ModuleUI.html#notification">notification</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="AppBackground.modules.ModuleUser.html">ModuleUser</a>
+                <div class="nav-item-sub hidden" id="AppBackground_modules_ModuleUser_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _initialState"><a href="AppBackground.modules.ModuleUser.html#_initialState">_initialState</a></a></li><li class="sub-nav-item _platformData"><a href="AppBackground.modules.ModuleUser.html#_platformData">_platformData</a></a></li><li class="sub-nav-item login"><a href="AppBackground.modules.ModuleUser.html#login">login</a></a></li><li class="sub-nav-item logout"><a href="AppBackground.modules.ModuleUser.html#logout">logout</a></a></li><li class="sub-nav-item toString"><a href="AppBackground.modules.ModuleUser.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts-Presence.html">Presence</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_Presence_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleContacts-PresenceSip.html">PresenceSip</a>
+                <div class="nav-item-sub hidden" id="module_ModuleContacts_PresenceSip_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item _statusFromDialog"><a href="module-ModuleContacts-PresenceSip.html#_statusFromDialog">_statusFromDialog</a></a></li><li class="sub-nav-item subscribe"><a href="module-ModuleContacts-PresenceSip.html#subscribe">subscribe</a></a></li><li class="sub-nav-item unsubscribe"><a href="module-ModuleContacts-PresenceSip.html#unsubscribe">unsubscribe</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Sounds-RingTone.html">RingTone</a>
+                <div class="nav-item-sub hidden" id="module_Sounds_RingTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-Sounds-RingbackTone.html">RingbackTone</a>
+                <div class="nav-item-sub hidden" id="module_Sounds_RingbackTone_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="app.Skeleton.html">Skeleton</a>
+                <div class="nav-item-sub hidden" id="app_Skeleton_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item emit"><a href="app.Skeleton.html#emit">emit</a></a></li><li class="sub-nav-item ipcListener"><a href="app.Skeleton.html#ipcListener">ipcListener</a></a></li><li class="sub-nav-item on"><a href="app.Skeleton.html#on">on</a></a></li><li class="sub-nav-item toString"><a href="app.Skeleton.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Store.html">Store</a>
+                <div class="nav-item-sub hidden" id="Store_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item clear"><a href="Store.html#clear">clear</a></a></li><li class="sub-nav-item toString"><a href="Store.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="app.modules.extension.Tabs.html">Tabs</a>
+                <div class="nav-item-sub hidden" id="app_modules_extension_Tabs_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item contextMenuItems"><a href="app.modules.extension.Tabs.html#contextMenuItems">contextMenuItems</a></a></li><li class="sub-nav-item signalIcons"><a href="app.modules.extension.Tabs.html#signalIcons">signalIcons</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Telemetry.html">Telemetry</a>
+                <div class="nav-item-sub hidden" id="Telemetry_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item event"><a href="Telemetry.html#event">event</a></a></li><li class="sub-nav-item getClientId"><a href="Telemetry.html#getClientId">getClientId</a></a></li><li class="sub-nav-item toString"><a href="Telemetry.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="Timer.html">Timer</a>
+                <div class="nav-item-sub hidden" id="Timer_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item __jitter"><a href="Timer.html#__jitter">__jitter</a></a></li><li class="sub-nav-item increaseTimeout"><a href="Timer.html#increaseTimeout">increaseTimeout</a></a></li><li class="sub-nav-item setTimeout"><a href="Timer.html#setTimeout">setTimeout</a></a></li><li class="sub-nav-item toString"><a href="Timer.html#toString">toString</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="App.Utils.html">Utils</a>
+                <div class="nav-item-sub hidden" id="App_Utils_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item sanitizeNumber"><a href="App.Utils.html#sanitizeNumber">sanitizeNumber</a></a></li><li class="sub-nav-item sortByMultipleKey"><a href="App.Utils.html#sortByMultipleKey">sortByMultipleKey</a></a></li><li class="sub-nav-item stringifySearch"><a href="App.Utils.html#stringifySearch">stringifySearch</a></a></li></ul></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="tab.Walker.html">Walker</a>
+                <div class="nav-item-sub hidden" id="tab_Walker_sub"><div class="member-type">Methods</div><ul class="inner"><li class="sub-nav-item getBlockedRoles"><a href="tab.Walker.html#getBlockedRoles">getBlockedRoles</a></a></li><li class="sub-nav-item getBlockedTagNames"><a href="tab.Walker.html#getBlockedTagNames">getBlockedTagNames</a></a></li><li class="sub-nav-item isBlockedElement"><a href="tab.Walker.html#isBlockedElement">isBlockedElement</a></a></li><li class="sub-nav-item skipNode"><a href="tab.Walker.html#skipNode">skipNode</a></a></li><li class="sub-nav-item walkTheDOM"><a href="tab.Walker.html#walkTheDOM">walkTheDOM</a></a></li></ul></div>
+            </li></ul></div><div class="nav-api hidden"><h3>Events</h3><ul class="nav-items"><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html#event:bg:calls:call_accept">bg:calls:call_accept</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls#bg_calls_call_accept_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html#~event:bg:calls:call_activate">bg:calls:call_activate</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls_bg_calls_call_activate_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html#event:bg:calls:call_create">bg:calls:call_create</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls#bg_calls_call_create_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html#event:bg:calls:call_delete">bg:calls:call_delete</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls#bg_calls_call_delete_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="module-ModuleCalls.html#event:bg:calls:call_terminate">bg:calls:call_terminate</a>
+                <div class="nav-item-sub hidden" id="module_ModuleCalls#bg_calls_call_terminate_sub"></div>
+            </li><li class="nav-item">
+                <span class="toggle-subnav invisible btn btn-link fa fa-plus"></span>
+                <a href="global.html#event:bg:user:login">bg:user:login</a>
+                <div class="nav-item-sub hidden" id="bg_user_login_sub"></div>
+            </li></ul></div></div>
+        </div>
+    </nav>
+
+    <div class="content-container">
+        <div class="content">
+            <ul class="breadcrumbs">
+                <li><a href="index.html">Docs</a> »</li>
+                <li>Module: ModuleActivity</li>
+            </ul>
+            <hr>
+            
+
+
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>The Activity module is mainly used to show recent Call
+history and allow the user to make reminders from
+activity entries.</p></div>
+        
+
+        
+            
+
+<dt>
+
+</dt>
+
+<dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+    
+
+</dd>
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+
+
+
+
+            <hr>
+            <footer>
+                <strong>&copy; Windshaft BV</strong><br/>
+                Documented with <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a>
+            </footer>
+        </div>
+        <div class="flex-filler"></div>
+    </div>
+
+
+<script src="js/jquery.min.js"></script>
+<script>
+
+window.isApi = true
+window.isManual = false
+window.doc = {
+    name: 'ModuleActivity',
+    longname: 'module:ModuleActivity',
+}
+
+if (!doc.name) isApi = false
+
+</script>
+<script src="js/rtd.js"></script>
+</body>
+</html>
