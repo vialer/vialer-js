@@ -71,6 +71,22 @@ class ModuleSettings extends Module {
                 },
                 enabled: false,
                 media: {
+                    devices: {
+                        input: {
+                            options: [],
+                            selected: {
+                                id: null,
+                                name: null,
+                            },
+                        },
+                        output: {
+                            options: [],
+                            selected: {
+                                id: null,
+                                name: null,
+                            },
+                        },
+                    },
                     permission: false,
                     type: {
                         options: [
@@ -79,10 +95,6 @@ class ModuleSettings extends Module {
                         ],
                         selected: {id: 'AUDIO_NOPROCESSING', name: 'Audio without processing'},
                     },
-                },
-                sinks: {
-                    input: {id: '', name: ''},
-                    output: {id: '', name: ''},
                 },
             },
         }

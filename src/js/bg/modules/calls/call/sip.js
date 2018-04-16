@@ -40,7 +40,8 @@ class CallSIP extends Call {
 
         this.session.on('rejected', (e) => {
             // The `e` is a SIP header string when the callee hangs up,
-            // otherwise it is an object.
+            // otherwise it is an object. If it is an object, we can distinguish
+            // several rejected reasons from each other from the headers.
             if (typeof e === 'object') {
                 const reason = this._parseHeader(e.getHeader('reason'))
 
@@ -57,6 +58,9 @@ class CallSIP extends Call {
                     if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
                     else this.setState({status: 'rejected_a'})
                 }
+            } else {
+                this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
+                this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
             }
 
             this._stop({message: this.translations[this.state.status]})

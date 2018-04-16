@@ -141,13 +141,14 @@ class Call {
         }
 
         // Set the output device from settings.
-        const sinks = this.app.state.settings.webrtc.sinks
+        const {input, output} = this.app.state.settings.webrtc.media.devices
         try {
-            if (sinks.input.id) this.remoteVideo.setSinkId(sinks.input.id)
-            if (sinks.output.id) await this.remoteVideo.setSinkId(sinks.output.id)
+            if (input.selected.id) await this.remoteVideo.setSinkId(input.selected.id)
+            if (output.selected.id) await this.remoteVideo.setSinkId(output.selected.id)
         } catch (err) {
             const message = this.app.$t('Failed to set input or output device.')
             this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
+            console.error(err)
         }
 
         return navigator.mediaDevices.getUserMedia(this.app._getUserMediaFlags())

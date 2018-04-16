@@ -14,8 +14,6 @@
             <li :class="classes('tabs', 'audio')" @click="setTab('settings', 'audio', settings.webrtc.enabled)">
                 <a><span class="icon is-small"><icon name="microphone"/></span><span>{{$t('Audio')}}</span></a>
             </li>
-
-
         </ul>
     </div>
 
@@ -184,13 +182,13 @@
         </div>
 
         <Field name="input_device" type="select" v-if="user.developer"
-            :label="$t('Input device')" :model.sync="settings.webrtc.sinks.input"
-            :options="inputDevice.options"
+            :label="$t('Input device')" :model.sync="devices.input.selected"
+            :options="devices.input.options"
             :placeholder="$t('Select an input device')"/>
 
         <Field name="output_device" type="select" v-if="user.developer"
-            :label="$t('Output device')" :model.sync="settings.webrtc.sinks.output"
-            :options="outputDevice.options"
+            :label="$t('Output device')" :model.sync="devices.output.selected"
+            :options="devices.output.options"
             :placeholder="$t('Select an output device')"/>
     </div>
 

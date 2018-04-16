@@ -8,12 +8,6 @@ module.exports = (app) => {
     const Settings = {
         data: function() {
             return {
-                inputDevice: {
-                    options: [],
-                },
-                outputDevice: {
-                    options: [],
-                },
                 sound: {
                     enabled: true,
                     inputlevel: 0,
@@ -60,21 +54,43 @@ module.exports = (app) => {
             // Query devices and fill the store with them. This is
             // currently a feature behind a developer flag, because
             // its not stable yet.
+            let checkDevices = false
+            if (!this.devices.input.options.length || this.devices.output.options.length) {
+                checkDevices = true
+            }
+
+            if (!checkDevices) return
+
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices()
+                let inputOptions = []
+                let outputOptions = []
                 for (const device of devices) {
                     if (device.kind === 'audioinput') {
-                        this.inputDevice.options.push({
+                        inputOptions.push({
                             id: device.deviceId,
                             name: device.label,
                         })
                     } else if (device.kind === 'audiooutput') {
-                        this.outputDevice.options.push({
+                        outputOptions.push({
                             id: device.deviceId,
                             name: device.label,
                         })
                     }
                 }
+
+                app.setState({
+                    settings: {
+                        webrtc: {
+                            media: {
+                                devices: {
+                                    input: {options: inputOptions},
+                                    output: {options: outputOptions},
+                                },
+                            },
+                        },
+                    },
+                }, {persist: true})
             } catch (err) {
                 console.error(err)
             }
@@ -83,6 +99,7 @@ module.exports = (app) => {
         staticRenderFns: templates.settings.s,
         store: {
             app: 'app',
+            devices: 'settings.webrtc.media.devices',
             env: 'env',
             settings: 'settings',
             tabs: 'ui.tabs.settings',
