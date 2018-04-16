@@ -68,10 +68,10 @@
             &.disabled {
                 color: rgba(255, 255, 255, 0.5);
 
+                &.active,
                 &:hover {
-                    background: none;
+                    background: rgba(255, 255, 255, 0.6);
                     color: rgba(255, 255, 255, 0.5);
-                    cursor: not-allowed;
                 }
             }
 

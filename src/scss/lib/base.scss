@@ -54,6 +54,10 @@ body {
             height: $spacer * 5;
         }
     }
+
+    .switch[type="checkbox"]:checked + label::before {
+        background: $green-color;
+    }
 }
 
 // A generic link class that can be used on non-html elements

@@ -73,7 +73,9 @@ module.exports = (app) => {
         }, app.helpers.sharedMethods()),
         mounted: function() {
             // Focus the input element directly.
-            this.$refs.input.focus()
+            if (!this.callingDisabled) {
+                this.$refs.input.focus()
+            }
         },
         props: {
             call: {default: null},

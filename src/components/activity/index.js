@@ -2,8 +2,11 @@ module.exports = (app) => {
 
     return {
         computed: {
-            sortedRecents: function() {
-                return this.activity.sort(app.utils.sortByMultipleKey(['date'], -1))
+            filteredRecents: function() {
+                let activity = this.activity.sort(app.utils.sortByMultipleKey(['date'], -1))
+                if (this.filters.reminders) activity = activity.filter((i) => i.remind)
+                if (this.filters.missed) activity = activity.filter((i) => i.label === 'missed')
+                return activity
             },
             sortedReminders: function() {
                 return this.activity.filter((i) => i.remind)
@@ -23,8 +26,18 @@ module.exports = (app) => {
                     classes[modifier.status] = true
                 } else if (block === 'remind-button') {
                     if (modifier.remind) classes.active = true
+                } else if (block === 'filter-missed-calls') {
+                    if (this.filters.missed) classes.active = true
+                } else if (block === 'filter-reminders') {
+                    if (this.filters.reminders) classes.active = true
                 }
                 return classes
+            },
+            toggleFilterMissedCalls: function() {
+                app.setState({activity: {filters: {missed: !app.state.activity.filters.missed}}}, {persist: true})
+            },
+            toggleFilterReminders: function() {
+                app.setState({activity: {filters: {reminders: !app.state.activity.filters.reminders}}}, {persist: true})
             },
             toggleReminder: function(activity) {
                 activity.remind = !activity.remind
@@ -40,6 +53,7 @@ module.exports = (app) => {
         store: {
             activity: 'activity.activity',
             contacts: 'contacts.contacts',
+            filters: 'activity.filters',
             tabs: 'ui.tabs.activity',
             user: 'user',
         },

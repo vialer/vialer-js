@@ -33,7 +33,7 @@
 
     <div class="field">
         <input id="dnd_availability" v-model="dnd" type="checkbox" name="platform_availability" class="switch is-warning"
-        :disabled="!webrtc.enabled || callingDisabled">
+        :disabled="!webrtc.enabled">
         <label for="dnd_availability">{{$t('Do not disturb')}} (Do not Disturb)</label>
         <em class="help">
             {{$t('Decline incoming softphone calls.')}}

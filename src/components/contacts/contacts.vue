@@ -3,8 +3,8 @@
         <header>
             <h1>{{$t('Contacts')}}</h1>
             <div class="vertical-devider"></div>
-            <div class="filters">
-                <div class="filter favorites-filter" :class="classes('favorites-filter')" @click="toggleFilterFavorites()">
+            <div class="content-filters">
+                <div class="filter" :class="classes('favorites-filter')" @click="toggleFilterFavorites()">
                     <icon name="star"/>
                     {{$t('Favorites')}}
                 </div>

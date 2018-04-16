@@ -5,37 +5,6 @@
 
     header {
         display: flex;
-
-        .filters {
-            font-size: 0.8rem;
-
-            .filter {
-                &:hover {
-                    cursor: pointer;
-                }
-            }
-
-            .favorites-filter {
-                align-items: center;
-                color: $grey-color-dark;
-                display: flex;
-                font-weight: 500;
-                justify-content: center;
-                vertical-align: middle;
-
-                svg {
-                    margin-right: $spacer / 2;
-                }
-
-                &.active {
-                    color: #000;
-
-                    svg {
-                        color: $yellow-color;
-                    }
-                }
-            }
-        }
     }
 
     .contacts-options {

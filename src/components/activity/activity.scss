@@ -3,6 +3,10 @@
 
 .component-activity {
 
+    header {
+        display: flex;
+    }
+
     .tabs-squeezed {
         margin: 0 $spacer * 9;
         margin-bottom: $spacer;

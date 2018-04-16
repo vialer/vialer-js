@@ -39,20 +39,24 @@ class CallSIP extends Call {
         })
 
         this.session.on('rejected', (e) => {
-            const reason = this._parseHeader(e.getHeader('reason'))
+            // The `e` is a SIP header string when the callee hangs up,
+            // otherwise it is an object.
+            if (typeof e === 'object') {
+                const reason = this._parseHeader(e.getHeader('reason'))
 
-            if (reason.get('text') === 'Call completed elsewhere') {
-                this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
-                this.setState({status: 'answered_elsewhere'})
-            } else {
-                // `Call completed elsewhere` is not considered to be
-                // a missed call and will not end up in the activity log.
-                this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
-                this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
-                // `e.method` is CANCEL when the incoming caller hung up.
-                // `e` will be a SIP response 480 when the callee hung up.
-                if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
-                else this.setState({status: 'rejected_a'})
+                if (reason.get('text') === 'Call completed elsewhere') {
+                    this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
+                    this.setState({status: 'answered_elsewhere'})
+                } else {
+                    // `Call completed elsewhere` is not considered to be
+                    // a missed call and will not end up in the activity log.
+                    this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
+                    this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
+                    // `e.method` is CANCEL when the incoming caller hung up.
+                    // `e` will be a SIP response 480 when the callee hung up.
+                    if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
+                    else this.setState({status: 'rejected_a'})
+                }
             }
 
             this._stop({message: this.translations[this.state.status]})
@@ -206,8 +210,6 @@ class CallSIP extends Call {
             // A fresh outgoing Call; not yet started. There may or may not
             // be a session object. End the session if there is one.
             if (this.session) this.session.terminate()
-            // Decrease the stop event delay, because the user is already
-            // aware of the intend to end the call.
             this.setState({status: 'rejected_a'})
             // The session's closing events will not be called, so manually
             // trigger the Call to stop here.
@@ -226,7 +228,9 @@ class CallSIP extends Call {
                     this.setState({status: 'bye'})
                 }
             } catch (err) {
-                this.app.logger.warn(`${this}unable to close the session properly.`)
+                this.app.logger.warn(`${this}unable to close the session properly. (${err})`)
+                // Get rid of the Call anyway.
+                this._stop()
             }
         }
     }

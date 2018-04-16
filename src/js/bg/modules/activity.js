@@ -54,6 +54,10 @@ class ModuleActivity extends Module {
     _initialState() {
         return {
             activity: [],
+            filters: {
+                missed: false,
+                reminders: false,
+            },
             unread: false,
         }
     }

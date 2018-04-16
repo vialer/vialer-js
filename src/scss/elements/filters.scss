@@ -1,0 +1,33 @@
+.content-filters {
+    align-items: flex-start;
+    display: flex;
+    font-size: 0.8rem;
+    justify-content: top;
+
+    .filter {
+        align-items: center;
+        color: $grey-color-dark;
+        display: flex;
+        font-weight: 500;
+        justify-content: center;
+        margin-right: $spacer;
+        user-select: none;
+        vertical-align: middle;
+
+        svg {
+            margin-right: $spacer / 2;
+        }
+
+        &.active {
+            color: #000;
+
+            svg {
+                color: $yellow-color;
+            }
+        }
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+}

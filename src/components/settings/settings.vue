@@ -97,7 +97,7 @@
                     <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`phoneaccount`)">{{$t('VoIP-accounts')}}</a> {{ $t('to create a VoIP-account.') }}.</li>
                 </ul>
             </div>
-            <div class="notification-box troubleshoot" v-else-if="settings.webrtc.enabled">
+            <div class="notification-box info" v-else-if="settings.webrtc.enabled">
                 <header>
                     <icon name="info"/><span>{{`${$t('VoIP account')} ${$t('checklist')}`}}</span>
                 </header>
@@ -150,44 +150,38 @@
             :options="settings.webrtc.codecs.options"
             :placeholder="$t('Select an input device')"/>
 
-        <!-- Microphone permission switch -->
-        <Field name="webrtc_permission" type="checkbox" :disabled="true" class="webrtc-switch"
-            :label="$t('Microphone access')" :model.sync="settings.webrtc.media.permission" />
-
         <div class="field">
+            <label class="label">{{$t('Microphone access')}}</label>
             <!-- Additional help to guide the user to the browser permission settings. -->
             <em class="help" v-if="settings.webrtc.media.permission">
-                {{$t('Check if the volume meter responds to your voice.')}}
+                {{$t('The browser has permission to access the microphone.')}}
+                {{$t('Check if the microphone responds to your voice.')}}
                 <Soundmeter/>
             </em>
             <!-- Give the user instructions how to enable the microphone in the popout -->
             <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.media.permission && env.isPopout">
                 <header>
-                    <icon name="warning"/><span>{{$t('The softphone doesn\'t have access to your microphone!')}}</span>
+                    <icon name="warning"/>
+                    <span>{{$t('The softphone doesn\'t have access to your microphone!')}}</span>
                 </header>
                 <ul>
                     <!-- Reference to the popout mode from the popup modus only-->
-                    <li >
+                    <li>
                         {{$t('Inspect the browser navigation bar for microphone access.')}}
                         <icon name="video-cam-disabled" class="video-cam-disabled"/>
                     </li>
-                    <li>
-                        {{$t('Refresh or close this tab afterwards to reflect your changes.')}}
-                    </li>
+                    <li>{{$t('Refresh or close this tab afterwards to reflect your changes.')}}</li>
                 </ul>
             </div>
 
-            <a class="microphone-popout button is-danger" v-if="!settings.webrtc.media.permission && !env.isPopout" @click="openPopoutView">
-                <span class="icon is-small">
-                    <icon name="microphone"/>
-                </span>
-                <span>{{$t('Allow microphone permission')}}</span>
-            </a>
-            <em class="help" v-if="!settings.webrtc.media.permission && !env.isPopout">
-                {{$t('The softphone doesn\'t have access to your microphone!')}}
-            </em>
+            <span v-if="!settings.webrtc.media.permission && !env.isPopout">
+                <em class="help">{{$t('The softphone doesn\'t have access to your microphone!')}}</em>
+                <a class="microphone-popout button is-danger" @click="openPopoutView">
+                    <span class="icon is-small"><icon name="microphone"/></span>
+                    <span>{{$t('Allow microphone permission')}}</span>
+                </a>
+            </span>
         </div>
-
 
         <Field name="input_device" type="select" v-if="user.developer"
             :label="$t('Input device')" :model.sync="settings.webrtc.sinks.input"
