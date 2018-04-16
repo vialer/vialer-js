@@ -2,15 +2,15 @@
     <!-- First loop through all the active calls -->
     <div :data-tooltip="callTitle(call)" class="call tooltip tooltip-left" :class="classes(call, 'call-button')"
         v-if="call.status !== 'new'" v-for="call in calls" @click="activateOrDeleteCall(call)">
-        <svgicon :name="callIcon(call)"/>
+        <icon :name="callIcon(call)"/>
     </div>
     <!-- New call always end up at the bottom -->
     <div :data-tooltip="callTitle(call)" class="call tooltip tooltip-left" :class="classes(call, 'call-button')"
         v-if="call.status === 'new'" v-for="call in calls" @click="activateOrDeleteCall(call)">
-        <svgicon :name="callIcon(call)"/>
+        <icon :name="callIcon(call)"/>
     </div>
     <!-- Create new Call button -->
     <div :data-tooltip="$t('Setup new Call')" class="call tooltip tooltip-left" v-if="newCallAllowed()" @click="createCall(false, false)">
-        <svgicon name="dialpad"/>
+        <icon name="dialpad"/>
     </div>
 </component>

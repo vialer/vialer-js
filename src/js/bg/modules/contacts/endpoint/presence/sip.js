@@ -2,7 +2,7 @@
 * @module ModuleContacts
 */
 const Presence = require('./index')
-const SUBSCRIBE_DELAY = 150
+const SUBSCRIBE_DELAY = 50
 
 
 /**
@@ -10,8 +10,8 @@ const SUBSCRIBE_DELAY = 150
 */
 class PresenceSip extends Presence {
 
-    constructor(contact, calls) {
-        super(contact, calls)
+    constructor(endpoint) {
+        super(endpoint)
         this.subscription = null
     }
 
@@ -64,12 +64,12 @@ class PresenceSip extends Presence {
     */
     subscribe() {
         return new Promise((resolve, reject) => {
-            this.subscription = this.calls.ua.subscribe(`${this.contact.state.id}@voipgrid.nl`, 'dialog')
+            this.subscription = this.app.modules.calls.ua.subscribe(`${this.endpoint.state.id}@voipgrid.nl`, 'dialog')
             this.subscription.on('notify', (notification) => {
                 const status = this._statusFromDialog(notification)
-                this.contact.setState({status: status})
+                this.endpoint.setState({status})
                 setTimeout(() => {
-                    resolve(this.contact)
+                    resolve(this.endpoint)
                 }, SUBSCRIBE_DELAY)
             })
         })
@@ -82,7 +82,16 @@ class PresenceSip extends Presence {
     * @param {Number} accountId - The accountId to deregister.
     */
     unsubscribe() {
-        if (this.subscription) this.subscription.unsubscribe()
+        if (this.subscription) {
+            try {
+                this.subscription.unsubscribe()
+                this.endpoint.setState({status: 'unregistered'})
+            } catch (err) {
+                this.app.logger.debug(`${this}failed to unsubscribe properly`)
+            }
+
+
+        }
         this.subscription = null
     }
 }

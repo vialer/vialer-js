@@ -77,6 +77,9 @@ class ModuleUI extends Module {
             },
             overlay: null,
             tabs: {
+                activity: {
+                    active: 'recent',
+                },
                 settings: {
                     active: 'phone',
                 },
@@ -166,7 +169,6 @@ class ModuleUI extends Module {
                         } else {
                             browser.browserAction.setIcon({path: `img/menubar-${newVal}.png`})
                         }
-
                     } else {
                         browser.browserAction.setIcon({path: `img/menubar-${this.app.state.ui.menubar.default}.png`})
                     }

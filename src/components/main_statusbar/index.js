@@ -5,6 +5,17 @@ module.exports = (app) => {
     const MainStatusbar = {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
+            classes: function(block) {
+                let classes = {}
+                if (block === 'component') {
+                    if (this.user.authenticated) {
+                        if (this.ua.status === 'disconnected') classes.error = true
+                        else if (this.dnd) classes.warning = true
+                        else classes.default = true
+                    } else classes.default = true
+                }
+                return classes
+            },
             logout: app.helpers.logout,
             refreshApiData: function() {
                 if (!this.app.online) return

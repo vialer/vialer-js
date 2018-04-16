@@ -8,7 +8,7 @@ $spacer: 8px;
 
 // Dimensions: The boundaries of the popup.
 $max-popup-width: 500px;
-$min-popup-height: 260px;
+$min-popup-height: 284px;
 $max-popup-height: 600px;
 
 // Colors: Base variable color palette; overriden by vialer-jsrc colors object.
@@ -17,6 +17,7 @@ $grey-color: #999 !default;
 $primary-color: #3c3c50 !default;
 $green-color: #28ca42 !default;
 $red-color: #d9534f !default;
+$yellow-color: #ffc02f !default;
 
 // Colors: Derivate colors from the base color palette.
 $grey-color-darkest: darken($grey-color, 30%);
@@ -29,6 +30,7 @@ $grey-color-lightest: lighten($grey-color, 38%);
 // Shared (Bulma)
 $warning: $orange-color;
 $yellow-color: $yellow;
+$white-color: $white;
 
 $white: #fff;
 $success: $green-color;

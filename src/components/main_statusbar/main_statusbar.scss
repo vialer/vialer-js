@@ -1,9 +1,10 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 // The most upper box containing account info and
 // icon-links to several locations.
 .component-main-statusbar {
-    background: $grey-color-lighter;
+
     color: $grey-color;
     display: flex;
     font-size: 0.8rem;
@@ -11,15 +12,46 @@
     height: ($spacer * 5);
     justify-content: space-between;
 
+    &.default {
+        background: $grey-color-lighter;
+
+        .status-left .status-indicator svg {
+            &.dnd {fill: $orange-color;}
+            &.disconnected {fill: $red-color;}
+            &.connected {fill: $green-color;}
+            &.microphone-denied {fill: $red-color;}
+            &.registered {fill: $green-color;}
+            &.registration-failed {fill: $red-color;}
+        }
+    }
+
+    &.warning {
+        background: $orange-color;
+        color: $white-color;
+
+        .status-left .status-indicator svg {
+            fill: $white-color;
+        }
+    }
+
+    &.error {
+        background: $red-color;
+        color: $white-color;
+
+        .status-left .status-indicator svg {
+            fill: $white-color;
+        }
+    }
+
+
     .vendor {
         align-items: center;
         display: flex;
 
         .vendor-logo {
+            @include icon-size($spacer * 3);
             fill: $brand-color;
-            height: $spacer * 3;
             margin-left: $spacer / 2;
-            width: $spacer * 3;
         }
 
         .vendor-name {
@@ -29,7 +61,6 @@
             padding-left: $spacer;
         }
     }
-
 
     &.dnd {
         background: $red-color;
@@ -58,15 +89,7 @@
             width: $spacer * 5;
 
             svg {
-                height: $spacer * 3;
-                width: $spacer * 3;
-
-                &.dnd {fill: $orange-color;}
-                &.disconnected {fill: $red-color;}
-                &.connected {fill: $green-color;}
-                &.microphone-denied {fill: $red-color;}
-                &.registered {fill: $green-color;}
-                &.registration-failed {fill: $red-color;}
+                @include icon-size($spacer * 3);
             }
         }
 
@@ -98,6 +121,7 @@
             &.active,
             &:hover {
                 background: $white;
+                color: $brand-color;
                 cursor: pointer;
             }
         }

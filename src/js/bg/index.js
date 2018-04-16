@@ -135,21 +135,10 @@ class AppBackground extends App {
             // See if we can decipher the stored encrypted state when
             // there is an active vault, a key and an encrypted store.
             if (this.state.settings.vault.key) {
-                const encryptedState = this.store.get('state.encrypted')
-                if (encryptedState) {
-                    await this.crypto._importVaultKey(this.state.settings.vault.key)
-                    await this._restoreState()
-                    menubarState = this.state.ui.menubar.default
-                    // Kickstart services; application is ready again.
-                    this.__initServices()
-                } else {
-                    this.logger.debug(`${this}relogin required - a key is available, but no vault found in store`)
-                    // There is a vault key, but no vault to open. Relogin.
-                    this.setState({
-                        settings: {vault: {unlocked: false}},
-                        ui: {layer: 'login'}, user: {authenticated: false},
-                    }, {encrypt: false, persist: true})
-                }
+                // Restores the user's identity.
+                await this.__unlockVault({key: this.state.settings.vault.key})
+                this.__initServices()
+                menubarState = this.state.ui.menubar.default
             } else {
                 // Active vault, but no key. Ask the user for the key.
                 menubarState = 'lock-on'
@@ -174,7 +163,6 @@ class AppBackground extends App {
         this.initViewModel(watchers)
         // (!) State is reactive from here on.
         this.setState({ui: {menubar: {default: menubarState}}})
-
         // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()
@@ -187,17 +175,17 @@ class AppBackground extends App {
     * loosing all of the personalized state properties.
     */
     __logoutState() {
-        let _state = this._initialState()
-        delete _state.app
-        delete _state.user
+        let _initialState = this._initialState()
+        delete _initialState.app
+        delete _initialState.user
 
         this.setState({
-            availability: _state.availability,
-            calls: _state.calls,
-            contacts: _state.contacts,
-            queues: _state.queues,
+            availability: _initialState.availability,
+            calls: _initialState.calls,
+            contacts: _initialState.contacts,
+            queues: _initialState.queues,
             settings: {
-                webrtc: _state.settings.webrtc,
+                webrtc: _initialState.settings.webrtc,
             },
             user: {password: ''},
         }, {persist: true})
@@ -211,51 +199,62 @@ class AppBackground extends App {
     * state storage for `AppBackground`.
     * @param {Object} options - See the parameter description of super.
     */
-    async __mergeState({action = null, encrypt = true, path = null, persist = false, state}) {
+    async __mergeState({action = 'upsert', encrypt = true, path = null, persist = false, state}) {
         super.__mergeState({action, encrypt, path, persist, state})
         if (!persist) return
 
         // Background is leading and is the only one that
         // writes to storage using encryption.
-        if (encrypt) {
-            let cipherDataBefore = this.store.get('state.encrypted')
-            let stateClone
-
-            if (cipherDataBefore) {
-                stateClone = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, cipherDataBefore))
-            } else {
-                stateClone = {}
+        let storageKey = encrypt ? 'state.encrypted' : 'state.unencrypted'
+        let stateClone = this.store.get(storageKey)
+        if (stateClone) {
+            if (encrypt) {
+                stateClone = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, stateClone))
             }
-            this.__mergeDeep(stateClone, state)
-            const cipherDataAfter = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(stateClone))
-            this.store.set('state.encrypted', cipherDataAfter)
-        } else {
-            let stateClone = this.store.get('state.unencrypted')
-            if (!stateClone) stateClone = {}
-            this.__mergeDeep(stateClone, state)
-            this.store.set('state.unencrypted', stateClone)
+        } else stateClone = {}
+
+        // Properly store specific properties from a key path.
+        if (path) {
+            path = path.split('.')
+            const _ref = path.reduce((o, i)=>o[i], stateClone)
+            this.__mergeDeep(_ref, state)
+        } else this.__mergeDeep(stateClone, state)
+
+        // Encrypt the updated store state.
+        if (encrypt) {
+            stateClone = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(stateClone))
         }
 
+        this.store.set(storageKey, stateClone)
     }
 
 
     /**
     * Unlock the encrypted store while the application is already running.
-    * @param {String} username - The username to unlock the store with.
-    * @param {String} password - The password to unlock the store with.
+    * @param {Object} [options] - The options to pass.
+    * @param {String} [options.username] - The username to unlock the store with.
+    * @param {String} [options.password] - The password to unlock the store with.
     */
-    async __unlockVault(username, password) {
-        try {
+    async __unlockVault({key = null, username = null, password = null} = {}) {
+        if (key) {
+            this.logger.info(`${this}unlocking vault with existing cryptokey`)
+            await this.crypto._importVaultKey(key)
+        } else if (username && password) {
+            this.logger.info(`${this}unlocking vault with credentials`)
             await this.crypto.loadIdentity(username, password)
-            // Clean the state after retrieving a state dump from the store.
-            await this._restoreState()
-            // And we're authenticated again!
-            this.setState({settings: {vault: {active: true, unlocked: true}}, user: {authenticated: true}}, {encrypt: false, persist: true})
-            this.__initServices()
-        } catch (err) {
-            this.setState({user: {authenticated: false}}, {encrypt: false, persist: true})
-            const message = this.$t('Failed to unlock. Please check your password.')
-            this.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
+        } else {
+            throw new Error('Cannot unlock without session key or credentials.')
+        }
+
+        await this._restoreState()
+        this.setState({
+            settings: {vault: {active: true, unlocked: true}},
+            user: {authenticated: true},
+        }, {encrypt: false, persist: true})
+
+        // Set the default layer if it's still on unlock.
+        if (this.state.ui.layer === 'unlock') {
+            this.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
         }
     }
 
@@ -276,12 +275,13 @@ class AppBackground extends App {
 
 
     /**
-    * The stored state are two separated serialized JSON objects.
-    * One is for encrypted data, and the other for unencrypted data.
-    * When the application needs to get its state together, this method
-    * will restore the combined state from storage with some
-    * module-specific state that needs to be (re)set when the
-    * application state is being restored.
+    * The stored state is separated between two serialized JSON objects
+    * in localStorage. One is for encrypted data, and the other for
+    * unencrypted data. When the application needs to retrieve its state
+    * from storage, this method will restore the combined state
+    * and applies module-specific state changes. See for instance the
+    * _restoreState implementation in the Contacts module for a more
+    * complicated example.
     */
     async _restoreState() {
         let cipherData = this.store.get('state.encrypted')
@@ -320,6 +320,7 @@ class AppBackground extends App {
 }
 
 let options = {env, modules: [
+    {Module: require('./modules/activity'), name: 'activity'},
     {Module: require('./modules/app'), name: 'app'},
     {Module: require('./modules/availability'), name: 'availability'},
     {Module: require('./modules/calls'), name: 'calls'},

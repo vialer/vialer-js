@@ -22,8 +22,7 @@
             transition: all 250ms ease-in-out;
 
             svg {
-                height: $spacer * 3;
-                width: $spacer * 3;
+                @include icon-size($spacer * 3);
             }
 
             &.availability {
@@ -41,6 +40,22 @@
                 }
             }
 
+            // Unread red-dot on top of the recent icon.
+            &.unread {
+                position: relative;
+
+                &::after {
+                    @include icon-size(14px);
+                    background: $red-color;
+                    border-radius: 50%;
+                    content: "";
+                    position: absolute;
+                    right: 4px;
+                    top: 13px;
+                    z-index: 10;
+                }
+            }
+
             &.calls {
                 &.calls-active {color: $green-color;}
             }
@@ -53,10 +68,10 @@
             &.disabled {
                 color: rgba(255, 255, 255, 0.5);
 
+                &.active,
                 &:hover {
-                    background: none;
+                    background: rgba(255, 255, 255, 0.6);
                     color: rgba(255, 255, 255, 0.5);
-                    cursor: not-allowed;
                 }
             }
 

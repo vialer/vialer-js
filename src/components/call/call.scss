@@ -1,26 +1,59 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 .component-call {
+    align-items: center;
     color: $white;
     display: flex;
     flex-direction: column;
 
+    .soundmeter {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin: $spacer 0;
+
+        svg {
+            margin-left: -$spacer * 3;
+            margin-right: $spacer;
+        }
+
+        canvas {
+            height: $spacer;
+            width: 50%;
+        }
+
+    }
+
     .call-info {
         align-self: flex-start;
         font-weight: 400;
-        margin-bottom: $spacer * 3;
         text-align: center;
         width: 100%;
 
-        .info-name {font-size: 1.2rem;}
-
-        .info-number {
-            font-size: 1.8rem;
-            font-weight: 500;
+        .contact-avatar {
+            @include icon-size($spacer * 8);
+            background: $grey-color-lightest;
+            border-radius: 50%;
+            color: $grey-color-dark;
             margin-bottom: $spacer;
+            padding: $spacer;
+            z-index: 100;
         }
 
-        .info-status {font-size: 1.1rem;}
+        .info-name {
+            font-size: 1.2rem;
+        }
+
+        .info-number {
+            font-size: 1.6rem;
+            font-weight: 500;
+        }
+
+        .info-status {
+            font-size: 1rem;
+            font-weight: 500;
+        }
         .info-timer {font-size: 1rem;}
     }
 
@@ -34,7 +67,7 @@
         width: 100%;
 
         .rounded-button-with-text {
-            padding: $spacer / 2;
+            padding: $spacer * 0.75;
             text-align: center;
 
             .rounded-button {
@@ -42,8 +75,7 @@
                 margin-bottom: $spacer;
 
                 svg {
-                    height: $spacer * 3;
-                    width: $spacer * 3;
+                    @include icon-size($spacer * 3);
                 }
 
                 &:hover,
@@ -70,7 +102,7 @@
         }
 
         .option {
-            padding: 10px;
+            padding: $spacer * 2;
             text-align: center;
 
             &.active {
@@ -109,7 +141,7 @@
             display: flex;
             flex-direction: row;
             justify-content: center;
-            margin-bottom: $spacer * 3;
+            margin-bottom: $spacer * 2;
             width: 100%;
 
             .transfer-button {
@@ -148,8 +180,8 @@
         }
 
         .transfer-text {
-            font-size: 1.1rem;
-            margin-bottom: $spacer * 3;
+            font-size: 1rem;
+            margin-bottom: $spacer;
             text-align: center;
         }
 
@@ -169,8 +201,7 @@
     // TODO: Cleanup rounded-button class.
     .rounded-button {
         svg {
-            height: $spacer * 4;
-            width: $spacer * 4;
+            @include icon-size($spacer * 4);
         }
     }
 

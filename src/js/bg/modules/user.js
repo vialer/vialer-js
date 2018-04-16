@@ -24,8 +24,21 @@ class ModuleUser extends Module {
 
         this.app.on('bg:user:login', ({username, password}) => this.login(username, password))
         this.app.on('bg:user:logout', this.logout.bind(this))
-        this.app.on('bg:user:unlock', ({password}) => {
-            this.app.__unlockVault(this.app.state.user.username, password)
+        this.app.on('bg:user:unlock', async({password}) => {
+            try {
+                await this.app.__unlockVault({
+                    password,
+                    username: this.app.state.user.username,
+                })
+                this.app.__initServices()
+            } catch (err) {
+                this.app.setState({
+                    ui: {layer: 'unlock'},
+                    user: {authenticated: false},
+                }, {encrypt: false, persist: true})
+                const message = this.app.$t('Failed to unlock. Please check your password.')
+                this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
+            }
         })
 
         this.app.on('bg:user:update-token', async({callback}) => {
@@ -109,13 +122,7 @@ class ModuleUser extends Module {
         }
 
         // Unlock the store now we have the username and password.
-        if (this.app.store.get('state.encrypted')) {
-            await this.app.__unlockVault(username, password)
-        } else {
-            await this.app.crypto.loadIdentity(username, password)
-        }
-
-        this.app.setState({user: {authenticated: true, username}}, {encrypt: false, persist: true})
+        await this.app.__unlockVault({password, username})
 
         let startLayer
         if (this.app.state.app.installed) {
@@ -123,19 +130,22 @@ class ModuleUser extends Module {
             startLayer = 'settings'
             this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('Review your softphone and audio settings.'), timeout: 0, type: 'warning'})
         } else {
-            startLayer = 'contacts'
+            startLayer = 'calls'
             this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: user.realName}), type: 'success'})
         }
 
         this.app.setState({
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},
-            ui: {layer: startLayer, menubar: {default: 'active'}}}, {encrypt: false, persist: true})
+            ui: {layer: startLayer, menubar: {default: 'active'}},
+            user: {username},
+        }, {encrypt: false, persist: true})
+
         this.app.setState({
             user: {
                 client_id: user.client.replace(/[^\d.]/g, ''),
                 id: user.id,
-                password: password,
+                password,
                 platform: {
                     tokens: {
                         sip: user.token,
@@ -160,7 +170,7 @@ class ModuleUser extends Module {
         // and after unlocking the vault. Logout may be called from
         // the the lock screen. At this moment, the encrypted state
         // can't be persisted.
-        this.app.setState({user: {password: ''}}, this.app.state.user.authenticated ? {persist: true} : {})
+        this.app.setState({user: {password: ''}})
         this.app.setState({
             settings: {vault: {active: false, unlocked: false}},
             ui: {layer: 'login'},

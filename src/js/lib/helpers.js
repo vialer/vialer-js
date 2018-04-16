@@ -14,7 +14,7 @@
 */
 function helpers(app) {
 
-    const closingStatus = ['rejected_a', 'rejected_b', 'bye']
+    const closingStatus = ['answered_elsewhere', 'rejected_a', 'rejected_b', 'bye']
 
     let _helpers = {}
 
@@ -43,17 +43,19 @@ function helpers(app) {
     * @returns {Boolean} - Whether calling options are disabled.
     */
     _helpers.callingDisabled = function() {
-        let _disabled = false
+        let errors = []
 
-        if (!app.state.app.online) _disabled = true
-        else if (app.state.settings.webrtc.enabled) {
-            if (!app.state.settings.webrtc.media.permission) _disabled = true
-            else if (!(app.state.calls.ua.status === 'registered')) _disabled = true
+        if (!app.state.app.online) errors.push('offline')
+        if (app.state.settings.webrtc.enabled) {
+            if (!app.state.settings.webrtc.media.permission) errors.push('mediaPermission')
+            else if (!(app.state.calls.ua.status === 'registered')) errors.push('unregistered')
         } else {
             // ConnectAB mode.
-            if (!app.state.calls.ua.status === 'connected') _disabled = true
+            if (!app.state.calls.ua.status === 'connected') errors.push('disconnected')
         }
-        return _disabled
+
+        if (!errors.length) return false
+        else return errors
     }
 
 
@@ -111,23 +113,55 @@ function helpers(app) {
         return {
             call: {
                 accepted: {
-                    hold: $t('On hold'),
-                    incoming: $t('Incoming call'),
-                    outgoing: $t('Outgoing call'),
+                    hold: $t('on hold'),
+                    incoming: $t('calling'),
+                    outgoing: $t('calling'),
                 },
-                bye: $t('Call ended'),
-                create: $t('Setting up call'),
-                dialing_a: $t('Dialing phone A'),
-                dialing_b: $t('Dialing phone B'),
-                invite: $t('You are being called'),
-                rejected_a: $t('You disconnected'),
-                rejected_b: $t('Callee is busy'),
+                answered_elsewhere: $t('answered elsewhere'),
+                bye: $t('call ended'),
+                create: $t('setting up call'),
+                dialing_a: $t('dialing phone A'),
+                dialing_b: $t('dialing phone B'),
+                invite: $t('incoming call'),
+                rejected_a: $t('you disconnected'),
+                rejected_b: $t('callee is busy'),
+            },
+            callingDisabled: {
+                disconnected: $t('Can\'t connect to server (disconnected)'),
+                mediaPermission: $t('Go to Audio settings and give the browser permission to use your microphone.'),
+                offline: $t('You are currently not connected to the internet. Check your connectivity.'),
+                unregistered: $t('Can\'t connect to server (unregistered)'),
             },
         }
     }
 
+    /**
+        * Find the contact related to a calling number.
+        * @param {String} number - The number to look for.
+        * @param {Boolean} partial - Return the first matching number.
+        * @returns {Object|null} - Contact and Endpoint Id or null.
+        */
+    _helpers.matchContact = function(number, partial = false) {
+        const contacts = app.state.contacts.contacts
+        for (const contactId of Object.keys(contacts)) {
+            for (const endpointId of Object.keys(contacts[contactId].endpoints)) {
+                const endpoint = contacts[contactId].endpoints[endpointId]
+                if (partial) {
+                    if (String(endpoint.number).includes(number)) {
+                        return {contact: contacts[contactId].id, endpoint: endpoint.id}
+                    }
+                } else {
+                    if (String(endpoint.number) === number) return {contact: contacts[contactId].id, endpoint: endpoint.id}
+                }
+            }
+        }
+
+        return null
+    }
+
 
     _helpers.sharedMethods = function() {
+
         return {
             closeOverlay: function() {
                 app.setState({ui: {overlay: null}}, {encrypt: false, persist: true})
@@ -142,6 +176,7 @@ function helpers(app) {
                 app.emit('bg:calls:call_create', {number, start, transfer})
                 return number
             },
+            getTranslations: _helpers.getTranslations,
             openPlatformUrl: function(path = '') {
                 app.emit('bg:user:update-token', {
                     callback: ({token}) => {
@@ -169,6 +204,14 @@ function helpers(app) {
             setOverlay: function(layerName) {
                 app.setState({ui: {overlay: layerName}}, {encrypt: false, persist: true})
             },
+            setTab: function(category, name, condition = true) {
+                if (!condition) return
+                app.setState({ui: {tabs: {[category]: {active: name}}}}, {encrypt: false, persist: true})
+            },
+            translations: function(category, key) {
+                if (!this._translations) this._translations = this.getTranslations()
+                return this._translations[category][key]
+            },
         }
     }
 
@@ -194,7 +237,6 @@ function helpers(app) {
                 }
                 return translations[this.call.status]
             },
-
             hours: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60 / 60) % 24
             },
@@ -214,10 +256,10 @@ function helpers(app) {
             },
             sessionTime: function() {
                 let formattedTime
-                if (this.minutes.toString().length <= 1) formattedTime = '0'
-                formattedTime += `${this.minutes.toString()}:`
-                if (this.seconds.toString().length <= 1) formattedTime += '0'
-                formattedTime += `${this.seconds.toString()}`
+                if (this.minutes <= 9) formattedTime = `0${this.minutes}`
+                else formattedTime = `${this.minutes}`
+                if (this.seconds <= 9) formattedTime = `${formattedTime}:0${this.seconds}`
+                else formattedTime = `${formattedTime}:${this.seconds}`
                 return formattedTime
             },
             transferStatus: function() {

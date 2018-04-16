@@ -11,10 +11,13 @@ module.exports = (app) => {
                 // this logic if other kind of blocks are required.
                 classes.active = (this.layer === block)
 
-                if (block === 'availability') {
+                if (block === 'activity') {
+                    classes.unread = this.unread
+                } else if (block === 'availability') {
                     if (this.available) classes.available = true
                     else classes.unavailable = true
                 } else if (block === 'calls') {
+                    classes.disabled = !this.app.online
                     classes['calls-active'] = this.callOngoing
                 } else if (block === 'contacts') {
                     classes.hint = (this.transferStatus === 'select')
@@ -29,8 +32,10 @@ module.exports = (app) => {
         render: templates.main_menubar.r,
         staticRenderFns: templates.main_menubar.s,
         store: {
+            app: 'app',
             available: 'availability.available',
             layer: 'ui.layer',
+            unread: 'activity.unread',
         },
     }
 

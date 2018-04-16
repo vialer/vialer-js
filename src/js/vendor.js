@@ -12,6 +12,8 @@ global.Vue = require('vue/dist/vue.runtime')
 // Define custom tags here, so they are not interpreted by Vue.
 Vue.config.ignoredElements = ['component']
 
+// Used to generate small UUIDs.
+global.shortid = require('shortid')
 global.VueStash = require('vue-stash').default
 Vue.use(global.VueStash)
 
@@ -31,5 +33,5 @@ global.Vuelidate.validators = require('vuelidate/lib/validators')
 Vue.use(global.Vuelidate.default)
 
 Vue.use(global.VueSVGIcon, {
-    tagName: 'svgicon',
+    tagName: 'icon',
 })

@@ -1,19 +1,6 @@
 module.exports = (app) => {
 
-    var soundMeter = false
     const v = Vuelidate.validators
-
-    async function microphoneCheck() {
-        try {
-            soundMeter = new app.sounds.SoundMeter()
-            const stream = await navigator.mediaDevices.getUserMedia({audio: true})
-            soundMeter.connectToSource(stream)
-            return soundMeter
-        } catch (err) {
-            return false
-        }
-    }
-
 
     /**
     * @memberof fg.components
@@ -37,6 +24,14 @@ module.exports = (app) => {
             clearInterval(this.soundMeterInterval)
         },
         methods: Object.assign({
+            classes: function(block, modifier) {
+                let classes = {}
+                if (block === 'tabs') {
+                    if (modifier === 'audio' && !this.settings.webrtc.enabled) classes.disabled = true
+                    if (modifier === this.tabs.active) classes['is-active'] = true
+                }
+                return classes
+            },
             playSound: function() {
                 // Don't allow the user to frenzy-click the test-audio button.
                 if (!this.sound.enabled) return
@@ -50,39 +45,23 @@ module.exports = (app) => {
             },
             save: function(e) {
                 app.setState({
-                    availability: {dnd: false}, // Disable dnd after a save to keep conditions simple.
+                    // Disable dnd after a save to keep condition checks simple.
+                    availability: {dnd: false},
                     settings: this.settings,
                 }, {persist: true})
 
                 app.vm.$notify({icon: 'settings', message: app.$t('Settings stored'), type: 'success'})
                 app.emit('bg:calls:connect')
             },
-            setTab: function(name) {
-                app.setState({ui: {tabs: {settings: {active: name}}}}, {encrypt: false, persist: true})
-            },
         }, app.helpers.sharedMethods()),
         mounted: async function() {
             // Immediatly triger validation on the fields.
             this.$v.$touch()
-
-            if (!soundMeter) soundMeter = await microphoneCheck()
-            if (soundMeter) {
-                app.state.settings.webrtc.media.permission = true
-                this.soundMeterInterval = setInterval(() => {
-                    window.requestAnimationFrame(() => {
-                        Vue.set(this.sound, 'inputLevel', soundMeter.slow)
-                    })
-                }, 10)
-            } else {
-                // Still no soundMeter? Something terrible happened
-                // and we can't use WebRTC now.
-                app.state.settings.webrtc.media.permission = false
-            }
-
             // Query devices and fill the store with them. This is
             // currently a feature behind a developer flag, because
             // its not stable yet.
-            navigator.mediaDevices.enumerateDevices().then((devices) => {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices()
                 for (const device of devices) {
                     if (device.kind === 'audioinput') {
                         this.inputDevice.options.push({
@@ -96,9 +75,9 @@ module.exports = (app) => {
                         })
                     }
                 }
-            }).catch((err) => {
+            } catch (err) {
                 console.error(err)
-            })
+            }
         },
         render: templates.settings.r,
         staticRenderFns: templates.settings.s,
@@ -170,17 +149,6 @@ module.exports = (app) => {
                     }
                 } else {
                     this.settings.webrtc.account.selected = {id: null, name: null, password: null, username: null}
-                }
-            },
-            'settings.webrtc.permission': async function(newVal, oldVal) {
-                if (!soundMeter) soundMeter = await microphoneCheck()
-                if (soundMeter) {
-                    this.settings.webrtc.media.permission = true
-                    this.soundMeterInterval = setInterval(() => {
-                        Vue.set(this.sound, 'inputLevel', soundMeter.instant)
-                    }, 25)
-                } else {
-                    this.settings.webrtc.media.permission = false
                 }
             },
         },

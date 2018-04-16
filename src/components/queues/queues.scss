@@ -1,3 +1,4 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 .component-queues {
@@ -8,9 +9,8 @@
         }
 
         svg.icon-selected-queue {
+            @include icon-size($spacer * 2.5);
             fill: $green-color;
-            height: $spacer * 2.5;
-            width: $spacer * 2.5;
         }
 
         .status-icon {
@@ -21,16 +21,15 @@
             // It is a background with inside text, instead
             // of a font.
             .indicator {
+                @include icon-size($spacer * 3);
                 border-radius: 100%;
                 color: $white;
                 font-size: 0.8rem;
                 font-style: normal;
                 font-weight: 500;
-                height: $spacer * 3;
                 letter-spacing: 0;
                 line-height: $spacer * 3;
                 vertical-align: center;
-                width: $spacer * 3;
                 // Centers the icon in the middle of the background.
 
                 &.quiet {background: $green-color;}

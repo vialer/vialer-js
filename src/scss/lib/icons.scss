@@ -1,0 +1,35 @@
+// Default styling for inline SVG components (vue-svgicon).
+.svg-icon {
+    color: inherit;
+    display: inline-block;
+    fill: none;
+    height: 1rem;
+    stroke: currentColor;
+    vertical-align: middle;
+    width: 1rem;
+}
+
+.svg-fill {
+    fill: currentColor;
+    stroke: none;
+}
+
+.svg-up {
+    transform: rotate(0deg);
+}
+
+.svg-right {
+    transform: rotate(90deg);
+}
+
+.svg-down {
+    transform: rotate(180deg);
+}
+
+.svg-left {
+    transform: rotate(-90deg);
+}
+
+.spinner {
+    animation: spin 0.75s linear infinite;
+}

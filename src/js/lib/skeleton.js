@@ -29,7 +29,6 @@ class Skeleton extends EventEmitter {
         if (options.apps) this.apps = options.apps
         this._listeners = 0
         this.utils = new Utils()
-
         this.logger = new Logger(this)
 
         if (this.env.isExtension) {

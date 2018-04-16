@@ -1,3 +1,4 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 // Specific main panel styling per environment.
@@ -88,41 +89,58 @@ html {
         .panel-content {
             padding: $spacer * 3;
         }
+    }
 
-        .notification-box {
-            background: rgba($brand-color, 0.1);
-            border-radius: $spacer / 2;
-            font-size: 0.75rem;
-            margin: $spacer 0;
-            overflow: auto;
-            padding: $spacer ($spacer * 2);
+    .no-results {
+        align-items: center;
+        color: $grey-color-lighter;
+        display: flex;
+        flex-direction: column;
+        margin-top: $spacer * 6;
+        width: 100%;
 
-            header {
-                align-items: center;
-                display: flex;
-                font-weight: bold;
-                margin-bottom: $spacer;
-                text-transform: uppercase;
+        .no-results-icon {
+            @include icon-size($spacer * 5);
+        }
 
-                svg {
-                    color: $brand-color;
-                    margin-right: $spacer;
-                }
-            }
+        .no-results-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-top: $spacer;
+        }
+    }
 
-            .description {
-                margin-bottom: $spacer;
-            }
+    .disabled-placeholder {
+        align-items: center;
+        color: $grey-color-lighter;
+        display: flex;
+        flex-direction: column;
+        margin-top: $spacer * 6;
+        width: 100%;
+
+        .disabled-icon {
+            @include icon-size($spacer * 8);
+            color: $brand-color;
+        }
+
+        .disabled-text {
+            color: $brand-color;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-top: $spacer * 2;
+            text-align: center;
+            width: 75%;
+        }
+
+        .disabled-reason {
+            color: $grey-color;
+            margin-top: $spacer * 2;
+            text-align: center;
+            width: 75%;
 
             ul {
                 li {
-                    margin-bottom: $spacer / 4;
-
-                    // Icons that are used in help texts.
-                    svg {
-                        height: 0.75rem;
-                        width: 0.75rem;
-                    }
+                    margin-bottom: $spacer;
                 }
             }
         }

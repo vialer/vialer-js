@@ -181,8 +181,7 @@
     // TODO: Cleanup rounded-button class.
     .rounded-button {
         svg {
-            height: $spacer * 4;
-            width: $spacer * 4;
+            @include icon-size($spacer * 4);
         }
     }
 

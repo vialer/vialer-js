@@ -23,18 +23,16 @@ module.exports = (app) => {
         computed: Object.assign({
             matchedContact: function() {
                 let _number = String(this.number)
-                let matchedContact = null
-
                 if (_number.length > 1) {
-                    for (const id of Object.keys(this.contacts)) {
-                        const contact = this.contacts[id]
-                        const number = String(contact.number)
-                        if (number.includes(_number)) {
-                            matchedContact = contact
+                    let match = app.helpers.matchContact(String(this.number), true)
+                    if (match) {
+                        return {
+                            contact: this.contacts[match.contact],
+                            endpoint: this.contacts[match.contact].endpoints[match.endpoint],
                         }
                     }
                 }
-                return matchedContact
+                return null
             },
         }, app.helpers.sharedComputed()),
         methods: Object.assign({
@@ -75,7 +73,9 @@ module.exports = (app) => {
         }, app.helpers.sharedMethods()),
         mounted: function() {
             // Focus the input element directly.
-            this.$refs.input.focus()
+            if (!this.callingDisabled) {
+                this.$refs.input.focus()
+            }
         },
         props: {
             call: {default: null},

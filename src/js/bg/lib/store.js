@@ -29,7 +29,7 @@ class Store {
 
     constructor(app) {
         this.app = app
-        this.schema = 7
+        this.schema = 8
 
         if (this.app.env.isNode) this.store = new MemoryStore()
         else this.store = localStorage

@@ -21,16 +21,22 @@ class AppForeground extends App {
     constructor(opts) {
         super(opts)
 
+        this.__fgReady = false
+
         // Create a remote notification.
         this.on('fg:notify', (message) => this.vm.$notify(message))
-        // Make state modifications from AppBackground.
-        this.on('fg:set_state', this.__mergeState.bind(this))
+        // Make state modifications from AppBackground, but only
+        // after fg had its initial state received from bg.
+        this.on('fg:set_state', (data) => {
+            if (this.__fgReady) this.__mergeState(data)
+        })
 
         /**
         * @namespace AppForeground.components
         */
         this.components = {
             About: require('../../components/about'),
+            Activity: require('../../components/activity'),
             Availability: require('../../components/availability'),
             Call: require('../../components/call'),
             CallKeypad: require('../../components/call_keypad'),
@@ -45,6 +51,7 @@ class AppForeground extends App {
             Notifications: require('../../components/notifications'),
             Queues: require('../../components/queues'),
             Settings: require('../../components/settings'),
+            Soundmeter: require('../../components/soundmeter'),
             Telemetry: require('../../components/telemetry'),
             Unlock: require('../../components/unlock'),
         }
@@ -71,6 +78,7 @@ class AppForeground extends App {
                 // serialize data between scripts, so this is done in
                 // webview mode as well for consistency's sake.
                 this.state = JSON.parse(state)
+                this.__fgReady = true
                 // (!) Don't inherit the env of the background script.
                 this.state.env = this.env
 
@@ -81,17 +89,6 @@ class AppForeground extends App {
                     // Keep track of the popup's visibility status by
                     // opening a long-lived connection to the background.
                     chrome.runtime.connect({name: 'vialer-js'})
-                }
-
-                if (!this.env.isFirefox) {
-                    navigator.mediaDevices.getUserMedia({audio: true}).then((stream) => {
-                        this.localStream = stream
-                        this.state.settings.webrtc.media.permission = true
-                    }).catch((err) => {
-                        this.state.settings.webrtc.media.permission = false
-                    })
-                } else {
-                    this.state.settings.webrtc.media.permission = false
                 }
             },
         })

@@ -39,6 +39,25 @@ body {
         font-weight: 500;
         line-height: none;
     }
+
+
+    .input {
+        box-shadow: none;
+
+        &:focus,
+        &:active {
+            border: 1px solid $brand-color;
+            box-shadow: 0 0 1px 1px rgba($brand-color, 0.3);
+        }
+
+        &[type="text"] {
+            height: $spacer * 5;
+        }
+    }
+
+    .switch[type="checkbox"]:checked + label::before {
+        background: $green-color;
+    }
 }
 
 // A generic link class that can be used on non-html elements
@@ -47,12 +66,6 @@ body {
     &:hover {
         color: $brand-color;
         cursor: pointer;
-    }
-}
-
-input {
-    &[type="text"] {
-        height: $spacer * 5;
     }
 }
 
@@ -82,11 +95,10 @@ video {
         padding: 8px;
 
         .status-icon {
+            @include icon-size($spacer * 6);
             align-items: center;
             display: flex;
-            height: $spacer * 6;
             justify-content: center;
-            width: $spacer * 6;
         }
 
         .info {
@@ -115,13 +127,12 @@ video {
         }
 
         .rounded-button {
+            @include icon-size($spacer * 4);
             background: $white;
             box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
-            height: $spacer * 4;
             line-height: 32px;
             padding: 0;
             text-align: center;
-            width: $spacer * 4;
 
             &:hover {
                 background: $brand-color;
@@ -138,42 +149,6 @@ video {
             color: $brand-color;
             content: "• ";
         }
-    }
-}
-
-.tabs {
-    height: $spacer * 7;
-    margin-bottom: 0;
-
-    ul {
-        display: flex;
-        justify-content: space-between;
-
-        li {
-            flex-grow: 1;
-        }
-    }
-
-    a {
-        height: $spacer * 7;
-        padding: 0.5rem 0.5rem;
-
-    }
-}
-
-// Button beneath tabs.
-.tabs-actions {
-    padding: 0 ($spacer * 3);
-    padding-bottom: ($spacer * 3);
-}
-
-.tab {
-    display: none;
-    margin-bottom: $spacer * 2;
-    padding: 0 ($spacer * 3);
-
-    &.is-active {
-        display: block;
     }
 }
 
@@ -202,93 +177,9 @@ video {
     background: rgba($brand-color, 0.1);
 }
 
-
-@keyframes grow {
-    0% {
-        display: none;
-        opacity: 0;
-    }
-
-    1% {
-        display: block;
-        opacity: 0;
-        transform: scale(0);
-    }
-
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@include keyframes(hint-pulse) {
-    0%  {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: $white;
-    }
-
-    50% {background-color: rgba(255, 255, 255, 0.2);}
-
-    100% {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: $white;
-    }
-}
-
-
-@include keyframes(hint-pulse-active) {
-    0%  {
-        background-color: rgba(255, 255, 255, 0.7);
-        color: $brand-variation-color;
-    }
-
-    50% {background-color: rgba(255, 255, 255, 1);}
-
-    100% {
-        background-color: rgba(255, 255, 255, 0.7);
-        color: $brand-variation-color;
-    }
-}
-
-
-// Recommended css code for vue-svgicon.
-.svg-icon {
-    color: inherit;
-    display: inline-block;
-    fill: none;
-    height: 1rem;
-    stroke: currentColor;
-    vertical-align: middle;
-    width: 1rem;
-}
-
-.svg-fill {
-    fill: currentColor;
-    stroke: none;
-}
-
-.svg-up {
-    transform: rotate(0deg);
-}
-
-.svg-right {
-    transform: rotate(90deg);
-}
-
-.svg-down {
-    transform: rotate(180deg);
-}
-
-.svg-left {
-    transform: rotate(-90deg);
-}
-
-.spinner {
-    animation: spin 0.75s linear infinite;
-}
-
-@keyframes spin {
-    100% {
-        transform: rotate(360deg);
-    }
+.vertical-devider {
+    background: $grey-color-light;
+    height: $spacer * 3;
+    margin: 0 $spacer;
+    width: 2px;
 }
