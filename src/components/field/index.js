@@ -137,7 +137,15 @@ module.exports = (app) => {
                             }
                         }
                     }
+                } else if (event.target.tagName === 'TEXTAREA') {
+                    // For now assume each line is an item in an Array, because
+                    // it suits the usecases for the blacklist items. Extend
+                    // when other usecases (plain text) are required.
+                    let items = event.target.value.split('\n')
+                    this.$emit('update:model', items)
                 }
+
+
 
                 if (this.validation) this.validation.$touch()
             },

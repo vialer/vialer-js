@@ -94,11 +94,21 @@ class Tabs {
         let allowedUrl = true
         for (let blacklistRegex of this.app.state.settings.click2dial.blacklist) {
             if (new RegExp(blacklistRegex).test(tab.url)) {
+                this.app.logger.debug(`${this}skipping icon placement for site with regex: '${blacklistRegex}'`)
                 allowedUrl = false
                 break
             }
         }
         return allowedUrl
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return `${this.app}[tabs] `
     }
 }
 

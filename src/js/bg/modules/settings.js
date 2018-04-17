@@ -20,7 +20,21 @@ class ModuleSettings extends Module {
     _initialState() {
         return {
             click2dial: {
-                blacklist: [],
+                blacklist: [
+                    '^chrome',
+                    // we prefer not to add icons in documents
+                    '^https?.*docs\\.google\\.com.*$',
+                    '^https?.*drive\\.google\\.com.*$',
+                    // Pages on these websites tend to grow too large to parse them in
+                    // a reasonable amount of time.
+                    '^https?.*bitbucket\\.org.*$',
+                    '^https?.*github\\.com.*$',
+                    '^https?.*rbcommons\\.com.*$',
+                    // This site has at least tel: support and uses javascript to open
+                    // a new web page when clicking the anchor element wrapping the
+                    // inserted icon.
+                    '^https?.*slack\\.com.*$',
+                ],
                 enabled: true,
             },
             language: {

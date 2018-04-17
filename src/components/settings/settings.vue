@@ -21,9 +21,15 @@
     <div class="tab" :class="{'is-active': tabs.active === 'general'}">
 
         <Field name="click2dial" type="checkbox"
-            :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
             :help="$t('Add clickable icons next to phonenumbers in webpages.')"
+            :label="`${$t('Click-to-Dial')} ${$t('icons')}`"
+            :model.sync="settings.click2dial.enabled"
             :placeholder="$t('SIP Server')"/>
+
+        <Field name="language" type="textarea"
+            :help="$t('The language used throughout the application.')"
+            :label="`${$t('Click-to-Dial')} ${$t('blacklist')}`" :model.sync="settings.click2dial.blacklist"
+            :placeholder="$t('Use one line per site.')"/>
 
         <Field name="language" type="select"
             :help="$t('The language used throughout the application.')"
@@ -157,10 +163,10 @@
         <div class="field">
             <label class="label">{{`${$t('Headset microphone')} ${$t('volume')}`}}</label>
             <!-- Additional help to guide the user to the browser permission settings. -->
+            <Soundmeter class="soundmeter"/>
             <em class="help" v-if="settings.webrtc.media.permission">
-                {{$t('The browser has permission to access the microphone.')}}
                 {{$t('Check if the microphone responds to your voice.')}}
-                <Soundmeter class="soundmeter"/>
+
             </em>
             <!-- Give the user instructions how to enable the microphone in the popout -->
             <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.media.permission && env.isPopout">
