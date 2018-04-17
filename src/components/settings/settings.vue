@@ -160,7 +160,7 @@
             <em class="help" v-if="settings.webrtc.media.permission">
                 {{$t('The browser has permission to access the microphone.')}}
                 {{$t('Check if the microphone responds to your voice.')}}
-                <Soundmeter/>
+                <Soundmeter class="soundmeter"/>
             </em>
             <!-- Give the user instructions how to enable the microphone in the popout -->
             <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.media.permission && env.isPopout">

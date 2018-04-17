@@ -7,24 +7,6 @@
     display: flex;
     flex-direction: column;
 
-    .soundmeter {
-        align-items: center;
-        display: flex;
-        justify-content: center;
-        margin: $spacer 0;
-
-        svg {
-            margin-left: -$spacer * 3;
-            margin-right: $spacer;
-        }
-
-        canvas {
-            height: $spacer;
-            width: 50%;
-        }
-
-    }
-
     .call-info {
         align-self: flex-start;
         font-weight: 400;
@@ -62,7 +44,7 @@
         display: flex;
         flex-direction: row;
         justify-content: center;
-        margin-bottom: $spacer;
+        margin-top: $spacer * 3;
         padding: 0 ($spacer * 5);
         width: 100%;
 
@@ -197,8 +179,8 @@
     display: flex;
     justify-content: center;
     width: 100%;
+    margin-top: $spacer;
 
-    // TODO: Cleanup rounded-button class.
     .rounded-button {
         svg {
             @include icon-size($spacer * 4);

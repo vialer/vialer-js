@@ -7,12 +7,7 @@
         <div class="info-status">
             <span>{{sessionTime}} - </span>
             <span>{{callStatus}}</span>
-            <div class="soundmeter">
-                <icon name="microphone"/>
-                <Soundmeter />
-            </div>
         </div>
-
     </div>
 
     <!-- Call options like transfer ops, on-hold and keypad -->

@@ -10,6 +10,8 @@ module.exports = (app) => {
                 if (block === 'component') {
                     if (this.user.authenticated) {
                         if (this.ua.status === 'disconnected') classes.error = true
+                        else if (!this.settings.webrtc.enabled) classes.notice = true
+                        else if (!this.settings.webrtc.media.permission) classes.error = true
                         else if (this.dnd) classes.warning = true
                         else classes.default = true
                     } else classes.default = true

@@ -20,6 +20,11 @@
         }
     }
 
+    .soundmeter {
+        border: 1px solid $grey-color-light;
+        height: $spacer * 4;
+    }
+
     // The switch is disabled, but use more opacity to indicate
     // that it's value is set from the browser.
     .webrtc-switch {
@@ -56,9 +61,7 @@
         .video-cam-disabled {
             path[pid="0"] {fill: $primary-color;}
             path[pid="1"] {fill: $white-color;}
-            rect[pid="2"] {
-                fill: $red-color;
-            }
+            rect[pid="2"] {fill: $red-color;}
         }
     }
 

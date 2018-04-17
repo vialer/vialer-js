@@ -25,6 +25,15 @@
         }
     }
 
+    &.notice {
+        background: $grey-color-dark;
+        color: $white-color;
+
+        .status-left .status-indicator svg {
+            fill: $white-color;
+        }
+    }
+
     &.warning {
         background: $orange-color;
         color: $white-color;

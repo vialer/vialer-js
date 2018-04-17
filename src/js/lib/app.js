@@ -51,6 +51,49 @@ class App extends Skeleton {
 
 
     /**
+    * Initialize multi-language support. An I18nStore is mounted
+    * to the store. Translations can be dynamically added.
+    */
+    __initI18n() {
+        const i18nStore = new I18nStore(this.state)
+        Vue.use(i18n, i18nStore)
+        let selectedLanguage = this.state.settings.language.selected.id
+        for (const translation of Object.keys(translations)) {
+            Vue.i18n.add(selectedLanguage, translations[translation])
+        }
+        Vue.i18n.set(selectedLanguage)
+        // Add a simple reference to the translation module.
+        this.$t = Vue.i18n.translate
+    }
+
+
+    /**
+    * Initialize media access and system sounds.
+    */
+    __initMedia() {
+        // Check media permission at the start of the bg/fg.
+        if (!this.env.isFirefox) {
+            navigator.mediaDevices.getUserMedia(this._getUserMediaFlags()).then((stream) => {
+                this.setState({settings: {webrtc: {media: {permission: true}}}}, {encrypt: false, persist: true})
+            }).catch((err) => {
+                // This error also may be triggered when there are no
+                // devices at all. The browser sometimes has issues
+                // finding any devices.
+                this.setState({settings: {webrtc: {media: {permission: false}}}}, {encrypt: false, persist: true})
+            })
+        } else {
+            this.setState({settings: {webrtc: {media: {permission: false}}}}, {encrypt: false, persist: true})
+        }
+
+        /**
+        * Sounds that are used in the application. They can both
+        * be triggered from `AppForeground` and `AppBackground`.
+        */
+        this.sounds = new Sounds(this)
+    }
+
+
+    /**
     * Application parts using this class should provide their own
     * initStore implementation. The foreground script for instance
     * gets its state from the background, while the background
@@ -214,31 +257,13 @@ class App extends Skeleton {
 
 
     /**
-    * Initialize multi-language support. An I18nStore is mounted
-    * to the store. Translations can be dynamically added.
-    */
-    initI18n() {
-        const i18nStore = new I18nStore(this.state)
-        Vue.use(i18n, i18nStore)
-        let selectedLanguage = this.state.settings.language.selected.id
-        for (const translation of Object.keys(translations)) {
-            Vue.i18n.add(selectedLanguage, translations[translation])
-        }
-        Vue.i18n.set(selectedLanguage)
-        // Add a simple reference to the translation module.
-        this.$t = Vue.i18n.translate
-    }
-
-
-
-    /**
     * Initialize Vue with the Vue-stash store, the
     * root rendering component and gathered watchers
     * from modules.
     * @param {Object} watchers - Store properties to watch for changes.
     */
     initViewModel(watchers) {
-        this.initI18n()
+        this.__initI18n()
 
         this.vm = new Vue({
             data: {
@@ -248,26 +273,7 @@ class App extends Skeleton {
             watch: watchers,
         })
 
-        // Check media permission at the start of the bg/fg.
-        if (!this.env.isFirefox) {
-            navigator.mediaDevices.getUserMedia(this._getUserMediaFlags()).then((stream) => {
-                this.setState({settings: {webrtc: {media: {permission: true}}}}, {encrypt: false, persist: true})
-            }).catch((err) => {
-                // This error also may be triggered when there are no
-                // devices at all. The browser sometimes has issues
-                // finding any devices.
-                this.setState({settings: {webrtc: {media: {permission: false}}}}, {encrypt: false, persist: true})
-            })
-        } else {
-            this.setState({settings: {webrtc: {media: {encrypt: false, permission: false}}}})
-        }
-
-
-        /**
-        * Sounds that are used in the application. They can both
-        * be triggered from `AppForeground` and `AppBackground`.
-        */
-        this.sounds = new Sounds(this)
+        this.__initMedia()
     }
 
 

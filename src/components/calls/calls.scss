@@ -1,9 +1,27 @@
 @import "../../scss/lib/variables";
 
 .component-calls {
+    // Push the soundmeter to the bottom.
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
     &.call-ongoing {
         background: linear-gradient(180deg, $brand-color, $brand-variation-color);
-        display: grid;
-        grid-template-columns: auto ($spacer * 5);
+
+        .calls-container {
+            display: grid;
+            grid-template-columns: auto ($spacer * 5);
+        }
+    }
+
+    .soundmeter {
+        align-items: center;
+        border-top: 1px solid darken($brand-variation-color, 5%);
+        display: flex;
+        height: $spacer * 1.5;
+        justify-content: center;
+        position: relative;
+        width: 100%;
     }
 }

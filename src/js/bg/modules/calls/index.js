@@ -28,7 +28,7 @@ class ModuleCalls extends Module {
         // made when the websocket connection is gone.
         this.reconnect = true
         // The default connection timeout to start with.
-        this.retryDefault = {interval: 1250, limit: 60000, timeout: 1250}
+        this.retryDefault = {interval: 250, limit: 10000, timeout: 250}
         // Used to store retry state.
         this.retry = Object.assign({}, this.retryDefault)
 
@@ -418,8 +418,10 @@ class ModuleCalls extends Module {
 
 
     /**
-    * Build the useragent string to identify Vialer-js with.
-    * The format is `Vialer-js/<VERSION> (<OS/<ENV>) <Vendor>`
+    * Build the useragent to identify Vialer-js with.
+    * The format is `Vialer-js/<VERSION> (<OS/<ENV>) <Vendor>`.
+    * Don't change this string lightly since third-party
+    * applications depend on it.
     * @returns {String} - Useragent string.
     */
     _userAgent() {
@@ -456,6 +458,8 @@ class ModuleCalls extends Module {
             'store.app.online': (isOnline, wasOnline) => {
                 if (!isOnline) {
                     this.app.setState({calls: {ua: {status: 'disconnected'}}})
+                    // Offline modus is not detected by Sip.js, so we manually disconnect.
+                    this.disconnect()
                 } else {
                     // We are online again, try to reconnect.
                     this.connect()
