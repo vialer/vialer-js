@@ -1,4 +1,5 @@
 const Skeleton = require('./skeleton')
+const Sounds = require('./sounds')
 
 
 /**
@@ -22,11 +23,7 @@ class App extends Skeleton {
         */
         this.modules = {}
         this._modules = options.modules
-        /**
-        * Sounds that are used in the application. They can both
-        * be triggered from `AppForeground` and `AppBackground`.
-        */
-        this.sounds = require('./sounds')
+
         // Use shorthand naming for the event target, because
         // the script context is part of the event name as a
         // convention.
@@ -176,16 +173,14 @@ class App extends Skeleton {
         this.userMediaFlags = {
             AUDIO_NOPROCESSING: {
                 audio: {
-                    mandatory: {
-                        echoCancellation: false,
-                        googAudioMirroring: false,
-                        googAutoGainControl: false,
-                        googAutoGainControl2: false,
-                        googEchoCancellation: false,
-                        googHighpassFilter: false,
-                        googNoiseSuppression: false,
-                        googTypingNoiseDetection: false,
-                    },
+                    echoCancellation: false,
+                    googAudioMirroring: false,
+                    googAutoGainControl: false,
+                    googAutoGainControl2: false,
+                    googEchoCancellation: false,
+                    googHighpassFilter: false,
+                    googNoiseSuppression: false,
+                    googTypingNoiseDetection: false,
                 },
             },
             AUDIO_PROCESSING: {
@@ -193,8 +188,9 @@ class App extends Skeleton {
             },
         }
 
-
         const userMediaFlags = this.userMediaFlags[this.state.settings.webrtc.media.type.selected.id]
+        const inputSink = this.state.settings.webrtc.media.devices.input.selected.id
+        if (inputSink) userMediaFlags.audio.deviceId = inputSink
         return userMediaFlags
     }
 
@@ -252,16 +248,26 @@ class App extends Skeleton {
             watch: watchers,
         })
 
-        // Check media permission.
+        // Check media permission at the start of the bg/fg.
         if (!this.env.isFirefox) {
             navigator.mediaDevices.getUserMedia(this._getUserMediaFlags()).then((stream) => {
                 this.setState({settings: {webrtc: {media: {permission: true}}}}, {encrypt: false, persist: true})
             }).catch((err) => {
+                // This error also may be triggered when there are no
+                // devices at all. The browser sometimes has issues
+                // finding any devices.
                 this.setState({settings: {webrtc: {media: {permission: false}}}}, {encrypt: false, persist: true})
             })
         } else {
             this.setState({settings: {webrtc: {media: {encrypt: false, permission: false}}}})
         }
+
+
+        /**
+        * Sounds that are used in the application. They can both
+        * be triggered from `AppForeground` and `AppBackground`.
+        */
+        this.sounds = new Sounds(this)
     }
 
 

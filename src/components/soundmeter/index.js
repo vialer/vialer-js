@@ -1,6 +1,7 @@
 module.exports = (app) => {
 
     const audioContext = new AudioContext()
+
     let meter = null
     let volumeLib = require('./lib')
     let canvasContext, canvasElement
@@ -30,11 +31,12 @@ module.exports = (app) => {
             canvasElement = this.$refs.meter
             canvasContext = canvasElement.getContext('2d')
             try {
-                const stream = await navigator.mediaDevices.getUserMedia(app._getUserMediaFlags())
-                const mediaStreamSource = audioContext.createMediaStreamSource(stream)
+                this.stream = await navigator.mediaDevices.getUserMedia(app._getUserMediaFlags())
+                const mediaStreamSource = audioContext.createMediaStreamSource(this.stream)
                 meter = volumeLib.createAudioMeter(audioContext)
                 mediaStreamSource.connect(meter)
                 this.drawLoop()
+
             } catch (err) {
                 app.setState({settings: {webrtc: {media: {permission: false}}}})
             }
@@ -42,9 +44,20 @@ module.exports = (app) => {
         render: templates.soundmeter.r,
         staticRenderFns: templates.soundmeter.s,
         store: {
-            app: 'app',
-            env: 'env',
+            devices: 'settings.webrtc.media.devices',
             settings: 'settings',
+        },
+        watch: {
+            /**
+            * Reinitialize the soundmeter when the
+            * input device changes.
+            */
+            'devices.input.selected.id': async function() {
+                this.stream = await navigator.mediaDevices.getUserMedia(app._getUserMediaFlags())
+                const mediaStreamSource = audioContext.createMediaStreamSource(this.stream)
+                meter = volumeLib.createAudioMeter(audioContext)
+                mediaStreamSource.connect(meter)
+            },
         },
     }
 

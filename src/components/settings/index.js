@@ -28,13 +28,12 @@ module.exports = (app) => {
             },
             playSound: function() {
                 // Don't allow the user to frenzy-click the test-audio button.
-                if (!this.sound.enabled) return
-                const selectedSound = this.settings.ringtones.selected.name
-                this.ringtone = new app.sounds.RingTone(selectedSound, false)
-                this.ringtone.on('stop', () => {
+                if (app.sounds.ringTone.playing) return
+
+                app.sounds.ringTone.off('stop').on('stop', () => {
                     this.sound.enabled = true
                 })
-                this.ringtone.play()
+                app.sounds.ringTone.play(false)
                 this.sound.enabled = false
             },
             save: function(e) {
@@ -55,7 +54,7 @@ module.exports = (app) => {
             // currently a feature behind a developer flag, because
             // its not stable yet.
             let checkDevices = false
-            if (!this.devices.input.options.length || this.devices.output.options.length) {
+            if ((!this.devices.input.options.length || !this.devices.output.options.length) && this.settings.webrtc.media.permission) {
                 checkDevices = true
             }
 
@@ -86,6 +85,7 @@ module.exports = (app) => {
                                 devices: {
                                     input: {options: inputOptions},
                                     output: {options: outputOptions},
+                                    sounds: {options: outputOptions},
                                 },
                             },
                         },
@@ -136,6 +136,14 @@ module.exports = (app) => {
             return validations
         },
         watch: {
+            /**
+            * Change the sink for the ringtone when the selected
+            * ringtone device changes.
+            */
+
+            'devices.sounds.selected.id': function(newVal, oldVal) {
+                if (newVal) app.sounds.ringTone.audio.setSinkId(newVal)
+            },
             /**
             * Reactively change the language when the select updates.
             * @param {Object} newVal - New select value.

@@ -20,16 +20,16 @@
     <!-- General preferences -->
     <div class="tab" :class="{'is-active': tabs.active === 'general'}">
 
+        <Field name="click2dial" type="checkbox"
+            :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
+            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
+            :placeholder="$t('SIP Server')"/>
+
         <Field name="language" type="select"
             :help="$t('The language used throughout the application.')"
             :label="$t('Application language')" :model.sync="settings.language.selected"
             :options="settings.language.options"
             :placeholder="$t('Select a language')"/>
-
-        <Field name="click2dial" type="checkbox"
-            :label="$t('Click-to-Dial icons')" :model.sync="settings.click2dial.enabled"
-            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
-            :placeholder="$t('SIP Server')"/>
 
         <Field name="platform_url" type="text" v-if="user.developer && settings.platform.enabled"
             :label="$t('Platform URL')" :model.sync="settings.platform.url"
@@ -124,10 +124,16 @@
     <!-- Audio settings -->
     <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
 
+        <Field name="sounds_device" type="select" v-if="settings.webrtc.media.permission"
+            :help="$t('The audio device that is used to notify you about an incoming call.')"
+            :label="`${$t('Ringtone audio')} ${$t('device')}`" :model.sync="devices.sounds.selected"
+            :options="devices.sounds.options"
+            :placeholder="$t('Select a sounds output device')"/>
+
         <div class="ringtone">
             <Field class="ringtone-select" name="ringtone" type="select"
                 :help="$t('The ringtone that is played when you\'re being called.')"
-                :label="$t('Ringtone')" :model.sync="settings.ringtones.selected"
+                :label="`${$t('Ringtone audio')} ${$t('file')}`" :model.sync="settings.ringtones.selected"
                 :options="settings.ringtones.options"
                 :placeholder="$t('Select a ringtone')">
 
@@ -137,19 +143,19 @@
             </Field>
         </div>
 
-        <Field name="media_type" type="select"
-            :help="$t('Media options that can be used by the browser.')"
-            :label="$t('Supported media')" :model.sync="settings.webrtc.media.type.selected"
-            :options="settings.webrtc.media.type.options"
-            :placeholder="$t('Select an input device')"/>
+        <Field name="output_device" type="select" v-if="settings.webrtc.media.permission"
+            :help="$t('The audio device that is used for calling on the headset.')"
+            :label="`${$t('Headset audio output')} ${$t('device')}`" :model.sync="devices.output.selected"
+            :options="devices.output.options"
+            :placeholder="$t('Select an output device')"/>
 
-        <Field name="audio_codec" type="select"
-            :label="$t('Audio codec')" :model.sync="settings.webrtc.codecs.selected"
-            :options="settings.webrtc.codecs.options"
+        <Field name="input_device" type="select" v-if="settings.webrtc.media.permission"
+            :label="`${$t('Headset microphone')} ${$t('device')}`" :model.sync="devices.input.selected"
+            :options="devices.input.options"
             :placeholder="$t('Select an input device')"/>
 
         <div class="field">
-            <label class="label">{{$t('Microphone access')}}</label>
+            <label class="label">{{`${$t('Headset microphone')} ${$t('volume')}`}}</label>
             <!-- Additional help to guide the user to the browser permission settings. -->
             <em class="help" v-if="settings.webrtc.media.permission">
                 {{$t('The browser has permission to access the microphone.')}}
@@ -181,15 +187,17 @@
             </span>
         </div>
 
-        <Field name="input_device" type="select" v-if="user.developer"
-            :label="$t('Input device')" :model.sync="devices.input.selected"
-            :options="devices.input.options"
+        <Field name="audio_codec" type="select"
+            :label="$t('Audio codec')" :model.sync="settings.webrtc.codecs.selected"
+            :options="settings.webrtc.codecs.options"
             :placeholder="$t('Select an input device')"/>
 
-        <Field name="output_device" type="select" v-if="user.developer"
-            :label="$t('Output device')" :model.sync="devices.output.selected"
-            :options="devices.output.options"
-            :placeholder="$t('Select an output device')"/>
+        <Field name="media_type" type="select"
+            :help="$t('Media options that can be used by the browser.')"
+            :label="$t('Supported media')" :model.sync="settings.webrtc.media.type.selected"
+            :options="settings.webrtc.media.type.options"
+            :placeholder="$t('Select an input device')"/>
+
     </div>
 
     <div class="tabs-actions field is-grouped">

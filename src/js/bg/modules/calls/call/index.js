@@ -26,10 +26,10 @@ class Call {
 
         this._started = false
 
-        this.busyTone = new this.app.sounds.BusyTone()
-        this.translations = this.app.helpers.getTranslations().call
-        this.ringtone = new this.app.sounds.RingTone(this.app.state.settings.ringtones.selected.name)
-        this.ringbackTone = new this.app.sounds.RingbackTone()
+        this.busyTone = app.sounds.busyTone
+        this.translations = app.helpers.getTranslations().call
+        this.ringtone = app.sounds.ringTone
+        this.ringbackTone = app.sounds.ringbackTone
 
         this.id = shortid.generate()
         /**
@@ -129,22 +129,11 @@ class Call {
     * @returns {Promise} - Resolves with the local audio stream.
     */
     async _initMedia() {
-        // Append the AV-elements in the background DOM, so the audio
-        // can continue to play when the popup closes.
-        if (document.querySelector('.remote')) {
-            // Reuse existing media elements.
-            this.remoteVideo = document.querySelector('.remote')
-        } else {
-            this.remoteVideo = document.createElement('video')
-            this.remoteVideo.classList.add('remote')
-            document.body.prepend(this.remoteVideo)
-        }
-
         // Set the output device from settings.
-        const {input, output} = this.app.state.settings.webrtc.media.devices
+        const {output} = this.app.state.settings.webrtc.media.devices
         try {
-            if (input.selected.id) await this.remoteVideo.setSinkId(input.selected.id)
-            if (output.selected.id) await this.remoteVideo.setSinkId(output.selected.id)
+            // if (input.selected.id) await this.app.video.setSinkId(input.selected.id)
+            if (output.selected.id) await this.app.video.setSinkId(output.selected.id)
         } catch (err) {
             const message = this.app.$t('Failed to set input or output device.')
             this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})

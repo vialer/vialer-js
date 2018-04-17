@@ -86,6 +86,13 @@ class ModuleSettings extends Module {
                                 name: null,
                             },
                         },
+                        sounds: {
+                            options: [],
+                            selected: {
+                                id: null,
+                                name: null,
+                            },
+                        },
                     },
                     permission: false,
                     type: {

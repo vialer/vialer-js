@@ -101,8 +101,8 @@ class CallSIP extends Call {
 
             this.pc.getReceivers().forEach((receiver) => {
                 this.remoteStream.addTrack(receiver.track)
-                this.remoteVideo.srcObject = this.remoteStream
-                this.remoteVideo.play()
+                this.app.video.srcObject = this.remoteStream
+                this.app.video.play()
             })
 
             this._start({message: this.translations.accepted.outgoing})
@@ -167,8 +167,8 @@ class CallSIP extends Call {
         this.session.sessionDescriptionHandler.on('addStream', () => {
             this.pc.getReceivers().forEach((receiver) => {
                 this.remoteStream.addTrack(receiver.track)
-                this.remoteVideo.srcObject = this.remoteStream
-                this.remoteVideo.play()
+                this.app.video.srcObject = this.remoteStream
+                this.app.video.play()
             })
         })
     }

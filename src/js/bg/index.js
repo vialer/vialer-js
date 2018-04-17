@@ -60,15 +60,25 @@ class AppBackground extends App {
     * @param {String} opts.message - Notification body.
     */
     __factoryDefaults({title, message}) {
-        this.modules.ui.notification({force: true, message, title})
+        if (title && message) {
+            this.modules.ui.notification({force: true, message, title})
+        }
+
         this.store.clear()
         if (this.env.isBrowser) location.reload()
-        this.emit('factory-defaults')
+        else this.emit('factory-defaults')
     }
 
 
     async __init() {
         this.api = new Api(this)
+        // Create audio/video elements. The audio element is used to playback
+        // sounds with (like ringtones, dtmftones). The video element is
+        // used to attach the remote WebRTC stream to.
+        this.audio = document.createElement('audio')
+        this.video = document.createElement('video')
+        document.body.prepend(this.audio)
+        document.body.prepend(this.video)
 
         // Start by initializing all modules.
         for (let module of this._modules) {
@@ -81,10 +91,16 @@ class AppBackground extends App {
         // Clear all state if the schema changed after a plugin update.
         // This is done here because of translations, which are only available
         // after initializing Vue.
-        if (!this.store.validSchema()) {
-            let message = this.$t('We are constantly improving this software. At the moment this requires you to re-login and setup your account again. Our apologies.')
-            this.__factoryDefaults({message, title: this.$t('Database schema changed')})
+        const validSchema = this.store.validSchema()
+        let notification = {message: null, title: null}
+        // Only send a notification if the schema is already defined, but invalid.
+        if (validSchema === false) {
+            notification.message = this.$t('This update requires you to re-login and setup your account again. Our apologies.')
+            notification.title = this.$t('Database schema changed')
         }
+
+        if (!validSchema) this.__factoryDefaults(notification)
+
 
         // From here on, a request to bg:get_state will be
         // dealed with properly. Finish the callback wheb

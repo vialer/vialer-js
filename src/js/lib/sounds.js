@@ -1,12 +1,11 @@
 /**
+* Phone tone generators.
+* based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
 * @module Sounds
 */
 
-/**
-* Phone tone generators.
-* based on: http://outputchannel.com/post/recreating-phone-sounds-web-audio/
-*/
-let context = null
+
+let context = new AudioContext()
 
 
 /**
@@ -14,8 +13,8 @@ let context = null
 */
 class BusyTone {
 
-    constructor() {
-        if (!context) context = new AudioContext()
+    constructor(app) {
+        this.app = app
     }
 
     createRingerLFO() {
@@ -71,9 +70,14 @@ class BusyTone {
 */
 class DtmfTone {
 
-    constructor() {
-        if (!context) context = new AudioContext()
+    constructor(app) {
+        this.app = app
         this.started = false
+
+        this.audio = new Audio()
+        this.dest = context.createMediaStreamDestination()
+        this.audio.srcObject = this.dest.stream
+        this.audio.play()
 
         this.frequencies = {
             '#': {f1: 941, f2: 1477},
@@ -95,6 +99,10 @@ class DtmfTone {
     play(key) {
         if (this.started) return
 
+        // DTMF tones are on the same sink as the headset output.
+        const outputSink = this.app.state.settings.webrtc.media.devices.output.selected.id
+        if (outputSink) this.audio.setSinkId(outputSink)
+
         const frequencyPair = this.frequencies[key]
         this.freq1 = frequencyPair.f1
         this.freq2 = frequencyPair.f2
@@ -112,10 +120,11 @@ class DtmfTone {
         this.osc1.connect(gainNode)
         this.osc2.connect(gainNode)
         gainNode.connect(filter)
-        filter.connect(context.destination)
+        filter.connect(this.dest)
 
         this.osc1.start(0)
         this.osc2.start(0)
+
         this.started = true
     }
 
@@ -135,10 +144,15 @@ class DtmfTone {
 */
 class RingbackTone {
 
-    constructor(region = 'europe') {
-        if (!context) context = new AudioContext()
+    constructor(app, region = 'europe') {
+        this.app = app
         this.region = region
         this.started = false
+
+        this.audio = new Audio()
+        this.dest = context.createMediaStreamDestination()
+        this.audio.srcObject = this.dest.stream
+        this.audio.play()
     }
 
 
@@ -174,34 +188,43 @@ class RingbackTone {
 
     play() {
         if (this.started) return
+
+        // The Ringback tone is on the same sink as the headset output.
+        const outputSink = this.app.state.settings.webrtc.media.devices.output.selected.id
+        if (outputSink) this.audio.setSinkId(outputSink)
+
         let freq1, freq2
 
-        this.oscillator1 = context.createOscillator()
+
         let gainNode = context.createGain()
-        this.oscillator1.connect(gainNode)
+
 
         if (this.region === 'europe') {
             freq1 = 425
-            this.oscillator1.type = 'sine'
-            gainNode.connect(context.destination)
-            this.oscillator1.connect(gainNode)
-            this.oscillator1.start(0)
+            this.oscillator = context.createOscillator()
+            this.oscillator.type = 'sine'
+            this.oscillator.connect(gainNode)
+            gainNode.connect(this.dest)
+            this.oscillator.connect(gainNode)
+            this.oscillator.start(0)
+            this.oscillator.frequency.setValueAtTime(freq1, context.currentTime)
         } else if (this.region === 'uk') {
             freq1 = 400
             freq2 = 450
 
-            this.oscillator2 = context.createOscillator()
-            this.oscillator2.frequency.setValueAtTime(freq2, context.currentTime)
-            this.oscillator2.connect(gainNode)
+            this.oscillator = context.createOscillator()
+            this.oscillator.frequency.setValueAtTime(freq2, context.currentTime)
+            this.oscillator.connect(gainNode)
 
             let filter = context.createBiquadFilter()
             filter.type = 'lowpass'
-            filter.connect(context.destination)
+            filter.connect(this.dest)
             gainNode.connect(filter)
-            this.oscillator2.start(0)
+
+            this.oscillator.start(0)
         }
 
-        this.oscillator1.frequency.setValueAtTime(freq1, context.currentTime)
+
 
         gainNode.gain.setValueAtTime(0, context.currentTime)
         this.ringerLFOSource = context.createBufferSource()
@@ -216,8 +239,7 @@ class RingbackTone {
 
     stop() {
         if (!this.started) return
-        this.oscillator1.stop(0)
-        if (this.region === 'uk') this.oscillator2.stop(0)
+        this.oscillator.stop(0)
         this.ringerLFOSource.stop(0)
         this.started = false
     }
@@ -229,32 +251,63 @@ class RingbackTone {
 */
 class RingTone extends EventEmitter {
 
-    constructor(target, loop = true) {
-        if (!context) context = new AudioContext()
+    constructor(app) {
         super()
-        this.audio = new Audio(`ringtones/${target}`)
-        // Loop the sound.
-        this.audio.addEventListener('ended', () => {
-            this.emit('stop')
-            if (loop) {
-                this.audio.currentTime = 0
-                this.audio.play()
-            }
-        }, false)
+        this.app = app
+        this.audio = new Audio(`ringtones/${app.state.settings.ringtones.selected.name}`)
+        this.audio.addEventListener('ended', this.playEnd.bind(this))
     }
 
 
-    play() {
+    play(loop = true) {
+        this.loop = loop
+        const soundSink = this.app.state.settings.webrtc.media.devices.sounds.selected.id
+        if (soundSink) {
+            this.audio.setSinkId(this.app.state.settings.webrtc.media.devices.sounds.selected.id)
+        }
+
+        // Loop the sound.
+        if (loop) {
+            this.audio.addEventListener('ended', () => {
+                this.playing = false
+
+            }, false)
+        }
+
+
         this.audio.play()
-        this.emit('play')
+        this.playing = true
+    }
+
+
+    playEnd() {
+        this.emit('stop')
+        this.playing = false
+
+        if (this.loop) {
+            this.playing = true
+            this.audio.currentTime = 0
+            this.audio.play()
+        }
     }
 
 
     stop() {
         this.audio.pause()
         this.audio.currentTime = 0
-        this.emit('stop')
+        this.playing = false
     }
 }
 
-module.exports = {BusyTone, DtmfTone, RingbackTone, RingTone}
+module.exports = class Sounds {
+
+    constructor(app) {
+        this.app = app
+        this.context = context
+
+        this.busyTone = new BusyTone(app)
+        this.dtmfTone = new DtmfTone(app)
+        this.ringbackTone = new RingbackTone(app)
+        this.ringTone = new RingTone(app)
+    }
+}

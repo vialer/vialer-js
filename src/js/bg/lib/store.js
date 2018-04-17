@@ -29,7 +29,7 @@ class Store {
 
     constructor(app) {
         this.app = app
-        this.schema = 8
+        this.schema = 9
 
         if (this.app.env.isNode) this.store = new MemoryStore()
         else this.store = localStorage
@@ -90,7 +90,8 @@ class Store {
         if (schema === null || schema !== this.schema) {
             this.set('schema', this.schema)
             this.app.logger.warn(`${this}store schema changed! db: ${schema} state: ${this.schema}`)
-            return false
+            if (schema === null) return null
+            else return false
         }
 
         return true
