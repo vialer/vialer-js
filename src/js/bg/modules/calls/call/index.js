@@ -237,9 +237,7 @@ class Call {
 
         // Stop the Call interval timer.
         clearInterval(this.timerId)
-        this.app.setState({ui: {menubar: {event: null}}})
         this.setState({keypad: {active: false}})
-
         // Reset the transfer state of target calls in case the transfer mode
         // of this Call is active and the callee ends the call.
         if (this.state.transfer.active) this.module.__setTransferState(this, false)

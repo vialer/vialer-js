@@ -61,17 +61,17 @@ class ModuleCalls extends Module {
             // Always sanitize the number.
             number = this.app.utils.sanitizeNumber(number)
 
-            let activeCall = this.activeCall(true)
-            if (activeCall && activeCall.state.transfer.active && activeCall.state.transfer.type === 'blind') {
+            // Deal with a blind transfer Call.
+            let activeOngoingCall = this.findCall({active: true, ongoing: true})
+            if (activeOngoingCall && activeOngoingCall.state.transfer.active && activeOngoingCall.state.transfer.type === 'blind') {
                 // Directly transfer the number to the currently activated
                 // call when the active call has blind transfer mode set.
                 this.app.telemetry.event('call[sip]', 'transfer', 'blind')
-                activeCall.transfer(number)
+                activeOngoingCall.transfer(number)
             } else {
                 // Both a 'regular' new call and an attended transfer call will
                 // create or get a new Call and activate it.
                 let call = this._newCall({number, type})
-
                 if (start) call.start()
                 // Sync the others transfer state of other calls to the new situation.
                 this.__setTransferState()
@@ -324,7 +324,7 @@ class ModuleCalls extends Module {
 
 
         this.ua.on('disconnected', () => {
-             this.app.setState({calls: {ua: {status: 'disconnected'}}})
+            this.app.setState({calls: {ua: {status: 'disconnected'}}})
             // // Don't use SIPJS simpler reconnect logic, which doesn't have
             // // jitter and an increasing timeout.
             this.ua.stop()
@@ -579,6 +579,16 @@ class ModuleCalls extends Module {
                 }
             },
             /**
+            * Modify the menubar event icon when there is
+            * no more ongoing call.
+            */
+            'store.calls.calls': () => {
+                const ongoingCall = this.findCall({ongoing: true})
+                if (!ongoingCall && ['calling', 'ringing'].includes(this.app.state.ui.menubar.event)) {
+                    this.app.setState({ui: {menubar: {event: null}}})
+                }
+            },
+            /**
             * Watch for changes in UA status and update the menubar
             * status accordingly. The menubar states are slightly
             * different from the UA states, because there are conditions
@@ -658,23 +668,6 @@ class ModuleCalls extends Module {
 
 
     /**
-    * @param {Boolean} ongoing - Whether to check if the call is ongoing or not.
-    * @returns {Call|null} - the current active ongoing call or null.
-    */
-    activeCall(ongoing = false) {
-        let activeCall = null
-        for (const callId of Object.keys(this.calls)) {
-            // Don't select a call that is already closing
-            if (this.calls[callId].state.active) {
-                if (!ongoing) activeCall = this.calls[callId]
-                else if (this.calls[callId].state.status === 'accepted') activeCall = this.calls[callId]
-            }
-        }
-        return activeCall
-    }
-
-
-    /**
     * A loosely coupled Call action handler. Operates on all current Calls.
     * Supported actions are:
     *   `accept-new`: Accepts an incoming call or switch to the new call dialog.
@@ -684,10 +677,13 @@ class ModuleCalls extends Module {
     */
     callAction(action) {
         let inviteCall = null
+        let activeCall = this.findCall({active: true})
 
         for (const callId of Object.keys(this.calls)) {
             // Don't select a call that is already closing
-            if (this.calls[callId].state.status === 'invite') inviteCall = this.calls[callId]
+            if (this.calls[callId].state.status === 'invite') {
+                inviteCall = this.calls[callId]
+            }
         }
 
         if (action === 'accept-new') {
@@ -699,11 +695,9 @@ class ModuleCalls extends Module {
             }
         } else if (action === 'decline-hangup') {
             // Ongoing Calls can also be terminated.
-            let activeCall = this.activeCall()
             if (inviteCall) inviteCall.terminate()
             else if (activeCall) activeCall.terminate()
         } else if (action === 'hold-active') {
-            let activeCall = this.activeCall()
             // Make sure the action isn't provoked on a closing call.
             if (activeCall && activeCall.state.status === 'accepted') {
                 if (activeCall.state.hold.active) activeCall.unhold()
@@ -744,7 +738,7 @@ class ModuleCalls extends Module {
         // This call is being cleaned up; move to a different call
         // when this call was the active call.
         if (call.state.active) {
-            let activeCall = null
+            let newActiveCall = null
             let fallbackCall = null
             for (const callId of Object.keys(this.calls)) {
                 // We are not going to activate the Call we are deleting.
@@ -755,14 +749,14 @@ class ModuleCalls extends Module {
                     // The fallback Call is a non-specific closing call.
                     if (this.calls[callId]) fallbackCall = this.calls[callId]
                 } else {
-                    activeCall = this.calls[callId]
+                    newActiveCall = this.calls[callId]
                     break
                 }
-
             }
+
             // Select the first closing Call when all Calls are closing.
-            if (!activeCall && fallbackCall) activeCall = fallbackCall
-            this.activateCall(activeCall, true, false)
+            if (newActiveCall) this.activateCall(newActiveCall, true, false)
+            else if (fallbackCall) this.activateCall(fallbackCall, true, false)
         }
 
         // Finally delete the call and its references.
@@ -786,6 +780,34 @@ class ModuleCalls extends Module {
             this.ua.stop()
             this.app.logger.debug(`${this}ua disconnected`)
         }
+    }
+
+
+    /**
+    * @param {Object} options - Options to pass.
+    * @param {Boolean} [options.ongoing] - Find the first Call that is going on.
+    * @returns {Call|null} - the current active ongoing call or null.
+    */
+    findCall({active = false, ongoing = false} = {}) {
+        let matchedCall = null
+        for (const callId of Object.keys(this.calls)) {
+            // Don't select a call that is already closing.
+            if (active) {
+                if (this.calls[callId].state.active) {
+                    if (ongoing) {
+                        if (this.calls[callId].state.status === 'accepted') matchedCall = this.calls[callId]
+                    } else {
+                        matchedCall = this.calls[callId]
+                    }
+                }
+            } else {
+                if (ongoing) {
+                    if (this.calls[callId].state.status === 'accepted') matchedCall = this.calls[callId]
+                }
+            }
+
+        }
+        return matchedCall
     }
 
 
