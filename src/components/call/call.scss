@@ -6,6 +6,8 @@
     color: $white;
     display: flex;
     flex-direction: column;
+    padding: $spacer * 3;
+    padding-bottom: $spacer;
 
     .call-info {
         align-self: flex-start;
@@ -35,6 +37,7 @@
         .info-status {
             font-size: 1rem;
             font-weight: 500;
+            margin-top: $spacer / 2;
         }
         .info-timer {font-size: 1rem;}
     }

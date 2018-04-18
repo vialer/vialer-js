@@ -373,13 +373,7 @@ class Crypto {
     * @param {Boolean} e2e - Whether to create an asymmetric encryption key.
     */
     async loadIdentity(username, password, e2e = false) {
-        try {
-            this.sessionKey = await this._generateVaultKey(username, password)
-        } catch (err) {
-            console.error('ERROR:', err)
-            throw err
-        }
-
+        this.sessionKey = await this._generateVaultKey(username, password)
         if (!e2e) return
 
         const rsa = this.app.store.get('rsa')

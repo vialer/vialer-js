@@ -88,6 +88,15 @@ html {
 
         .panel-content {
             padding: $spacer * 3;
+
+            header {
+                display: flex;
+                flex-direction: column;
+
+                .header-line {
+                    display: flex;
+                }
+            }
         }
     }
 

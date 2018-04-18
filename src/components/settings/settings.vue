@@ -26,7 +26,7 @@
             :model.sync="settings.click2dial.enabled"
             :placeholder="$t('SIP Server')"/>
 
-        <Field name="language" type="textarea"
+        <Field name="language" type="textarea" v-if="user.developer"
             :help="$t('The language used throughout the application.')"
             :label="`${$t('Click-to-Dial')} ${$t('blacklist')}`" :model.sync="settings.click2dial.blacklist"
             :placeholder="$t('Use one line per site.')"/>
@@ -129,44 +129,21 @@
 
     <!-- Audio settings -->
     <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
-
-        <Field name="sounds_device" type="select" v-if="settings.webrtc.media.permission"
-            :help="$t('The audio device that is used to notify you about an incoming call.')"
-            :label="`${$t('Ringtone audio')} ${$t('device')}`" :model.sync="devices.sounds.selected"
-            :options="devices.sounds.options"
-            :placeholder="$t('Select a sounds output device')"/>
-
-        <div class="ringtone">
-            <Field class="ringtone-select" name="ringtone" type="select"
-                :help="$t('The ringtone that is played when you\'re being called.')"
-                :label="`${$t('Ringtone audio')} ${$t('file')}`" :model.sync="settings.ringtones.selected"
-                :options="settings.ringtones.options"
-                :placeholder="$t('Select a ringtone')">
-
-                <button slot="select-extra" class="ringtone-play button is-link select-button" :disabled="!sound.enabled" @click="playSound()">
-                    <span class="icon is-small"><icon name="ring"/></span>
-                </button>
-            </Field>
-        </div>
-
         <Field name="output_device" type="select" v-if="settings.webrtc.media.permission"
-            :help="$t('The audio device that is used for calling on the headset.')"
-            :label="`${$t('Headset audio output')} ${$t('device')}`" :model.sync="devices.output.selected"
+            :label="$t('Headset audio output')" :model.sync="devices.output.selected"
             :options="devices.output.options"
             :placeholder="$t('Select an output device')"/>
 
         <Field name="input_device" type="select" v-if="settings.webrtc.media.permission"
-            :label="`${$t('Headset microphone')} ${$t('device')}`" :model.sync="devices.input.selected"
+            :label="$t('Headset microphone')" :model.sync="devices.input.selected"
             :options="devices.input.options"
             :placeholder="$t('Select an input device')"/>
 
         <div class="field">
-            <label class="label">{{`${$t('Headset microphone')} ${$t('volume')}`}}</label>
             <!-- Additional help to guide the user to the browser permission settings. -->
-            <Soundmeter class="soundmeter"/>
             <em class="help" v-if="settings.webrtc.media.permission">
-                {{$t('Check if the microphone responds to your voice.')}}
-
+                <span class="microphone-hint">{{$t('Check if the microphone responds to your voice.')}}</span>
+                <Soundmeter class="soundmeter"/>
             </em>
             <!-- Give the user instructions how to enable the microphone in the popout -->
             <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.media.permission && env.isPopout">
@@ -185,7 +162,7 @@
             </div>
 
             <span v-if="!settings.webrtc.media.permission && !env.isPopout">
-                <em class="help">{{$t('The softphone doesn\'t have access to your microphone!')}}</em>
+                <span class="microphone-warning">{{$t('The softphone doesn\'t have access to your microphone!')}}</span>
                 <a class="microphone-popout button is-danger" @click="openPopoutView">
                     <span class="icon is-small"><icon name="microphone"/></span>
                     <span>{{$t('Allow microphone permission')}}</span>
@@ -193,12 +170,30 @@
             </span>
         </div>
 
-        <Field name="audio_codec" type="select"
+        <Field name="sounds_device" type="select" v-if="settings.webrtc.media.permission"
+            :label="$t('Ringtone audio output')" :model.sync="devices.sounds.selected"
+            :options="devices.sounds.options"
+            :placeholder="$t('Select a sounds output device')"/>
+
+        <div class="ringtone">
+            <Field class="ringtone-select" name="ringtone" type="select"
+                :help="$t('The ringtone that is played when you\'re being called.')"
+                :label="`${$t('Ringtone audio')} ${$t('file')}`" :model.sync="settings.ringtones.selected"
+                :options="settings.ringtones.options"
+                :placeholder="$t('Select a ringtone')">
+
+                <button slot="select-extra" class="ringtone-play button is-link select-button" :disabled="!sound.enabled" @click="playSound()">
+                    <span class="icon is-small"><icon name="ring"/></span>
+                </button>
+            </Field>
+        </div>
+
+        <Field name="audio_codec" type="select" v-if="user.developer"
             :label="$t('Audio codec')" :model.sync="settings.webrtc.codecs.selected"
             :options="settings.webrtc.codecs.options"
             :placeholder="$t('Select an input device')"/>
 
-        <Field name="media_type" type="select"
+        <Field name="media_type" type="select" v-if="user.developer"
             :help="$t('Media options that can be used by the browser.')"
             :label="$t('Supported media')" :model.sync="settings.webrtc.media.type.selected"
             :options="settings.webrtc.media.type.options"

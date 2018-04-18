@@ -2,14 +2,11 @@ module.exports = (app) => {
 
     return {
         computed: {
-            filteredRecents: function() {
+            filteredActivity: function() {
                 let activity = this.activity.sort(app.utils.sortByMultipleKey(['date'], -1))
                 if (this.filters.reminders) activity = activity.filter((i) => i.remind)
                 if (this.filters.missed) activity = activity.filter((i) => i.label === 'missed')
                 return activity
-            },
-            sortedReminders: function() {
-                return this.activity.filter((i) => i.remind)
             },
         },
         methods: Object.assign({

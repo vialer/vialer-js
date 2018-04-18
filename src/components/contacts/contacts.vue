@@ -1,30 +1,33 @@
 <component class="component-contacts">
     <div class="panel-content">
         <header>
-            <h1>{{$t('Contacts')}}</h1>
-            <div class="vertical-devider"></div>
-            <div class="content-filters">
-                <div class="filter" :class="classes('favorites-filter')" @click="toggleFilterFavorites()">
-                    <icon name="star"/>
-                    {{$t('Favorites')}}
+            <div class="header-line">
+                <h1>{{$t('Contacts')}}</h1>
+                <div class="vertical-devider"></div>
+                <div class="content-filters">
+                    <div class="filter" :class="classes('favorites-filter')" @click="toggleFilterFavorites()">
+                        <icon name="star"/>
+                        {{$t('Favorites')}}
+                    </div>
+                </div>
+            </div>
+            <div class="header-line contacts-options">
+                <input class="input" autofocus type="email"
+                    :placeholder="$t('Find contact') + '...'"
+                    :disabled="search.disabled"
+                    v-model="search.input"/>
+                <div class="display-mode" :class="classes('display-mode', 'lean')" @click="setDisplayMode('lean')">
+                    <icon name="contacts-lean"/>
+                </div>
+                <div class="display-mode" :class="classes('display-mode', 'regular')" @click="setDisplayMode('regular')">
+                    <icon name="contacts-regular"/>
+                </div>
+                <div class="display-mode" :class="classes('display-mode', 'dense')" @click="setDisplayMode('dense')">
+                    <icon name="contacts-dense"/>
                 </div>
             </div>
         </header>
-        <div class="contacts-options">
-            <input class="input" autofocus type="email"
-                :placeholder="$t('Find contact') + '...'"
-                :disabled="search.disabled"
-                v-model="search.input"/>
-            <div class="display-mode" :class="classes('display-mode', 'lean')" @click="setDisplayMode('lean')">
-                <icon name="contacts-lean"/>
-            </div>
-            <div class="display-mode" :class="classes('display-mode', 'regular')" @click="setDisplayMode('regular')">
-                <icon name="contacts-regular"/>
-            </div>
-            <div class="display-mode" :class="classes('display-mode', 'dense')" @click="setDisplayMode('dense')">
-                <icon name="contacts-dense"/>
-            </div>
-        </div>
+
 
         <div class="contacts-list" :class="classes('contacts-list')">
             <div class="contact" v-for="contact in filteredContacts" :class="{'disabled': calls.length}">

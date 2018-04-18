@@ -127,10 +127,10 @@ function helpers(app) {
                 rejected_b: $t('callee is busy'),
             },
             callingDisabled: {
-                disconnected: $t('Can\'t connect to server (disconnected)'),
+                disconnected: $t('You are disconnected from the SIP service.'),
                 mediaPermission: $t('Go to Audio settings and give the browser permission to use your microphone.'),
-                offline: $t('You are currently not connected to the internet. Check your connectivity.'),
-                unregistered: $t('Can\'t connect to server (unregistered)'),
+                offline: $t('You are disconnected from the internet. Check your connectivity.'),
+                unregistered: $t('Not registered at the SIP service. Check your connectivity.'),
             },
         }
     }

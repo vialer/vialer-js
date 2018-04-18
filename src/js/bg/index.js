@@ -31,7 +31,6 @@ class AppBackground extends App {
         super(opts)
 
         this.store = new Store(this)
-
         this.crypto = new Crypto(this)
         this.timer = new Timer(this)
 

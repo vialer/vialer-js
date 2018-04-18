@@ -22,7 +22,7 @@
 
     .soundmeter {
         border: 1px solid $grey-color-light;
-        height: $spacer * 4;
+        height: $spacer;
     }
 
     // The switch is disabled, but use more opacity to indicate
@@ -49,6 +49,21 @@
                 }
             }
         }
+    }
+
+    .microphone-hint,
+    .microphone-warning {
+        font-style: normal;
+        font-weight: 500;
+    }
+
+    .microphone-warning {
+        color: $red-color;
+        font-size: 0.9rem;
+    }
+
+    .microphone-hint {
+        font-size: 0.8rem;
     }
 
 

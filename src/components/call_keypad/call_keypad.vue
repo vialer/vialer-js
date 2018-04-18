@@ -2,7 +2,7 @@
     <div class="disabled-placeholder" v-if="callingDisabled">
         <icon class="disabled-icon" name="dialpad-off"/>
         <div class="disabled-text">
-            {{$t('You can\'t call out at the moment.')}}
+            {{$t('You cannot call out at the moment.')}}
         </div>
         <div class="disabled-reason">
             <ul>
