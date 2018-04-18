@@ -150,9 +150,6 @@ class RingbackTone {
         this.started = false
 
         this.audio = new Audio()
-        this.dest = context.createMediaStreamDestination()
-        this.audio.srcObject = this.dest.stream
-        this.audio.play()
     }
 
 
@@ -189,15 +186,16 @@ class RingbackTone {
     play() {
         if (this.started) return
 
+        this.dest = context.createMediaStreamDestination()
+        this.audio.srcObject = this.dest.stream
+        this.audio.play()
+
         // The Ringback tone is on the same sink as the headset output.
         const outputSink = this.app.state.settings.webrtc.media.devices.output.selected.id
         if (outputSink) this.audio.setSinkId(outputSink)
 
         let freq1, freq2
-
-
         let gainNode = context.createGain()
-
 
         if (this.region === 'europe') {
             freq1 = 425
