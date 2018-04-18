@@ -50,50 +50,6 @@ module.exports = (app) => {
         mounted: async function() {
             // Immediatly triger validation on the fields.
             this.$v.$touch()
-            // Query devices and fill the store with them. This is
-            // currently a feature behind a developer flag, because
-            // its not stable yet.
-            let checkDevices = false
-            if ((!this.devices.input.options.length || !this.devices.output.options.length) && this.settings.webrtc.media.permission) {
-                checkDevices = true
-            }
-
-            if (!checkDevices) return
-
-            try {
-                const devices = await navigator.mediaDevices.enumerateDevices()
-                let inputOptions = []
-                let outputOptions = []
-                for (const device of devices) {
-                    if (device.kind === 'audioinput') {
-                        inputOptions.push({
-                            id: device.deviceId,
-                            name: device.label,
-                        })
-                    } else if (device.kind === 'audiooutput') {
-                        outputOptions.push({
-                            id: device.deviceId,
-                            name: device.label,
-                        })
-                    }
-                }
-
-                app.setState({
-                    settings: {
-                        webrtc: {
-                            media: {
-                                devices: {
-                                    input: {options: inputOptions},
-                                    output: {options: outputOptions},
-                                    sounds: {options: outputOptions},
-                                },
-                            },
-                        },
-                    },
-                }, {persist: true})
-            } catch (err) {
-                console.error(err)
-            }
         },
         render: templates.settings.r,
         staticRenderFns: templates.settings.s,
@@ -174,6 +130,52 @@ module.exports = (app) => {
                     }
                 } else {
                     this.settings.webrtc.account.selected = {id: null, name: null, password: null, username: null}
+                }
+            },
+            'settings.webrtc.media.permission': async function(newPermission, oldPermission) {
+                // Query devices and fill the store with them. This is
+                // currently a feature behind a developer flag, because
+                // its not stable yet.
+                let checkDevices = false
+                if ((!this.devices.input.options.length || !this.devices.output.options.length) && newPermission) {
+                    checkDevices = true
+                }
+
+                if (!checkDevices) return
+
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices()
+                    let inputOptions = []
+                    let outputOptions = []
+                    for (const device of devices) {
+                        if (device.kind === 'audioinput') {
+                            inputOptions.push({
+                                id: device.deviceId,
+                                name: device.label,
+                            })
+                        } else if (device.kind === 'audiooutput') {
+                            outputOptions.push({
+                                id: device.deviceId,
+                                name: device.label,
+                            })
+                        }
+                    }
+
+                    app.setState({
+                        settings: {
+                            webrtc: {
+                                media: {
+                                    devices: {
+                                        input: {options: inputOptions},
+                                        output: {options: outputOptions},
+                                        sounds: {options: outputOptions},
+                                    },
+                                },
+                            },
+                        },
+                    }, {persist: true})
+                } catch (err) {
+                    console.error(err)
                 }
             },
         },

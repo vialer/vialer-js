@@ -131,7 +131,6 @@ class Call {
         // Set the output device from settings.
         const {output} = this.app.state.settings.webrtc.media.devices
         try {
-            // if (input.selected.id) await this.app.video.setSinkId(input.selected.id)
             if (output.selected.id) await this.app.video.setSinkId(output.selected.id)
         } catch (err) {
             const message = this.app.$t('Failed to set input or output device.')

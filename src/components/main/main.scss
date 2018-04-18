@@ -89,7 +89,7 @@ html {
         .panel-content {
             padding: $spacer * 3;
 
-            header {
+            > header {
                 display: flex;
                 flex-direction: column;
 

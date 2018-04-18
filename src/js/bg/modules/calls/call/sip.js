@@ -100,7 +100,6 @@ class CallSIP extends Call {
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
             this.app.telemetry.event('call[sip]', 'outgoing', 'accepted')
-
             this.pc = this.session.sessionDescriptionHandler.peerConnection
             this.remoteStream = new MediaStream()
 
