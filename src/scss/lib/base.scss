@@ -55,11 +55,15 @@ body {
         }
     }
 
-    .switch[type="checkbox"]:checked + label {
-        font-weight: 500;
+    .switch[type="checkbox"] {
+        & + label {
+            font-weight: 500;
+        }
 
-        &::before {
-            background: $green-color;
+        &:checked + label {
+            &::before {
+                background: $green-color;
+            }
         }
     }
 }

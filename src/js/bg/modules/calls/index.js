@@ -53,9 +53,9 @@ class ModuleCalls extends Module {
         * Create - and optionally start - a new Call. This is the main
         * event used to start a call with.
         * @event module:ModuleCalls#bg:calls:call_create
-        * @property {String} callInfo.number - The number to call.
-        * @property {String} callInfo.start - Start calling right away or just create a Call instance.
-        * @property {String} callInfo.type - Class name of the Call implementation, e.g. a `CallSIP` instance.
+        * @property {String} options.number - The number to call.
+        * @property {String} [options.start] - Start calling right away or just create a Call instance.
+        * @property {String} [options.type] - Class name of the Call implementation, e.g. a `CallSIP` instance.
         */
         this.app.on('bg:calls:call_create', ({callback, number, start, type}) => {
             // Always sanitize the number.
@@ -239,6 +239,120 @@ class ModuleCalls extends Module {
 
 
     /**
+    * Deal with events coming from a UA.
+    */
+    __uaEvents() {
+        /**
+        * An incoming call. Call-waiting is not implemented.
+        * A new incoming call on top of a call that is already
+        * ongoing will be silently terminated.
+        */
+        this.ua.on('invite', (session) => {
+            const callIds = Object.keys(this.calls)
+            const callOngoing = this.app.helpers.callOngoing()
+            const closingCalls = this.app.helpers.callsClosing()
+            const dnd = this.app.state.availability.dnd
+            const microphoneAccess = this.app.state.settings.webrtc.media.permission
+
+            let acceptCall = true
+            let declineReason
+            if (dnd || !microphoneAccess) {
+                acceptCall = false
+                declineReason = dnd ? 'dnd' : 'microphone'
+            }
+
+            if (callOngoing) {
+                // All ongoing calls are closing. Accept the call.
+                if (callIds.length === closingCalls.length) {
+                    acceptCall = true
+                } else {
+                    // Filter non-closing calls from all Call objects.
+                    const notClosingCalls = callIds.filter((i) => !closingCalls.includes(i))
+                    // From these Call objects, see which ones are not `new`.
+                    const notClosingNotNewCalls = notClosingCalls.filter((i) => this.calls[i].state.status !== 'new')
+
+                    if (notClosingNotNewCalls.length) {
+                        acceptCall = false
+                        declineReason = 'call(s) ongoing'
+                    } else acceptCall = true
+                }
+            }
+
+            if (acceptCall) {
+                this.app.logger.info(`${this}accept incoming call.`)
+                // An ongoing call may be a closing call. In that case we first
+                // remove all the closing calls before starting the new one.
+                for (const callId of closingCalls) {
+                    this.app.logger.info(`${this}deleting closing call ${callId}.`)
+                    this.deleteCall(this.calls[callId])
+                }
+            }
+            // A declined Call will still be initialized, but as a silent
+            // Call, meaning it won't notify the user about it.
+            const call = this.callFactory(session, {silent: !acceptCall}, 'CallSIP')
+            this.calls[call.id] = call
+            call.start()
+
+            if (!acceptCall) {
+                this.app.logger.info(`${this}decline incoming call (${declineReason})`)
+                call.terminate()
+            } else {
+                Vue.set(this.app.state.calls.calls, call.id, call.state)
+                this.app.emit('fg:set_state', {action: 'upsert', path: `calls.calls.${call.id}`, state: call.state})
+            }
+        })
+
+
+        this.ua.on('registered', () => {
+            this.app.setState({calls: {ua: {status: 'registered'}}})
+            this.app.logger.info(`${this}ua registered`)
+        })
+
+
+        this.ua.on('unregistered', () => {
+            this.app.setState({calls: {ua: {status: this.ua.isConnected() ? 'connected' : 'disconnected'}}})
+            this.app.logger.info(`${this}ua unregistered, switch back to ${this.app.state.calls.ua.status} status`)
+        })
+
+
+        this.ua.on('connected', () => {
+            this.app.setState({calls: {ua: {status: 'connected'}}})
+            this.app.logger.info(`${this}ua connected`)
+            // Reset the retry interval timer..
+            this.retry = Object.assign({}, this.retryDefault)
+        })
+
+
+        this.ua.on('disconnected', () => {
+             this.app.setState({calls: {ua: {status: 'disconnected'}}})
+            // // Don't use SIPJS simpler reconnect logic, which doesn't have
+            // // jitter and an increasing timeout.
+            this.ua.stop()
+
+            if (this.app.state.user.authenticated) {
+                this.app.setState({calls: {ua: {status: 'disconnected'}}})
+            } else {
+                this.app.setState({calls: {ua: {status: 'inactive'}}})
+                this.retry = Object.assign({}, this.retryDefault)
+                this.app.logger.debug(`${this}ua disconnected (inactive)`)
+                this.reconnect = false
+            }
+
+            if (this.reconnect) {
+                // Reconnection timer logic is performed only here.
+                this.app.logger.debug(`${this}ua reconnecting in ${this.retry.timeout} ms`)
+                setTimeout(() => this.connect(), this.retry.timeout)
+                this.retry = this.app.timer.increaseTimeout(this.retry)
+            }
+        })
+
+        this.ua.on('registrationFailed', (reason) => {
+            this.app.setState({calls: {ua: {status: 'registration_failed'}}})
+        })
+    }
+
+
+    /**
     * Setup the initial UA options. This depends for instance
     * on whether the application will be using the softphone
     * to connect to the backend with or the vendor portal user.
@@ -248,6 +362,8 @@ class ModuleCalls extends Module {
         const settings = this.app.state.settings
         // For webrtc this is a voipaccount, otherwise an email address.
         let options = {
+            autostart: false,
+            autostop: false,
             log: {
                 builtinEnabled: true,
                 level: 'error',
@@ -339,9 +455,9 @@ class ModuleCalls extends Module {
 
 
     /**
-    * Check if there is a `new` call ready to be used. Requires some
-    * bookkeeping because of the settings that can change in the
-    * meanwhile.
+    * Return a `Call` object that can be used to setup a new Call with,
+    * depending on the current settings. This requires some extra
+    * bookkeeping because settings may change in the meanwhile.
     * @param {Object} opts - Options to pass.
     * @param {String} [opts.type] - The type of call to find.
     * @param {String} [opts.number] - The number to call to.
@@ -350,18 +466,15 @@ class ModuleCalls extends Module {
     _newCall({number = null, type}) {
         let call
 
-        // See if we can reuse an existing `new` Call object.
         for (const callId of Object.keys(this.calls)) {
             if (this.calls[callId].state.status !== 'new') continue
 
+            // See if we can reuse an existing `new` Call object.
             if (type) {
-                // Otherwise we just check if the call matches the
-                // expected type.
-                if (this.calls[callId].constructor.name !== type) {
-                    this.deleteCall(this.calls[callId])
-                } else {
+                // Check if the found Call matches the expected type.
+                if (this.calls[callId].constructor.name === type) {
                     call = this.calls[callId]
-                }
+                } else this.deleteCall(this.calls[callId])
             } else {
                 // When an empty call already exists, it must
                 // adhere to the current WebRTC-SIP/ConnectAB settings
@@ -616,117 +729,10 @@ class ModuleCalls extends Module {
             this.app.logger.warn(`${this}cannot connect without username and password`)
         }
 
+        // Fresh new instance is used each time, so we can reset settings properly.
         this.ua = new this.lib.UA(uaOptions)
-
-
-        /**
-        * An incoming call. Call-waiting is not implemented.
-        * A new incoming call on top of a call that is already
-        * ongoing will be silently terminated.
-        */
-        this.ua.on('invite', (session) => {
-            const callIds = Object.keys(this.calls)
-            const callOngoing = this.app.helpers.callOngoing()
-            const closingCalls = this.app.helpers.callsClosing()
-            const dnd = this.app.state.availability.dnd
-            const microphoneAccess = this.app.state.settings.webrtc.media.permission
-
-            let acceptCall = true
-            let declineReason
-            if (dnd || !microphoneAccess) {
-                acceptCall = false
-                declineReason = dnd ? 'dnd' : 'microphone'
-            }
-
-            if (callOngoing) {
-                // All ongoing calls are closing. Accept the call.
-                if (callIds.length === closingCalls.length) {
-                    acceptCall = true
-                } else {
-                    // Filter non-closing calls from all Call objects.
-                    const notClosingCalls = callIds.filter((i) => !closingCalls.includes(i))
-                    // From these Call objects, see which ones are not `new`.
-                    const notClosingNotNewCalls = notClosingCalls.filter((i) => this.calls[i].state.status !== 'new')
-
-                    if (notClosingNotNewCalls.length) {
-                        acceptCall = false
-                        declineReason = 'call(s) ongoing'
-                    } else acceptCall = true
-                }
-            }
-
-            if (acceptCall) {
-                this.app.logger.info(`${this}accept incoming call.`)
-                // An ongoing call may be a closing call. In that case we first
-                // remove all the closing calls before starting the new one.
-                for (const callId of closingCalls) {
-                    this.app.logger.info(`${this}deleting closing call ${callId}.`)
-                    this.deleteCall(this.calls[callId])
-                }
-            }
-            // A declined Call will still be initialized, but as a silent
-            // Call, meaning it won't notify the user about it.
-            const call = this.callFactory(session, {silent: !acceptCall}, 'CallSIP')
-            this.calls[call.id] = call
-            call.start()
-
-            if (!acceptCall) {
-                this.app.logger.info(`${this}decline incoming call (${declineReason})`)
-                call.terminate()
-            } else {
-                Vue.set(this.app.state.calls.calls, call.id, call.state)
-                this.app.emit('fg:set_state', {action: 'upsert', path: `calls.calls.${call.id}`, state: call.state})
-            }
-        })
-
-
-        this.ua.on('registered', () => {
-            this.app.setState({calls: {ua: {status: 'registered'}}})
-            this.app.logger.info(`${this}ua registered`)
-        })
-
-
-        this.ua.on('unregistered', () => {
-            this.app.setState({calls: {ua: {status: 'connected'}}})
-            this.app.logger.info(`${this}ua unregistered, switch back to connected status`)
-        })
-
-
-        this.ua.on('connected', () => {
-            this.app.setState({calls: {ua: {status: 'connected'}}})
-            this.app.logger.info(`${this}ua connected`)
-            // Reset the retry interval timer..
-            this.retry = Object.assign({}, this.retryDefault)
-        })
-
-
-        this.ua.on('disconnected', () => {
-            // Don't use SIPJS simpler reconnect logic, which doesn't have
-            // jitter and an increasing timeout.
-            this.ua.stop()
-
-            if (this.app.state.user.authenticated) {
-                this.app.setState({calls: {ua: {status: 'disconnected'}}})
-            } else {
-                this.app.setState({calls: {ua: {status: 'inactive'}}})
-                this.retry = Object.assign({}, this.retryDefault)
-                this.app.logger.debug(`${this}ua disconnected (inactive)`)
-                this.reconnect = false
-            }
-
-            if (this.reconnect) {
-                this.app.logger.debug(`${this}ua disconnected (reconnect)`)
-                // Reconnection timer logic is performed only here.
-                this.app.logger.debug(`${this}ua reconnecting in ${this.retry.timeout} ms`)
-                setTimeout(() => this.connect(), this.retry.timeout)
-                this.retry = this.app.timer.increaseTimeout(this.retry)
-            }
-        })
-
-
-        this.ua.on('registrationFailed', (reason) => {
-            this.app.setState({calls: {ua: {status: 'registration_failed'}}})
-        })
+        this.__uaEvents()
+        this.ua.start()
     }
 
 

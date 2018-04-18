@@ -13,15 +13,14 @@ class Call {
     * AppForeground and the backend of AppBackground.
     * @param {AppBackground} app - The background application.
     * @param {String} target - A target endpoint to call. Typically a number.
-    * @param {Object} options - Call options to pass.
-    * @param {Boolean} options.active - Whether this Call should be activated in the UI.
-    * @param {Boolean} options.silent - Whether to setup a Call without disturbing the UI.
+    * @param {Object} [options] - Call options to pass.
+    * @param {Boolean} [options.active] - Activates this Call in the UI.
+    * @param {Boolean} [options.silent] - Setup a Call without interfering with the UI.
     */
     constructor(app, target, {active, silent} = {}) {
         this.app = app
         this.module = app.modules.calls
 
-        this.ua = this.module.ua
         this.silent = silent
 
         this._started = false

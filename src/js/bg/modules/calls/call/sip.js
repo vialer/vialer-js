@@ -8,9 +8,15 @@ const Call = require('./index')
 * using WebRTC and SIP.js.
 */
 class CallSIP extends Call {
-
-    constructor(app, target, options) {
-        super(app, target, options)
+    /**
+    * @param {AppBackground} app - The background application.
+    * @param {String|Number|Session} [target] - An endpoint identifier to call to.
+    * @param {Object} [options] - An endpoint identifier to call to.
+    * @param {Boolean} [options.active] - Activates this Call in the UI.
+    * @param {Boolean} [options.silent] - Setup a Call without interfering with the UI.
+    */
+    constructor(app, target, {active, silent} = {}) {
+        super(app, target, {active, silent})
 
         this._sessionOptions = {media: {}}
         if (!target || ['string', 'number'].includes(typeof target)) {
@@ -90,8 +96,7 @@ class CallSIP extends Call {
     */
     _outgoing() {
         super._outgoing()
-        this.session = this.ua.invite(`sip:${this.state.number}@voipgrid.nl`, this._sessionOptions)
-
+        this.session = this.module.ua.invite(`sip:${this.state.number}@voipgrid.nl`, this._sessionOptions)
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
             this.app.telemetry.event('call[sip]', 'outgoing', 'accepted')
@@ -203,7 +208,7 @@ class CallSIP extends Call {
 
 
     /**
-    * End a call based on it's current status.
+    * Terminate a Call depending on it's current status.
     */
     terminate() {
         if (this.state.status === 'new') {
@@ -237,6 +242,15 @@ class CallSIP extends Call {
                 this._stop()
             }
         }
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return `${this.app}[CallSIP][${this.id}] `
     }
 
 
