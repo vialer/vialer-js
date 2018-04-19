@@ -123,6 +123,21 @@ class ModuleSettings extends Module {
 
 
     /**
+    * Refresh the devices list when this plugin is started, but
+    * only if the Vault is unlocked, because the devices list is
+    * stored in the encrypted part of the store, which should be
+    * available at that point. An additional vault unlock watcher
+    * is used to refresh the devices list when auto unlocking is
+    * disabled.
+    */
+    _ready() {
+        if (this.app.state.settings.vault.unlocked && this.app.state.settings.webrtc.media.permission) {
+            this.queryMediaDevices()
+        }
+    }
+
+
+    /**
     * Respond to changes in settings, like storing the Vault key,
     * send a telemetry event when Telemetry is switched on or off,
     * toggle the Click-to-dial icon observer, etc..
@@ -138,15 +153,69 @@ class ModuleSettings extends Module {
             'store.settings.telemetry.enabled': (newVal, oldVal) => {
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: newVal, eventName: 'telemetry', override: true})
             },
-            'store.settings.vault.store': (newVal, oldVal) => {
-                if (newVal) this.app.crypto.storeVault()
+            'store.settings.vault.store': (storeVaultKey) => {
+                if (storeVaultKey) this.app.crypto.storeVaultKey()
                 else {
                     this.app.setState({settings: {vault: {key: null}}}, {encrypt: false, persist: true})
+                }
+            },
+            'store.settings.vault.unlocked': (unlocked) => {
+                if (unlocked && this.app.state.settings.webrtc.media.permission) {
+                    this.queryMediaDevices()
                 }
             },
             'store.settings.webrtc.enabled': (newVal, oldVal) => {
                 this.app.emit('bg:tabs:update_contextmenus', {}, true)
             },
+            /**
+            * Read the devices list once as soon there is media permission.
+            */
+            'store.settings.webrtc.media.permission': () => {
+                this.queryMediaDevices()
+            },
+        }
+    }
+
+
+    /**
+    * Query for media devices. This must be done only after the
+    * getUserMedia permission has been granted; otherwise the names
+    * of the devices aren't returned, due to browser security restrictions.
+    */
+    async queryMediaDevices() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices()
+            let inputOptions = []
+            let outputOptions = []
+            for (const device of devices) {
+                if (device.kind === 'audioinput') {
+                    inputOptions.push({
+                        id: device.deviceId,
+                        name: device.label,
+                    })
+                } else if (device.kind === 'audiooutput') {
+                    outputOptions.push({
+                        id: device.deviceId,
+                        name: device.label,
+                    })
+                }
+            }
+
+            this.app.setState({
+                settings: {
+                    webrtc: {
+                        media: {
+                            devices: {
+                                input: {options: inputOptions},
+                                output: {options: outputOptions},
+                                sounds: {options: outputOptions},
+                            },
+                        },
+                    },
+                },
+            }, {persist: true})
+        } catch (err) {
+            console.error(err)
         }
     }
 }

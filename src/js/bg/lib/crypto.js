@@ -411,7 +411,7 @@ class Crypto {
     * of the store, so the plugin can automatically unlock.
     * This is a tradeoff between usability and security.
     */
-    async storeVault() {
+    async storeVaultKey() {
         const sessionKey = await this.__exportAESKey(this.sessionKey)
         this.app.setState({settings: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
     }

@@ -121,10 +121,10 @@ class Call {
 
 
     /**
-    * Add two video elements to the DOM of AppBackground and ask for
-    * permission to the microphone. In a WebExtension, addding the video
-    * elements to the background script DOM allows us to keep the Call
-    * stream active after the popup is closed.
+    * Add two video elements to the DOM of AppBackground and get the
+    * permission to the microphone. This permission is already granted
+    * from the fg script. Addding the video elements to the bg DOM
+    * allows us to keep the Call stream active after the popup is closed.
     * @returns {Promise} - Resolves with the local audio stream.
     */
     async _initMedia() {

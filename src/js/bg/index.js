@@ -145,6 +145,9 @@ class AppBackground extends App {
         const unencryptedState = this.store.get('state.unencrypted')
         if (typeof unencryptedState === 'object') this.__mergeDeep(this.state, unencryptedState)
 
+        // The vault always starts in a locked position, no matter what the
+        // unencrypted store says.
+        this.setState({settings: {vault: {unlocked: false}}}, {encrypt: false, persist: true})
 
         if (this.state.settings.vault.active) {
             // See if we can decipher the stored encrypted state when
