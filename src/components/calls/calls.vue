@@ -4,5 +4,5 @@
         <Call v-if="activeCall" :call="activeCall"/>
         <CallSwitch v-if="callOngoing" :call="activeCall"/>
     </div>
-    <Soundmeter class="soundmeter" v-if="callOngoing"/>
+    <Soundmeter class="soundmeter"/>
 </component>

@@ -13,11 +13,15 @@
             display: grid;
             grid-template-columns: auto ($spacer * 5);
         }
+
+        .soundmeter {
+            border-top: 1px solid darken($brand-variation-color, 5%);
+        }
     }
 
     .soundmeter {
         align-items: center;
-        border-top: 1px solid darken($brand-variation-color, 5%);
+        border-top: 1px solid $grey-color-lightest;
         display: flex;
         height: $spacer * 1.5;
         justify-content: center;
