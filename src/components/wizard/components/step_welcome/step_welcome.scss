@@ -1,0 +1,21 @@
+@import "../../../../scss/lib/mixins";
+@import "../../../../scss/lib/variables";
+
+.component-step-progress {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    margin-bottom: $spacer * 3;
+
+    .step-hl {
+        background: $grey-color-light;
+        border-radius: 50%;
+        height: $spacer;
+        margin-right: $spacer;
+        width: $spacer;
+
+        &.active {
+            background: $brand-color;
+        }
+    }
+}

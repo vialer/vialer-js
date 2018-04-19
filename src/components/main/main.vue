@@ -1,6 +1,6 @@
 <component class="component-main" id="app">
     <!-- Force the telemetry window to show up -->
-    <Telemetry v-if="telemetry.enabled === null && user.authenticated"/>
+    <Wizard v-if="!wizard.completed && user.authenticated"/>
     <template v-else>
         <div class="overlay" v-if="overlay">
             <div class="close-button" @click="closeOverlay()">
@@ -13,14 +13,16 @@
         <MainCallBar v-if="callOngoing && call.active" :call="call" v-for="call in calls"/>
 
         <Notifications  :class="classes('notifications')"/>
+
         <div class="panel" :class="classes('panel')">
+
             <template v-if="!user.authenticated">
                 <Login v-if="layer === 'login'" class="panel-content"/>
                 <Unlock v-else-if="layer === 'unlock'" class="panel-content"/>
             </template>
+
             <template v-else>
                 <MainMenuBar/>
-
                 <Availability v-if="layer==='availability'"/>
                 <Contacts v-else-if="layer==='contacts'"/>
                 <Queues v-else-if="layer==='queues'"/>

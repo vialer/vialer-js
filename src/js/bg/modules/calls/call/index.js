@@ -131,7 +131,10 @@ class Call {
         // Set the output device from settings.
         const {output} = this.app.state.settings.webrtc.media.devices
         try {
-            if (output.selected.id) await this.app.video.setSinkId(output.selected.id)
+            if (output.selected.id && output.selected.id !== 'default') {
+                this.app.logger.info(`${this}call video element on sink ${output.selected.id}`)
+                await this.app.video.setSinkId(output.selected.id)
+            }
         } catch (err) {
             const message = this.app.$t('Failed to set input or output device.')
             this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
@@ -146,6 +149,7 @@ class Call {
     * Some UI state plumbing to setup an outgoing Call.
     */
     _outgoing() {
+        this.remoteStream = new MediaStream()
         // Try to fill in the displayName from contacts.
         const contacts = this.app.state.contacts.contacts
         let displayName = ''

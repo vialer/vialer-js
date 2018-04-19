@@ -1,0 +1,60 @@
+@import "../../scss/lib/mixins";
+@import "../../scss/lib/variables";
+
+.component-wizard {
+
+    .step {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        padding: $spacer * 4;
+        padding-bottom: 0;
+        text-align: center;
+
+        .field {
+            display: flex;
+            justify-content: center;
+        }
+
+        > header {
+            color: $brand-color;
+            font-size: 1.8rem;
+        }
+
+        .step-description {
+            color: $grey-color-darker;
+            padding-bottom: $spacer * 3;
+            padding-top: $spacer * 2;
+            text-align: center;
+            width: 75%;
+        }
+
+        .step-container {
+            width: 75%;
+        }
+    }
+
+    .progress {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin-bottom: $spacer * 3;
+
+        .step-hl {
+            background: $grey-color-light;
+            border-radius: 50%;
+            height: $spacer;
+            margin-right: $spacer;
+            width: $spacer;
+
+            &.active {
+                background: $brand-color;
+            }
+        }
+    }
+
+    .buttons {
+        margin-bottom: $spacer * 4;
+    }
+
+}

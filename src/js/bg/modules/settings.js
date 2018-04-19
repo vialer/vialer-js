@@ -118,6 +118,10 @@ class ModuleSettings extends Module {
                     },
                 },
             },
+            wizard: {
+                completed: false,
+                step: 0,
+            },
         }
     }
 
@@ -131,7 +135,11 @@ class ModuleSettings extends Module {
     * disabled.
     */
     _ready() {
-        if (this.app.state.settings.vault.unlocked && this.app.state.settings.webrtc.media.permission) {
+        const vaultUnlocked = this.app.state.settings.vault.unlocked
+        const mediaPermission = this.app.state.settings.webrtc.media.permission
+        const isAuthenticated = this.app.state.user.authenticated
+
+        if (vaultUnlocked && mediaPermission && isAuthenticated) {
             this.queryMediaDevices()
         }
     }
@@ -145,13 +153,13 @@ class ModuleSettings extends Module {
     */
     _watchers() {
         return {
-            'store.settings.click2dial.enabled': (newVal, oldVal) => {
+            'store.settings.click2dial.enabled': (enabled) => {
                 if (this.app.env.isExtension) {
-                    this.app.modules.extension.tabs.signalIcons({enabled: newVal})
+                    this.app.modules.extension.tabs.signalIcons({enabled})
                 }
             },
-            'store.settings.telemetry.enabled': (newVal, oldVal) => {
-                this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: newVal, eventName: 'telemetry', override: true})
+            'store.settings.telemetry.enabled': (enabled) => {
+                this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: enabled, eventName: 'telemetry', override: true})
             },
             'store.settings.vault.store': (storeVaultKey) => {
                 if (storeVaultKey) this.app.crypto.storeVaultKey()
@@ -164,14 +172,16 @@ class ModuleSettings extends Module {
                     this.queryMediaDevices()
                 }
             },
-            'store.settings.webrtc.enabled': (newVal, oldVal) => {
+            'store.settings.webrtc.enabled': () => {
                 this.app.emit('bg:tabs:update_contextmenus', {}, true)
             },
             /**
-            * Read the devices list once as soon there is media permission.
+            * Read the devices list once as soon there is media permission
+            * and the user is authenticated. The devices list is stored
+            * in the encrypted part, so the vault must be open at that point.
             */
             'store.settings.webrtc.media.permission': () => {
-                this.queryMediaDevices()
+                if (this.app.state.user.authenticated) this.queryMediaDevices()
             },
         }
     }

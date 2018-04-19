@@ -28,6 +28,7 @@ module.exports = (app) => {
             overlay: 'ui.overlay',
             telemetry: 'settings.telemetry',
             user: 'user',
+            wizard: 'settings.wizard',
         },
     }
 

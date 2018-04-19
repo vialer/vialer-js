@@ -34,6 +34,7 @@ class AppBackground extends App {
         this.crypto = new Crypto(this)
         this.timer = new Timer(this)
 
+        this.__mergeBusy = false
         this.__ready = false
         // Send the background script's state to the requesting event.
         this.on('bg:get_state', ({callback}) => {
@@ -134,11 +135,9 @@ class AppBackground extends App {
     * is ready to rumble.
     */
     async __initStore() {
+        super.__initStore()
         // Changing the menubar icon depends on a state watcher, which requires
         // Vue to be already initialized in order to pick up changes.
-        let menubarState = 'inactive'
-        super.__initStore()
-
         Object.assign(this.state, this._initialState())
         // Avoid allowing the unencrypted store to override state
         // properties from the encrypted store.
@@ -147,7 +146,10 @@ class AppBackground extends App {
 
         // The vault always starts in a locked position, no matter what the
         // unencrypted store says.
-        this.setState({settings: {vault: {unlocked: false}}}, {encrypt: false, persist: true})
+        this.setState({
+            settings: {vault: {unlocked: false}},
+            ui: {menubar: {default: 'inactive'}},
+        }, {encrypt: false, persist: true})
 
         if (this.state.settings.vault.active) {
             // See if we can decipher the stored encrypted state when
@@ -156,16 +158,14 @@ class AppBackground extends App {
                 // Restores the user's identity.
                 await this.__unlockVault({key: this.state.settings.vault.key})
                 this.__initServices()
-                menubarState = this.state.ui.menubar.default
             } else {
                 // Active vault, but no key. Ask the user for the key.
-                menubarState = 'lock-on'
-                this.setState({ui: {layer: 'unlock'}, user: {authenticated: false}})
+                this.setState({ui: {layer: 'unlock', menubar: {default: 'lock-on'}}, user: {authenticated: false}})
             }
         } else {
             this.setState({
                 settings: {vault: {unlocked: false}},
-                ui: {layer: 'login'}, user: {authenticated: false},
+                ui: {layer: 'login', menubar: {default: 'inactive'}}, user: {authenticated: false},
             }, {encrypt: false, persist: true})
         }
 
@@ -180,7 +180,7 @@ class AppBackground extends App {
 
         this.initViewModel(watchers)
         // (!) State is reactive from here on.
-        this.setState({ui: {menubar: {default: menubarState}}})
+
         // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()
@@ -214,17 +214,33 @@ class AppBackground extends App {
 
     /**
     * App state merge operation with additional optional
-    * state storage for `AppBackground`.
+    * state storage for `AppBackground`. Make sure that
+    * merge operations are done sequently. This should
+    * be a queue, but a polling mechanism with a timeout
+    * works well enough for now.
     * @param {Object} options - See the parameter description of super.
     */
     async __mergeState({action = 'upsert', encrypt = true, path = null, persist = false, state}) {
+        if (this.__mergeBusy) {
+            setTimeout(() => {
+                this.__mergeState({action, encrypt, path, persist, state})
+            }, 1)
+            return
+        }
+
+        // Flag that the operation is currently in use.
+        this.__mergeBusy = true
         super.__mergeState({action, encrypt, path, persist, state})
-        if (!persist) return
+        if (!persist) {
+            this.__mergeBusy = false
+            return
+        }
 
         // Background is leading and is the only one that
         // writes to storage using encryption.
         let storageKey = encrypt ? 'state.encrypted' : 'state.unencrypted'
         let stateClone = this.store.get(storageKey)
+
         if (stateClone) {
             if (encrypt) {
                 stateClone = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, stateClone))
@@ -236,7 +252,9 @@ class AppBackground extends App {
             path = path.split('.')
             const _ref = path.reduce((o, i)=>o[i], stateClone)
             this.__mergeDeep(_ref, state)
-        } else this.__mergeDeep(stateClone, state)
+        } else {
+            this.__mergeDeep(stateClone, state)
+        }
 
         // Encrypt the updated store state.
         if (encrypt) {
@@ -244,6 +262,7 @@ class AppBackground extends App {
         }
 
         this.store.set(storageKey, stateClone)
+        this.__mergeBusy = false
     }
 
 

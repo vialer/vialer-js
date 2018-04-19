@@ -26,11 +26,11 @@
     }
 
     &.notice {
-        background: $red-color;
-        color: $white-color;
+        background: $grey-color-lighter;
 
         .status-left .status-indicator svg {
-            fill: $white-color;
+            fill: $grey-color-dark;
+            stroke: $white-color;
         }
     }
 

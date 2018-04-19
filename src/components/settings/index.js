@@ -95,42 +95,17 @@ module.exports = (app) => {
             /**
             * Change the sink for the ringtone when the selected
             * ringtone device changes.
+            * @param {String} newSinkId - The selected sink for sounds.
             */
-
-            'devices.sounds.selected.id': function(newVal, oldVal) {
-                if (newVal) app.sounds.ringTone.audio.setSinkId(newVal)
+            'devices.sounds.selected.id': function(newSinkId) {
+                if (newSinkId) app.sounds.ringTone.audio.setSinkId(newSinkId)
             },
             /**
             * Reactively change the language when the select updates.
-            * @param {Object} newVal - New select value.
-            * @param {Object} oldVal - Old select value.
+            * @param {Object} language - Selected language.
             */
-            'settings.language.selected': function(newVal, oldVal) {
-                Vue.i18n.set(newVal.id)
-            },
-            /**
-            * The switch to toggle the softphone. This is a bit more complicated
-            * because the store data that is used to setup the connection, e.g.
-            * `settings.webrtc.account`, is not directly bound to the VoIP-account
-            * selection
-            * @param {Object} newVal - New checkbox/switch value.
-            * @param {Object} oldVal - Old checkbox/switch value.
-            */
-            'settings.webrtc.enabled': function(newVal, oldVal) {
-                if (newVal) {
-                    // No option is set in the VoIP-account select yet.
-                    // This is required. Help the user by setting the first
-                    // account as the default. An info-message is shown if
-                    // there are no accounts yet.
-                    if (!this.settings.webrtc.account.selected.username) {
-                        // There are options to choose from.
-                        if (this.settings.webrtc.account.options.length) {
-                            this.settings.webrtc.account.selected = this.settings.webrtc.account.options[0]
-                        }
-                    }
-                } else {
-                    this.settings.webrtc.account.selected = {id: null, name: null, password: null, username: null}
-                }
+            'settings.language.selected': function(language) {
+                Vue.i18n.set(language.id)
             },
         },
     }

@@ -1,0 +1,26 @@
+@import "../../scss/lib/mixins";
+@import "../../scss/lib/variables";
+
+.component-mic-permission {
+
+    .mic-popout-instructions {
+        color: $grey-color-darker;
+        font-size: 0.8rem;
+        font-weight: 500;
+        margin-bottom: $spacer;
+    }
+
+    .mic-popout-notice {
+        font-size: 0.8rem;
+        font-style: italic;
+        margin-bottom: $spacer;
+    }
+
+    .video-cam {
+        @include icon-size($spacer * 3);
+        margin-bottom: $spacer;
+        path[pid="0"] {fill: $primary-color;}
+        path[pid="1"] {fill: $white-color;}
+        rect[pid="2"] {fill: $red-color;}
+    }
+}

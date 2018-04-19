@@ -125,10 +125,10 @@ class ModuleUser extends Module {
         await this.app.__unlockVault({password, username})
 
         let startLayer
-        if (this.app.state.app.installed) {
+        if (!this.app.state.settings.wizard.completed) {
             // On install, go to the settings page.
             startLayer = 'settings'
-            this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('Review your softphone and audio settings.'), timeout: 0, type: 'warning'})
+            this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('Almost done! Please check your audio settings.'), timeout: 0, type: 'success'})
         } else {
             startLayer = 'calls'
             this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: user.realName}), type: 'success'})

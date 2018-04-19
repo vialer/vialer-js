@@ -233,7 +233,10 @@ class App extends Skeleton {
 
         const userMediaFlags = this.userMediaFlags[this.state.settings.webrtc.media.type.selected.id]
         const inputSink = this.state.settings.webrtc.media.devices.input.selected.id
-        if (inputSink) userMediaFlags.audio.deviceId = inputSink
+        if (inputSink && inputSink !== 'default') {
+            this.logger.info(`${this}userMedia stream using sink: ${inputSink}`)
+            userMediaFlags.audio.deviceId = inputSink
+        }
         return userMediaFlags
     }
 

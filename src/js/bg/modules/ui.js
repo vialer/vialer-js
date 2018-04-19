@@ -65,6 +65,17 @@ class ModuleUI extends Module {
 
 
     /**
+    * Set the menubar icon in WebExtensions.
+    * @param {String} name - The name of the menubar png to set.
+    */
+    __menubarIcon(name) {
+        if (this.app.env.isExtension && name) {
+            browser.browserAction.setIcon({path: `img/menubar-${name}.png`})
+        }
+    }
+
+
+    /**
     * Initializes the module's store.
     * @returns {Object} The module's store properties.
     */
@@ -81,7 +92,7 @@ class ModuleUI extends Module {
                     active: 'recent',
                 },
                 settings: {
-                    active: 'phone',
+                    active: 'audio',
                 },
             },
             visible: false,
@@ -95,6 +106,7 @@ class ModuleUI extends Module {
     * and the background script.
     */
     _ready() {
+        this.__menubarIcon(this.app.state.ui.menubar.default)
         if (this.app.env.isExtension) {
             this.app.setState({ui: {visible: false}})
             // A connection between the popup script and the background
@@ -153,10 +165,8 @@ class ModuleUI extends Module {
     */
     _watchers() {
         return {
-            'store.ui.menubar.default': (newVal, oldVal) => {
-                if (this.app.env.isExtension) {
-                    browser.browserAction.setIcon({path: `img/menubar-${newVal}.png`})
-                }
+            'store.ui.menubar.default': (menubarIcon) => {
+                this.__menubarIcon(menubarIcon)
             },
             'store.ui.menubar.event': (newVal, oldVal) => {
                 if (this.app.env.isExtension) {

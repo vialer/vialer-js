@@ -51,35 +51,6 @@
         }
     }
 
-    .microphone-hint,
-    .microphone-warning {
-        font-style: normal;
-        font-weight: 500;
-    }
-
-    .microphone-warning {
-        color: $red-color;
-        font-size: 0.9rem;
-    }
-
-    .microphone-hint {
-        font-size: 0.8rem;
-    }
-
-
-    // The enable microphone button that opens the popout mode.
-    .microphone-popout.button {
-        margin-top: $spacer;
-    }
-
-    .notification-box {
-        .video-cam-disabled {
-            path[pid="0"] {fill: $primary-color;}
-            path[pid="1"] {fill: $white-color;}
-            rect[pid="2"] {fill: $red-color;}
-        }
-    }
-
     // The container for the save button.
     .settings-actions {
         margin-top: $spacer * 3;

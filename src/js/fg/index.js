@@ -48,12 +48,14 @@ class AppForeground extends App {
             MainCallBar: require('../../components/main_callbar'),
             MainMenuBar: require('../../components/main_menubar'),
             MainStatusBar: require('../../components/main_statusbar'),
+            MicPermission: require('../../components/mic_permission'),
             Notifications: require('../../components/notifications'),
             Queues: require('../../components/queues'),
             Settings: require('../../components/settings'),
             Soundmeter: require('../../components/soundmeter'),
-            Telemetry: require('../../components/telemetry'),
             Unlock: require('../../components/unlock'),
+            VoipaccountPicker: require('../../components/voipaccount_picker'),
+            Wizard: require('../../components/wizard'),
         }
 
         for (const name of Object.keys(this.components)) {

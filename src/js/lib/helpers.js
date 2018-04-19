@@ -237,6 +237,12 @@ function helpers(app) {
                 }
                 return translations[this.call.status]
             },
+            greeting: function() {
+                let hours = new Date().getHours()
+                if (hours < 12) return this.$t('Good Morning')
+                else if (hours >= 12 && hours <= 17) return this.$t('Good Afternoon')
+                else return this.$t('Good Evening')
+            },
             hours: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60 / 60) % 24
             },

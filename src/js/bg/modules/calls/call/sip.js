@@ -18,7 +18,6 @@ class CallSIP extends Call {
     constructor(app, target, {active, silent} = {}) {
         super(app, target, {active, silent})
 
-        this._sessionOptions = {media: {}}
         if (!target || ['string', 'number'].includes(typeof target)) {
             app.__mergeDeep(this.state, {keypad: {mode: 'call'}, number: target, status: 'new', type: 'outgoing'})
         } else {
@@ -96,12 +95,15 @@ class CallSIP extends Call {
     */
     _outgoing() {
         super._outgoing()
-        this.session = this.module.ua.invite(`sip:${this.state.number}@voipgrid.nl`, this._sessionOptions)
+        this.session = this.module.ua.invite(`sip:${this.state.number}@voipgrid.nl`, {
+            sessionDescriptionHandlerOptions: {
+                constraints: this.app._getUserMediaFlags(),
+            },
+        })
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
             this.app.telemetry.event('call[sip]', 'outgoing', 'accepted')
             this.pc = this.session.sessionDescriptionHandler.peerConnection
-            this.remoteStream = new MediaStream()
 
             this.pc.getReceivers().forEach((receiver) => {
                 this.remoteStream.addTrack(receiver.track)
@@ -165,15 +167,25 @@ class CallSIP extends Call {
     */
     accept() {
         super.accept()
-        this.session.accept(this._sessionOptions)
-        this.pc = this.session.sessionDescriptionHandler.peerConnection
 
-        this.session.sessionDescriptionHandler.on('addStream', () => {
-            this.pc.getReceivers().forEach((receiver) => {
-                this.remoteStream.addTrack(receiver.track)
-                this.app.video.srcObject = this.remoteStream
-                this.app.video.play()
-            })
+        this.__trackAdded = false
+
+        this.session.on('trackAdded', () => {
+            if (!this.__trackAdded) {
+                this.pc = this.session.sessionDescriptionHandler.peerConnection
+                this.pc.getReceivers().forEach((receiver) => {
+                    this.remoteStream.addTrack(receiver.track)
+                    this.app.video.srcObject = this.remoteStream
+                    this.app.video.play()
+                })
+            }
+
+            this.__trackAdded = true
+        })
+        this.session.accept({
+            sessionDescriptionHandlerOptions: {
+                constraints: this.app._getUserMediaFlags(),
+            },
         })
     }
 
@@ -194,9 +206,7 @@ class CallSIP extends Call {
             // Query media and assign the stream. The actual permission must be
             // already granted from a foreground script running in a tab.
             try {
-                const stream = await this._initMedia()
-                this._sessionOptions.media.stream = stream
-                this.stream = stream
+                await this._initMedia()
                 if (this.state.status === 'invite') this._incoming()
                 else this._outgoing()
             } catch (err) {

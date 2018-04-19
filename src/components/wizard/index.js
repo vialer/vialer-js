@@ -1,0 +1,69 @@
+module.exports = (app) => {
+    // Initialize sub-components of the wizard.
+    Vue.component('StepMicPermission', require('./components/step_mic_permission')(app))
+    Vue.component('StepTelemetry', require('./components/step_telemetry')(app))
+    Vue.component('StepVoipaccount', require('./components/step_voipaccount')(app))
+    Vue.component('StepWelcome', require('./components/step_welcome')(app))
+    /**
+    * @memberof fg.components
+    */
+    const Wizard = {
+        computed: app.helpers.sharedComputed(),
+        data: function() {
+            return {
+                steps: [
+                    {name: 'welcome', ready: true},
+                    {name: 'telemetry', ready: null}, // hide the next button.
+                    {name: 'voipaccount', ready: true},
+                    {name: 'microphone', ready: null},
+                ],
+            }
+        },
+        methods: Object.assign({
+            finish: function() {
+                app.setState({settings: {wizard: {completed: true, step: 0}}}, {persist: true})
+                app.emit('bg:calls:disconnect', {reconnect: true})
+            },
+            nextStep: function() {
+                if (this.steps[this.step].name === 'voipaccount') {
+                    this.settings.webrtc.enabled = true
+                    app.setState({
+                        settings: {
+                            webrtc: {
+                                account: {
+                                    selected: this.settings.webrtc.account.selected,
+                                },
+                                enabled: true,
+                            },
+                        },
+                    }, {persist: true})
+                }
+                app.setState({settings: {wizard: {step: this.step += 1}}}, {persist: true})
+            },
+        }, app.helpers.sharedMethods()),
+        mounted: function() {
+            // The microphone step is ready when the permission
+            // is already there.
+            if (this.settings.webrtc.media.permission) {
+                this.steps.find((i) => i.name === 'microphone').ready = true
+            }
+        },
+        render: templates.wizard.r,
+        staticRenderFns: templates.wizard.s,
+        store: {
+            app: 'app',
+            permission: 'settings.webrtc.media.permission',
+            settings: 'settings',
+            step: 'settings.wizard.step',
+        },
+        watch: {
+            permission: function(newPermission) {
+                if (this.settings.webrtc.media.permission) {
+                    this.steps.find((i) => i.name === 'microphone').ready = true
+                }
+            },
+        },
+    }
+
+    return Wizard
+}

@@ -81,104 +81,39 @@
 
         <Field name="webrtc_enabled" type="checkbox"
             :disabled="env.isFirefox"
-            :label="$t('Use as softphone')" :model.sync="settings.webrtc.enabled"
+            :label="$t('Use as softphone')"
+            :model.sync="settings.webrtc.enabled"
             :help="env.isFirefox ? $t('Firefox doesn\'t support this feature yet.') : $t('Use WebRTC to be able to receive incoming calls with and place outgoing calls.')"/>
 
-        <!-- Platform integration allows the user to select a voip-account. -->
-        <template v-if="['closed', 'open'].includes(app.vendor.type)">
-            <Field name="webrtc_account" type="select"
-                :disabled="!settings.webrtc.enabled"
-                :empty="$t('No VoIP-accounts')"
-                :label="$t('Softphone VoIP-account')" :model.sync="settings.webrtc.account.selected"
-                :options="settings.webrtc.account.options"
-                :placeholder="$t('Select a VoIP-account')"
-                :validation="$v.settings.webrtc.account.selected.id"/>
-
-            <div class="notification-box info" v-if="!settings.webrtc.account.options || !settings.webrtc.account.options.length">
-                <header><icon name="info"/><span>{{$t('A VoIP-account is required.')}}</span></header>
-                <ul>
-                    <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
-                    <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`phoneaccount`)">{{$t('VoIP-accounts')}}</a> {{ $t('to create a VoIP-account.') }}.</li>
-                </ul>
-            </div>
-            <div class="notification-box info" v-else-if="settings.webrtc.enabled">
-                <header>
-                    <icon name="info"/><span>{{`${$t('VoIP account')} ${$t('checklist')}`}}</span>
-                </header>
-                <ul>
-                    <!-- Reference to the popout mode from the popup modus only-->
-                    <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount`)">{{$t('the account')}}</a></b> {{$t('is not in use by another device')}}.</li>
-                    <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b> {{$t('is set in Expert options')}}.</li>
-                    <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b> {{$t('is set in Expert options')}}.</li>
-                </ul>
-            </div>
-        </template>
-
-        <template v-else-if="settings.webrtc.enabled && app.vendor.type === 'free'">
-            <Field name="webrtc_username" type="text"
-                :disabled="!settings.webrtc.enabled"
-                :label="$t('VoIP') + ' ' + $t('username')" :model.sync="settings.webrtc.account.selected.username"
-                :placeholder="$t('VoIP account') + ' id'"/>
-
-            <Field name="webrtc_password" type="password"
-                :disabled="!settings.webrtc.enabled"
-                :label="$t('VoIP') + ' ' + $t('password')" :model.sync="settings.webrtc.account.selected.password"
-                :placeholder="$t('VoIP account') + ' ' + $t('password')"/>
-        </template>
+        <VoipaccountPicker :label="$t('Softphone VoIP-account')"/>
     </div>
 
     <!-- Audio settings -->
     <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
-        <Field name="output_device" type="select" v-if="settings.webrtc.media.permission"
-            :label="$t('Headset audio output')" :model.sync="devices.output.selected"
-            :options="devices.output.options"
-            :placeholder="$t('Select an output device')"/>
 
         <Field name="input_device" type="select" v-if="settings.webrtc.media.permission"
             :label="$t('Headset microphone')" :model.sync="devices.input.selected"
             :options="devices.input.options"
             :placeholder="$t('Select an input device')"/>
 
-        <div class="field">
-            <!-- Additional help to guide the user to the browser permission settings. -->
-            <em class="help" v-if="settings.webrtc.media.permission">
-                <span class="microphone-hint">{{$t('Check if the microphone responds to your voice.')}}</span>
-                <Soundmeter class="soundmeter"/>
-            </em>
-            <!-- Give the user instructions how to enable the microphone in the popout -->
-            <div class="notification-box troubleshoot" v-else-if="!settings.webrtc.media.permission && env.isPopout">
-                <header>
-                    <icon name="warning"/>
-                    <span>{{$t('The softphone doesn\'t have access to your microphone!')}}</span>
-                </header>
-                <ul>
-                    <!-- Reference to the popout mode from the popup modus only-->
-                    <li>
-                        {{$t('Inspect the browser navigation bar for microphone access.')}}
-                        <icon name="video-cam-disabled" class="video-cam-disabled"/>
-                    </li>
-                    <li>{{$t('Refresh or close this tab afterwards to reflect your changes.')}}</li>
-                </ul>
-            </div>
+        <MicPermission />
 
-            <span v-if="!settings.webrtc.media.permission && !env.isPopout">
-                <span class="microphone-warning">{{$t('The softphone doesn\'t have access to your microphone!')}}</span>
-                <a class="microphone-popout button is-danger" @click="openPopoutView">
-                    <span class="icon is-small"><icon name="microphone"/></span>
-                    <span>{{$t('Allow microphone permission')}}</span>
-                </a>
-            </span>
-        </div>
+        <Field name="output_device" type="select" v-if="settings.webrtc.media.permission"
+            :label="$t('Headset audio output')"
+            :model.sync="devices.output.selected"
+            :options="devices.output.options"
+            :placeholder="$t('Select an output device')"/>
 
         <Field name="sounds_device" type="select" v-if="settings.webrtc.media.permission"
-            :label="$t('Ringtone audio output')" :model.sync="devices.sounds.selected"
+            :label="$t('Ringtone audio output')"
+            :model.sync="devices.sounds.selected"
             :options="devices.sounds.options"
             :placeholder="$t('Select a sounds output device')"/>
 
         <div class="ringtone">
             <Field class="ringtone-select" name="ringtone" type="select"
-                :help="$t('The ringtone that is played when you\'re being called.')"
-                :label="`${$t('Ringtone audio')} ${$t('file')}`" :model.sync="settings.ringtones.selected"
+                :label="`${$t('Ringtone audio')} ${$t('file')}`"
+                :model.sync="settings.ringtones.selected"
                 :options="settings.ringtones.options"
                 :placeholder="$t('Select a ringtone')">
 

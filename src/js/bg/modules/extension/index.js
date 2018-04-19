@@ -71,7 +71,7 @@ class ModuleExtension extends Module {
                 this.app.modules.calls.callAction('decline-hangup')
             } else if (command === 'action-dnd') {
                 // Only toggle when calling options are enabled and webrtc is enabled.
-                if (!this.app.helpers.callingDisabled() && this.app.state.settings.webrtc.enabled) {
+                if (this.app.state.settings.webrtc.enabled && !this.app.helpers.callOngoing() && !this.app.helpers.callingDisabled()) {
                     this.app.setState({availability: {dnd: !this.app.state.availability.dnd}})
                 }
             } else if (command === 'action-hold-active') {

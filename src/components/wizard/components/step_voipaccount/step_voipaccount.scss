@@ -1,0 +1,14 @@
+@import "../../../../scss/lib/mixins";
+@import "../../../../scss/lib/variables";
+
+.component-step-voipaccount {
+    &.step {
+        .step-description {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: $spacer * 2;
+        }
+    }
+
+}
