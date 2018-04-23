@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Source: src/components/call_keypad/index.js | Vialer-js</title>
+    <title>Source: src/components/voipaccount_picker/index.js | Vialer-js</title>
     <link type="text/css" rel="stylesheet" href="styles/font-awesome.min.css">
     <link type="text/css" rel="stylesheet" href="styles/main.css">
 
@@ -325,7 +325,7 @@
         <div class="content">
             <ul class="breadcrumbs">
                 <li><a href="index.html">Docs</a> »</li>
-                <li>Source: src/components/call_keypad/index.js</li>
+                <li>Source: src/components/voipaccount_picker/index.js</li>
             </ul>
             <hr>
             
@@ -336,116 +336,77 @@
 <article>
     <pre class="prettyprint source linenums"><code>module.exports = (app) => {
 
-    const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#']
-
-    // we detect the mouseup event on the window tag as opposed to the li
-    // tag because otherwise if we release the mouse when not over a button,
-    // the tone will remain playing.
-    function stopKeypress() {
-        if (app.sounds.dtmfTone.status) {
-            window.setTimeout(() => {
-                app.sounds.dtmfTone.stop()
-            }, 50)
-        }
-    }
-
-    document.addEventListener('mouseup', stopKeypress)
-    document.addEventListener('touchend', stopKeypress)
+    const v = Vuelidate.validators
 
     /**
     * @memberof fg.components
     */
-    const CallKeypad = {
-        computed: Object.assign({
-            matchedContact: function() {
-                let _number = String(this.number)
-                if (_number.length > 1) {
-                    let match = app.helpers.matchContact(String(this.number), true)
-                    if (match) {
-                        return {
-                            contact: this.contacts[match.contact],
-                            endpoint: this.contacts[match.contact].endpoints[match.endpoint],
-                        }
-                    }
-                }
-                return null
-            },
-        }, app.helpers.sharedComputed()),
+    const WizardStepWelcome = {
+        computed: app.helpers.sharedComputed(),
         methods: Object.assign({
-            classes: function(block) {
-                let classes = {}
-                if (block === 'component') {
-                    classes['call-ongoing'] = true
-                } else if (block === 'number-input') {
-                    classes['number-input'] = true
-                    classes[this.display] = true
-                }
-                return classes
-            },
-            inputChange: function(newVal) {
-                this.$emit('update:model', newVal)
-            },
-            pressKey: function(key) {
-                if (this.callingDisabled) return
-                if (!key) {
-                    // No key pressed. Stop playing sound.
-                    window.setTimeout(() => app.sounds.dtmfTone.stop(), 50)
-                    return
-                }
-                if (!allowedKeys.includes(key)) return
-                app.sounds.dtmfTone.play(key)
-                // Force stop playing dtmf sound after x amount of time,
-                // because mouseup event may not fire properly, in case of
-                // a right-click => contextmenu.
-                window.setTimeout(() => app.sounds.dtmfTone.stop(), 500)
-                let newVal = app.utils.sanitizeNumber(`${this.number}${key}`)
-                if (newVal) this.$emit('update:model', newVal)
-                if (this.mode === 'dtmf') app.emit('bg:calls:dtmf', {callId: this.call.id, key})
-            },
-            removeLastNumber: function() {
-                if (this.callingDisabled) return
-                if (this.number) this.$emit('update:model', this.number.substring(0, this.number.length - 1))
+            nextStep: function() {
+                this.step += 1
             },
         }, app.helpers.sharedMethods()),
-        mounted: function() {
-            // Focus the input element directly.
-            if (!this.callingDisabled) {
-                this.$refs.input.focus()
-            }
-        },
         props: {
-            call: {default: null},
-            display: {default: 'expanded', type: String},
-            dtmf: {default: false, type: Boolean},
-            mode: {default: 'call', type: String},
-            number: {default: '', type: String},
-            search: {default: true, type: Boolean},
+            info: {default: true},
+            label: {default: ''},
         },
-        render: templates.call_keypad.r,
-        staticRenderFns: templates.call_keypad.s,
+        render: templates.voipaccount_picker.r,
+        staticRenderFns: templates.voipaccount_picker.s,
         store: {
-            contacts: 'contacts.contacts',
+            app: 'app',
+            settings: 'settings',
             user: 'user',
         },
+        validations: function() {
+            let validations = {
+                settings: {
+                    webrtc: {
+                        account: {
+                            selected: {
+                                id: {
+                                    requiredIf: v.requiredIf(() => {
+                                        return this.settings.webrtc.enabled
+                                    }),
+                                },
+                            },
+                        },
+                    },
+                },
+            }
+
+            return validations
+        },
         watch: {
-            number: function(newVal, oldVal) {
-                // Toggle developer features with a special number.
-                if (newVal === '02*06*18') {
-                    if (!this.user.developer) {
-                        this.$notify({icon: 'info', message: this.$t('Developer mode activated'), type: 'success'})
-                    } else {
-                        this.$notify({icon: 'info', message: this.$t('Developer mode deactivated'), type: 'success'})
+            /**
+            * The switch to toggle the softphone. This is a bit more complicated
+            * because the store data that is used to setup the connection, e.g.
+            * `settings.webrtc.account`, is not directly bound to the VoIP-account
+            * selection
+            * @param {Object} webrtcEnabled - New checkbox/switch value.
+            */
+            'settings.webrtc.enabled': function(webrtcEnabled) {
+                if (webrtcEnabled) {
+                    // No option is set in the VoIP-account select yet.
+                    // This is required. Help the user by setting the first
+                    // account as the default. An info-message is shown if
+                    // there are no accounts yet.
+                    if (!this.settings.webrtc.account.selected.username) {
+                        // There are options to choose from.
+                        if (this.settings.webrtc.account.options.length) {
+                            app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
+                        }
                     }
-                    app.setState({user: {developer: !this.user.developer}}, {persist: true})
+                } else {
+                    const emptyAccount = {id: null, name: null, password: null, username: null}
+                    app.setState({settings: {webrtc: {account: {selected: emptyAccount}}}}, {persist: true})
                 }
-                if (this.callingDisabled) return
-                let cleanedNumber = app.utils.sanitizeNumber(newVal)
-                this.$emit('update:model', cleanedNumber)
             },
         },
     }
 
-    return CallKeypad
+    return WizardStepWelcome
 }
 </code></pre>
 </article>
