@@ -105,12 +105,21 @@ class ModuleAvailability extends Module {
         else if (sud.phoneaccount) selected = destinations.find((d) => d.id === sud.phoneaccount)
 
         // Platform users select an existing WebRTC-SIP VoIP-account.
-        let platformAccounts = userdestination.phoneaccounts.map((i) => ({
-            id: i.id,
-            name: i.description,
-            password: i.password,
-            username: i.account_id,
-        }))
+        let platformAccounts = userdestination.phoneaccounts.map((i) => {
+            // The options we care about.
+            let options = {
+                avpf: false,
+                encryption: false,
+            }
+            Object.assign(options, this.app.utils.parseConfigLine(i.expert_options))
+            return {
+                id: i.id,
+                name: `${i.internal_number} - ${i.description}`,
+                options,
+                password: i.password,
+                username: i.account_id,
+            }
+        })
 
         this.app.setState({
             availability: {available: Boolean(selected.id), destinations, selected, sud: sud.id},

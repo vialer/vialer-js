@@ -41,12 +41,20 @@ module.exports = (app) => {
                 app.setState({settings: {wizard: {step: this.step += 1}}}, {persist: true})
             },
         }, app.helpers.sharedMethods()),
+        /**
+        * Adjusting the wizard steps is done when the component
+        * mounts, and when data changes. That is being tracked
+        * in appropriate watchers.
+        */
         mounted: function() {
             // The microphone step is ready when the permission
             // is already there.
             if (this.settings.webrtc.media.permission) {
                 this.steps.find((i) => i.name === 'microphone').ready = true
             }
+            const selectedVoipaccountId = this.settings.webrtc.account.selected.id
+            const voipaccountStep = this.steps.find((i) => i.name === 'voipaccount')
+            voipaccountStep.ready = selectedVoipaccountId ? true : false
         },
         render: templates.wizard.r,
         staticRenderFns: templates.wizard.s,

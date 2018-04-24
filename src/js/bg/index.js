@@ -71,7 +71,6 @@ class AppBackground extends App {
 
 
     async __init() {
-        this.api = new Api(this)
         // Create audio/video elements. The audio element is used to playback
         // sounds with (like ringtones, dtmftones). The video element is
         // used to attach the remote WebRTC stream to.
@@ -85,6 +84,7 @@ class AppBackground extends App {
             this.modules[module.name] = new module.Module(this)
         }
 
+        this.api = new Api(this)
         await this.__initStore()
 
         this.telemetry = new Telemetry(this)
@@ -111,12 +111,11 @@ class AppBackground extends App {
 
 
     /**
-    * Load API data, setup the API and connect to the SIP backend.
-    * Only execute this when the user is authenticated.
+    * Load API data and connect to the SIP backend.
+    * Only use this method on an authenticated user.
     */
     __initServices() {
         this.logger.info(`${this}init connectivity services`)
-        this.api.setupClient(this.state.user.username, this.state.user.password)
         if (this.state.app.online) {
             this._platformData()
             this.modules.calls.connect()
@@ -143,6 +142,9 @@ class AppBackground extends App {
         // properties from the encrypted store.
         const unencryptedState = this.store.get('state.unencrypted')
         if (typeof unencryptedState === 'object') this.__mergeDeep(this.state, unencryptedState)
+        // Setup a HTTP client without authentication as soon there
+        // is a start of the store.
+        this.api.setupClient()
 
         // The vault always starts in a locked position, no matter what the
         // unencrypted store says.
@@ -157,6 +159,8 @@ class AppBackground extends App {
             if (this.state.settings.vault.key) {
                 // Restores the user's identity.
                 await this.__unlockVault({key: this.state.settings.vault.key})
+                // Ther username and token must be available in the store by now.
+                this.api.setupClient(this.state.user.username, this.state.user.token)
                 this.__initServices()
             } else {
                 // Active vault, but no key. Ask the user for the key.

@@ -9,6 +9,21 @@ class Utils {
 
 
     /**
+    * Convert a config line to a key/value object.
+    * @param {String} line - The config line.
+    * @returns {Object} - Config directives.
+    */
+    parseConfigLine(line) {
+        const map = new Map(line.split(';').map((j) => j.split('=')))
+        let obj = {}
+        map.forEach((v, k) => {
+            obj[k] = (v === 'yes' ? true : false)
+        })
+        return obj
+    }
+
+
+    /**
     * Clear a phonenumber from special characters like `+`, `*` and `*`.
     * @param {String} number - Number to clean.
     * @returns {String} - The cleaned number.

@@ -21,8 +21,9 @@ class ModuleUser extends Module {
     */
     constructor(app) {
         super(app)
-
-        this.app.on('bg:user:login', ({username, password}) => this.login(username, password))
+        // Other implementation may use other user identifiers than email,
+        // that's why the main event uses `username` instead of `email`.
+        this.app.on('bg:user:login', ({username, password}) => this.login({email: username, password}))
         this.app.on('bg:user:logout', this.logout.bind(this))
         this.app.on('bg:user:unlock', async({password}) => {
             try {
@@ -30,6 +31,7 @@ class ModuleUser extends Module {
                     password,
                     username: this.app.state.user.username,
                 })
+                this.app.api.setupClient(this.app.state.user.username, this.app.state.user.token)
                 this.app.__initServices()
             } catch (err) {
                 this.app.setState({
@@ -56,13 +58,13 @@ class ModuleUser extends Module {
         return {
             authenticated: false,
             developer: false, // Unlocks experimental developer-only features.
-            password: '',
             platform: {
                 tokens: {
                     portal: null,
                     sip: null,
                 },
             },
+            token: null,
             username: null,
         }
     }
@@ -83,18 +85,19 @@ class ModuleUser extends Module {
     * Make an api call with the current basic authentication to retrieve
     * profile information with. Save the credentials in storage when the call
     * is succesful, otherwise remove the credentials from the store.
-    * @param {String} username - Email address to login with.
-    * @param {String} password - Password to login with.
+    * @param {object} options - Options to pass.
+    * @param {String} options.email - Email address to login with.
+    * @param {String} options.password - Password to login with.
     */
-    async login(username, password) {
-        this.app.api.setupClient(username, password)
-        const res = await this.app.api.client.get('api/permission/systemuser/profile/')
-
+    async login({email, password}) {
+        let res = await this.app.api.client.post('api/permission/apitoken/', {email, password})
         // A login failure. Give the user feedback about what went wrong.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             let message
             const icon = 'warning', type = 'warning'
-            if (res.data.error) {
+            if (!res.data.error) {
+                message = this.app.$t('Failed to login. Please check your credentials.')
+            } else {
                 let failMessage = res.data.error.message
                 // Notify the user about being blocked out of the platform due to
                 // too many login attempts.
@@ -103,26 +106,43 @@ class ModuleUser extends Module {
                     window.failMessage = failMessage
                     message = this.app.$t('Too many failed login attempts; try again at {date}', {date})
                 }
-            } else {
-                message = this.app.$t('Failed to login. Please check your credentials.')
             }
-            this.app.emit('fg:notify', {icon, message, type})
 
+            this.app.emit('fg:notify', {icon, message, type})
             // Remove credentials from the in-memory store.
-            this.app.setState({user: {password: ''}})
+            this.app.setState({user: {token: null}})
             return
         }
+
+        let token = res.data.api_token
+        // Restore the API client now we have the API credentials again.
+        this.app.api.setupClient(email, token)
+        // Unlock the store now we have a valid email and password.
+        await this.app.__unlockVault({password, username: email})
+
+        res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
         let user = res.data
-        user.realName = [user.first_name, user.preposition, user.last_name].filter((i) => i !== '').join(' ')
-        // Only platform client users are able to use vendor platform telephony features.
         if (!user.client) {
+            // Only platform client users are able to use vendor platform
+            // telephony features. Logout partner users.
             this.logout()
+            this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('The plugin can only be used by partner users.'), type: 'warning'})
             return
         }
 
-        // Unlock the store now we have the username and password.
-        await this.app.__unlockVault({password, username})
+        user.realName = [user.first_name, user.preposition, user.last_name].filter((i) => i !== '').join(' ')
+        this.app.setState({
+            user: {
+                client_id: user.client.replace(/[^\d.]/g, ''),
+                id: user.id,
+                platform: {
+                    tokens: {sip: user.token},
+                },
+                realName: user.realName,
+                token,
+            },
+        }, {persist: true})
 
         let startLayer
         if (!this.app.state.settings.wizard.completed) {
@@ -138,22 +158,10 @@ class ModuleUser extends Module {
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},
             ui: {layer: startLayer, menubar: {default: 'active'}},
-            user: {username},
+            user: {username: email},
         }, {encrypt: false, persist: true})
 
-        this.app.setState({
-            user: {
-                client_id: user.client.replace(/[^\d.]/g, ''),
-                id: user.id,
-                password,
-                platform: {
-                    tokens: {
-                        sip: user.token,
-                    },
-                },
-                realName: user.realName,
-            },
-        }, {persist: true})
+
         this.app.__initServices()
     }
 

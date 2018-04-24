@@ -21,9 +21,9 @@
 
     <Field name="password" type="password"
         :disabled="!app.online"
-        :label="$t('Password')" :model.sync="user.password"
+        :label="$t('Password')" :model.sync="password"
         :placeholder="$t('Enter your password')"
-        :validation="$v.user.password"/>
+        :validation="$v.password"/>
 
     <div class="buttons is-centered">
         <button type="button" class="button is-primary" data-link="login"

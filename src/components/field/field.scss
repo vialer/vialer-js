@@ -2,7 +2,10 @@
 
 // A select field with a button attached next to it.
 .field-select {
+
     .control {
+        display: flex;
+        justify-content: center;
         max-width: 300px;
     }
 

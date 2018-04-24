@@ -2,7 +2,7 @@
     <!-- Platform integration allows the user to select a voip-account. -->
     <template v-if="app.vendor.type === 'closed'">
         <Field name="webrtc_account" type="select"
-            :empty="$t('No VoIP-accounts')"
+            :empty="$t('No VoIP accounts')"
             :label="label" :model.sync="settings.webrtc.account.selected"
             :options="settings.webrtc.account.options"
             :placeholder="$t('Select a VoIP-account')"
@@ -28,8 +28,8 @@
             <ul>
                 <!-- Reference to the popout mode from the popup modus only-->
                 <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount`)">{{$t('the account')}}</a></b> {{$t('is not in use by another device')}}.</li>
-                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b> {{$t('is set in Expert options')}}.</li>
-                <li>{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b> {{$t('is set in Expert options')}}.</li>
+                <li v-if="!settings.webrtc.account.selected.options.avpf">{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b> {{$t('is set in Expert options')}}.</li>
+                <li v-if="!settings.webrtc.account.selected.options.encryption">{{$t('Make sure')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b> {{$t('is set in Expert options')}}.</li>
             </ul>
         </div>
     </template>

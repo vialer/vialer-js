@@ -121,7 +121,7 @@ global.translations.nl = {
     'No options available': 'Geen opties beschikbaar',
     'No presence information available right now.': 'Aanwezigheidsinformatie niet beschikbaar op dit moment.',
     'No thanks': 'Nee bedankt',
-    'No VoIP-accounts': 'Geen VoIP accounts',
+    'No VoIP accounts': 'Geen VoIP-accounts',
     'Not registered at the SIP service. Check your connectivity.': 'Niet geregistreerd bij de SIP service. Controleer je verbinding.',
     'of': 'van',
     'offline': 'offline',

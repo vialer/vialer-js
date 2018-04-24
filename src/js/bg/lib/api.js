@@ -18,20 +18,20 @@ class Api {
 
     /**
     * Set a http client with or without basic authentication.
-    * @param {String} username - Username to login with.
-    * @param {String} password - Password to login with.
+    * @param {String} email - User identifier to login with.
+    * @param {String} token - The API token to login with.
     */
-    setupClient(username, password) {
-        let clientOptions = {
-            auth: {
-                password: password,
-                username: username,
-            },
+    setupClient(email, token) {
+        let options = {
             baseURL: this.app.state.settings.platform.url,
             timeout: 15000,
         }
 
-        this.client = axios.create(clientOptions)
+        if (email && token) {
+            options.headers = {authorization: `Token ${email}:${token}`}
+        }
+
+        this.client = axios.create(options)
         this.app.logger.info(`${this}setup axios api client`)
         this.client.interceptors.response.use(function(response) {
             return response

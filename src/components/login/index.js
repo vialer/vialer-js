@@ -7,10 +7,16 @@ module.exports = (app) => {
     */
     const Login = {
         computed: app.helpers.sharedComputed(),
+        data: function() {
+            return {
+                password: '',
+            }
+        },
         methods: Object.assign({
             login: function() {
+                if (this.$v.$invalid) return
                 app.emit('bg:user:login', {
-                    password: this.user.password,
+                    password: this.password,
                     username: this.user.username,
                 })
             },
@@ -25,11 +31,11 @@ module.exports = (app) => {
         },
         validations: function() {
             let validations = {
+                password: {
+                    minLength: v.minLength(6),
+                    required: v.required,
+                },
                 user: {
-                    password: {
-                        minLength: v.minLength(6),
-                        required: v.required,
-                    },
                     username: {
                         email: v.email,
                         required: v.required,
