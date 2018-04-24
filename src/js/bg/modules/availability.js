@@ -18,6 +18,9 @@ class ModuleAvailability extends Module {
     */
     constructor(app) {
         super(app)
+
+        this.app.on('bg:availability:platform_data', this._platformData.bind(this))
+
         /**
         * Notify the VoIPGRID API about the availability change and set
         * the background state to the new situation.

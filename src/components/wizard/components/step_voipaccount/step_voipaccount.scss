@@ -9,6 +9,9 @@
             flex-direction: column;
             padding-bottom: $spacer * 2;
         }
-    }
 
+        .notification-box {
+            margin: $spacer * 3 0;
+        }
+    }
 }

@@ -6,13 +6,18 @@
             :label="label" :model.sync="settings.webrtc.account.selected"
             :options="settings.webrtc.account.options"
             :placeholder="$t('Select a VoIP-account')"
-            :validation="$v.settings.webrtc.account.selected.id"/>
+            :validation="$v.settings.webrtc.account.selected.id">
+
+            <button slot="select-extra" class="ringtone-play button is-link select-button" @click="refreshVoipaccounts()">
+                <span class="icon is-small"><icon name="refresh"/></span>
+            </button>
+        </Field>
 
         <div class="notification-box info" v-if="!settings.webrtc.account.options.length">
             <header><icon name="info"/><span>{{$t('A VoIP-account is required.')}}</span></header>
             <ul>
-                <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
                 <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`phoneaccount`)">{{$t('VoIP-accounts')}}</a> {{ $t('to create a VoIP-account.') }}.</li>
+                <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
             </ul>
         </div>
         <!-- Allow hiding the hints for managing VoIP-accounts -->

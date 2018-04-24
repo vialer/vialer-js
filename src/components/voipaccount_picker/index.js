@@ -1,5 +1,6 @@
 module.exports = (app) => {
 
+    const emptyAccount = {id: null, name: null, password: null, username: null}
     const v = Vuelidate.validators
 
     /**
@@ -8,8 +9,10 @@ module.exports = (app) => {
     const WizardStepWelcome = {
         computed: app.helpers.sharedComputed(),
         methods: Object.assign({
-            nextStep: function() {
-                this.step += 1
+            refreshVoipaccounts: function() {
+                // Call the API endpoint that is responsible for updating
+                // the user's voipaccount list.
+                app.emit('bg:availability:platform_data')
             },
         }, app.helpers.sharedMethods()),
         props: {
@@ -22,6 +25,7 @@ module.exports = (app) => {
             app: 'app',
             settings: 'settings',
             user: 'user',
+            vendor: 'app.vendor',
         },
         validations: function() {
             let validations = {
@@ -44,15 +48,36 @@ module.exports = (app) => {
         },
         watch: {
             /**
-            * The switch to toggle the softphone. This is a bit more complicated
-            * because the store data that is used to setup the connection, e.g.
-            * `settings.webrtc.account`, is not directly bound to the VoIP-account
-            * selection
+            * Respond to updates of the VoIPaccount list associated with the user.
+            * @param {Array} options - Reactive array with VoIP account options.
+            */
+            'settings.webrtc.account.options': function(options) {
+                const selectedId = this.settings.webrtc.account.selected.id
+                if (selectedId && options.length) {
+                    // Make sure that a previous choice is still part of the
+                    // available choices. Select the first option if it isn't.
+                    if (!options.find((i) => i.id === selectedId)) {
+                        app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
+                    }
+                } else {
+                    if (!options.length) {
+                        // Nothing selected and no options. Select an empty placeholder.
+                        app.setState({settings: {webrtc: {account: {selected: emptyAccount}}}}, {persist: true})
+                    } else {
+                        // Nothing selected; but there are available options. Select the first option.
+                        app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
+                    }
+                }
+            },
+            /**
+            * Respond to toggling the softphone on and off by unsetting the
+            * selected VoIP-account or by selecting the first option by
+            * default.
             * @param {Object} webrtcEnabled - New checkbox/switch value.
             */
             'settings.webrtc.enabled': function(webrtcEnabled) {
                 if (webrtcEnabled) {
-                    // No option is set in the VoIP-account select yet.
+                    // No option is set in the VoIP account select yet.
                     // This is required. Help the user by setting the first
                     // account as the default. An info-message is shown if
                     // there are no accounts yet.
@@ -63,7 +88,6 @@ module.exports = (app) => {
                         }
                     }
                 } else {
-                    const emptyAccount = {id: null, name: null, password: null, username: null}
                     app.setState({settings: {webrtc: {account: {selected: emptyAccount}}}}, {persist: true})
                 }
             },

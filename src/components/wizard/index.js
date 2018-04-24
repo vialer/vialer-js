@@ -14,7 +14,7 @@ module.exports = (app) => {
                 steps: [
                     {name: 'welcome', ready: true},
                     {name: 'telemetry', ready: null}, // hide the next button.
-                    {name: 'voipaccount', ready: true},
+                    {name: 'voipaccount', ready: false},
                     {name: 'microphone', ready: null},
                 ],
             }
@@ -61,6 +61,12 @@ module.exports = (app) => {
                 if (this.settings.webrtc.media.permission) {
                     this.steps.find((i) => i.name === 'microphone').ready = true
                 }
+            },
+            // The voipaccount step can only be passed when
+            // a VoIP account is selected.
+            'settings.webrtc.account.selected.id': function(selectedId) {
+                const voipaccountStep = this.steps.find((i) => i.name === 'voipaccount')
+                voipaccountStep.ready = selectedId ? true : false
             },
         },
     }
