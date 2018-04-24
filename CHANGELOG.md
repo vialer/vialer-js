@@ -1,5 +1,5 @@
-<a name="3.0.130"></a>
-## [3.0.130](https://github.com/voipgrid/vialer-js/compare/v3.0.107...v3.0.130) (2018-04-18)
+<a name="3.0.136"></a>
+## [3.0.136](https://github.com/voipgrid/vialer-js/compare/v3.0.107...v3.0.136) (2018-04-24)
 
 
 ### Bug Fixes
@@ -10,8 +10,11 @@
 * Cleanup styling settings audio tab, activity, component header. ([253972c](https://github.com/voipgrid/vialer-js/commit/253972c))
 * less obtrusive soundmeter styling in-call, cleanup audio initialization. ([f4b5df8](https://github.com/voipgrid/vialer-js/commit/f4b5df8))
 * query for devices as soon media permission is granted. ([aaf1297](https://github.com/voipgrid/vialer-js/commit/aaf1297))
+* query media devices and unlock watcher. ([ad4af74](https://github.com/voipgrid/vialer-js/commit/ad4af74))
+* show soundmeter in all stages of a call dialog. ([cdb2b10](https://github.com/voipgrid/vialer-js/commit/cdb2b10))
 * VIALJS-54 only unset menubar ringing/calling event when there are no more ongoing calls. ([7b464e7](https://github.com/voipgrid/vialer-js/commit/7b464e7))
 * VIALJS-61 - cleanup ua reference causing Call setup to fail. ([dde2750](https://github.com/voipgrid/vialer-js/commit/dde2750))
+* voipaccount picker responsivity and refresh button. ([40354f5](https://github.com/voipgrid/vialer-js/commit/40354f5))
 
 
 ### Features
@@ -19,6 +22,7 @@
 * call answered elsewhere detection. ([561260e](https://github.com/voipgrid/vialer-js/commit/561260e))
 * Color switch styling, dialpad disabled dialog. ([64ea19d](https://github.com/voipgrid/vialer-js/commit/64ea19d))
 * VIALJS-39,53,38 Contacts, Endpoints, recent calls, Media control, Canvas soundmeter, soundmeter in Call, Cleanup. ([723606b](https://github.com/voipgrid/vialer-js/commit/723606b))
+* VIALJS-51 Add a wizard, move telemetry to wizard. Introduce common components. ([db11e63](https://github.com/voipgrid/vialer-js/commit/db11e63))
 * VIALJS-59 - Add device/sink selection for sounds, getUserMedia and video element. Cleanup video/audio initialization & sounds. ([ed71382](https://github.com/voipgrid/vialer-js/commit/ed71382))
 
 
@@ -187,3 +191,6 @@
 
 <a name="2.0.6"></a>
 ## 2.0.6 (2017-10-12)
+
+
+
