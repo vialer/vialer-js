@@ -23,6 +23,7 @@ module.exports = (app) => {
             finish: function() {
                 app.setState({settings: {wizard: {completed: true, step: 0}}}, {persist: true})
                 app.emit('bg:calls:disconnect', {reconnect: true})
+                this.$notify({icon: 'settings', message: this.$t('Almost done! Please check your audio settings.'), timeout: 0, type: 'success'})
             },
             nextStep: function() {
                 if (this.steps[this.step].name === 'voipaccount') {
@@ -54,7 +55,7 @@ module.exports = (app) => {
             }
             const selectedVoipaccountId = this.settings.webrtc.account.selected.id
             const voipaccountStep = this.steps.find((i) => i.name === 'voipaccount')
-            voipaccountStep.ready = selectedVoipaccountId ? true : false
+            voipaccountStep.ready = (this.validVoipSettings && selectedVoipaccountId) ? true : false
         },
         render: templates.wizard.r,
         staticRenderFns: templates.wizard.s,
@@ -70,11 +71,13 @@ module.exports = (app) => {
                     this.steps.find((i) => i.name === 'microphone').ready = true
                 }
             },
-            // The voipaccount step can only be passed when
-            // a VoIP account is selected.
-            'settings.webrtc.account.selected.id': function(selectedId) {
+            /**
+            * The `voipaccount` step can only be passed when a VoIP account is selected.
+            * @param {String} selectedVoipaccountId - The VoIP account that is being selected.
+            */
+            'settings.webrtc.account.selected.id': function(selectedVoipaccountId) {
                 const voipaccountStep = this.steps.find((i) => i.name === 'voipaccount')
-                voipaccountStep.ready = selectedId ? true : false
+                voipaccountStep.ready = (this.validVoipSettings && selectedVoipaccountId) ? true : false
             },
         },
     }

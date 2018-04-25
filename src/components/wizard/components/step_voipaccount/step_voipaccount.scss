@@ -10,8 +10,12 @@
             padding-bottom: $spacer * 2;
         }
 
-        .notification-box {
-            margin: $spacer * 3 0;
+        .component-voipaccount-picker {
+            align-items: center;
+        }
+
+        .progress {
+            margin-top: $spacer * 3;
         }
     }
 }

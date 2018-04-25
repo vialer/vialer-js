@@ -84,6 +84,7 @@ module.exports = (app) => {
                                     }),
                                 },
                             },
+                            validVoipSettings: app.helpers.validVoipSettings,
                         },
                     },
                 },

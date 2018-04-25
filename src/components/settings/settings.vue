@@ -26,31 +26,36 @@
             :model.sync="settings.click2dial.enabled"
             :placeholder="$t('SIP Server')"/>
 
-        <Field name="language" type="textarea" v-if="user.developer"
+        <Field v-if="user.developer" name="language" type="textarea"
             :help="$t('The language used throughout the application.')"
-            :label="`${$t('Click-to-Dial')} ${$t('blacklist')}`" :model.sync="settings.click2dial.blacklist"
+            :label="`${$t('Click-to-Dial')} ${$t('blacklist')}`"
+            :model.sync="settings.click2dial.blacklist"
             :placeholder="$t('Use one line per site.')"/>
 
         <Field name="language" type="select"
             :help="$t('The language used throughout the application.')"
-            :label="$t('Application language')" :model.sync="settings.language.selected"
+            :label="$t('Application language')"
+            :model.sync="settings.language.selected"
             :options="settings.language.options"
             :placeholder="$t('Select a language')"/>
 
-        <Field name="platform_url" type="text" v-if="user.developer && settings.platform.enabled"
-            :label="$t('Platform URL')" :model.sync="settings.platform.url"
+        <Field v-if="user.developer && settings.platform.enabled" name="platform_url" type="text"
+            :label="$t('Platform URL')"
+            :model.sync="settings.platform.url"
             :help="$t('This URL is used to communicate with the platform API. Don\'t change it unless you know what you\'re doing.')"
             :validation="$v.settings.platform.url"
             placeholder="https://"/>
 
-        <Field name="sip_endpoint" type="text" v-if="user.developer || !settings.platform.enabled"
-            :label="$t('SIP server')" :model.sync="settings.sipEndpoint"
+        <Field v-if="user.developer || !settings.platform.enabled" name="sip_endpoint" type="text"
+            :label="$t('SIP server')"
+            :model.sync="settings.sipEndpoint"
             :help="$t('Domainname of the SIP server with websocket support.')"
             :placeholder="$t('SIP server')"
             :validation="$v.settings.sipEndpoint"/>
 
-        <Field name="platform_enabled" type="checkbox" v-if="vendor.type === 'open'"
-            :label="`${vendor.name} ${$t('platform integration')}`" :model.sync="settings.platform.enabled"
+        <Field v-if="vendor.type === 'open'" name="platform_enabled" type="checkbox"
+            :label="`${vendor.name} ${$t('platform integration')}`"
+            :model.sync="settings.platform.enabled"
             :help="$t('Add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor.name})"/>
     </div>
 
@@ -58,10 +63,11 @@
     <div class="tab" :class="{'is-active': tabs.active === 'privacy'}">
 
         <Field name="store_key" type="checkbox"
-            :label="$t('Automatic unlock')" :model.sync="settings.vault.store"
+            :label="$t('Automatic unlock')"
+            :model.sync="settings.vault.store"
             :help="$t('Automatically unlock after a browser restart.')"/>
 
-        <div class="notification-box info" v-if="settings.vault.store">
+        <div v-if="settings.vault.store" class="notification-box info">
             <header><icon name="lock-off"/><span>{{$t('Data security')}}</span></header>
             <ul>
                 <li>{{$t('Your data and credentials are stored encrypted in the browser by a password-generated key.')}}
@@ -72,7 +78,8 @@
         </div>
 
         <Field name="telemetry_enabled" type="checkbox"
-            :label="$t('Telemetry')" :model.sync="settings.telemetry.enabled"
+            :label="$t('Telemetry')"
+            :model.sync="settings.telemetry.enabled"
             :help="$t('Pseudo-anonymized usage statistics help us to improve the software.')"/>
     </div>
 
@@ -85,26 +92,27 @@
             :model.sync="settings.webrtc.enabled"
             :help="env.isFirefox ? $t('Firefox doesn\'t support this feature yet.') : $t('Use WebRTC to be able to receive incoming calls with and place outgoing calls.')"/>
 
-        <VoipaccountPicker :label="$t('Softphone VoIP-account')"/>
+        <VoipaccountPicker :label="$t('Softphone VoIP-account')" :v="$v"/>
     </div>
 
     <!-- Audio settings -->
     <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
 
-        <Field name="input_device" type="select" v-if="settings.webrtc.media.permission"
-            :label="$t('Headset microphone')" :model.sync="devices.input.selected"
+        <Field v-if="settings.webrtc.media.permission" name="input_device" type="select"
+            :label="$t('Headset microphone')"
+            :model.sync="devices.input.selected"
             :options="devices.input.options"
             :placeholder="$t('Select an input device')"/>
 
         <MicPermission />
 
-        <Field name="output_device" type="select" v-if="settings.webrtc.media.permission"
+        <Field v-if="settings.webrtc.media.permission" name="output_device" type="select"
             :label="$t('Headset audio output')"
             :model.sync="devices.output.selected"
             :options="devices.output.options"
             :placeholder="$t('Select an output device')"/>
 
-        <Field name="sounds_device" type="select" v-if="settings.webrtc.media.permission"
+        <Field v-if="settings.webrtc.media.permission" name="sounds_device" type="select"
             :label="$t('Ringtone audio output')"
             :model.sync="devices.sounds.selected"
             :options="devices.sounds.options"
@@ -117,23 +125,25 @@
                 :options="settings.ringtones.options"
                 :placeholder="$t('Select a ringtone')">
 
-                <button slot="select-extra" class="ringtone-play button is-link select-button" :disabled="!sound.enabled" @click="playSound()">
+                <button slot="select-extra" class="ringtone-play button is-link select-button"
+                    :disabled="!sound.enabled" @click="playSound()">
                     <span class="icon is-small"><icon name="ring"/></span>
                 </button>
             </Field>
         </div>
 
-        <Field name="audio_codec" type="select" v-if="user.developer"
-            :label="$t('Audio codec')" :model.sync="settings.webrtc.codecs.selected"
+        <Field v-if="user.developer" name="audio_codec" type="select"
+            :label="$t('Audio codec')"
+            :model.sync="settings.webrtc.codecs.selected"
             :options="settings.webrtc.codecs.options"
             :placeholder="$t('Select an input device')"/>
 
-        <Field name="media_type" type="select" v-if="user.developer"
+        <Field v-if="user.developer" name="media_type" type="select"
             :help="$t('Media options that can be used by the browser.')"
-            :label="$t('Supported media')" :model.sync="settings.webrtc.media.type.selected"
+            :label="$t('Supported media')"
+            :model.sync="settings.webrtc.media.type.selected"
             :options="settings.webrtc.media.type.options"
             :placeholder="$t('Select an input device')"/>
-
     </div>
 
     <div class="tabs-actions field is-grouped">

@@ -1,4 +1,4 @@
-<component class="component-telemetry">
+<component class="component-step-telemetry">
     <header>{{$t('Usage statistics')}}</header>
 
     <div class="step-description">

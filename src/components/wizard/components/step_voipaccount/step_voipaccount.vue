@@ -9,7 +9,8 @@
         </span>
 
     </div>
-    <VoipaccountPicker label="" :info="true"/>
+
+    <VoipaccountPicker label=""/>
 
     <slot name="progress"></slot>
 

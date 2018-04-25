@@ -160,6 +160,19 @@ function helpers(app) {
     }
 
 
+    /**
+    * Validate whether a selected account has the right settings.
+    * @returns {Boolean} - Valid or invalid.
+    */
+    _helpers.validVoipSettings = function() {
+        const selected = this.settings.webrtc.account.selected
+        if (selected && selected.settings) {
+            if (!selected.settings.avpf || !selected.settings.encryption) return false
+        }
+        return true
+    }
+
+
     _helpers.sharedMethods = function() {
 
         return {
@@ -280,6 +293,7 @@ function helpers(app) {
                 }
                 return transferStatus
             },
+            validVoipSettings: _helpers.validVoipSettings,
         }
     }
 

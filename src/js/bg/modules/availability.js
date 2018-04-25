@@ -81,8 +81,8 @@ class ModuleAvailability extends Module {
     * Do an API request to get an update of the available userdestination
     * options when the module is loaded in the background.
     */
-    async _platformData() {
-        const res = await this.app.api.client.get('api/userdestination/')
+    async _platformData({callback = null} = {}) {
+        let res = await this.app.api.client.get('api/userdestination/')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             this.app.logger.warn(`${this}platform data request failed (${res.status})`)
             return
@@ -104,19 +104,29 @@ class ModuleAvailability extends Module {
         if (sud.fixeddestination) selected = destinations.find((d) => d.id === sud.fixeddestination)
         else if (sud.phoneaccount) selected = destinations.find((d) => d.id === sud.phoneaccount)
 
-        // Platform users select an existing WebRTC-SIP VoIP-account.
+        // Request all voipaccounts and filter them against the ones the user
+        // has. Then augment them with the useragent, so we know whether
+        // the VoIP account is already in use or not.
+        res = await this.app.api.client.get('api/phoneaccount/basic/phoneaccount/?active=true&order_by=description')
+        let voipaccounts = res.data.objects
+
         let platformAccounts = userdestination.phoneaccounts.map((i) => {
-            // The options we care about.
-            let options = {
+            // The options for successful softphone usage.
+            let settings = {
                 avpf: false,
                 encryption: false,
+                ua: null,
             }
-            Object.assign(options, this.app.utils.parseConfigLine(i.expert_options))
+
+            let registeredAccount = voipaccounts.find((j) => (j.account_id === i.account_id && j.sipreginfo))
+            if (registeredAccount) settings.ua = registeredAccount.sipreginfo.useragent
+            // The expert options need to be parsed first.
+            Object.assign(settings, this.app.utils.parseConfigLine(i.expert_options))
             return {
                 id: i.id,
                 name: `${i.internal_number} - ${i.description}`,
-                options,
                 password: i.password,
+                settings,
                 username: i.account_id,
             }
         })
@@ -129,6 +139,8 @@ class ModuleAvailability extends Module {
         // Set an available icon when the user is available.
         if (selected.id && !this.app.state.availability.dnd) this.app.setState({ui: {menubar: {default: 'active'}}})
         else this.app.setState({ui: {menubar: {default: 'unavailable'}}})
+
+        if (callback) callback()
     }
 
 

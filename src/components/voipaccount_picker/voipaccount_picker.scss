@@ -1,21 +1,13 @@
 @import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
-.component-step-progress {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    margin-bottom: $spacer * 3;
+.component-voipaccount-picker {
 
-    .step-hl {
-        background: $grey-color-light;
-        border-radius: 50%;
-        height: $spacer;
-        margin-right: $spacer;
-        width: $spacer;
+    .field-select {
+        margin-bottom: 0;
+    }
 
-        &.active {
-            background: $brand-color;
-        }
+    .notification-box {
+        margin-top: $spacer * 2;
     }
 }

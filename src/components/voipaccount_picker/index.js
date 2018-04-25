@@ -1,50 +1,45 @@
 module.exports = (app) => {
 
     const emptyAccount = {id: null, name: null, password: null, username: null}
-    const v = Vuelidate.validators
-
     /**
     * @memberof fg.components
     */
-    const WizardStepWelcome = {
+    const VoipaccountPicker = {
         computed: app.helpers.sharedComputed(),
+        data: function() {
+            return {
+                loading: false,
+                validationField: null,
+            }
+        },
         methods: Object.assign({
             refreshVoipaccounts: function() {
                 // Call the API endpoint that is responsible for updating
                 // the user's voipaccount list.
-                app.emit('bg:availability:platform_data')
+                this.loading = true
+                app.emit('bg:availability:platform_data', {
+                    callback: () => {
+                        this.loading = false
+                    },
+                })
             },
         }, app.helpers.sharedMethods()),
+        mounted: function() {
+            if (this.v) this.validationField = this.v.settings.webrtc.account.selected.id
+        },
         props: {
             info: {default: true},
             label: {default: ''},
+            v: {default: null}, // Optionally pass a Vuelidate validator.
         },
         render: templates.voipaccount_picker.r,
         staticRenderFns: templates.voipaccount_picker.s,
         store: {
             app: 'app',
+            selected: 'settings.webrtc.account.selected',
             settings: 'settings',
             user: 'user',
             vendor: 'app.vendor',
-        },
-        validations: function() {
-            let validations = {
-                settings: {
-                    webrtc: {
-                        account: {
-                            selected: {
-                                id: {
-                                    requiredIf: v.requiredIf(() => {
-                                        return this.settings.webrtc.enabled
-                                    }),
-                                },
-                            },
-                        },
-                    },
-                },
-            }
-
-            return validations
         },
         watch: {
             /**
@@ -54,10 +49,15 @@ module.exports = (app) => {
             'settings.webrtc.account.options': function(options) {
                 const selectedId = this.settings.webrtc.account.selected.id
                 if (selectedId && options.length) {
-                    // Make sure that a previous choice is still part of the
-                    // available choices. Select the first option if it isn't.
-                    if (!options.find((i) => i.id === selectedId)) {
+                    // Always update the selected option from the updated
+                    // option list, because a setting may have changes.
+                    // Select the first option if it isn't.
+                    const match = options.find((i) => i.id === selectedId)
+                    if (match) {
+                        app.setState({settings: {webrtc: {account: {selected: match}}}}, {persist: true})
+                    } else {
                         app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
+
                     }
                 } else {
                     if (!options.length) {
@@ -68,6 +68,8 @@ module.exports = (app) => {
                         app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
                     }
                 }
+
+                if (this.v) this.v.$touch()
             },
             /**
             * Respond to toggling the softphone on and off by unsetting the
@@ -90,9 +92,10 @@ module.exports = (app) => {
                 } else {
                     app.setState({settings: {webrtc: {account: {selected: emptyAccount}}}}, {persist: true})
                 }
+                if (this.v) this.v.$touch()
             },
         },
     }
 
-    return WizardStepWelcome
+    return VoipaccountPicker
 }

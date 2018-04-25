@@ -1,21 +1,28 @@
+@import "../../scss/lib/mixins";
+@import "../../scss/lib/variables";
 // This is Bulma with some field customizations.
 
 // A select field with a button attached next to it.
 .field-select {
 
-    .control {
-        display: flex;
-        justify-content: center;
-        max-width: 300px;
-    }
 
-    div.select {
-        select {
-            border-bottom-right-radius: 0;
-            border-top-right-radius: 0;
+    .control {
+        .select {
+
+            select {
+                border-bottom-right-radius: 0;
+                border-top-right-radius: 0;
+                max-width: 300px;
+
+                &:active,
+                &:focus {
+                    border: 1px solid $grey-color-light;
+                    box-shadow: 0 0 0 1px inset lighten($brand-color, 20%);
+                }
+            }
         }
 
-        & + button {
+        button {
             border-bottom-left-radius: 0;
             border-top-left-radius: 0;
         }

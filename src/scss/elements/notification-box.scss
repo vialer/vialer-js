@@ -10,8 +10,12 @@
     }
 
     &.troubleshoot {
-        background: $red-color;
+        background: $orange-color;
         color: $white;
+
+        a {
+            color: $white;
+        }
 
         header {
             svg {

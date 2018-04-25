@@ -35,6 +35,7 @@ class AppBackground extends App {
         this.timer = new Timer(this)
 
         this.__mergeBusy = false
+        this.__mergeQueue = []
         this.__ready = false
         // Send the background script's state to the requesting event.
         this.on('bg:get_state', ({callback}) => {
@@ -217,24 +218,22 @@ class AppBackground extends App {
 
 
     /**
-    * App state merge operation with additional optional
-    * state storage for `AppBackground`. Make sure that
-    * merge operations are done sequently. This should
-    * be a queue, but a polling mechanism with a timeout
-    * works well enough for now.
+    * App state merge operation with additional optional state storage.
+    * The busy flag and queue make sure that merge operations are done
+    * sequently. Multiple requests can come in from events; each should
+    * be processed one at a time.
     * @param {Object} options - See the parameter description of super.
     */
     async __mergeState({action = 'upsert', encrypt = true, path = null, persist = false, state}) {
         if (this.__mergeBusy) {
-            setTimeout(() => {
-                this.__mergeState({action, encrypt, path, persist, state})
-            }, 1)
+            this.__mergeQueue.push(() => this.__mergeState({action, encrypt, path, persist, state}))
             return
         }
 
         // Flag that the operation is currently in use.
         this.__mergeBusy = true
         super.__mergeState({action, encrypt, path, persist, state})
+
         if (!persist) {
             this.__mergeBusy = false
             return
@@ -267,6 +266,10 @@ class AppBackground extends App {
 
         this.store.set(storageKey, stateClone)
         this.__mergeBusy = false
+        // Other mergeState requests are waiting; process the next one.
+        if (this.__mergeQueue.length) {
+            this.__mergeQueue.pop()()
+        }
     }
 
 
