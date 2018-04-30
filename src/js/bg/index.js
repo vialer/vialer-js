@@ -42,7 +42,7 @@ class BackgroundApp extends Skeleton {
         }
 
         // Continue last session if credentials are available.
-        if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
+        if (this.store.get('user') && this.store.get('token')) {
             this.logger.info(`${this}reusing existing session from existing credentials`)
             this.reloadModules(false)
 
@@ -97,7 +97,7 @@ class BackgroundApp extends Skeleton {
      * @returns {Boolean} - True if username and password are present.
      */
     hasCredentials() {
-        if (this.store.get('user') && this.store.get('username') && this.store.get('password')) {
+        if (this.store.get('user') && this.store.get('username') && this.store.get('token')) {
             return true
         }
         return false

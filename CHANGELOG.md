@@ -1,5 +1,8 @@
 # Changelog
 
+## Version 2.2.1
+* Added two-factor authentication.
+
 ## Version 2.2.0
 * Fix for click2dial icons being disabled by default
 * Analytics tracking code per build target. Fixes Firefox analytics not showing any activity anymore.

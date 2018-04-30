@@ -23,13 +23,25 @@
         "message": "Password",
         "description": "Label for the login form of the field 'password'."
     },
+    "loginFormTwoFactorLabel": {
+        "message": "Verification code",
+        "description": "Label for the login form of the field 'Verification code'."
+    },
     "loginFormLoginFailedText": {
         "message": "Incorrect username/password",
         "description": "Text to show after a failed login attempt."
     },
+    "twoFactorFailedText": {
+        "message": "Could not verify code, try again",
+        "description": "Text to show after a failed login attempt with 2fa."
+    },
     "loginFormLoginErrorText": {
         "message": "Error, please check platform settings",
         "description": "Text to show after a failed login attempt."
+    },
+    "twoFactorErrorText": {
+        "message": "Incorrect input, check code and try again",
+        "description": "Text to show after a failed login attempt with verification code."
     },
     "loginFormLogoutText": {
         "message": "Logged out",
@@ -39,8 +51,16 @@
         "message": "<i class='icon-refresh icon-spin'></i> <span>Logging in...</span>",
         "description": "Text to show while trying to log in."
     },
+    "twoFactorLoadingText": {
+        "message": "<i class='icon-refresh icon-spin'></i> <span>Logging in...</span>",
+        "description": "Text to show while trying to log in."
+    },
     "loginFormLoginButtonText": {
         "message": "Log in",
+        "description": "Text for the login button."
+    },
+    "twoFactorButtonText": {
+        "message": "Verify code",
         "description": "Text for the login button."
     },
     "logoutLinkText": {

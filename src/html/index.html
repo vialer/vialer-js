@@ -32,6 +32,17 @@
             </form>
         </div>
 
+        <div class="view view-two-factor login-section hide">
+            <form class="two-factor-form">
+                <label for="twofactor" data-i18n-content="loginFormTwoFactorLabel"></label>
+                <input id="twofactor" type="text" tabindex="1" />
+                <button id="two-factor" type="button" class="two-factor-button" data-link="two-factor" disabled
+                    data-i18n-attrs='{"data-state-failed": "twoFactorFailedText", "data-state-error": "twoFactorErrorText", "data-state-loading": "twoFactorLoadingText", "data-state-default": "twoFactorButtonText"}'
+                    data-i18n-content="twoFactorButtonText">
+                </button>
+            </form>
+        </div>
+
         <div class="view view-app container hide">
 
             <div class="account-info">

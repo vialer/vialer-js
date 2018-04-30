@@ -69,7 +69,8 @@
     }
 }
 
-.login-form {
+.login-form,
+.two-factor-form {
     label {
         font-weight: 500;
         display: block;
@@ -82,7 +83,8 @@
         margin-bottom: 7px;
     }
 
-    .login-button {
+    .login-button,
+    .two-factor-button {
         margin-top: 5px;
 
         i {
@@ -93,7 +95,6 @@
         }
     }
 }
-
 
 .flip-horizontal {
     transform: scaleX(-1);

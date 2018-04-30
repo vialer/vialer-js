@@ -23,13 +23,25 @@
         "message": "Wachtwoord",
         "description": "Label voor het loginformulier van het veld 'password'."
     },
+    "loginFormTwoFactorLabel": {
+        "message": "Verificatie code",
+        "description": "Label voor het loginformulier van het veld 'Verificatie code'."
+    },
     "loginFormLoginFailedText": {
         "message": "Onjuiste gebruiksernaam/wachtwoord",
         "description": "Weer te geven tekst bij een mislukte inlogpoging."
     },
+    "twoFactorFailedText": {
+        "message": "Verificatie mislukt, probeer opnieuw",
+        "description": "Weer te geven tekst bij een mislukte inlogpoging met verificatie code."
+    },
     "loginFormLoginErrorText": {
         "message": "Fout, controleer platform instellingen",
         "description": "Weer te geven tekst bij een mislukte inlogpoging."
+    },
+    "twoFactorErrorText": {
+        "message": "verkeerde code, check code en probeer opnieuw",
+        "description": "Weer te geven tekst bij een mislukte inlogpoging met verificatie code."
     },
     "loginFormLogoutText": {
         "message": "Uitgelogd",
@@ -39,8 +51,16 @@
         "message": "<i class='icon-refresh icon-spin'></i> <span>Inloggen...</span>",
         "description": "Weer te geven tekst tijdens het inloggen."
     },
+    "twoFactorLoadingText": {
+        "message": "<i class='icon-refresh icon-spin'></i> <span>Inloggen...</span>",
+        "description": "Weer te geven tekst tijdens het inloggen met 2fa."
+    },
     "loginFormLoginButtonText": {
         "message": "Inloggen",
+        "description": "Tekst van de loginknop."
+    },
+    "twoFactorButtonText": {
+        "message": "verifieer code",
         "description": "Tekst van de loginknop."
     },
     "logoutLinkText": {

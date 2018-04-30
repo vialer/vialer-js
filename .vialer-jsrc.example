@@ -7,7 +7,7 @@
             "name": "Vialer",
             "analytics_id": {
                 "chrome": "",
-                "edge": ""
+                "edge": "",
                 "electron": "",
                 "firefox": "",
                 "webview": ""

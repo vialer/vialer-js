@@ -281,7 +281,7 @@ class DialerModule {
     * @returns {Boolean} - Whether the observer should be listening.
     */
     switchObserver(tab) {
-        if (!this.app.store.get('username') || !this.app.store.get('password')) {
+        if (!this.app.store.get('token')) {
             this.app.logger.info(`${this}not observing because user is not logged in`)
             this.removeContextMenuItem()
             return false

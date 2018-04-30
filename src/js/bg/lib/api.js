@@ -13,29 +13,22 @@ class Api {
         this.OK_STATUS = [200, 201, 202, 204]
         this.NOTOK_STATUS = [400, 401, 403, 404, 'Network Error']
         this.UNAUTHORIZED_STATUS = [401]
-        this.setupClient(this.app.store.get('username'), this.app.store.get('password'))
-    }
 
-    /**
-    * Set a http client with or without basic authentication.
-    * @param {String} username - Username to login with.
-    * @param {String} password - Password to login with.
-    */
-    setupClient(username, password) {
-        let clientOptions = {
+        this.client = axios.create({
             baseURL: this.app.store.get('platformUrl'),
             timeout: 15000,
-        }
-        if (username && password) {
-            this.app.logger.info(`${this}Set api client with basic auth for user ${username}`)
-            clientOptions.auth = {
-                password: password,
-                username: username,
+        })
+
+        this.client.interceptors.request.use(config => {
+            const token = this.app.store.get('token')
+            if (token) {
+                config.headers.authorization = token
             }
-        } else {
-            this.app.logger.info(`${this}Set unauthenticated api client`)
-        }
-        this.client = axios.create(clientOptions)
+            return config;
+        }, (error) => {
+            // Do something with request error
+            return Promise.reject(error);
+        });
         this.client.interceptors.response.use(function(response) {
             return response
         }, (err) => {
@@ -51,7 +44,6 @@ class Api {
             return Promise.resolve(err.response)
         })
     }
-
 
     toString() {
         return `${this.app}[api] `

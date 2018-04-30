@@ -9,3 +9,5 @@ src/brand.json
 .vialer-jsrc
 .directory
 src/brand
+.vscode
+~
