@@ -29,7 +29,7 @@ class Store {
 
     constructor(app) {
         this.app = app
-        this.schema = 11
+        this.schema = 12
 
         if (this.app.env.isNode) this.store = new MemoryStore()
         else this.store = localStorage
@@ -46,6 +46,33 @@ class Store {
         for (const key in keys) {
             if (this.store.getItem(key) && key !== 'schema') this.remove(key)
         }
+    }
+
+
+    /**
+    * Multiple users can login the plugin. To prevent state
+    * collisioning, each user has its own state namespace, e.g.
+    * `myuser@domain/state`. This method returns all available
+    * sessions and a preferred one.
+    * @returns {Object} - The store sessions.
+    */
+    findSessions() {
+        let active = null
+        let available = []
+        for (const key of Object.keys(this.store)) {
+            if (key.endsWith('state')) {
+                const sessionName = key.replace('/state', '')
+                available.push(sessionName)
+                let state = JSON.parse(this.store.getItem(key))
+                // An active session has a stored key.
+                if (state.app.vault.salt && state.app.vault.key) {
+                    active = sessionName
+                }
+            }
+        }
+
+
+        return {active, available}
     }
 
 

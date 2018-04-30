@@ -53,7 +53,7 @@
             <select v-on:change="updateModel($event)" :id="name"
                 :name="name" :v-bind:value="model" :disabled="disabled || !options.length">
                 <template v-if="!options.length">
-                    <option value="" disabled selected>{{empty}}</option>
+                    <option value="" disabled selected>{{$t(empty)}}</option>
                 </template>
                 <option :selected="option[idfield] == model.id" :value="option[idfield]" v-for="option in options" v-else>
                     <template v-if="option[idfield] === null && placeholder">{{placeholder}}</template>

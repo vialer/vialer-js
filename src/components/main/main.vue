@@ -15,12 +15,7 @@
         <Notifications  :class="classes('notifications')"/>
 
         <div class="panel" :class="classes('panel')">
-
-            <template v-if="!user.authenticated">
-                <Login v-if="layer === 'login'" class="panel-content"/>
-                <Unlock v-else-if="layer === 'unlock'" class="panel-content"/>
-            </template>
-
+            <Login v-if="!user.authenticated" class="panel-content"/>
             <template v-else>
                 <MainMenuBar/>
                 <Availability v-if="layer==='availability'"/>

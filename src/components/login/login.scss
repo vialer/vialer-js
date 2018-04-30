@@ -1,3 +1,4 @@
+@import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
 
 .component-login {
@@ -14,6 +15,12 @@
             color: $grey-color-darker;
             padding-bottom: $spacer * 3;
             padding-top: $spacer * 2;
+
+            .session-name {
+                color: $brand-color;
+                font-size: 0.9rem;
+                font-style: italic;
+            }
         }
     }
 
@@ -46,4 +53,82 @@
     .buttons {
         padding-top: ($spacer * 2);
     }
+
+    .sessions {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        padding: $spacer * 3;
+        padding-top: 0;
+
+        .new-session-text {
+            color: $grey-color;
+            font-size: 0.8rem;
+            font-style: italic;
+            margin-bottom: $spacer;
+            margin-top: $spacer / 2;
+        }
+
+        .new-session {
+
+            svg {
+                margin-right: $spacer;
+            }
+
+            &:hover {
+                color: $brand-color;
+                cursor: pointer;
+            }
+        }
+
+        .session {
+            align-items: center;
+            background: $grey-color-lighter;
+            border-bottom: 2px solid $grey-color-lighter;
+            border-top: 2px solid transparent;
+            display: flex;
+            margin-bottom: $spacer / 2;
+            width: 100%;
+
+            svg {
+                color: $grey-color;
+                margin: 0 $spacer;
+                transition: color 0.2s ease-in;
+            }
+
+            .icon-session svg {
+                @include icon-size($spacer * 3);
+            }
+
+            .icon-remove svg {
+                @include icon-size($spacer * 1.5);
+
+                &:hover {
+                    color: $brand-color;
+                }
+            }
+
+            &:hover {
+                border-bottom: 2px solid $brand-color;
+                cursor: pointer;
+
+                .icon-session svg {
+                    color: $brand-color;
+                }
+            }
+
+            .description {
+                color: $grey-color-dark;
+                font-size: 0.9rem;
+                font-weight: 500;
+                height: $spacer * 5;
+                line-height: $spacer * 5;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100%;
+            }
+        }
+    }
+
 }

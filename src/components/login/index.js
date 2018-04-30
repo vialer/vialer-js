@@ -15,10 +15,27 @@ module.exports = (app) => {
         methods: Object.assign({
             login: function() {
                 if (this.$v.$invalid) return
-                app.emit('bg:user:login', {
-                    password: this.password,
-                    username: this.user.username,
-                })
+
+                if (this.app.session.active && this.app.session.active !== 'new') {
+                    app.emit('bg:user:unlock', {
+                        password: this.password,
+                        username: this.app.session.active,
+                    })
+                } else {
+                    app.emit('bg:user:login', {
+                        password: this.password,
+                        username: this.user.username,
+                    })
+                }
+            },
+            newSession: function() {
+                app.setState({app: {session: {active: 'new'}}, user: {username: ''}})
+            },
+            removeSession: function(session) {
+                app.emit('bg:user:remove_session', {session})
+            },
+            selectSession: function(session) {
+                app.emit('bg:user:set_session', {session})
             },
         }, app.helpers.sharedMethods()),
         render: templates.login.r,
@@ -38,7 +55,9 @@ module.exports = (app) => {
                 user: {
                     username: {
                         email: v.email,
-                        required: v.required,
+                        requiredIf: v.requiredIf(() => {
+                            return !this.app.session.active
+                        }),
                     },
                 },
             }
@@ -47,7 +66,7 @@ module.exports = (app) => {
         },
         watch: {
             'user.username': function(newVal, oldVal) {
-                app.setState({user: {username: newVal}}, {persist: false})
+                app.setState({user: {username: newVal}})
             },
         },
     }

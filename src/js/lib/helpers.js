@@ -177,7 +177,7 @@ function helpers(app) {
 
         return {
             closeOverlay: function() {
-                app.setState({ui: {overlay: null}}, {encrypt: false, persist: true})
+                app.setState({ui: {overlay: null}})
             },
             createCall: function(number, start = true, transfer = false) {
                 if (!this.user.authenticated) return false
@@ -215,7 +215,7 @@ function helpers(app) {
                 app.setState({ui: {layer: layerName}}, {encrypt: false, persist: true})
             },
             setOverlay: function(layerName) {
-                app.setState({ui: {overlay: layerName}}, {encrypt: false, persist: true})
+                app.setState({ui: {overlay: layerName}})
             },
             setTab: function(category, name, condition = true) {
                 if (!condition) return

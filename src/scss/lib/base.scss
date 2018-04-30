@@ -151,40 +151,6 @@ video {
     }
 }
 
-.decorated-list {
-    li {
-        &::before {
-            color: $brand-color;
-            content: "• ";
-        }
-    }
-}
-
-// A general icon popping up against a white content background.
-.content-icon {
-    color: $brand-color;
-    font-size: 12px;
-
-    &:hover {
-        color: $brand-variation-color;
-        cursor: pointer;
-    }
-}
-
-.styled-list {
-    li {
-        &::before {
-            color: $brand-color;
-            content: "• ";
-        }
-
-    }
-}
-
-.info-box {
-    background: rgba($brand-color, 0.1);
-}
-
 .vertical-devider {
     background: $grey-color-light;
     height: $spacer * 3;

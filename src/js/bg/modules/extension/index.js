@@ -42,7 +42,7 @@ class ModuleExtension extends Module {
                             current: chrome.runtime.getManifest().version,
                         },
                     },
-                }, {encrypt: false, persist: true})
+                })
             } else if (details.reason === 'update') {
                 this.app.setState({
                     app: {
@@ -53,7 +53,7 @@ class ModuleExtension extends Module {
                             previous: details.previousVersion,
                         },
                     },
-                }, {encrypt: false, persist: true})
+                })
             }
         })
     }

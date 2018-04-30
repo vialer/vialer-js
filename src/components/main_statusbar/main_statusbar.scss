@@ -11,26 +11,15 @@
     font-weight: 500;
     height: ($spacer * 5);
     justify-content: space-between;
+    transition: background 0.5s ease;
 
-    &.default {
-        background: $grey-color-lighter;
+    &.error {
+        background: $red-color;
+        color: $white-color;
 
-        .status-left .status-indicator svg {
-            &.dnd {fill: $orange-color;}
-            &.disconnected {fill: $red-color;}
-            &.connected {fill: $green-color;}
-            &.microphone-denied {fill: $red-color;}
-            &.registered {fill: $green-color;}
-            &.registration-failed {fill: $red-color;}
-        }
-    }
-
-    &.notice {
-        background: $grey-color-lighter;
 
         .status-left .status-indicator svg {
-            fill: $grey-color-dark;
-            stroke: $white-color;
+            fill: $white-color;
         }
     }
 
@@ -43,15 +32,14 @@
         }
     }
 
-    &.error {
-        background: $red-color;
-        color: $white-color;
+    &.ok {
+        background: $grey-color-lighter;
+
 
         .status-left .status-indicator svg {
-            fill: $white-color;
+            fill: $green-color;
         }
     }
-
 
     .vendor {
         align-items: center;

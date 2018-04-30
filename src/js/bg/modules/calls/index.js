@@ -574,7 +574,8 @@ class ModuleCalls extends Module {
                     // Offline modus is not detected by Sip.js, so we manually disconnect.
                     this.disconnect()
                 } else {
-                    // We are online again, try to reconnect.
+                    // We are online again, try to reconnect and refresh API data.
+                    this.app._platformData()
                     this.connect()
                 }
             },
@@ -604,6 +605,7 @@ class ModuleCalls extends Module {
                 } else if (newUAStatus === 'disconnected') menubarState = 'disconnected'
                 else if (this.app.state.settings.webrtc.enabled) {
                     if (newUAStatus === 'registered') {
+
                         if (this.app.state.availability.dnd) menubarState = 'unavailable'
                         else menubarState = 'active'
                     } else menubarState = 'disconnected'
@@ -613,7 +615,7 @@ class ModuleCalls extends Module {
                     else menubarState = 'disconnected'
                 }
 
-                this.app.setState({ui: {menubar: {default: menubarState}}}, {encrypt: false, persist: true})
+                this.app.setState({ui: {menubar: {default: menubarState}}})
             },
         }
     }

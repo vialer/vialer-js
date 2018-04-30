@@ -112,6 +112,7 @@ $tooltip-color: hsla(0, 0%, 30%, 0.5);
     margin-bottom: 0;
     margin-right: -12px;
     margin-top: 12px;
+    top: -5px;
 }
 
 .tooltip-left:hover:before,
@@ -160,6 +161,7 @@ $tooltip-color: hsla(0, 0%, 30%, 0.5);
     margin-bottom: 0;
     margin-left: -12px;
     margin-top: 3px;
+    top: 3px;
 }
 
 .tooltip-right:hover:before,
@@ -169,12 +171,6 @@ $tooltip-color: hsla(0, 0%, 30%, 0.5);
     -moz-transform:    translateX(12px);
     -webkit-transform: translateX(12px);
     transform:         translateX(12px);
-}
-
-// Move directional arrows down a bit for left/right tooltips.
-.tooltip-left:before,
-.tooltip-right:before {
-    top: 3px;
 }
 
 // Vertically center tooltip content for left/right tooltips.

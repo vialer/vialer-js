@@ -7,11 +7,7 @@
         <span>
             {{$t('Select the VoIP account you would like to use as your softphone')}}:
         </span>
-
     </div>
-
     <VoipaccountPicker label=""/>
-
     <slot name="progress"></slot>
-
 </component>

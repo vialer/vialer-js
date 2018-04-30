@@ -74,15 +74,15 @@ class App extends Skeleton {
         // Check media permission at the start of the bg/fg.
         if (!this.env.isFirefox) {
             navigator.mediaDevices.getUserMedia(this._getUserMediaFlags()).then((stream) => {
-                this.setState({settings: {webrtc: {media: {permission: true}}}}, {encrypt: false, persist: true})
+                this.setState({settings: {webrtc: {media: {permission: true}}}})
             }).catch((err) => {
                 // This error also may be triggered when there are no
                 // devices at all. The browser sometimes has issues
                 // finding any devices.
-                this.setState({settings: {webrtc: {media: {permission: false}}}}, {encrypt: false, persist: true})
+                this.setState({settings: {webrtc: {media: {permission: false}}}})
             })
         } else {
-            this.setState({settings: {webrtc: {media: {permission: false}}}}, {encrypt: false, persist: true})
+            this.setState({settings: {webrtc: {media: {permission: false}}}})
         }
 
         /**

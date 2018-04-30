@@ -42,7 +42,7 @@ class Endpoint {
         // This merges to the call's local state; not the app's state!
         this.app.__mergeDeep(this.state, state)
 
-        if (this.state.id) {
+        if (this.id) {
             Vue.set(this.app.state.contacts.contacts[this.contact.id].endpoints, this.id, this.state)
             // Send a complete state representation down the wire once.
             this.app.emit('fg:set_state', {action: 'upsert', path: `contacts.contacts.${this.contact.id}.endpoints.${this.id}`, state: this.state})

@@ -50,7 +50,17 @@ class ModuleApp extends Module {
             name: process.env.APP_NAME,
             notifications: [],
             online: this._checkConnectivity(),
+            session: {
+                active: null,
+                available: [],
+            },
             updated: false,
+            vault: {
+                key: null,
+                salt: null,
+                store: false,
+                unlocked: false,
+            },
             vendor: {
                 name: process.env.VENDOR_NAME,
                 portal: {
@@ -79,6 +89,38 @@ class ModuleApp extends Module {
     _restoreState(moduleStore) {
         moduleStore.notifications = []
         moduleStore.online = this._checkConnectivity()
+    }
+
+
+    _watchers() {
+        return {
+            'store.app.vault.store': (storeVaultKey) => {
+                // Only respond as long the user is logged in.
+                if (!this.app.state.user.authenticated) return
+
+                if (storeVaultKey) this.app.crypto.storeVaultKey()
+                else {
+                    this.app.setState({app: {vault: {key: null}}}, {encrypt: false, persist: true})
+                }
+            },
+            'store.app.vault.unlocked': (unlocked) => {
+                // Only respond as long the user is logged in.
+                if (!this.app.state.user.authenticated) return
+
+                if (unlocked && this.app.state.settings.webrtc.media.permission) {
+                    this.app.modules.settings.queryMediaDevices()
+                }
+            },
+        }
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return `${this.app}[app] `
     }
 }
 

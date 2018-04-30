@@ -175,13 +175,17 @@ class Call {
 
 
     /**
-    * Handle logic when a call is started; both incoming and outgoing.
+    * Handle UI-related logic when a Call is started; both for
+    * incoming and outgoing calls.
     * @param {Object} options - Options to pass to _start.
     * @param {Number} options.timeout - Postpones resetting the call state.
     * @param {Boolean} options.force - Force showing a notification.
     * @param {String} [options.message] - Force a notification message.
     */
     _start({force = false, message = ''}) {
+        // A silent Call doesn't need to do anything here.
+        if (this.silent) return
+
         if (!message) {
             message = this.state.number
             if (this.state.displayName) message += `:${this.state.displayName}`
@@ -191,10 +195,8 @@ class Call {
         this.ringtone.stop()
         this.setState({status: 'accepted', timer: {current: new Date().getTime(), start: new Date().getTime()}})
 
-        if (!this.silent) {
-            const title = this.translations.accepted[this.state.type]
-            this.app.modules.ui.notification({force, message, number: this.state.number, title})
-        }
+        const title = this.translations.accepted[this.state.type]
+        this.app.modules.ui.notification({force, message, number: this.state.number, title})
 
         this.app.setState({ui: {menubar: {event: 'calling'}}})
         this.timerId = window.setInterval(() => {
@@ -208,13 +210,19 @@ class Call {
     * was created. Make sure you set the final state of a call
     * before calling cleanup. The timeout is meant to postpone
     * resetting the state, so the user has a hint of what
-    * happened in between.
+    * happened in between. A silent call is dropped immediatly
+    * however; since no UI-interaction is involved.
     * @param {Object} options - Options to pass to _stop.
     * @param {Boolean} options.force - Force showing a notification.
     * @param {String} [options.message] - Force a notification message.
     * @param {Number} options.timeout - Postpones resetting the call state.
     */
     _stop({force = false, message = '', timeout = 3000} = {}) {
+        if (this.silent) {
+            this.module.deleteCall(this)
+            return
+        }
+
         if (!message) {
             message = this.state.number
             if (this.state.displayName) message += `:${this.state.displayName}`
@@ -223,7 +231,7 @@ class Call {
         this.ringbackTone.stop()
         this.ringtone.stop()
 
-        if (force || !this.silent) {
+        if (force) {
             if (this.state.status === 'rejected_b') {
                 const title = this.translations.rejected_b
                 this.app.modules.ui.notification({force, message, number: this.state.number, stack: true, title})
@@ -254,6 +262,9 @@ class Call {
     }
 
 
+    /**
+    * Shared accept Call logic.
+    */
     accept() {
         if (!(this.state.type === 'incoming')) throw 'session must be incoming type'
         this.remoteStream = new MediaStream()
@@ -261,16 +272,15 @@ class Call {
 
 
     /**
-    * Convenient version of setState that keeps the state local
-    * to  a Call instance.
+    * Call-specific setState that operates within the scope
+    * of the Call's state.
     * @param {Object} state - The state to update.
     */
     setState(state) {
         // This merges to the call's local state; not the app's state!
         this.app.__mergeDeep(this.state, state)
-        // Allows calls to come in without troubling the UI.
+        // Allows a Call to come in without disturbing the UI.
         if (this.silent) return
-
         this.app.emit('fg:set_state', {action: 'upsert', path: `calls.calls.${this.id}`, state})
     }
 

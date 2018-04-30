@@ -53,7 +53,6 @@ class AppForeground extends App {
             Queues: require('../../components/queues'),
             Settings: require('../../components/settings'),
             Soundmeter: require('../../components/soundmeter'),
-            Unlock: require('../../components/unlock'),
             VoipaccountPicker: require('../../components/voipaccount_picker'),
             Wizard: require('../../components/wizard'),
         }

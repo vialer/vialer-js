@@ -60,22 +60,11 @@ class ModuleSettings extends Module {
                 clientId: null,
                 enabled: null, // Three values; null(not decided), false(disable), true(enable)
             },
-            vault: {
-                active: false,
-                key: null,
-                salt: null,
-                store: false,
-                unlocked: false,
-            },
             webrtc: {
                 account: {
                     options: [], // Platform integration provides these choices.
                     password: '',
-                    selected: {
-                        id: null,
-                        password: null,
-                        username: null,
-                    },
+                    selected: {id: null, password: null, username: null},
                 },
                 codecs: {
                     options: [
@@ -88,24 +77,15 @@ class ModuleSettings extends Module {
                     devices: {
                         input: {
                             options: [],
-                            selected: {
-                                id: null,
-                                name: null,
-                            },
+                            selected: {id: null, name: null},
                         },
                         output: {
                             options: [],
-                            selected: {
-                                id: null,
-                                name: null,
-                            },
+                            selected: {id: null, name: null},
                         },
                         sounds: {
                             options: [],
-                            selected: {
-                                id: null,
-                                name: null,
-                            },
+                            selected: {id: null, name: null},
                         },
                     },
                     permission: false,
@@ -135,7 +115,7 @@ class ModuleSettings extends Module {
     * disabled.
     */
     _ready() {
-        const vaultUnlocked = this.app.state.settings.vault.unlocked
+        const vaultUnlocked = this.app.state.app.vault.unlocked
         const mediaPermission = this.app.state.settings.webrtc.media.permission
         const isAuthenticated = this.app.state.user.authenticated
 
@@ -161,24 +141,13 @@ class ModuleSettings extends Module {
             'store.settings.telemetry.enabled': (enabled) => {
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: enabled, eventName: 'telemetry', override: true})
             },
-            'store.settings.vault.store': (storeVaultKey) => {
-                if (storeVaultKey) this.app.crypto.storeVaultKey()
-                else {
-                    this.app.setState({settings: {vault: {key: null}}}, {encrypt: false, persist: true})
-                }
-            },
-            'store.settings.vault.unlocked': (unlocked) => {
-                if (unlocked && this.app.state.settings.webrtc.media.permission) {
-                    this.queryMediaDevices()
-                }
-            },
             'store.settings.webrtc.enabled': () => {
                 this.app.emit('bg:tabs:update_contextmenus', {}, true)
             },
             /**
-            * Read the devices list once as soon there is media permission
+            * Read the devices list as soon there is media permission
             * and the user is authenticated. The devices list is stored
-            * in the encrypted part, so the vault must be open at that point.
+            * in the encrypted part, so the vault must be open at this point.
             */
             'store.settings.webrtc.media.permission': () => {
                 if (this.app.state.user.authenticated) this.queryMediaDevices()
@@ -199,15 +168,9 @@ class ModuleSettings extends Module {
             let outputOptions = []
             for (const device of devices) {
                 if (device.kind === 'audioinput') {
-                    inputOptions.push({
-                        id: device.deviceId,
-                        name: device.label,
-                    })
+                    inputOptions.push({id: device.deviceId, name: device.label})
                 } else if (device.kind === 'audiooutput') {
-                    outputOptions.push({
-                        id: device.deviceId,
-                        name: device.label,
-                    })
+                    outputOptions.push({id: device.deviceId, name: device.label})
                 }
             }
 

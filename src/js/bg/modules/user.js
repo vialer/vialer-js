@@ -25,22 +25,29 @@ class ModuleUser extends Module {
         // that's why the main event uses `username` instead of `email`.
         this.app.on('bg:user:login', ({username, password}) => this.login({email: username, password}))
         this.app.on('bg:user:logout', this.logout.bind(this))
-        this.app.on('bg:user:unlock', async({password}) => {
+        this.app.on('bg:user:unlock', async({username, password}) => {
+            this.app.setSession(username)
             try {
-                await this.app.__unlockVault({
-                    password,
-                    username: this.app.state.user.username,
-                })
-                this.app.api.setupClient(this.app.state.user.username, this.app.state.user.token)
+                await this.app.__unlockSession({password, username})
+                this.app.api.setupClient(username, this.app.state.user.token)
                 this.app.__initServices()
+                this.app.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
             } catch (err) {
                 this.app.setState({
-                    ui: {layer: 'unlock'},
+                    ui: {layer: 'login'},
                     user: {authenticated: false},
                 }, {encrypt: false, persist: true})
-                const message = this.app.$t('Failed to unlock. Please check your password.')
+                const message = this.app.$t('Failed to unlock session. Check your password.')
                 this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
             }
+        })
+
+        this.app.on('bg:user:set_session', ({session}) => {
+            app.setSession(session)
+        })
+
+        this.app.on('bg:user:remove_session', ({session}) => {
+            app.removeSession(session)
         })
 
         this.app.on('bg:user:update-token', async({callback}) => {
@@ -90,6 +97,7 @@ class ModuleUser extends Module {
     * @param {String} options.password - Password to login with.
     */
     async login({email, password}) {
+        this.app.setSession(email)
         let res = await this.app.api.client.post('api/permission/apitoken/', {email, password})
         // A login failure. Give the user feedback about what went wrong.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
@@ -109,17 +117,12 @@ class ModuleUser extends Module {
             }
 
             this.app.emit('fg:notify', {icon, message, type})
-            // Remove credentials from the in-memory store.
-            this.app.setState({user: {token: null}})
             return
         }
 
-        let token = res.data.api_token
-        // Restore the API client now we have the API credentials again.
+        const token = res.data.api_token
         this.app.api.setupClient(email, token)
-        // Unlock the store now we have a valid email and password.
-        await this.app.__unlockVault({password, username: email})
-
+        await this.app.__unlockSession({password, username: email})
         res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
         let user = res.data
@@ -132,17 +135,6 @@ class ModuleUser extends Module {
         }
 
         user.realName = [user.first_name, user.preposition, user.last_name].filter((i) => i !== '').join(' ')
-        this.app.setState({
-            user: {
-                client_id: user.client.replace(/[^\d.]/g, ''),
-                id: user.id,
-                platform: {
-                    tokens: {sip: user.token},
-                },
-                realName: user.realName,
-                token,
-            },
-        }, {persist: true})
 
         let startLayer
         if (!this.app.state.settings.wizard.completed) {
@@ -160,35 +152,37 @@ class ModuleUser extends Module {
             user: {username: email},
         }, {encrypt: false, persist: true})
 
+        this.app.setState({
+            user: {
+                client_id: user.client.replace(/[^\d.]/g, ''),
+                id: user.id,
+                platform: {tokens: {sip: user.token}},
+                realName: user.realName,
+                token,
+            },
+        }, {persist: true})
 
         this.app.__initServices()
     }
 
 
     /**
-    * Don't delete the salt. This will render the cached and stored
-    * state useless. Removing the username from the lock indicates that
-    * the user is logged out. The state cannot be used while it is
-    * encrypted.
+    * Remove any stored session key, but don't delete the salt.
+    * This will render the cached and stored state useless.
     */
     logout() {
         this.app.logger.info(`${this}logging out and cleaning up state`)
-        // The password is restored on the state again on login
-        // and after unlocking the vault. Logout may be called from
-        // the the lock screen. At this moment, the encrypted state
-        // can't be persisted.
-        this.app.setState({user: {password: ''}})
+        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Goodbye!'), type: 'success'})
         this.app.setState({
-            settings: {vault: {active: false, unlocked: false}},
-            ui: {layer: 'login'},
+            app: {vault: {key: null, store: false, unlocked: false}},
             user: {authenticated: false},
         }, {encrypt: false, persist: true})
         // Remove credentials from basic auth.
         this.app.api.setupClient()
         // Disconnect without reconnect attempt.
         this.app.modules.calls.disconnect(false)
-        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Goodbye!'), type: 'success'})
-        this.app.setState({ui: {menubar: {default: 'inactive'}}})
+        this.app.emit('bg:user:logged_out', {}, true)
+        this.app.setSession('new')
     }
 
 

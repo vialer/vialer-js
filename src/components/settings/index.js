@@ -43,6 +43,8 @@ module.exports = (app) => {
                     settings: this.settings,
                 }, {persist: true})
 
+                // Disable dnd after a save to keep condition checks simple.
+                app.setState({app: {vault: this.app.vault}}, {encrypt: false, persist: true})
                 app.vm.$notify({icon: 'settings', message: app.$t('Settings stored'), type: 'success'})
                 app.emit('bg:calls:connect')
             },

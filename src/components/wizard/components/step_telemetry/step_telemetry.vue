@@ -9,7 +9,7 @@
     <slot name="progress"></slot>
 
     <div class="buttons is-centered">
-        <span class="button is-primary" @click="toggleTelemetry(true)">{{$t('Yes, let me help')}}</span>
-        <span class="button" @click="toggleTelemetry(false)">{{$t('No thanks')}}</span>
+        <button class="button is-primary" @click="toggleTelemetry(true)">{{$t('Yes, let me help')}}</button>
+        <button class="button" @click="toggleTelemetry(false)">{{$t('No thanks')}}</button>
     </div>
 </component>

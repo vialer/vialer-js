@@ -63,11 +63,11 @@
     <div class="tab" :class="{'is-active': tabs.active === 'privacy'}">
 
         <Field name="store_key" type="checkbox"
-            :label="$t('Automatic unlock')"
-            :model.sync="settings.vault.store"
-            :help="$t('Automatically unlock after a browser restart.')"/>
+            :label="$t('Remember session')"
+            :model.sync="app.vault.store"
+            :help="$t('Automatically unlock your session after restart.')"/>
 
-        <div v-if="settings.vault.store" class="notification-box info">
+        <div v-if="app.vault.store" class="notification-box info">
             <header><icon name="lock-off"/><span>{{$t('Data security')}}</span></header>
             <ul>
                 <li>{{$t('Your data and credentials are stored encrypted in the browser by a password-generated key.')}}
@@ -149,5 +149,4 @@
     <div class="tabs-actions field is-grouped">
         <button class="button is-primary" :disabled="$v.$invalid" @click="save">{{$t('Save changes')}}</button>
     </div>
-
 </component>

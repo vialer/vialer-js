@@ -153,7 +153,7 @@ class Crypto {
         const keydata = await crypto.subtle.exportKey('raw', aesKey)
         //returns the exported key data
         let base64Keydata = this.__dataArrayToBase64(keydata)
-        this.app.logger.info(`${this}export aes-gcm sessionkey`)
+        this.app.logger.info(`${this}exported AES-GCM session key`)
         return base64Keydata
     }
 
@@ -274,21 +274,19 @@ class Crypto {
     * @returns {Promise} - Resolves with an AES-GCM key.
     */
     async _generateVaultKey(username, password) {
+        let base64Salt
         let salt
         // The salt is bound to the username and is therefor required.
-        if (this.app.state.settings.vault && this.app.state.settings.vault.salt && this.app.state.user.username) {
-            salt = this.__base64ToDataArray(this.app.state.settings.vault.salt)
+        if (this.app.state.app.vault && this.app.state.app.vault.salt && this.app.state.user.username) {
+            base64Salt = this.app.state.app.vault.salt
+            salt = this.__base64ToDataArray(base64Salt)
         } else {
             salt = crypto.getRandomValues(new Uint8Array(16))
+            base64Salt = this.__dataArrayToBase64(salt)
         }
 
-        this.app.setState({
-            settings: {
-                vault: {active: true, salt: this.__dataArrayToBase64(salt)},
-            },
-        }, {encrypt: false, persist: true})
-
-        this.pdkdf2Key = await crypto.subtle.importKey(
+        this.app.setState({app: {vault: {salt: base64Salt, store: false}}}, {encrypt: false, persist: true})
+        this.pbkdf2Key = await crypto.subtle.importKey(
             'raw', this.__stringToDataArray(`${username}${password}`),
             {name: 'PBKDF2'}, false, ['deriveKey', 'deriveBits'],
         )
@@ -297,7 +295,7 @@ class Crypto {
         // enough, to make it less likely that the password can be brute-forced.
         const sessionKey = await crypto.subtle.deriveKey(
             {hash: {name: 'SHA-256'}, iterations: 500000, name: 'PBKDF2', salt},
-            this.pdkdf2Key, {length: 256, name: 'AES-GCM'}, true, ['encrypt', 'decrypt'])
+            this.pbkdf2Key, {length: 256, name: 'AES-GCM'}, true, ['encrypt', 'decrypt'])
         return sessionKey
     }
 
@@ -413,7 +411,7 @@ class Crypto {
     */
     async storeVaultKey() {
         const sessionKey = await this.__exportAESKey(this.sessionKey)
-        this.app.setState({settings: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
+        this.app.setState({app: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
     }
 
 

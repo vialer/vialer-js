@@ -1,7 +1,5 @@
 <component class="component-step-welcome">
-    <header>
-        {{greeting}}
-    </header>
+    <header>{{greeting}}</header>
 
     <div class="step-description">
         {{$t('Welcome to your')}} {{app.name}}.<br/>

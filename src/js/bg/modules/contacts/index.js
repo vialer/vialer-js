@@ -23,6 +23,11 @@ class ModuleContacts extends Module {
         super(app)
         // Holds Contact instances, not Contact state.
         this.contacts = {}
+
+        this.app.on('bg:user:logged_out', () => {
+            this.contacts = {}
+            this.app.setState({}, {action: 'replace', path: 'contacts.contacts'})
+        })
     }
 
 
@@ -68,15 +73,14 @@ class ModuleContacts extends Module {
         // Subscribe here, so we are able to wait before a subscription
         // is completed until going to the next. This prevents the
         // server from being hammered.
-        if (['registered', 'connected'].includes(this.app.state.calls.ua.status)) {
-            for (let contactId of Object.keys(this.contacts)) {
+        for (let contactId of Object.keys(this.contacts)) {
+            if (['registered', 'connected'].includes(this.app.state.calls.ua.status)) {
                 const endpoints = this.contacts[contactId].endpoints
                 for (let endpointId of Object.keys(endpoints)) {
                     if (endpoints[endpointId].presence) {
                         await endpoints[endpointId].presence.subscribe()
                     }
                 }
-                if (this.contacts[contactId].presence) await this.contacts[contactId].presence.subscribe()
             }
         }
     }

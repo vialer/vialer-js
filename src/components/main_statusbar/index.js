@@ -8,14 +8,18 @@ module.exports = (app) => {
             classes: function(block) {
                 let classes = {}
                 if (block === 'component') {
-                    if (this.user.authenticated) {
-                        if (this.ua.status === 'disconnected') classes.error = true
-                        // ConnectAB modus.
-                        else if (this.ua.status === 'connected') classes.notice = true
-                        else if (this.settings.webrtc.enabled && !this.settings.webrtc.media.permission) classes.error = true
-                        else if (this.dnd) classes.warning = true
-                        else classes.default = true
-                    } else classes.default = true
+                    if (!this.user.authenticated) classes.ok = true
+                    else {
+                        if (this.settings.webrtc.enabled) {
+                            if (!this.settings.webrtc.media.permission) classes.error = true
+                            else if (this.ua.status !== 'registered') classes.error = true
+                            else if (this.dnd) classes.warning = true
+                            else if (this.ua.status === 'registered') classes.ok = true
+                        } else {
+                            if (this.ua.status !== 'connected') classes.error = true
+                            else classes.ok = true
+                        }
+                    }
                 }
                 return classes
             },
@@ -30,24 +34,33 @@ module.exports = (app) => {
                 let title = ''
                 if (block === 'indicator') {
                     title += `${this.$t('Status:')} `
-                    if (['disconnected', 'reconnect'].includes(this.ua.status)) {
-                        title += this.$t('no connection')
+                    if (['disconnected', 'reconnect', 'registration_failed'].includes(this.ua.status)) {
                         // Give an indication why we are not connected.
-                        if (!this.app.online) {
-                            title += ` (${this.$t('offline')})`
+                        if (!this.app.online) title += this.$t('offline')
+                        else if (this.ua.status === 'registration_failed') {
+                            title += this.$t('registration failed')
+                        } else title += this.$t('no connection')
+                    } else {
+                        if (this.settings.webrtc.enabled) {
+                            if (this.ua.status === 'registered') {
+                                title += this.$t('registered')
+                                if (!this.settings.webrtc.media.permission) {
+                                    title += ` (${this.$t('no microphone access')})`
+                                } else if (this.dnd) title += ` (${this.$t('Do not Disturb')})`
+                            } else {
+                                title += this.$t('not registered')
+                            }
+                            title += ` (${this.$t('WebRTC')})`
+                        } else {
+                            if (this.ua.status === 'connected') {
+                                title += `${this.$t('connected')} (${this.$t('ConnectAB')})`
+                            } else {
+                                title += `${this.$t(this.ua.status)} (${this.$t('ConnectAB')})`
+                            }
                         }
-                    } else if (this.ua.status === 'connected') {
-                        title += `${this.$t('connected')} (${this.$t('ConnectAB')})`
-                    } else if (this.ua.status === 'registered') {
-                        title += this.$t('registered')
-                        if (!this.settings.webrtc.media.permission) {
-                            title += ` (${this.$t('no microphone access')})`
-                        } else if (this.dnd) title += ` (${this.$t('Do not Disturb')})`
-                        else title += ` (${this.$t('WebRTC')})`
-                    } else if (this.ua.status === 'registration_failed') {
-                        title += this.$t('registration failed')
                     }
                 }
+
                 return title
             },
         }, app.helpers.sharedMethods()),

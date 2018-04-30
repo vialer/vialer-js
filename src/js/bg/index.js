@@ -127,51 +127,29 @@ class AppBackground extends App {
 
 
     /**
-    * Load store defaults and try to restore the encrypted state from
-    * localStorage. Load a clean state from defaults otherwise. Then
-    * initialize the ViewModel and check for the data schema. Do a factory
-    * reset if the data schema is outdated. The watchers are initialized
-    * on a module level and finally signal to the modules that the application
-    * is ready to rumble.
+    * Load store defaults and restore the encrypted state from
+    * localStorage if the session can be restored. Load a clean state
+    * from defaults otherwise. Then initialize the ViewModel and check for the
+    * data schema. Do a factory reset if the data schema is outdated.
     */
     async __initStore() {
         super.__initStore()
-        // Changing the menubar icon depends on a state watcher, which requires
-        // Vue to be already initialized in order to pick up changes.
-        Object.assign(this.state, this._initialState())
-        // Avoid allowing the unencrypted store to override state
-        // properties from the encrypted store.
-        const unencryptedState = this.store.get('state.unencrypted')
-        if (typeof unencryptedState === 'object') this.__mergeDeep(this.state, unencryptedState)
-        // Setup a HTTP client without authentication as soon there
-        // is a start of the store.
+        this.setSession('active')
+        // Setup HTTP client without authentication when there is a store.
         this.api.setupClient()
-
-        // The vault always starts in a locked position, no matter what the
-        // unencrypted store says.
+        // The vault always starts in a locked position.
         this.setState({
-            settings: {vault: {unlocked: false}},
+            app: {vault: {unlocked: false}},
             ui: {menubar: {default: 'inactive'}},
-        }, {encrypt: false, persist: true})
+        })
 
-        if (this.state.settings.vault.active) {
-            // See if we can decipher the stored encrypted state when
-            // there is an active vault, a key and an encrypted store.
-            if (this.state.settings.vault.key) {
-                // Restores the user's identity.
-                await this.__unlockVault({key: this.state.settings.vault.key})
-                // Ther username and token must be available in the store by now.
-                this.api.setupClient(this.state.user.username, this.state.user.token)
-                this.__initServices()
-            } else {
-                // Active vault, but no key. Ask the user for the key.
-                this.setState({ui: {layer: 'unlock', menubar: {default: 'lock-on'}}, user: {authenticated: false}})
-            }
-        } else {
-            this.setState({
-                settings: {vault: {unlocked: false}},
-                ui: {layer: 'login', menubar: {default: 'inactive'}}, user: {authenticated: false},
-            }, {encrypt: false, persist: true})
+        // See if we can decipher the stored encrypted state when
+        // there is an active vault, a key and an encrypted store.
+        if (this.state.app.vault.key) {
+            await this.__unlockSession({key: this.state.app.vault.key, username: this.state.user.username})
+            // The API username and token are now available in the store.
+            this.api.setupClient(this.state.user.username, this.state.user.token)
+            this.__initServices()
         }
 
         // Each module can define watchers on store attributes, which makes
@@ -179,41 +157,17 @@ class AppBackground extends App {
         let watchers = {}
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._watchers) {
+                this.logger.debug(`${this}adding watchers for module ${module}`)
                 Object.assign(watchers, this.modules[module]._watchers())
             }
         }
 
         this.initViewModel(watchers)
         // (!) State is reactive from here on.
-
         // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()
         }
-    }
-
-
-    /**
-    * Return the state to a stripped version without
-    * loosing all of the personalized state properties.
-    */
-    __logoutState() {
-        let _initialState = this._initialState()
-        delete _initialState.app
-        delete _initialState.user
-
-        this.setState({
-            availability: _initialState.availability,
-            calls: _initialState.calls,
-            contacts: _initialState.contacts,
-            queues: _initialState.queues,
-            settings: {
-                webrtc: _initialState.settings.webrtc,
-            },
-            user: {password: ''},
-        }, {persist: true})
-
-        this.setState({ui: {layer: 'login'}}, {encrypt: false, persist: true})
     }
 
 
@@ -228,6 +182,10 @@ class AppBackground extends App {
         if (this.__mergeBusy) {
             this.__mergeQueue.push(() => this.__mergeState({action, encrypt, path, persist, state}))
             return
+        } else if (this.__mergeQueue.length) {
+            // See if a request is queued before starting.
+            this.__mergeQueue.pop()()
+            return
         }
 
         // Flag that the operation is currently in use.
@@ -241,32 +199,34 @@ class AppBackground extends App {
 
         // Background is leading and is the only one that
         // writes to storage using encryption.
-        let storageKey = encrypt ? 'state.encrypted' : 'state.unencrypted'
-        let stateClone = this.store.get(storageKey)
+        let storeKey = encrypt ? `${this.state.user.username}/state/vault` : `${this.state.user.username}/state`
+        let storeState = this.store.get(storeKey)
 
-        if (stateClone) {
+        if (storeState) {
             if (encrypt) {
-                stateClone = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, stateClone))
+                storeState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, storeState))
             }
-        } else stateClone = {}
+        } else storeState = {}
 
-        // Properly store specific properties from a key path.
+        // Store specific properties in a nested key path.
         if (path) {
             path = path.split('.')
-            const _ref = path.reduce((o, i)=>o[i], stateClone)
+            const _ref = path.reduce((o, i)=>o[i], storeState)
             this.__mergeDeep(_ref, state)
         } else {
-            this.__mergeDeep(stateClone, state)
+            this.__mergeDeep(storeState, state)
         }
 
         // Encrypt the updated store state.
         if (encrypt) {
-            stateClone = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(stateClone))
+            storeState = await this.crypto.encrypt(this.crypto.sessionKey, JSON.stringify(storeState))
         }
 
-        this.store.set(storageKey, stateClone)
+        this.store.set(storeKey, storeState)
+        // The method is free to process the next request.
         this.__mergeBusy = false
-        // Other mergeState requests are waiting; process the next one.
+
+        // See if a request is queued before leaving.
         if (this.__mergeQueue.length) {
             this.__mergeQueue.pop()()
         }
@@ -274,30 +234,30 @@ class AppBackground extends App {
 
 
     /**
-    * Unlock the encrypted store while the application is already running.
-    * @param {Object} [options] - The options to pass.
+    * Unlock the vault while the application is already running.
+    * @param {Object} [options] - options.
     * @param {String} [options.username] - The username to unlock the store with.
     * @param {String} [options.password] - The password to unlock the store with.
     */
-    async __unlockVault({key = null, username = null, password = null} = {}) {
+    async __unlockSession({key = null, username = null, password = null} = {}) {
         if (key) {
-            this.logger.info(`${this}unlocking vault with existing cryptokey`)
+            this.logger.info(`${this}import vault CryptoKey from stored key`)
             await this.crypto._importVaultKey(key)
         } else if (username && password) {
-            this.logger.info(`${this}unlocking vault with credentials`)
+            this.logger.info(`${this}loading vault identity from credentials`)
             await this.crypto.loadIdentity(username, password)
         } else {
             throw new Error('Cannot unlock without session key or credentials.')
         }
 
-        await this._restoreState()
+        await this._restoreState(username)
         this.setState({
-            settings: {vault: {active: true, unlocked: true}},
+            app: {vault: {unlocked: true}},
             user: {authenticated: true},
         }, {encrypt: false, persist: true})
 
         // Set the default layer if it's still on unlock.
-        if (this.state.ui.layer === 'unlock') {
+        if (this.state.ui.layer === 'login') {
             this.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
         }
     }
@@ -307,11 +267,11 @@ class AppBackground extends App {
     * Refresh data from the API endpoints for each module.
     */
     _platformData() {
+        this.logger.debug(`${this}(re)refreshing platform api data`)
         for (let module in this.modules) {
             // Use 'load' instead of 'restore' to refresh the data on
             // browser restart.
             if (this.modules[module]._platformData) {
-                this.logger.debug(`${this}(re)refreshing api data for module ${module}`)
                 this.modules[module]._platformData()
             }
         }
@@ -326,19 +286,23 @@ class AppBackground extends App {
     * and applies module-specific state changes. See for instance the
     * _restoreState implementation in the Contacts module for a more
     * complicated example.
+    * @param {String} sessionId - The username/session to restore the state for.
     */
-    async _restoreState() {
-        let cipherData = this.store.get('state.encrypted')
-        let decryptedState
+    async _restoreState(sessionId) {
+        this.logger.debug(`${this}restoring state for session ${sessionId}`)
+        let cipherData = this.store.get(`${sessionId}/state/vault`)
+        let unencryptedState = this.store.get(`${sessionId}/state`)
+        if (!unencryptedState) unencryptedState = {}
 
+        let decryptedState = {}
+        // Determine if there is an encrypted state vault.
         if (cipherData) {
+            this.logger.debug(`${this}restoring encrypted vault state for session ${sessionId}`)
             decryptedState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, cipherData))
         } else decryptedState = {}
 
-        let unencryptedState = this.store.get('state.unencrypted')
-        if (!unencryptedState) unencryptedState = {}
-
         let state = {}
+
         this.__mergeDeep(state, decryptedState, unencryptedState)
 
         for (let module of Object.keys(this.modules)) {
@@ -351,6 +315,55 @@ class AppBackground extends App {
         }
 
         this.setState(state)
+    }
+
+
+    /**
+    * Remove a session with a clean state.
+    * @param {String} sessionId - The identifier of the session.
+    */
+    removeSession(sessionId) {
+        this.logger.info(`${this}removing session '${sessionId}'`)
+        this.store.remove(`${sessionId}/state`)
+        this.store.remove(`${sessionId}/state/vault`)
+        this.setSession('new')
+    }
+
+
+    /**
+    * Reboot a session with a clean state. It can be used
+    * to load a specific previously stored session, or to
+    * continue the session that should be active or to
+    * start a `new` session.
+    * @param {String} sessionId - The identifier of the session. Set to null
+    */
+    setSession(sessionId = 'new') {
+        let session = this.store.findSessions()
+        if (sessionId === 'active') {
+            sessionId = session.active ? session.active : null
+            this.logger.debug(`${this}active session requested, found "${sessionId}"`)
+        }
+
+        this.logger.debug(`${this}activating session "${sessionId}"`)
+        Object.assign(this.state, this._initialState())
+
+        if (sessionId && sessionId !== 'new') {
+            this.__mergeDeep(this.state, this.store.get(`${sessionId}/state`))
+            // Always pin these presets, no matter what the stored setting is.
+            if (this.state.app.vault.key) {
+                this.state.app.vault.unlocked = true
+            } else {
+                this.state.app.vault.unlocked = false
+                this.state.ui.menubar.default = 'lock'
+            }
+            Object.assign(this.state.user, {authenticated: false, username: sessionId})
+        }
+
+        this.state.app.session = session
+        // Set the active session.
+        if (sessionId && sessionId !== 'new') this.state.app.session.active = sessionId
+        this.setState(this.state)
+        this.__initMedia()
     }
 
 

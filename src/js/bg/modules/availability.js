@@ -62,16 +62,8 @@ class ModuleAvailability extends Module {
             destinations: [],
             dnd: false,
             phoneaccounts: [],
-            placeholder: {
-                id: null,
-                name: null,
-                type: null,
-            },
-            selected: {
-                id: null,
-                name: null,
-                type: null,
-            },
+            placeholder: {id: null, name: null, type: null},
+            selected: {id: null, name: null, type: null},
             sud: null, // This is a fixed id used to build the API endpoint for selected userdestination.
         }
     }
@@ -146,14 +138,15 @@ class ModuleAvailability extends Module {
 
     /**
     * Setup availability-specific store watchers.
+    * @param {Boolean} dndEnabled - Whether do-not-disturb is being enabled.
     * @returns {Object} - Properties that need to be watched.
     */
     _watchers() {
         return {
-            'store.availability.dnd': (newVal, oldVal) => {
+            'store.availability.dnd': (dndEnabled) => {
                 if (this.app.env.isExtension) {
                     // Dnd is set. Set the menubar to inactive.
-                    if (newVal) browser.browserAction.setIcon({path: 'img/menubar-unavailable.png'})
+                    if (dndEnabled) browser.browserAction.setIcon({path: 'img/menubar-unavailable.png'})
                     // Restore the previous value.
                     else browser.browserAction.setIcon({path: 'img/menubar-active.png'})
                 }

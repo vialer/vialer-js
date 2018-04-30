@@ -6,13 +6,16 @@
     </div>
     <div class="status-left" v-else>
         <span class="status-indicator tooltip tooltip-right" :data-tooltip="titles('indicator')">
-            <icon class="disconnected" name="disconnected" v-if="ua.status === 'disconnected'"/>
-            <icon class="registration-failed" name="disconnected" v-else-if="ua.status === 'registration_failed'"/>
-            <icon class="connected" name="user" v-else-if="ua.status === 'connected'"/>
-            <template v-else-if="ua.status === 'registered'">
-                <icon class="microphone-denied" name="mute" v-if="!this.settings.webrtc.media.permission"/>
-                <icon class="dnd" name="dnd" v-else-if="dnd"/>
-                <icon class="registered" name="softphone" v-else/>
+
+            <template v-if="settings.webrtc.enabled">
+                <icon class="error" name="mute" v-if="!settings.webrtc.media.permission"/>
+                <icon class="error" name="softphone" v-else-if="ua.status !== 'registered'"/>
+                <icon class="warning" name="dnd" v-else-if="dnd"/>
+                <icon class="ok" name="softphone" v-else-if="ua.status === 'registered'"/>
+            </template>
+            <template v-else>
+                <icon v-if="ua.status !== 'connected'" class="error" name="user" />
+                <icon v-else class="ok" name="user" />
             </template>
         </span>
 
