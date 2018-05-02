@@ -16,15 +16,15 @@ module.exports = (app) => {
             login: function() {
                 if (this.$v.$invalid) return
 
-                if (this.app.session.active && this.app.session.active !== 'new') {
-                    app.emit('bg:user:unlock', {
-                        password: this.password,
-                        username: this.app.session.active,
-                    })
-                } else {
+                if (this.app.session.active === 'new' || !this.app.session.available.length) {
                     app.emit('bg:user:login', {
                         password: this.password,
                         username: this.user.username,
+                    })
+                } else {
+                    app.emit('bg:user:unlock', {
+                        password: this.password,
+                        username: this.app.session.active,
                     })
                 }
             },

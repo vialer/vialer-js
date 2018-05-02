@@ -185,7 +185,6 @@ class AppBackground extends App {
         } else if (this.__mergeQueue.length) {
             // See if a request is queued before starting.
             this.__mergeQueue.pop()()
-            return
         }
 
         // Flag that the operation is currently in use.
