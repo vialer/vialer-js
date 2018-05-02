@@ -161,7 +161,8 @@ gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
     // Refresh the brand content with each build.
     let targetTasks
     if (settings.BUILD_TARGET === 'docs') {
-        return runSequence(['docs'], done)
+        runSequence(['docs'], done)
+        return
     } else if (settings.BUILD_TARGET === 'electron') targetTasks = ['js-electron']
     else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg']
     else if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg', 'js-app-observer', 'manifest']

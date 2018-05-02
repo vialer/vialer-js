@@ -31,6 +31,7 @@
         "I18nStore": true,
         "i18n": true,
         "EventEmitter": true,
+        "Raven": true,
         "Vuelidate": true,
         "resizeSensor": true
     },

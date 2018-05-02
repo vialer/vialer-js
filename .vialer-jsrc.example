@@ -21,12 +21,15 @@
                 },
                 "type": "closed"
             },
-            "analytics_id": {
-                "chrome": "",
-                "edge": "",
-                "electron": "",
-                "firefox": "",
-                "webview": ""
+            "telemetry": {
+                "analytics_id": {
+                    "chrome": "",
+                    "edge": "",
+                    "electron": "",
+                    "firefox": "",
+                    "webview": ""
+                }
+                "sentry_dsn": ""
             },
             "colors": {
                 "brand-color": "#de6b35",

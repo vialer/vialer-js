@@ -59,6 +59,7 @@ class ModuleSettings extends Module {
                 analyticsId: process.env.ANALYTICS_ID,
                 clientId: null,
                 enabled: null, // Three values; null(not decided), false(disable), true(enable)
+                sentryDsn: process.env.SENTRY_DSN,
             },
             webrtc: {
                 account: {
@@ -139,6 +140,17 @@ class ModuleSettings extends Module {
                 }
             },
             'store.settings.telemetry.enabled': (enabled) => {
+                if (enabled) {
+                    this.app.logger.info(`${this}enabling raven exception monitoring`)
+                    Raven.config(this.app.state.settings.telemetry.sentryDsn, {
+                        allowSecretKey: true,
+                        environment: process.env.DEPLOY_TARGET,
+                        release: this.app.state.app.version.current,
+                    }).install()
+                } else {
+                    this.app.logger.info(`${this}disabling raven exception monitoring`)
+                    Raven.uninstall()
+                }
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: enabled, eventName: 'telemetry', override: true})
             },
             'store.settings.webrtc.enabled': () => {
@@ -153,6 +165,15 @@ class ModuleSettings extends Module {
                 if (this.app.state.user.authenticated) this.queryMediaDevices()
             },
         }
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return `${this.app}[settings] `
     }
 
 

@@ -32,6 +32,5 @@ global.Vuelidate.validators = require('vuelidate/lib/validators')
 
 Vue.use(global.Vuelidate.default)
 
-Vue.use(global.VueSVGIcon, {
-    tagName: 'icon',
-})
+Vue.use(global.VueSVGIcon, {tagName: 'icon'})
+global.Raven = require('raven-js')
