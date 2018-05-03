@@ -23,7 +23,7 @@ class ModuleUser extends Module {
         super(app)
         // Other implementation may use other user identifiers than email,
         // that's why the main event uses `username` instead of `email`.
-        this.app.on('bg:user:login', ({username, password}) => this.login({email: username, password}))
+        this.app.on('bg:user:login', this.login.bind(this))
         this.app.on('bg:user:logout', this.logout.bind(this))
         this.app.on('bg:user:unlock', async({username, password}) => {
             this.app.setSession(username)
@@ -72,6 +72,7 @@ class ModuleUser extends Module {
                 },
             },
             token: null,
+            twoFactor: false,
             username: null,
         }
     }
@@ -93,36 +94,46 @@ class ModuleUser extends Module {
     * profile information with. Save the credentials in storage when the call
     * is succesful, otherwise remove the credentials from the store.
     * @param {object} options - Options to pass.
-    * @param {String} options.email - Email address to login with.
+    * @param {String} options.username - Email address to login with.
     * @param {String} options.password - Password to login with.
+    * @param {String} [options.token] - A 2fa token to login with.
     */
-    async login({email, password}) {
-        this.app.setSession(email)
-        let res = await this.app.api.client.post('api/permission/apitoken/', {email, password})
+    async login({callback, username, password, token}) {
+        if (this.app.state.app.session.active !== username) {
+            this.app.setSession(username)
+        }
+
+        let apiParams
+
+        if (token) apiParams = {email: username, password, two_factor_token: token}
+        else apiParams = {email: username, password}
+
+        let res = await this.app.api.client.post('api/permission/apitoken/', apiParams)
         // A login failure. Give the user feedback about what went wrong.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             let message
             const icon = 'warning', type = 'warning'
-            if (!res.data.error) {
-                message = this.app.$t('Failed to login. Please check your credentials.')
-            } else {
-                let failMessage = res.data.error.message
-                // Notify the user about being blocked out of the platform due to
-                // too many login attempts.
-                if (failMessage.includes('Too many failed login attempts')) {
-                    const date = failMessage.substring(failMessage.length - 9, failMessage.length - 1)
-                    window.failMessage = failMessage
-                    message = this.app.$t('Too many failed login attempts; try again at {date}', {date})
+            if (res.data.apitoken) {
+                if (res.data.apitoken.email || res.data.apitoken.password) {
+                    message = this.app.$t('Failed to login. Please check your credentials.')
+                    this.app.emit('fg:notify', {icon, message, type})
+                } else if (res.data.apitoken.two_factor_token) {
+                    const validationMessage = res.data.apitoken.two_factor_token[0]
+                    if (validationMessage === 'this field is required') {
+                        // Switch two-factor view.
+                        this.app.setState({user: {twoFactor: true}})
+                    } else if (validationMessage === 'invalid two_factor_token') {
+                        message = this.app.$t('Invalid two factor token. Please check your tokenizer.')
+                        callback({message, valid: false})
+                    }
                 }
             }
-
-            this.app.emit('fg:notify', {icon, message, type})
             return
         }
 
-        const token = res.data.api_token
-        this.app.api.setupClient(email, token)
-        await this.app.__unlockSession({password, username: email})
+        const apiToken = res.data.api_token
+        this.app.api.setupClient(username, apiToken)
+        await this.app.__unlockSession({password, username})
         res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
         let user = res.data
@@ -149,7 +160,7 @@ class ModuleUser extends Module {
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},
             ui: {layer: startLayer, menubar: {default: 'active'}},
-            user: {username: email},
+            user: {username},
         }, {encrypt: false, persist: true})
 
         this.app.setState({
@@ -158,7 +169,7 @@ class ModuleUser extends Module {
                 id: user.id,
                 platform: {tokens: {sip: user.token}},
                 realName: user.realName,
-                token,
+                token: apiToken,
             },
         }, {persist: true})
 

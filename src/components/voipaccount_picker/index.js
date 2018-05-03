@@ -73,7 +73,7 @@ module.exports = (app) => {
             },
             /**
             * Respond to toggling the softphone on and off by unsetting the
-            * selected VoIP-account or by selecting the first option by
+            * selected VoIP account or by selecting the first option by
             * default.
             * @param {Object} webrtcEnabled - New checkbox/switch value.
             */

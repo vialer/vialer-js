@@ -28,7 +28,12 @@ class AppForeground extends App {
         // Make state modifications from AppBackground, but only
         // after fg had its initial state received from bg.
         this.on('fg:set_state', (data) => {
-            if (this.__fgReady) this.__mergeState(data)
+            if (this.__fgReady) {
+                // When sending the whole background state, make sure that
+                // the env property of the foreground is never overwritten.
+                if (data.state && data.state.env) delete data.state.env
+                this.__mergeState(data)
+            }
         })
 
         /**

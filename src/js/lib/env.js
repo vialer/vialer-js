@@ -64,17 +64,6 @@ function env({role}) {
             if (_env.isEdge) $('html').classList.add('edge')
             if (_env.isFirefox) $('html').classList.add('firefox')
             if (_env.isExtension) $('html').classList.add('extension')
-
-            if (_env.isMacOS) {
-                // Forces height recalculation of the popup in Chrome OSX.
-                // See: https://bugs.chromium.org/p/chromium/issues/detail?id=307912
-                setTimeout(() => {
-                    const style = document.querySelector('#app').style
-                    setTimeout(() => {
-                        style.opacity = 1
-                    })
-                }, 200)
-            }
         }
     }
 

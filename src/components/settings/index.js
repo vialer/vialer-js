@@ -65,6 +65,20 @@ module.exports = (app) => {
             vendor: 'app.vendor',
         },
         validations: function() {
+            const isValid = Vuelidate.withParams({
+                type: 'isValid',
+            }, () => {
+                const account = this.settings.webrtc.account.selected
+                if (account) {
+                    if (account.settings.avpf && account.settings.encryption) {
+                        return true
+                    }
+                    return false
+                }
+
+                return true
+            })
+
             let validations = {
                 settings: {
                     platform: {
@@ -81,6 +95,7 @@ module.exports = (app) => {
                         account: {
                             selected: {
                                 id: {
+                                    isValid,
                                     requiredIf: v.requiredIf(() => {
                                         return this.settings.webrtc.enabled
                                     }),

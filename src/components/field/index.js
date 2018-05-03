@@ -28,43 +28,61 @@ module.exports = (app) => {
              */
             validationMessage: function() {
                 let errorMessages = []
-                if (this.validation.required === false) {
-                    errorMessages.push(this.$t('This field is required.'))
-                }
-                if (this.validation.requiredIf === false) {
-                    errorMessages.push(this.$t('This field is required.'))
+                const v = this.validation
+
+                if (!v) return errorMessages
+
+                if (v.apiResponse === false) {
+                    errorMessages.push(this.$t(v.$params.apiResponse.message))
                 }
 
-                if (this.validation.minLength === false) {
-                    errorMessages.push(this.$t(
-                        'Please fill in a value of at least {min} characters.', {
-                            min: this.validation.$params.minLength.min,
-                        })
-                    )
-                }
-                if (this.validation.maxLength === false) {
-                    errorMessages.push(this.$t(
-                        'Please fill in a value no longer than {max} characters.', {
-                            max: this.validation.$params.maxLength.max,
-                        })
-                    )
-                }
-
-                if (this.validation.domain === false) {
+                if (v.domain === false) {
                     errorMessages.push(this.$t('Please fill in a valid domain.'))
                 }
-                if (this.validation.email === false) {
+
+                if (v.email === false) {
                     errorMessages.push(this.$t('Please fill in a valid email address.'))
                 }
-                if (this.validation.must_be_unique === false) {
+
+                if (v.maxLength === false) {
+                    errorMessages.push(this.$t(
+                        'Please fill in a value no longer than {max} characters.', {
+                            max: v.$params.maxLength.max,
+                        })
+                    )
+                }
+
+                if (v.minLength === false) {
+                    errorMessages.push(this.$t(
+                        'Please fill in a value of at least {min} characters.', {
+                            min: v.$params.minLength.min,
+                        })
+                    )
+                }
+
+                if (v.numeric === false) {
+                    errorMessages.push(this.$t('Please fill in a valid number.'))
+                }
+
+                if (v.must_be_unique === false) {
                     errorMessages.push(this.$t('Please fill in a unique value.'))
                 }
-                if (this.validation.sameAs === false) {
+
+                if (v.required === false) {
+                    errorMessages.push(this.$t('This field is required.'))
+                }
+
+                if (v.requiredIf === false) {
+                    errorMessages.push(this.$t('This field is required.'))
+                }
+
+                if (v.sameAs === false) {
                     errorMessages.push(this.$t('Field "{fieldName}" must have the same value.', {
-                        fieldName: this.validation.$params.sameAs.eq,
+                        fieldName: v.$params.sameAs.eq,
                     }))
                 }
-                if (this.validation.url === false) {
+
+                if (v.url === false) {
                     errorMessages.push(this.$t('Please fill in a valid url.'))
                 }
 
@@ -144,8 +162,6 @@ module.exports = (app) => {
                     let items = event.target.value.split('\n')
                     this.$emit('update:model', items)
                 }
-
-
 
                 if (this.validation) this.validation.$touch()
             },

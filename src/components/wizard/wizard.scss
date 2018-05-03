@@ -12,7 +12,9 @@
         text-align: center;
 
         .field {
+            align-items: center;
             display: flex;
+            flex-direction: column;
             justify-content: center;
         }
 
@@ -23,8 +25,7 @@
 
         .step-description {
             color: $grey-color-darker;
-            padding-bottom: $spacer * 3;
-            padding-top: $spacer * 2;
+            padding: $spacer * 2 0;
             text-align: center;
             width: 75%;
         }

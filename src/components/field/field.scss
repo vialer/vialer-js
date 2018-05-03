@@ -1,10 +1,35 @@
 @import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
-// This is Bulma with some field customizations.
+// Bulma form field with some small modifications.
+
+.field {
+
+    &:not(:last-child) {
+        margin-bottom: 0;
+    }
+
+    .label {
+        &:not(:last-child) {
+            margin-bottom: 0;
+        }
+    }
+
+    .validation-message {
+        // Make sure it doesn't collapse when there is no message.
+        height: 1rem;
+        margin: 0;
+        margin-top: $spacer / 4;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+
+        &.show {
+            opacity: 1;
+        }
+    }
+}
 
 // A select field with a button attached next to it.
 .field-select {
-
 
     .control {
         .select {
@@ -20,11 +45,26 @@
                     box-shadow: 0 0 0 1px inset lighten($brand-color, 20%);
                 }
             }
+
+            &.is-danger {
+                select {
+                    &:active,
+                    &:focus {
+                        box-shadow: 0 0 0 1px inset $red-color;
+                    }
+                }
+            }
         }
 
         button {
             border-bottom-left-radius: 0;
             border-top-left-radius: 0;
         }
+    }
+}
+
+.field-checkbox {
+    .notification-box {
+        margin-bottom: $spacer * 2;
     }
 }

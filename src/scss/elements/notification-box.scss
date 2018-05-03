@@ -1,25 +1,41 @@
 .notification-box {
     border-radius: $spacer / 2;
     font-size: 0.75rem;
-    margin: $spacer 0;
     overflow: auto;
     padding: $spacer ($spacer * 2);
 
     &.info {
-        background: rgba($brand-color, 0.1);
-    }
-
-    &.troubleshoot {
-        background: $orange-color;
-        color: $white;
+        background: $grey-color-lightest;
+        border: 1px solid $grey-color-lighter;
+        color: $grey-color-darker;
 
         a {
-            color: $white;
+            color: $brand-color;
         }
 
         header {
+            color: $brand-color;
+
             svg {
-                fill: $white;
+                fill: $brand-color;
+            }
+        }
+    }
+
+    &.troubleshoot {
+        background: $grey-color-lightest;
+        border: 1px solid $red-color;
+        color: $grey-color-darker;
+
+        a {
+            color: $red-color;
+        }
+
+        header {
+            color: $red-color;
+
+            svg {
+                fill: $red-color;
             }
         }
     }

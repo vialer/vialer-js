@@ -29,7 +29,7 @@ class ModuleAvailability extends Module {
             // Set an icon depending on whether the user is available.
             let endpoint = `api/selecteduserdestination/${this.app.state.availability.sud}/`
             let res
-            this.app.setState({availability: {available, destinations, placeholder: selected, selected: selected}}, {persist: true})
+            this.app.setState({availability: {available, destinations, selected}}, {persist: true})
 
             if (available) {
                 this.app.setState({ui: {menubar: {default: 'active'}}})

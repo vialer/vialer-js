@@ -10,17 +10,32 @@ module.exports = (app) => {
         data: function() {
             return {
                 password: '',
+                twoFactorToken: {message: '', valid: true, value: null},
+                validateApi: false,
             }
         },
         methods: Object.assign({
             login: function() {
                 if (this.$v.$invalid) return
-
                 if (this.app.session.active === 'new' || !this.app.session.available.length) {
-                    app.emit('bg:user:login', {
-                        password: this.password,
-                        username: this.user.username,
-                    })
+                    if (!this.user.twoFactor) {
+                        app.emit('bg:user:login', {
+                            password: this.password,
+                            username: this.user.username,
+                        })
+                    } else {
+                        app.emit('bg:user:login', {
+                            callback: ({valid, message}) => {
+                                this.twoFactorToken.valid = valid
+                                this.validateApi = true
+                                this.twoFactorToken.message = message
+                            },
+                            password: this.password,
+                            token: this.twoFactorToken.value,
+                            username: this.user.username,
+                        })
+                    }
+
                 } else {
                     app.emit('bg:user:unlock', {
                         password: this.password,
@@ -47,10 +62,27 @@ module.exports = (app) => {
             vendor: 'app.vendor',
         },
         validations: function() {
+            // Bind the API response message to the validator $params.
+            const apiResponse = Vuelidate.withParams({
+                message: this.twoFactorToken.message,
+                type: 'apiResponse',
+            }, () => {
+                return this.twoFactorToken.valid
+            })
+
             let validations = {
                 password: {
                     minLength: v.minLength(6),
                     required: v.required,
+                },
+                twoFactorToken: {
+                    value: {
+                        apiResponse,
+                        numeric: v.numeric,
+                        requiredIf: v.requiredIf(() => {
+                            return this.user.twoFactor
+                        }),
+                    },
                 },
                 user: {
                     username: {
@@ -65,8 +97,11 @@ module.exports = (app) => {
             return validations
         },
         watch: {
-            'user.username': function(newVal, oldVal) {
-                app.setState({user: {username: newVal}})
+            'twoFactorToken.value': function() {
+                this.twoFactorToken.valid = true
+            },
+            'user.username': function(username) {
+                app.setState({user: {username}})
             },
         },
     }

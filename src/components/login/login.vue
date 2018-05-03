@@ -34,6 +34,17 @@
             <div class="description">{{$t('New session')}}</div>
         </div>
     </div>
+    <template v-else-if="user.twoFactor">
+        <Field name="two_factor_token" type="text"
+            :autofocus="true" :label="$t('Two factor token')" :model.sync="twoFactorToken.value"
+            :placeholder="$t('Enter your two factor token')"
+            :validation="$v.twoFactorToken.value"/>
+
+        <div class="buttons is-centered">
+            <button v-if="app.session.available.length" type="button" class="button" @click="selectSession()">{{$t('Change session')}}</button>
+            <button type="button" class="button is-primary" :disabled="$v.$invalid" @click="login">{{$t('Log in')}}</button>
+        </div>
+    </template>
     <!-- Show username/pw when there are no sessions yet or when a new session is selected.-->
     <template v-else-if="!app.session.available.length || app.session.active">
         <Field v-if="app.session.active === 'new' || !app.session.available.length" name="username" type="text"
@@ -51,6 +62,7 @@
             <button type="button" class="button is-primary" :disabled="$v.$invalid" @click="login">{{$t('Log in')}}</button>
         </div>
     </template>
+
 
     <footer>
         <div v-if="app.session.active" class="forgot-pw">

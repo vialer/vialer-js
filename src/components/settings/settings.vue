@@ -20,24 +20,22 @@
     <!-- General preferences -->
     <div class="tab" :class="{'is-active': tabs.active === 'general'}">
 
-        <Field name="click2dial" type="checkbox"
-            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
-            :label="`${$t('Click-to-Dial')} ${$t('icons')}`"
-            :model.sync="settings.click2dial.enabled"
-            :placeholder="$t('SIP Server')"/>
-
-        <Field v-if="user.developer" name="language" type="textarea"
-            :help="$t('The language used throughout the application.')"
-            :label="`${$t('Click-to-Dial')} ${$t('blacklist')}`"
-            :model.sync="settings.click2dial.blacklist"
-            :placeholder="$t('Use one line per site.')"/>
-
         <Field name="language" type="select"
-            :help="$t('The language used throughout the application.')"
             :label="$t('Application language')"
             :model.sync="settings.language.selected"
             :options="settings.language.options"
             :placeholder="$t('Select a language')"/>
+
+        <Field name="click2dial" type="checkbox"
+            :help="$t('Add clickable icons next to phonenumbers in webpages.')"
+            :label="`${$t('Click-to-Dial')} ${$t('icons')}`"
+            :model.sync="settings.click2dial.enabled"/>
+
+        <Field v-if="user.developer" name="language" type="textarea"
+            :help="$t('Blacklist sites that don\'t work well with Click-to-dial icons.')"
+            :label="`${$t('Click-to-Dial')} ${$t('blacklist')}`"
+            :model.sync="settings.click2dial.blacklist"
+            :placeholder="$t('Use one line per site.')"/>
 
         <Field v-if="user.developer && settings.platform.enabled" name="platform_url" type="text"
             :label="$t('Platform URL')"
@@ -65,22 +63,22 @@
         <Field name="store_key" type="checkbox"
             :label="$t('Remember session')"
             :model.sync="app.vault.store"
-            :help="$t('Automatically unlock your session after restart.')"/>
-
-        <div v-if="app.vault.store" class="notification-box info">
-            <header><icon name="lock-off"/><span>{{$t('Data security')}}</span></header>
-            <ul>
-                <li>{{$t('Your data and credentials are stored encrypted in the browser by a password-generated key.')}}
-                    {{$t('This key is intentionally not stored anywhere, to make it unlikely that your credentials are looked at without knowing the password.')}}
-                    {{$t('Make sure your computer is in a trusted environment before enabling this option.')}}
-                </li>
-            </ul>
-        </div>
+            :help="$t('Automatically unlock your session after restart.')">
+            <div slot="checkbox-extra" v-if="app.vault.store" class="notification-box info">
+                <header><icon name="info"/><span>{{$t('About data security')}}</span></header>
+                <ul>
+                    <li>{{$t('Your data and credentials are stored encrypted in the browser by a password-generated key.')}}
+                        {{$t('This key is intentionally not stored anywhere, to make it unlikely that your credentials are looked at without knowing the password.')}}
+                        {{$t('Make sure your computer is in a trusted environment before enabling this option.')}}
+                    </li>
+                </ul>
+            </div>
+        </Field>
 
         <Field name="telemetry_enabled" type="checkbox"
             :label="$t('Telemetry')"
             :model.sync="settings.telemetry.enabled"
-            :help="$t('Pseudo-anonymized usage statistics help us to improve the software.')"/>
+            :help="$t('By collecting information about anonymized usage and errors, we are able to improve this software at a faster pace.')"/>
     </div>
 
     <!-- Phone preferences -->
@@ -90,9 +88,9 @@
             :disabled="env.isFirefox"
             :label="$t('Use as softphone')"
             :model.sync="settings.webrtc.enabled"
-            :help="env.isFirefox ? $t('Firefox doesn\'t support this feature yet.') : $t('Use WebRTC to be able to receive incoming calls with and place outgoing calls.')"/>
+            :help="env.isFirefox ? $t('Firefox doesn\'t support this feature yet.') : $t('Use WebRTC to receive incoming calls with and place outgoing calls.')"/>
 
-        <VoipaccountPicker :label="$t('Softphone VoIP-account')" :v="$v"/>
+        <VoipaccountPicker :label="$t('Softphone VoIP account')" :v="$v"/>
     </div>
 
     <!-- Audio settings -->
@@ -102,9 +100,9 @@
             :label="$t('Headset microphone')"
             :model.sync="devices.input.selected"
             :options="devices.input.options"
-            :placeholder="$t('Select an input device')"/>
-
-        <MicPermission />
+            :placeholder="$t('Select an input device')">
+            <MicPermission slot="select-extra"/>
+        </Field>
 
         <Field v-if="settings.webrtc.media.permission" name="output_device" type="select"
             :label="$t('Headset audio output')"

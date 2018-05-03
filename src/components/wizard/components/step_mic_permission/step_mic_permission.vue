@@ -4,7 +4,7 @@
     </header>
 
     <div class="step-description">
-        {{$t('The software requires access to your microphone to be able to make calls.')}}<br/>
+        {{$t('Access to your computer\'s microphone is required to be able to make calls.')}}<br/>
     </div>
     <div class="step-container">
         <MicPermission :soundmeter="false"/>

@@ -168,16 +168,16 @@ class ModuleUI extends Module {
             'store.ui.menubar.default': (menubarIcon) => {
                 this.__menubarIcon(menubarIcon)
             },
-            'store.ui.menubar.event': (newVal, oldVal) => {
+            'store.ui.menubar.event': (eventName) => {
                 if (this.app.env.isExtension) {
                     this.__menubarAnimation()
-                    if (newVal) {
-                        if (newVal === 'ringing') {
+                    if (eventName) {
+                        if (eventName === 'ringing') {
                             this.__menubarAnimation('ringing')
-                        } else if (newVal === 'calling') {
+                        } else if (eventName === 'calling') {
                             browser.browserAction.setIcon({path: 'img/menubar-ringing-4.png'})
                         } else {
-                            browser.browserAction.setIcon({path: `img/menubar-${newVal}.png`})
+                            browser.browserAction.setIcon({path: `img/menubar-${eventName}.png`})
                         }
                     } else {
                         browser.browserAction.setIcon({path: `img/menubar-${this.app.state.ui.menubar.default}.png`})

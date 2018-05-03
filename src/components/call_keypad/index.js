@@ -92,9 +92,9 @@ module.exports = (app) => {
             user: 'user',
         },
         watch: {
-            number: function(newVal, oldVal) {
+            number: function(newNumber) {
                 // Toggle developer features with a special number.
-                if (newVal === '02*06*18') {
+                if (newNumber === '02*06*18') {
                     if (!this.user.developer) {
                         this.$notify({icon: 'info', message: this.$t('Developer mode activated'), type: 'success'})
                     } else {
@@ -103,7 +103,7 @@ module.exports = (app) => {
                     app.setState({user: {developer: !this.user.developer}}, {persist: true})
                 }
                 if (this.callingDisabled) return
-                let cleanedNumber = app.utils.sanitizeNumber(newVal)
+                let cleanedNumber = app.utils.sanitizeNumber(newNumber)
                 this.$emit('update:model', cleanedNumber)
             },
         },

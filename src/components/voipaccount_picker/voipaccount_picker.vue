@@ -6,46 +6,46 @@
             :empty="$t('No VoIP accounts')"
             :label="label" :model.sync="selected"
             :options="settings.webrtc.account.options"
-            :placeholder="$t('Select a VoIP-account')"
+            :placeholder="$t('Select a VoIP account')"
             :validation="validationField">
 
             <button slot="select-extra" class="button is-link" :class="{'is-loading': loading}" :disabled="loading" @click="refreshVoipaccounts()">
                 <span class="icon is-small"><icon name="refresh"/></span>
             </button>
+
+            <template slot="select-after">
+                <div class="registration-notice" :class="{show: selected.id && (selected.settings && selected.settings.ua)}">
+                     <a @click="openPlatformUrl(`phoneaccount/${selected.id}/change/`)">{{$t('Registered')}}</a>:
+                     <i v-if="selected.settings">{{selected.settings.ua}}</i>
+                </div>
+                <!-- Directions for the user to manage their VoIP accounts. -->
+                <template v-if="settings.webrtc.enabled">
+                    <div class="notification-box info" v-if="!settings.webrtc.account.options.length">
+                        <header><icon name="info"/><span>{{$t('A VoIP account is required.')}}</span></header>
+                        <ul>
+                            <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`phoneaccount`)">{{$t('VoIP accounts')}}</a> {{ $t('to create a VoIP account.') }}.</li>
+                            <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
+                        </ul>
+                    </div>
+
+                    <div class="notification-box troubleshoot" v-if="selected.id && !validVoipSettings">
+                        <header>
+                            <icon name="warning"/><span>{{$t('VoIP account adjustment required in')}} {{vendor.portal.name}}</span>
+                        </header>
+                        <ul>
+                            <li v-if="!selected.settings.encryption">
+                                {{$t('The option')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b>
+                                {{$t('is needed in')}} <i>{{$t('Connection Handling')}}</i>.
+                            </li>
+                            <li v-if="!selected.settings.avpf">
+                                {{$t('The option')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b>
+                                {{$t('is needed in')}} <i>{{$t('Expert Options')}}</i>.
+                            </li>
+                        </ul>
+                    </div>
+                </template>
+            </template>
         </Field>
-
-        <!-- Directions for properly managing VoIP-accounts -->
-        <template v-if="settings.webrtc.enabled">
-            <div class="notification-box info" v-if="!settings.webrtc.account.options.length">
-                <header><icon name="info"/><span>{{$t('A VoIP-account is required.')}}</span></header>
-                <ul>
-                    <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`phoneaccount`)">{{$t('VoIP-accounts')}}</a> {{ $t('to create a VoIP-account.') }}.</li>
-                    <li>{{$t('Head over to')}} <a @click="openPlatformUrl(`user/${user.id}/change/#tc0=user-tab-2`)">{{$t('user preferences')}}</a> {{ $t('to manage your {target}', {target: `${vendor.name} ${$t('user')}`}) }}.</li>
-                </ul>
-            </div>
-
-            <!-- Reference to the popout mode from the popup modus only-->
-            <em class="help" v-if="selected.id && selected.settings.ua">
-                 <b><a @click="openPlatformUrl(`phoneaccount/${selected.id}/change/`)">{{$t('This account')}}</a></b> {{$t('is possibly in use by device')}}:</br>
-                 <i>{{selected.settings.ua}}</i>.
-            </em>
-
-            <div class="notification-box troubleshoot" v-if="selected.id && !validVoipSettings">
-                <header>
-                    <icon name="warning"/><span>{{$t('VoIP account adjustment required.')}}</span>
-                </header>
-                <ul>
-                    <!-- Reference to the popout mode from the popup modus only-->
-                    <li v-if="!selected.settings.avpf">
-                        {{$t('The option')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">avpf=yes</a></b>
-                        {{$t('is not set in Expert options')}}.
-                    </li>
-                    <li v-if="!selected.settings.encryption">
-                        {{$t('The option')}} <b><a @click="openPlatformUrl(`phoneaccount/${settings.webrtc.account.selected.id}/change/#tc0=tab-2`)">{{$t('Enforce encryption')}}</a></b>
-                        {{$t('is not set in Expert options')}}.</li>
-                </ul>
-            </div>
-        </template>
     </template>
 
     <template v-else-if="settings.webrtc.enabled && app.vendor.type === 'free'">

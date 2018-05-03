@@ -141,14 +141,14 @@ class ModuleSettings extends Module {
             },
             'store.settings.telemetry.enabled': (enabled) => {
                 if (enabled) {
-                    this.app.logger.info(`${this}enabling raven exception monitoring`)
+                    this.app.logger.info(`${this}start raven exception monitoring`)
                     Raven.config(this.app.state.settings.telemetry.sentryDsn, {
                         allowSecretKey: true,
                         environment: process.env.DEPLOY_TARGET,
                         release: this.app.state.app.version.current,
                     }).install()
                 } else {
-                    this.app.logger.info(`${this}disabling raven exception monitoring`)
+                    this.app.logger.info(`${this}stop raven exception monitoring`)
                     Raven.uninstall()
                 }
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: enabled, eventName: 'telemetry', override: true})

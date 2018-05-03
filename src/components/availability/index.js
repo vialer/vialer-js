@@ -18,14 +18,14 @@ module.exports = (app, actions) => {
             webrtc: 'settings.webrtc',
         },
         watch: {
-            available: function(newVal, oldVal) {
+            available: function(available) {
                 // Sending an empty object like this will unset the
                 // user's availability.
                 let selected
                 const unavailable = {id: null, name: null, type: null}
 
                 // User wants to be available.
-                if (newVal) {
+                if (available) {
                     // Set from remembered account.
                     if (this.placeholder.id) selected = this.placeholder
                     // No remembered value; choose the first available option.
@@ -38,17 +38,17 @@ module.exports = (app, actions) => {
                 }
 
                 app.emit('bg:availability:update', {
-                    available: newVal,
+                    available,
                     destinations: this.destinations,
                     selected: selected,
                 })
             },
-            dnd: function(newVal, oldVal) {
-                app.setState({availability: {dnd: newVal}}, {persist: true})
+            dnd: function(dnd) {
+                app.setState({availability: {dnd}}, {persist: true})
             },
-            selected: function(newVal, oldVal) {
+            selected: function() {
                 // Save the user's last choice.
-                // this.placeholder = {id: this.selected.id, name: this.selected.name, type: this.selected.type}
+                this.placeholder = app.utils.copyObject(this.selected)
                 app.emit('bg:availability:update', {
                     available: this.available,
                     destinations: this.destinations,

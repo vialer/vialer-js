@@ -7,7 +7,25 @@
         margin-bottom: 0;
     }
 
-    .notification-box {
-        margin-top: $spacer * 2;
+    .registration-notice {
+        font-size: 0.7rem;
+        font-weight: 500;
+        height: $spacer * 3;
+        line-height: $spacer * 3;
+        opacity: 0;
+        vertical-align: middle;
+
+        &.show {
+            opacity: 1;
+        }
+
+
+        svg {
+            @include icon-size($spacer * 1.5);
+            color: $brand-color;
+            display: inline-block;
+            margin-bottom: $spacer / 4;
+            margin-right: $spacer / 2;
+        }
     }
 }
