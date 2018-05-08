@@ -1,25 +1,33 @@
-# About
-Vialer-js is an open-source communication platform written in JavaScript. It
-features an isomorphic design and a modular call-handling core,
-with implementations of a free SIP softphone(`CallSIP`) and an optional
-proprietary calling API(`CallConnectAB`) for the [VoIPGRID platform](https://voipgrid.nl/).
-`CallSIP` implements a SIP-over-websocket softphone (using SIP.js) with all features
-you would expect from a softphone like on-hold, blind & attended transfer,
-dealing with multiple calls and click-to-dial in browser tabs.
+# Vialer-js
+Vialer-js is an open-source softphone and communication tool in development.
+It is written using an environment-agnostic JavaScript coding style,
+which allows it to run as a browser WebExtension, a webpage widget, an Electron
+desktop app or a headless Node.js application. It's goal is to offer a user-
+and privacy-friendly unified communication experience to end-users.
+It relies on WebRTC, but most of the design is already suitable to use it as
+a base for other developers to incorporate their own (open) protocol
+specifications with.
 
-The isomorphic design allows the software to be run as a browser WebExtension,
-a webpage widget, an Electron desktop or a headless Node.js application.
+Currently, there is an implementation of a free SIP softphone(`CallSIP`) and an
+optional proprietary calling API(`CallConnectAB`) for the [VoIPGRID platform](https://voipgrid.nl/).
+The `CallSIP` implementation has all features you would expect from a softphone
+like on-hold, blind & attended transfer, dealing with multiple calls and
+click-to-dial in browser tabs. Its simple reactive data-orientated design makes
+it easy to implement new features for multiple platforms at a very fast pace.
 
-Its simple data-orientated design (Vue/Vue-stash) makes it easy to implement
-new features for multiple platforms at a very fast pace. Custom protocols can be
-incorporated into its core system, so Vialer-js is not bound to SIP.
+![Device settings](screenshot-1.png)
+![Contacts](screenshot-2.png)
+![Dialpad](screenshot-3.png)
+![Call dialog](screenshot-4.png)
 
 
 # Quickstart
 ## Requirements
-* Node.js 9.0.0 or higher
-* Npm 5 or higher
+* Node.js 10.0.0 or higher
+* Npm 6 or higher
 * Electron executable for the desktop version (optional)
+
+
 
 ## Setup
 Checkout the project and install its dependencies from npm:

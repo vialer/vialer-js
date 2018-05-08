@@ -103,7 +103,7 @@ class ModuleCalls extends Module {
         /**
         * Terminate/Hangup an active Call.
         * @event module:ModuleCalls#bg:calls:call_terminate
-        * @property {callId} callId - Id of the Call object to delete.
+        * @property {callId} callId - Id of the Call to delete.
         */
         this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
 
@@ -128,6 +128,12 @@ class ModuleCalls extends Module {
         })
 
 
+        /**
+        * Toggle mute status on the call by manupilating the rtp
+        * sender track of the Call.
+        * @event module:ModuleCalls#bg:calls:mute_toggle
+        * @property {callId} callId - Id of the Call to toggle mute for.
+        */
         this.app.on('bg:calls:mute_toggle', ({callId}) => {
             const call = this.calls[callId]
             const rtpSenderTrack = call.pc.getSenders()[0].track
@@ -143,7 +149,9 @@ class ModuleCalls extends Module {
 
 
         /**
-        * @param {String} callId - The call id of the call to transfer to.
+        * Finalizes an attended transfer.
+        * @event module:ModuleCalls#bg:calls:transfer_finalize
+        * @property {callId} callId - Id of the Call to transfer to.
         */
         this.app.on('bg:calls:transfer_finalize', ({callId}) => {
             // Find origin.
@@ -161,6 +169,8 @@ class ModuleCalls extends Module {
         /**
          * Toggle hold for the call that needs to be transferred. Set
          * transfer mode to active for this call.
+         * @event module:ModuleCalls#bg:calls:transfer_toggle
+         * @property {callId} callId - Id of the Call to toggle transfer mode for.
          */
         this.app.on('bg:calls:transfer_toggle', ({callId}) => {
             const sourceCall = this.calls[callId]

@@ -6,6 +6,7 @@ docs/build
 .publish
 .vialer-jsrc
 .directory
+package-lock.json
 src/brand/*
 src/brand/vialer/icons/
 !src/brand/vialer/
