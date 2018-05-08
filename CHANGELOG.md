@@ -1,5 +1,5 @@
-<a name="3.0.136"></a>
-## [3.0.136](https://github.com/voipgrid/vialer-js/compare/v3.0.107...v3.0.136) (2018-04-24)
+<a name="3.0.161"></a>
+## [3.0.161](https://github.com/voipgrid/vialer-js/compare/v3.0.107...v3.0.161) (2018-05-08)
 
 
 ### Bug Fixes
@@ -7,11 +7,15 @@
 * add blacklist defaults & input. cleanup soundmeter styling. ([e17433f](https://github.com/voipgrid/vialer-js/commit/e17433f))
 * audio frequency fix ringback tone. ([a58eaa5](https://github.com/voipgrid/vialer-js/commit/a58eaa5))
 * cleanup datamodel device sinks. ([71227e0](https://github.com/voipgrid/vialer-js/commit/71227e0))
+* cleanup github templates. ([54daebc](https://github.com/voipgrid/vialer-js/commit/54daebc))
 * Cleanup styling settings audio tab, activity, component header. ([253972c](https://github.com/voipgrid/vialer-js/commit/253972c))
 * less obtrusive soundmeter styling in-call, cleanup audio initialization. ([f4b5df8](https://github.com/voipgrid/vialer-js/commit/f4b5df8))
 * query for devices as soon media permission is granted. ([aaf1297](https://github.com/voipgrid/vialer-js/commit/aaf1297))
 * query media devices and unlock watcher. ([ad4af74](https://github.com/voipgrid/vialer-js/commit/ad4af74))
+* remove old issue templates. ([3b2d7b1](https://github.com/voipgrid/vialer-js/commit/3b2d7b1))
 * show soundmeter in all stages of a call dialog. ([cdb2b10](https://github.com/voipgrid/vialer-js/commit/cdb2b10))
+* update documentation. ([5c4a860](https://github.com/voipgrid/vialer-js/commit/5c4a860))
+* use login instead of unlock. ([03d36ca](https://github.com/voipgrid/vialer-js/commit/03d36ca))
 * VIALJS-54 only unset menubar ringing/calling event when there are no more ongoing calls. ([7b464e7](https://github.com/voipgrid/vialer-js/commit/7b464e7))
 * VIALJS-61 - cleanup ua reference causing Call setup to fail. ([dde2750](https://github.com/voipgrid/vialer-js/commit/dde2750))
 * voipaccount picker responsivity and refresh button. ([40354f5](https://github.com/voipgrid/vialer-js/commit/40354f5))
@@ -19,11 +23,16 @@
 
 ### Features
 
+* add sentry logging under telemetry option. ([536eb6b](https://github.com/voipgrid/vialer-js/commit/536eb6b))
+* added two-factor authentication step ([6895451](https://github.com/voipgrid/vialer-js/commit/6895451))
 * call answered elsewhere detection. ([561260e](https://github.com/voipgrid/vialer-js/commit/561260e))
 * Color switch styling, dialpad disabled dialog. ([64ea19d](https://github.com/voipgrid/vialer-js/commit/64ea19d))
+* replaced password with token authentication. Parse expert options. Fix select width wizard. ([847df96](https://github.com/voipgrid/vialer-js/commit/847df96))
 * VIALJS-39,53,38 Contacts, Endpoints, recent calls, Media control, Canvas soundmeter, soundmeter in Call, Cleanup. ([723606b](https://github.com/voipgrid/vialer-js/commit/723606b))
 * VIALJS-51 Add a wizard, move telemetry to wizard. Introduce common components. ([db11e63](https://github.com/voipgrid/vialer-js/commit/db11e63))
 * VIALJS-59 - Add device/sink selection for sounds, getUserMedia and video element. Cleanup video/audio initialization & sounds. ([ed71382](https://github.com/voipgrid/vialer-js/commit/ed71382))
+* VIALJS-64 proper session handling, major cleanup of data model. ([ed9f41a](https://github.com/voipgrid/vialer-js/commit/ed9f41a))
+* voipaccount validation checker. ([ad65fc4](https://github.com/voipgrid/vialer-js/commit/ad65fc4))
 
 
 
