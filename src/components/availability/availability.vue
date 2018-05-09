@@ -2,6 +2,7 @@
     <h1>{{$t('Availability options')}}</h1>
 
     <Field name="dnd_availability" type="checkbox"
+        css="is-warning"
         :disabled="!webrtc.enabled"
         :help="$t('Decline incoming softphone calls.')"
         :label="$t('Do not disturb')"

@@ -180,6 +180,7 @@ module.exports = (app) => {
             autofocus: Boolean,
             change: Function,
             click: Function,
+            css: '',
             disabled: Boolean,
             empty: {
                 default: 'No options available',

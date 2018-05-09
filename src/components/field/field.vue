@@ -1,5 +1,6 @@
 <div class="field field-checkbox" v-if="type === 'checkbox'">
-    <input class="switch" :disabled="disabled" :id="name" type="checkbox" :name="name" @change="updateModel($event)" :checked="model"/>
+
+    <input class="switch" :class="css" :disabled="disabled" :id="name" type="checkbox" :name="name" @change="updateModel($event)" :checked="model"/>
     <label :for="name" class="checkbox" >{{label}}</label>
     <em class="help" v-if="help">{{help}}</em>
     <span class="validation-message help is-danger" :class="{show: invalidFieldValue}" v-html="validationMessage"></span>
