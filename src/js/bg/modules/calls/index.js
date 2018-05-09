@@ -5,7 +5,6 @@
 * of all the tracked Calls.
 * @module ModuleCalls
 */
-const transform = require('sdp-transform')
 const Module = require('../../lib/module')
 
 
@@ -21,7 +20,6 @@ class ModuleCalls extends Module {
         super(app)
 
         this.callFactory = require('./call/factory')(this.app)
-        this.lib = require('sip.js')
         // Keeps track of calls. Keys match Sip.js session keys.
         this.calls = {}
         // This flag indicates whether a reconnection attempt will be
@@ -425,7 +423,7 @@ class ModuleCalls extends Module {
         let allowedCodecs = ['telephone-event', 'opus']
         if (selectedCodec !== 'opus') allowedCodecs.push(selectedCodec)
 
-        let sdpObj = transform.parse(sessionDescription.sdp);
+        let sdpObj = sdpTransform.parse(sessionDescription.sdp)
         let rtp = {media: []}
         let payloads = []
         let fmtps = []
@@ -445,7 +443,7 @@ class ModuleCalls extends Module {
         sdpObj.media[0].payloads = payloads.join(' ')
         sdpObj.media[0].fmtp = fmtps
 
-        sessionDescription.sdp = transform.write(sdpObj)
+        sessionDescription.sdp = sdpTransform.write(sdpObj)
         return Promise.resolve(sessionDescription)
     }
 
@@ -736,7 +734,7 @@ class ModuleCalls extends Module {
         }
 
         // Fresh new instance is used each time, so we can reset settings properly.
-        this.ua = new this.lib.UA(uaOptions)
+        this.ua = new SIP.UA(uaOptions)
         this.__uaEvents()
         this.ua.start()
     }

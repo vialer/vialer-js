@@ -15,6 +15,7 @@
     },
     "globals": {
         "app": true,
+        "axios": true,
         "browser": true,
         "chrome": true,
         "translate": true,
@@ -25,6 +26,7 @@
         "$": true,
         "$$": true,
         "shortid": true,
+        "sdpTransform": true,
         "templates": true,
         "Vue": true,
         "translations": true,
@@ -32,6 +34,7 @@
         "i18n": true,
         "EventEmitter": true,
         "Raven": true,
+        "SIP": true,
         "Vuelidate": true,
         "resizeSensor": true
     },

@@ -1,3 +1,9 @@
+global.Vue = require('vue/dist/vue.runtime')
+Vue.config.ignoredElements = ['component']
+
+global.VueSVGIcon = require('vue-svgicon')
+Vue.use(global.VueSVGIcon, {tagName: 'icon'})
+
 if (global.document) {
     window.global = window
     global.$ = document.querySelector.bind(document)
@@ -8,12 +14,6 @@ global.resizeSensor = require('css-element-queries').ResizeSensor
 global.EventEmitter = require('eventemitter3')
 if (!global.translations) global.translations = {}
 
-global.Vue = require('vue/dist/vue.runtime')
-// Define custom tags here, so they are not interpreted by Vue.
-Vue.config.ignoredElements = ['component']
-
-// Used to generate small UUIDs.
-global.shortid = require('shortid')
 global.VueStash = require('vue-stash').default
 Vue.use(global.VueStash)
 
@@ -25,12 +25,10 @@ if (process.env.NODE_ENV === 'production') {
     Vue.config.devtools = false
 }
 
-global.VueSVGIcon = require('vue-svgicon')
-
 global.Vuelidate = require('vuelidate')
 global.Vuelidate.validators = require('vuelidate/lib/validators')
 
 Vue.use(global.Vuelidate.default)
 
-Vue.use(global.VueSVGIcon, {tagName: 'icon'})
+
 global.Raven = require('raven-js')

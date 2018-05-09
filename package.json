@@ -96,6 +96,7 @@
     "bulma-switch": "^0.1.4",
     "css-element-queries": "^0.4.0",
     "eventemitter3": "^2.0.3",
+    "gulp-sentry-release-manager": "0.0.5",
     "raven-js": "^3.24.2",
     "roboto-fontface": "^0.8.0",
     "sdp-transform": "^2.4.0",

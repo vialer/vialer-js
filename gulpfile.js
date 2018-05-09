@@ -13,6 +13,7 @@ const childExec = require('child_process').exec
 const colorize = require('tap-colorize')
 const composer = require('gulp-uglify/composer')
 const concat = require('gulp-concat')
+const createReleaseManager = require('gulp-sentry-release-manager')
 const del = require('del')
 const flatten = require('gulp-flatten')
 const fuet = require('gulp-fuet')
@@ -36,6 +37,7 @@ const tape = require('gulp-tape')
 const test = require('tape')
 
 const writeFileAsync = promisify(fs.writeFile)
+
 
 // The main settings object containing info
 // from .vialer-jsrc and build flags.
@@ -308,7 +310,7 @@ gulp.task('html', 'Preprocess and build application HTML.', () => {
 
     // Scripts are combined
     if (['electron', 'webview'].includes(settings.BUILD_TARGET)) {
-        jsbottom = '<script src="js/app_bg.js"></script><script src="js/app_fg.js"></script>'
+        jsbottom = '<script src="js/vendor_bg.js"></script><script src="js/app_bg.js"></script><script src="js/app_fg.js"></script>'
     } else {
         jsbottom = '<script src="js/app_fg.js"></script>'
     }
@@ -378,15 +380,26 @@ gulp.task('js-electron-main', 'Copy Electron main thread js to build.', ['js-app
 })
 
 
-gulp.task('js-vendor', 'Generate third-party vendor js.', ['icons'], (done) => {
+gulp.task('js-vendor', (done) => {
+    runSequence([
+        'js-vendor-bg',
+        'js-vendor-fg',
+    ], async() => {
+        if (settings.LIVERELOAD) livereload.changed('web.js')
+        done()
+    })
+})
+
+
+gulp.task('js-vendor-bg', 'Generate third-party vendor js.', [], (done) => {
+    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/vendor', 'vendor_bg', [], done)
+}, {options: taskOptions.all})
+
+
+gulp.task('js-vendor-fg', 'Generate third-party vendor js.', ['icons'], (done) => {
     helpers.jsEntry(
-        settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', 'vendor',
-        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`],
-        () => {
-            if (settings.LIVERELOAD) livereload.changed('web.js')
-            done()
-        }
-    )
+        settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/vendor', 'vendor_fg',
+        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`], done)
 }, {options: taskOptions.all})
 
 
@@ -453,6 +466,21 @@ gulp.task('scss-observer', 'Generate observer css.', () => {
 gulp.task('scss-vendor', 'Generate vendor css.', () => {
     return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', false)
 }, {options: taskOptions.all})
+
+
+gulp.task('sentry-release', 'Upload release for additional Sentry debugging info', () => {
+    const sentry = settings.brands[settings.BRAND_TARGET].telemetry.sentry
+    const releaseManager = createReleaseManager({
+        apiKey: sentry.apiKey,
+        host: sentry.host,
+        org: sentry.org,
+        project: sentry.project,
+        version: settings.PACKAGE.version,
+    })
+    const base = path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')
+    gulp.src(path.join(base, '*'), {base})
+        .pipe(releaseManager.upload())
+})
 
 
 gulp.task('templates', 'Build Vue component templates', () => {
@@ -535,7 +563,7 @@ gulp.task('watch', 'Start development server and watch for changes.', () => {
         }
     }
 
-    gulp.watch(path.join(__dirname, 'src', 'js', 'vendor.js'), ['js-vendor'])
+    gulp.watch(path.join(__dirname, 'src', 'js', '{bg/vendor.js,fg/vendor.js}'), ['js-vendor'])
 
     if (!['electron', 'webview'].includes(settings.BUILD_TARGET)) {
         gulp.watch(path.join(__dirname, 'src', 'manifest.json'), ['manifest'])

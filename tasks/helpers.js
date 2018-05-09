@@ -231,6 +231,7 @@ class Helpers {
             if (this.settings.LIVERELOAD) BUNDLERS[bundleName].plugin(watchify)
             for (let entry of entries) BUNDLERS[bundleName].add(entry)
         }
+        BUNDLERS[bundleName].ignore('buffer')
         BUNDLERS[bundleName].ignore('process')
         // Exclude the webextension polyfill from non-webextension builds.
         if (bundleName === 'webview') {
@@ -244,7 +245,7 @@ class Helpers {
             })
             .pipe(source(`${bundleName}.js`))
             .pipe(buffer())
-            .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.init({loadMaps: true})))
+            .pipe(sourcemaps.init({loadMaps: true}))
             .pipe(envify({
                 ANALYTICS_ID: this.settings.brands[brandName].telemetry.analytics_id[buildType],
                 APP_NAME: this.settings.brands[brandName].name.production,
@@ -253,7 +254,7 @@ class Helpers {
                 PLATFORM_URL: this.settings.brands[brandName].permissions,
                 PORTAL_NAME: this.settings.brands[brandName].vendor.portal.name,
                 PORTAL_URL: this.settings.brands[brandName].vendor.portal.url,
-                SENTRY_DSN: this.settings.brands[brandName].telemetry.sentry_dsn,
+                SENTRY_DSN: this.settings.brands[brandName].telemetry.sentry.dsn,
                 SIP_ENDPOINT: this.settings.brands[brandName].sip_endpoint,
                 VENDOR_NAME: this.settings.brands[brandName].vendor.name,
                 VENDOR_SUPPORT_EMAIL: this.settings.brands[brandName].vendor.support.email,
@@ -264,7 +265,7 @@ class Helpers {
                 VERSION: this.settings.PACKAGE.version,
             }))
             .pipe(ifElse(this.settings.PRODUCTION, () => minifier()))
-            .pipe(ifElse(!this.settings.PRODUCTION, () => sourcemaps.write('./')))
+            .pipe(sourcemaps.write('./'))
             .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')))
             .pipe(size(_extend({title: `${bundleName}.js`}, this.settings.SIZE_OPTIONS)))
     }

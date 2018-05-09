@@ -29,7 +29,13 @@
                     "firefox": "",
                     "webview": ""
                 }
-                "sentry_dsn": ""
+                "sentry": {
+                    "apiKey": "",
+                    "dsn": "",
+                    "host": "https://sentry.voipgrid.nl",
+                    "org": "voipgrid",
+                    "project": "vialer-js"
+                }
             },
             "colors": {
                 "brand-color": "#de6b35",

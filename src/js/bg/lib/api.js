@@ -1,6 +1,3 @@
-const axios = require('axios')
-
-
 /**
 * Responsible for setting up the [Axios](https://github.com/axios/axios)
 * client for the API calls to the vendor backend.

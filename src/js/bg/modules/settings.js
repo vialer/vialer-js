@@ -169,15 +169,6 @@ class ModuleSettings extends Module {
 
 
     /**
-    * Generate a representational name for this module. Used for logging.
-    * @returns {String} - An identifier for this module.
-    */
-    toString() {
-        return `${this.app}[settings] `
-    }
-
-
-    /**
     * Query for media devices. This must be done only after the
     * getUserMedia permission has been granted; otherwise the names
     * of the devices aren't returned, due to browser security restrictions.
@@ -211,6 +202,15 @@ class ModuleSettings extends Module {
         } catch (err) {
             console.error(err)
         }
+    }
+
+
+    /**
+    * Generate a representational name for this module. Used for logging.
+    * @returns {String} - An identifier for this module.
+    */
+    toString() {
+        return `${this.app}[settings] `
     }
 }
 

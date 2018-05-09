@@ -209,13 +209,13 @@ class Crypto {
     */
     __importPrivateKey(privateKey, params, uses) {
         this.app.logger.debug(`${this}importing ${params.name} private key`)
-        if (!this.app.env.isBrowser) {
-            privateKey = new Buffer(privateKey, 'base64')
-        } else {
+        if (this.app.env.isBrowser) {
             privateKey = this.__base64ToDataArray(privateKey.replace(
                 'MFYwEAYEK4EEcAYIKoZIzj0DAQcDQgAE',
                 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE'
             ))
+        } else {
+            privateKey = new Buffer(privateKey, 'base64')
         }
 
         return crypto.subtle.importKey('pkcs8', privateKey, params, true, uses)
@@ -233,13 +233,13 @@ class Crypto {
         this.app.logger.debug(`${this}importing ${params.name} public key`)
         let publicKeyData
         if (!this.app.env.isBrowser) {
-            publicKeyData = new Buffer(publicKey, 'base64')
-        } else {
             let chromeSpkiPublickey = publicKey.replace(
                 'MFYwEAYEK4EEcAYIKoZIzj0DAQcDQgAE',
                 'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE'
             )
             publicKeyData = this.__base64ToDataArray(chromeSpkiPublickey)
+        } else {
+            publicKeyData = new Buffer(publicKey, 'base64')
         }
 
         return crypto.subtle.importKey('spki', publicKeyData, params, true, uses)
