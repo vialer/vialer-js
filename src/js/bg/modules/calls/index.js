@@ -815,7 +815,6 @@ class ModuleCalls extends Module {
                     if (this.calls[callId].state.status === 'accepted') matchedCall = this.calls[callId]
                 }
             }
-
         }
         return matchedCall
     }

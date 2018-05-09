@@ -117,7 +117,10 @@ let options = {env, modules: []}
 // browser context. In that case, the AppBackground instance is
 // passed to the AppForeground direcly.
 if (!env.isExtension) options.apps = {bg: global.bg}
-global.fg = new AppForeground(options)
+
+Raven.context(function() {
+    global.fg = new AppForeground(options)
+})
 
 
 module.exports = AppForeground

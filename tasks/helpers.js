@@ -9,6 +9,7 @@ const cleanCSS = require('gulp-clean-css')
 const composer = require('gulp-uglify/composer')
 const concat = require('gulp-concat')
 const connect = require('connect')
+const createReleaseManager = require('gulp-sentry-release-manager')
 const envify = require('gulp-envify')
 const fs = require('fs')
 const gulp = require('gulp-help')(require('gulp'), {})
@@ -104,6 +105,8 @@ class Helpers {
                     try {
                         const _res = await webStore.publish('default', token)
                         if (_res.status.includes('OK')) {
+                            // Upload stacktrace related files to Sentry.
+                            this.sentryRelease(brandName, buildType)
                             gutil.log(`Published ${brandName} Chrome WebExtension version ${PACKAGE.version}.`)
                             this.settings.BRAND_TARGET = OLD_BRAND_TARGET
                             this.settings.BUILD_TARGET = OLD_BUILD_TARGET
@@ -300,6 +303,24 @@ class Helpers {
             .on('end', () => {
                 if (this.settings.LIVERELOAD) livereload.changed(`${scssName}.css`)
             })
+    }
+
+
+    sentryRelease(brandName, buildType) {
+        const sentry = this.settings.brands[brandName].telemetry.sentry
+        const releaseManager = createReleaseManager({
+            apiKey: sentry.apiKey,
+            host: sentry.host,
+            org: sentry.org,
+            project: sentry.project,
+            sourceMapBasePath: 'chrome-extension:///js/',
+            version: this.settings.PACKAGE.version,
+        })
+        releaseManager.create(() => {
+            const base = path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')
+            gulp.src(path.join(base, '*'), {base})
+                .pipe(releaseManager.upload())
+        })
     }
 
 

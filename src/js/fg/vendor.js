@@ -1,4 +1,5 @@
 global.Vue = require('vue/dist/vue.runtime')
+
 Vue.config.ignoredElements = ['component']
 
 global.VueSVGIcon = require('vue-svgicon')
@@ -24,6 +25,8 @@ if (process.env.NODE_ENV === 'production') {
     Vue.config.productionTip = false
     Vue.config.devtools = false
 }
+
+
 
 global.Vuelidate = require('vuelidate')
 global.Vuelidate.validators = require('vuelidate/lib/validators')

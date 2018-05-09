@@ -123,6 +123,18 @@ class ModuleSettings extends Module {
         if (vaultUnlocked && mediaPermission && isAuthenticated) {
             this.queryMediaDevices()
         }
+
+        if (this.app.state.settings.telemetry.enabled) {
+            const sentryDsn = this.app.state.settings.telemetry.sentryDsn
+            this.app.logger.info(`${this}sentry exception monitoring to ${sentryDsn}`)
+            Raven.config(sentryDsn, {
+                allowSecretKey: true,
+                environment: process.env.DEPLOY_TARGET,
+                release: this.app.state.app.version.current,
+            }).install()
+
+            bar()
+        }
     }
 
 
@@ -140,9 +152,10 @@ class ModuleSettings extends Module {
                 }
             },
             'store.settings.telemetry.enabled': (enabled) => {
+                this.app.logger.info(`${this}switching sentry exception monitoring to ${enabled}`)
                 if (enabled) {
-                    this.app.logger.info(`${this}start raven exception monitoring`)
-                    Raven.config(this.app.state.settings.telemetry.sentryDsn, {
+                    const sentryDsn = this.app.state.settings.telemetry.sentryDsn
+                    Raven.config(sentryDsn, {
                         allowSecretKey: true,
                         environment: process.env.DEPLOY_TARGET,
                         release: this.app.state.app.version.current,

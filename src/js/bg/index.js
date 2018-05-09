@@ -392,7 +392,9 @@ if (env.isExtension) {
     options.modules.push({Module: require('./modules/extension'), name: 'extension'})
 }
 
-global.bg = new AppBackground(options)
+Raven.context(function() {
+    global.bg = new AppBackground(options)
+})
 
 
 module.exports = AppBackground

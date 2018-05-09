@@ -13,7 +13,6 @@ const childExec = require('child_process').exec
 const colorize = require('tap-colorize')
 const composer = require('gulp-uglify/composer')
 const concat = require('gulp-concat')
-const createReleaseManager = require('gulp-sentry-release-manager')
 const del = require('del')
 const flatten = require('gulp-flatten')
 const fuet = require('gulp-fuet')
@@ -469,17 +468,7 @@ gulp.task('scss-vendor', 'Generate vendor css.', () => {
 
 
 gulp.task('sentry-release', 'Upload release for additional Sentry debugging info', () => {
-    const sentry = settings.brands[settings.BRAND_TARGET].telemetry.sentry
-    const releaseManager = createReleaseManager({
-        apiKey: sentry.apiKey,
-        host: sentry.host,
-        org: sentry.org,
-        project: sentry.project,
-        version: settings.PACKAGE.version,
-    })
-    const base = path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')
-    gulp.src(path.join(base, '*'), {base})
-        .pipe(releaseManager.upload())
+    helpers.sentryRelease(settings.BRAND_TARGET, settings.BUILD_TARGET)
 })
 
 
