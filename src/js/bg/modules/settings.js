@@ -132,8 +132,6 @@ class ModuleSettings extends Module {
                 environment: process.env.DEPLOY_TARGET,
                 release: this.app.state.app.version.current,
             }).install()
-
-            bar()
         }
     }
 
