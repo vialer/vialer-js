@@ -39,10 +39,10 @@ class ModuleSettings extends Module {
             },
             language: {
                 options: [
-                    {id: 'nl', name: 'Dutch'},
-                    {id: 'en', name: 'English'},
+                    {id: 'nl', name: this.app.$t('dutch')},
+                    {id: 'en', name: this.app.$t('english')},
                 ],
-                selected: {id: 'nl', name: 'Dutch'},
+                selected: {id: 'nl', name: this.app.$t('dutch')},
             },
             platform: {
                 enabled: true,
@@ -70,6 +70,7 @@ class ModuleSettings extends Module {
                 codecs: {
                     options: [
                         {id: 1, name: 'G722'},
+                        {id: 2, name: 'opus'},
                     ],
                     selected: {id: 1, name: 'G722'},
                 },
@@ -92,10 +93,10 @@ class ModuleSettings extends Module {
                     permission: false,
                     type: {
                         options: [
-                            {id: 'AUDIO_NOPROCESSING', name: 'Audio without processing'},
-                            {id: 'AUDIO_PROCESSING', name: 'Audio with processing'},
+                            {id: 'AUDIO_NOPROCESSING', name: this.app.$t('audio without processing')},
+                            {id: 'AUDIO_PROCESSING', name: this.app.$t('audio with processing')},
                         ],
-                        selected: {id: 'AUDIO_NOPROCESSING', name: 'Audio without processing'},
+                        selected: {id: 'AUDIO_NOPROCESSING', name: this.app.$t('audio without processing')},
                     },
                 },
             },

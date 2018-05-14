@@ -9,9 +9,26 @@
         <script src="js/vendor_fg.js"></script>
         <script src="js/templates.js"></script>
         <script src="js/translations.js"></script>
+        <%if (['electron', 'webview'].includes(settings.BUILD_TARGET)) { %>
+        <script src="js/vendor_bg.js"></script>
+        <script src="js/app_bg.js"></script>
+        <script src="js/app_fg.js"></script>
+        <% } else { %>
+        <script src="js/app_fg.js"></script>
+        <% } %>
     </head>
     <body>
         <div id="app-placeholder"></div>
     </body>
-    <!--JSBOTTOM-->
+    <%if (['electron', 'webview'].includes(settings.BUILD_TARGET)) { %>
+    <script>
+    Raven.context(function() {
+        this.bg = new AppBackground(bgOptions)
+        this.bg.on('ready', () => {
+            fgOptions.apps = {bg: this.bg}
+            this.fg = new AppForeground(fgOptions)
+        })
+    })
+    </script>
+    <% } %>
 </html>

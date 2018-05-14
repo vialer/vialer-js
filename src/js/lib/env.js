@@ -24,6 +24,7 @@ function env({role}) {
         isFirefox: false,
         isLinux: false,
         isMacOS: false,
+        isNode: false,
         isPopout: false,
         isWindows: false,
         role: {
@@ -43,8 +44,7 @@ function env({role}) {
         if (ua.includes('edge')) _env.isEdge = true
         else if (ua.includes('firefox')) _env.isFirefox = true
         else if (ua.includes('chrome')) _env.isChrome = true
-        else _env.isNode = true
-    }
+    } else _env.isNode = true
 
     if (global.navigator) {
         _env.isBrowser = true

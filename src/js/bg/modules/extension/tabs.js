@@ -50,7 +50,7 @@ class Tabs {
                     this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'CallSIP'}, true)
                     browser.browserAction.openPopup((window) => {})
                 },
-                title: this.app.$t('Call %s with softphone'),
+                title: this.app.$t('call %s with softphone').capitalize(),
             })
         }
 
@@ -61,7 +61,7 @@ class Tabs {
                 browser.browserAction.openPopup((window) => {})
                 this.app.emit('bg:calls:call_create', {number: info.selectionText, start: true, type: 'ConnectAB'}, true)
             },
-            title: this.app.$t('Call %s with {vendor} user', {vendor: this.app.state.app.vendor.name}),
+            title: this.app.$t('call %s with {vendor} user', {vendor: this.app.state.app.vendor.name}).capitalize(),
         })
     }
 

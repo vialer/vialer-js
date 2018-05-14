@@ -30,6 +30,10 @@ class AppBackground extends App {
     constructor(opts) {
         super(opts)
 
+        // Allow context debugging during development.
+        // Avoid leaking this global in production mode!
+        if (!(process.env.NODE_ENV === 'production')) global.bg = this
+
         this.store = new Store(this)
         this.crypto = new Crypto(this)
         this.timer = new Timer(this)
@@ -42,8 +46,7 @@ class AppBackground extends App {
             // Race to the __ready flag from AppForeground.
             // Add a one-time event if AppBackground is not yet ready, which
             // releases the callback.
-            if (this.__ready) callback(JSON.stringify(this.state))
-            else this.once('bg:get_state_ready', () => callback(JSON.stringify(this.state)))
+            callback(JSON.stringify(this.state))
         })
         this.on('bg:refresh_api_data', this._platformData.bind(this))
         this.on('bg:set_state', this.__mergeState.bind(this))
@@ -66,19 +69,23 @@ class AppBackground extends App {
         }
 
         this.store.clear()
+        this.emit('factory-defaults')
         if (this.env.isBrowser) location.reload()
-        else this.emit('factory-defaults')
     }
 
 
     async __init() {
-        // Create audio/video elements. The audio element is used to playback
-        // sounds with (like ringtones, dtmftones). The video element is
-        // used to attach the remote WebRTC stream to.
-        this.audio = document.createElement('audio')
-        this.video = document.createElement('video')
-        document.body.prepend(this.audio)
-        document.body.prepend(this.video)
+        if (this.env.isBrowser) {
+            // Create audio/video elements in a browser-like environment.
+            // The audio element is used to playback sounds with
+            // (like ringtones, dtmftones). The video element is
+            // used to attach the remote WebRTC stream to.
+            this.audio = document.createElement('audio')
+            this.video = document.createElement('video')
+            document.body.prepend(this.audio)
+            document.body.prepend(this.video)
+        }
+
 
         // Start by initializing all modules.
         for (let module of this._modules) {
@@ -94,20 +101,18 @@ class AppBackground extends App {
         // after initializing Vue.
         const validSchema = this.store.validSchema()
         let notification = {message: null, title: null}
-        // Only send a notification if the schema is already defined, but invalid.
+        // Only send a notification when the schema is already defined and invalid.
         if (validSchema === false) {
-            notification.message = this.$t('This update requires you to re-login and setup your account again. Our apologies.')
-            notification.title = this.$t('Database schema changed')
+            notification.message = this.$t('this update requires you to re-login and setup your account again; our apologies.')
+            notification.title = this.$t('database schema changed')
         }
 
         if (!validSchema) this.__factoryDefaults(notification)
-
-
         // From here on, a request to bg:get_state will be
         // dealed with properly. Finish the callback wheb
         // an AppForeground state request is pending.
         this.__ready = true
-        this.emit('bg:get_state_ready')
+        this.emit('ready')
     }
 
 
@@ -162,7 +167,7 @@ class AppBackground extends App {
             }
         }
 
-        this.initViewModel(watchers)
+        this.__initViewModel(watchers)
         // (!) State is reactive from here on.
         // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
@@ -375,7 +380,7 @@ class AppBackground extends App {
     }
 }
 
-let options = {env, modules: [
+let bgOptions = {env, modules: [
     {Module: require('./modules/activity'), name: 'activity'},
     {Module: require('./modules/app'), name: 'app'},
     {Module: require('./modules/availability'), name: 'availability'},
@@ -387,14 +392,16 @@ let options = {env, modules: [
     {Module: require('./modules/user'), name: 'user'},
 ]}
 
-// Conditionally load ModuleExtension.
-if (env.isExtension) {
-    options.modules.push({Module: require('./modules/extension'), name: 'extension'})
+if (env.isBrowser) {
+    if (env.isExtension) {
+        bgOptions.modules.push({Module: require('./modules/extension'), name: 'extension'})
+        Raven.context(function() {
+            this.bg = new AppBackground(bgOptions)
+        })
+    } else {
+        global.AppBackground = AppBackground
+        global.bgOptions = bgOptions
+    }
+} else {
+    module.exports = {AppBackground, bgOptions}
 }
-
-Raven.context(function() {
-    global.bg = new AppBackground(options)
-})
-
-
-module.exports = AppBackground

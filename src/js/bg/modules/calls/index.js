@@ -613,7 +613,6 @@ class ModuleCalls extends Module {
                 } else if (newUAStatus === 'disconnected') menubarState = 'disconnected'
                 else if (this.app.state.settings.webrtc.enabled) {
                     if (newUAStatus === 'registered') {
-
                         if (this.app.state.availability.dnd) menubarState = 'unavailable'
                         else menubarState = 'active'
                     } else menubarState = 'disconnected'

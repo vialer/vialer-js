@@ -26,14 +26,14 @@ module.exports = (app) => {
             logout: app.helpers.logout,
             refreshApiData: function() {
                 if (!this.app.online) return
-                this.$notify({icon: 'refresh', message: `${app.$t('Reloaded application data')}...`, type: 'success'})
+                this.$notify({icon: 'refresh', message: `${app.$t('reloaded application data')}...`, type: 'success'})
                 app.emit('bg:refresh_api_data')
                 app.emit('bg:calls:disconnect', {reconnect: true})
             },
             titles: function(block) {
                 let title = ''
                 if (block === 'indicator') {
-                    title += `${this.$t('Status:')} `
+                    title += 'Status: '
                     if (['disconnected', 'reconnect', 'registration_failed'].includes(this.ua.status)) {
                         // Give an indication why we are not connected.
                         if (!this.app.online) title += this.$t('offline')
@@ -46,16 +46,16 @@ module.exports = (app) => {
                                 title += this.$t('registered')
                                 if (!this.settings.webrtc.media.permission) {
                                     title += ` (${this.$t('no microphone access')})`
-                                } else if (this.dnd) title += ` (${this.$t('Do not Disturb')})`
+                                } else if (this.dnd) title += ` (${this.$t('do not disturb')})`
                             } else {
                                 title += this.$t('not registered')
                             }
-                            title += ` (${this.$t('WebRTC')})`
+                            title += ' (WebRTC)'
                         } else {
                             if (this.ua.status === 'connected') {
-                                title += `${this.$t('connected')} (${this.$t('ConnectAB')})`
+                                title += `${this.$t('connected')} (ConnectAB)`
                             } else {
-                                title += `${this.$t(this.ua.status)} (${this.$t('ConnectAB')})`
+                                title += `${this.$t(this.ua.status)} (ConnectAB)`
                             }
                         }
                     }

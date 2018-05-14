@@ -23,7 +23,7 @@ module.exports = (app) => {
             finish: function() {
                 app.setState({settings: {wizard: {completed: true, step: 0}}}, {persist: true})
                 app.emit('bg:calls:disconnect', {reconnect: true})
-                this.$notify({icon: 'settings', message: this.$t('Almost done! Please check your audio settings.'), timeout: 0, type: 'success'})
+                this.$notify({icon: 'settings', message: this.$t('almost done! Please check your audio settings.'), timeout: 0, type: 'success'})
             },
             nextStep: function() {
                 if (this.steps[this.step].name === 'voipaccount') {

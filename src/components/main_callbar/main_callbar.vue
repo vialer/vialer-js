@@ -9,7 +9,7 @@
             <template v-else>{{call.number}}</template>
         </div>
         <div class="call-info" v-if="call.status === 'new'">
-            <span class="status">{{$t('New call')}}</span>
+            <span class="status cf">{{$t('new call')}}</span>
             <span class="timer"></span>
         </div>
         <div class="call-info" v-else>

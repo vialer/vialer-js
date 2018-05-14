@@ -35,8 +35,8 @@ module.exports = (app) => {
             callTitle: function(call) {
                 const translations = app.helpers.getTranslations().call
                 if (call.status === 'new') {
-                    if (call.active) return this.$t('Close new call')
-                    else return `${this.$t('Select new Call')}`
+                    if (call.active) return this.$t('close new call')
+                    else return `${this.$t('select new call')}`.capitalize()
                 } else {
                     let text = `${call.number} - `
                     if (call.status === 'accepted') {
@@ -46,7 +46,7 @@ module.exports = (app) => {
                         text += translations[call.status]
                     }
 
-                    return text
+                    return text.capitalize()
                 }
             },
             classes: function(call, block) {

@@ -127,10 +127,10 @@ function helpers(app) {
                 rejected_b: $t('callee is busy'),
             },
             callingDisabled: {
-                disconnected: $t('You are disconnected from the SIP service.'),
-                mediaPermission: $t('Go to Audio settings and give the browser permission to use your microphone.'),
-                offline: $t('You are disconnected from the internet. Check your connectivity.'),
-                unregistered: $t('Not registered at the SIP service. Check your connectivity.'),
+                disconnected: $t('you are disconnected from the SIP service.').capitalize(),
+                mediaPermission: $t('go to audio settings and give the browser permission to use your microphone.').capitalize(),
+                offline: $t('you are disconnected from the internet; check your connectivity.').capitalize(),
+                unregistered: $t('not registered at the SIP service; check your connectivity.').capitalize(),
             },
         }
     }
@@ -252,9 +252,9 @@ function helpers(app) {
             },
             greeting: function() {
                 let hours = new Date().getHours()
-                if (hours < 12) return this.$t('Good Morning')
-                else if (hours >= 12 && hours <= 17) return this.$t('Good Afternoon')
-                else return this.$t('Good Evening')
+                if (hours < 12) return this.$t('good morning')
+                else if (hours >= 12 && hours <= 17) return this.$t('good afternoon').capitalize()
+                else return this.$t('good evening')
             },
             hours: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60 / 60) % 24

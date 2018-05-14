@@ -37,7 +37,7 @@ class ModuleUser extends Module {
                     ui: {layer: 'login'},
                     user: {authenticated: false},
                 }, {encrypt: false, persist: true})
-                const message = this.app.$t('Failed to unlock session. Check your password.')
+                const message = this.app.$t('failed to unlock session; check your password.')
                 this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
             }
         })
@@ -115,7 +115,7 @@ class ModuleUser extends Module {
             const icon = 'warning', type = 'warning'
             if (res.data.apitoken) {
                 if (res.data.apitoken.email || res.data.apitoken.password) {
-                    message = this.app.$t('Failed to login. Please check your credentials.')
+                    message = this.app.$t('failed to login; please check your credentials.')
                     this.app.emit('fg:notify', {icon, message, type})
                 } else if (res.data.apitoken.two_factor_token) {
                     const validationMessage = res.data.apitoken.two_factor_token[0]
@@ -123,7 +123,7 @@ class ModuleUser extends Module {
                         // Switch two-factor view.
                         this.app.setState({user: {twoFactor: true}})
                     } else if (validationMessage === 'invalid two_factor_token') {
-                        message = this.app.$t('Invalid two factor token. Please check your tokenizer.')
+                        message = this.app.$t('invalid two factor token. Please check your tokenizer.')
                         callback({message, valid: false})
                     }
                 }
@@ -141,7 +141,7 @@ class ModuleUser extends Module {
             // Only platform client users are able to use vendor platform
             // telephony features. Logout partner users.
             this.logout()
-            this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('The plugin can only be used by partner users.'), type: 'warning'})
+            this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('this type of user is invalid.'), type: 'warning'})
             return
         }
 
@@ -153,7 +153,7 @@ class ModuleUser extends Module {
             startLayer = 'settings'
         } else {
             startLayer = 'calls'
-            this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Welcome back, {user}', {user: user.realName}), type: 'success'})
+            this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('welcome back, {user}', {user: user.realName}), type: 'success'})
         }
 
         this.app.setState({
@@ -183,7 +183,7 @@ class ModuleUser extends Module {
     */
     logout() {
         this.app.logger.info(`${this}logging out and cleaning up state`)
-        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('Goodbye!'), type: 'success'})
+        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('goodbye!'), type: 'success'})
         this.app.setState({
             app: {vault: {key: null, store: false, unlocked: false}},
             user: {authenticated: false},

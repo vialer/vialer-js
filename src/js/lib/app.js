@@ -16,6 +16,9 @@ class App extends Skeleton {
         * Environment sniffer.
         */
         this.env = options.env
+
+        // Placeholder method for translations, until the store is initialized.
+        this.$t = (text) => text
         this.filters = require('./filters')(this)
         this.helpers = require('./helpers')(this)
         /**
@@ -51,28 +54,11 @@ class App extends Skeleton {
 
 
     /**
-    * Initialize multi-language support. An I18nStore is mounted
-    * to the store. Translations can be dynamically added.
-    */
-    __initI18n() {
-        const i18nStore = new I18nStore(this.state)
-        Vue.use(i18n, i18nStore)
-        let selectedLanguage = this.state.settings.language.selected.id
-        for (const translation of Object.keys(translations)) {
-            Vue.i18n.add(selectedLanguage, translations[translation])
-        }
-        Vue.i18n.set(selectedLanguage)
-        // Add a simple reference to the translation module.
-        this.$t = Vue.i18n.translate
-    }
-
-
-    /**
     * Initialize media access and system sounds.
     */
     __initMedia() {
         // Check media permission at the start of the bg/fg.
-        if (!this.env.isFirefox) {
+        if (!this.env.isFirefox && !this.env.isNode) {
             navigator.mediaDevices.getUserMedia(this._getUserMediaFlags()).then((stream) => {
                 this.setState({settings: {webrtc: {media: {permission: true}}}})
             }).catch((err) => {
@@ -111,6 +97,34 @@ class App extends Skeleton {
         this.state = {
             env: this.env,
         }
+    }
+
+
+    /**
+    * Initialize multi-language support. An I18nStore is mounted
+    * to the store. Translations can be dynamically added. Then initialize Vue
+    * with the Vue-stash store, the root rendering component and gathered
+    * watchers from modules.
+    * @param {Object} watchers - Store properties to watch for changes.
+    */
+    __initViewModel(watchers) {
+        const i18nStore = new I18nStore(this.state)
+        Vue.use(i18n, i18nStore)
+        let selectedLanguage = this.state.settings.language.selected.id
+        for (const translation of Object.keys(translations)) {
+            Vue.i18n.add(selectedLanguage, translations[translation])
+        }
+        Vue.i18n.set(selectedLanguage)
+        // Add a simple reference to the translation module.
+        this.$t = Vue.i18n.translate
+
+        this.vm = new Vue({
+            data: {store: this.state},
+            render: h => h(require('../../components/main')(this)),
+            watch: watchers,
+        })
+
+        this.__initMedia()
     }
 
 
@@ -256,27 +270,6 @@ class App extends Skeleton {
         }
 
         return state
-    }
-
-
-    /**
-    * Initialize Vue with the Vue-stash store, the
-    * root rendering component and gathered watchers
-    * from modules.
-    * @param {Object} watchers - Store properties to watch for changes.
-    */
-    initViewModel(watchers) {
-        this.__initI18n()
-
-        this.vm = new Vue({
-            data: {
-                store: this.state,
-            },
-            render: h => h(require('../../components/main')(this)),
-            watch: watchers,
-        })
-
-        this.__initMedia()
     }
 
 
