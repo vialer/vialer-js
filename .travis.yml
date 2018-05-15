@@ -1,0 +1,12 @@
+before_script:
+  - npm install -g gulp-cli
+  - cp .vialer-jsrc.example .vialer-jsrc
+cache:
+  directories:
+    - "node_modules"
+language: node_js
+node_js:
+ - "node"
+script:
+ - npm run lint
+ - npm test

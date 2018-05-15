@@ -136,7 +136,7 @@ class Call {
                 await this.app.video.setSinkId(output.selected.id)
             }
         } catch (err) {
-            const message = this.app.$t('Failed to set input or output device.')
+            const message = this.app.$t('failed to set input or output device.')
             this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
             console.error(err)
         }

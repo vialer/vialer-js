@@ -27,12 +27,12 @@ const imagemin = require('gulp-imagemin')
 const minifier = composer(require('uglify-es'), console)
 const mkdirp = promisify(require('mkdirp'))
 const notify = require('gulp-notify')
-const replace = require('gulp-replace')
 const rc = require('rc')
 const runSequence = require('run-sequence')
 const size = require('gulp-size')
 const svgo = require('gulp-svgo')
 const tape = require('gulp-tape')
+const template = require('gulp-template')
 const test = require('tape')
 
 const writeFileAsync = promisify(fs.writeFile)
@@ -305,19 +305,10 @@ gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
 
 
 gulp.task('html', 'Preprocess and build application HTML.', () => {
-    let jsbottom
-
-    // Scripts are combined
-    if (['electron', 'webview'].includes(settings.BUILD_TARGET)) {
-        jsbottom = '<script src="js/vendor_bg.js"></script><script src="js/app_bg.js"></script><script src="js/app_fg.js"></script>'
-    } else {
-        jsbottom = '<script src="js/app_fg.js"></script>'
-    }
-
     // The index.html file is shared with the electron build target.
     // Appropriate scripts are inserted based on the build target.
     return gulp.src(path.join('src', 'index.html'))
-        .pipe(replace('<!--JSBOTTOM-->', jsbottom))
+        .pipe(template({settings}))
         .pipe(flatten())
         .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
         .pipe(ifElse(settings.LIVERELOAD, livereload))
@@ -495,6 +486,7 @@ gulp.task('test', function() {
     return gulp.src('test/**/*.js')
         .pipe(tape({
             outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
+            timeout: 1000,
         }))
 })
 

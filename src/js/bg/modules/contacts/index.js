@@ -153,7 +153,7 @@ class ModuleContacts extends Module {
                             name: endpoint.description,
                             number: endpoint.internal_number,
                             status: endpoint.sipreginfo ? 'unavailable' : 'unregistered',
-                            ua: endpoint.sipreginfo ? endpoint.sipreginfo.useragent : this.app.$t('Not available'),
+                            ua: endpoint.sipreginfo ? endpoint.sipreginfo.useragent : this.app.$t('not available').capitalize(),
                         },
                     },
                     name: endpoint.description,

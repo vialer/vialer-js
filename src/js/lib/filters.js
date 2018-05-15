@@ -16,14 +16,14 @@ function filters(app) {
         } else if (delta < hour) {
             fuzzy = `${Math.floor(delta / minute)} ${app.$t('minutes ago')}`
         } else if (Math.floor(delta / hour) === 1) {
-            fuzzy = app.$t('An hour ago')
+            fuzzy = app.$t('an hour ago')
         } else if (delta < day) {
             fuzzy = `${Math.floor(delta / hour)} ${app.$t('hours ago')}`
         } else if (delta < day * 2) {
             fuzzy = app.$t('yesterday')
         }
         if (!fuzzy) return new Date(value).toLocaleString()
-        else return fuzzy
+        else return fuzzy.capitalize()
     })
 }
 

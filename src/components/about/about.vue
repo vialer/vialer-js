@@ -8,29 +8,29 @@
     <div class="support">
         <div class="support-option">
             <icon class="support-icon" name="logo"/>
-            <div class="support-title">{{$t('Online help')}}</div>
+            <div class="support-title cf">{{$t('online help')}}</div>
             <div class="support-description">{{app.name}} {{$t('documentation')}}:</div>
             <div class="support-channel link" @click="openTab(vendor.support.website)">{{vendor.name}} website</div>
         </div>
 
         <div class="support-option">
             <icon class="support-icon" name="mail"/>
-            <div class="support-title">{{$t('E-mail')}}</div>
-            <div class="support-description">{{$t('Drop us your question at')}}:</div>
+            <div class="support-title">E-mail</div>
+            <div class="support-description cf">{{$t('drop us your question at')}}:</div>
             <div class="support-channel"><a :href="'mailto:' + vendor.support.email">{{vendor.support.email}}</a></div>
         </div>
 
         <div class="support-option">
             <icon class="support-icon" name="phone"/>
-            <div class="support-title">{{$t('Phone')}}</div>
-            <div class="support-description">{{$t('Give us a call')}}:</div>
+            <div class="support-title cf">{{$t('phone')}}</div>
+            <div class="support-description cf">{{$t('give us a call')}}:</div>
             <div class="support-channel link" @click="createCall(vendor.support.phone)">{{vendor.support.phone}}</div>
         </div>
 
         <div class="support-option">
             <icon class="support-icon" name="github"/>
-            <div class="support-title">{{$t('Github')}}</div>
-            <div class="support-description">{{$t('Report an issue')}}:</div>
+            <div class="support-title">Github</div>
+            <div class="support-description cf">{{$t('report an issue')}}:</div>
             <div class="support-channel link" @click="openTab('https://github.com/voipgrid/vialer-js/issues')">Github issues</div>
         </div>
     </div>

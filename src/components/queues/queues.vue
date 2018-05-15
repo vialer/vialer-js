@@ -1,7 +1,7 @@
 <component class="component-queues no-padding">
 
     <div class="panel-content">
-        <h1>{{$t('Queue')}} {{$t('callgroups')}}</h1>
+        <h1 class="uc">{{$t('queue')}} {{$t('callgroups')}}</h1>
     </div>
 
     <ul class="list-items">
@@ -27,7 +27,7 @@
                 <icon class="spinner" name="spinner"/>
             </div>
             <div class="info">
-                <div class="name">{{$t('Loading queue callgroups')}}...</div>
+                <div class="name cf">{{$t('loading queue callgroups')}}...</div>
             </div>
         </li>
         <li class="list-item queue" v-else-if="!queues.length">
@@ -35,7 +35,7 @@
                 <i class="icon icon-queues"></i>
             </div>
             <div class="info">
-                <div class="name">{{$t('No {target} found', {target: `${$t('queue')} ${$t('callgroups')}`})}}...</div>
+                <div class="name">{{$t('no {target} found', {target: `${$t('queue')} ${$t('callgroups')}`})}}...</div>
                 <div class="description"></div>
             </div>
         </li>
@@ -44,17 +44,16 @@
     <div class="notification-box info" v-if="queues.length <= 1">
         <header>
             <icon name="info"/>
-            <span>{{$t('Adding more queue callgroups')}}</span>
+            <span class="cf">{{$t('adding more queue callgroups')}}</span>
         </header>
-        <div class="description">
-            {{$t('You have {count} queue callgroup configured. ::: You have {count} queue callgroups configured.', {count: queues.length}, queues.length)}}
+        <div class="description cf">
+            {{$t('you have {count} queue callgroup configured. ::: you have {count} queue callgroups configured.', {count: queues.length}, queues.length)}}
         </div>
         <ul>
-            <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Callgroups')}}</a> {{$t('to manage your {target}', {target: $t('callgroups')})}}.</li>
-            <li>{{$t('Head over to')}} <a @click="openPlatformUrl('callgroup')">{{$t('Queues')}}</a> {{$t('to manage your {target}', {target: $t('queues')})}}.</li>
-            <li>{{$t('Head over to')}} <a @click="openPlatformUrl('routing')">{{$t('Dialplans')}}</a> {{$t('to add the {source} to a {target}', {source: $t('queue'), target: $t('dialplan')})}}.</li>
+            <li>{{$t('head over to')}} <a class="cf" @click="openPlatformUrl('callgroup')">{{$t('callgroups')}}</a> {{$t('to manage your {target}', {target: $t('callgroups')})}}.</li>
+            <li>{{$t('head over to')}} <a class="cf" @click="openPlatformUrl('callgroup')">{{$t('queues')}}</a> {{$t('to manage your {target}', {target: $t('queues')})}}.</li>
+            <li>{{$t('head over to')}} <a class="cf" @click="openPlatformUrl('routing')">{{$t('dialplans')}}</a> {{$t('to add the {source} to a {target}', {source: $t('queue'), target: $t('dialplan')})}}.</li>
         </ul>
     </div>
 
-    <div class="unauthorized-warning hide">{{$t('You are not authorized to monitor any queues you might have.')}}</div>
 </component>

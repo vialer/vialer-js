@@ -3,8 +3,8 @@
         <div class="icon">
             <icon :name="item.icon" v-if="item.icon"/>
         </div>
-        <div class="message" v-if="html" v-html="message"></div>
-        <div class="message" v-else>{{item.message}}</div>
+        <div class="message cf" v-if="html" v-html="message"></div>
+        <div class="message cf" v-else>{{item.message}}</div>
         <div class="actions">
             <button class="delete" @click="close(item)"></button>
         </div>

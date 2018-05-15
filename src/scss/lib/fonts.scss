@@ -18,3 +18,13 @@
     font-weight: 500;
     src: local("Roboto Medium"), local("Roboto-Medium"), url("#{$font-path}/Roboto-Medium.woff2") format("woff2");
 }
+
+// Small helper clases to apply proper capitalizing without polluting translations.
+.lc {text-transform: lowercase;}
+.uc {text-transform: uppercase;}
+.ca {text-transform: capitalize;}
+
+.cf {
+    display: inline-block;
+    &::first-letter {text-transform: uppercase;}
+}

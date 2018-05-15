@@ -1,10 +1,8 @@
 <component class="component-step-mic-permission">
-    <header>
-        {{$t('Microphone access')}}
-    </header>
+    <header class="cf">{{$t('microphone access')}}</header>
 
-    <div class="step-description">
-        {{$t('Access to your computer\'s microphone is required to be able to make calls.')}}<br/>
+    <div class="step-description cf">
+        {{$t('access to your computer\'s microphone is required to be able to make calls.')}}<br/>
     </div>
     <div class="step-container">
         <MicPermission :soundmeter="false"/>

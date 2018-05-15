@@ -37,53 +37,53 @@ module.exports = (app) => {
                 }
 
                 if (v.domain === false) {
-                    errorMessages.push(this.$t('Please fill in a valid domain.'))
+                    errorMessages.push(this.$t('fill in a valid domain.').capitalize())
                 }
 
                 if (v.email === false) {
-                    errorMessages.push(this.$t('Please fill in a valid email address.'))
+                    errorMessages.push(this.$t('fill in a valid email address.').capitalize())
                 }
 
                 if (v.maxLength === false) {
                     errorMessages.push(this.$t(
-                        'Please fill in a value no longer than {max} characters.', {
+                        'fill in a value no longer than {max} characters.', {
                             max: v.$params.maxLength.max,
-                        })
+                        }).capitalize()
                     )
                 }
 
                 if (v.minLength === false) {
                     errorMessages.push(this.$t(
-                        'Please fill in a value of at least {min} characters.', {
+                        'fill in a value of at least {min} characters.', {
                             min: v.$params.minLength.min,
-                        })
+                        }).capitalize()
                     )
                 }
 
                 if (v.numeric === false) {
-                    errorMessages.push(this.$t('Please fill in a valid number.'))
+                    errorMessages.push(this.$t('fill in a valid number.').capitalize())
                 }
 
                 if (v.must_be_unique === false) {
-                    errorMessages.push(this.$t('Please fill in a unique value.'))
+                    errorMessages.push(this.$t('fill in a unique value.').capitalize())
                 }
 
                 if (v.required === false) {
-                    errorMessages.push(this.$t('This field is required.'))
+                    errorMessages.push(this.$t('this field is required.').capitalize())
                 }
 
                 if (v.requiredIf === false) {
-                    errorMessages.push(this.$t('This field is required.'))
+                    errorMessages.push(this.$t('this field is required.').capitalize())
                 }
 
                 if (v.sameAs === false) {
-                    errorMessages.push(this.$t('Field "{fieldName}" must have the same value.', {
+                    errorMessages.push(this.$t('field "{fieldName}" must have the same value.', {
                         fieldName: v.$params.sameAs.eq,
-                    }))
+                    }).capitalize())
                 }
 
                 if (v.url === false) {
-                    errorMessages.push(this.$t('Please fill in a valid url.'))
+                    errorMessages.push(this.$t('fill in a valid url.').capitalize())
                 }
 
                 return errorMessages.join('</br>')
@@ -183,7 +183,7 @@ module.exports = (app) => {
             css: '',
             disabled: Boolean,
             empty: {
-                default: 'No options available',
+                default: app.$t('no options available'),
                 type: String,
             },
             help: String,

@@ -1,8 +1,8 @@
 <component class="component-call-keypad" tabindex="-1" :class="{'call-ongoing': callOngoing}">
     <div class="disabled-placeholder" v-if="callingDisabled">
         <icon class="disabled-icon" name="dialpad-off"/>
-        <div class="disabled-text">
-            {{$t('You cannot call out at the moment.')}}
+        <div class="disabled-text cf">
+            {{$t('you cannot call out at the moment.')}}
         </div>
         <div class="disabled-reason">
             <ul>

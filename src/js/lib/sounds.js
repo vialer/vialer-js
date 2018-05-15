@@ -5,7 +5,9 @@
 */
 
 
-let context = new AudioContext()
+let context
+
+if (global.window) context = new AudioContext()
 
 
 /**
@@ -71,6 +73,7 @@ class BusyTone {
 class DtmfTone {
 
     constructor(app) {
+        if (app.env.isNode) return
         this.app = app
         this.started = false
 
@@ -145,6 +148,7 @@ class DtmfTone {
 class RingbackTone {
 
     constructor(app, region = 'europe') {
+        if (app.env.isNode) return
         this.app = app
         this.region = region
         this.started = false
@@ -251,6 +255,7 @@ class RingTone extends EventEmitter {
 
     constructor(app) {
         super()
+        if (app.env.isNode) return
         this.app = app
         this.audio = new Audio(`ringtones/${app.state.settings.ringtones.selected.name}`)
         this.audio.addEventListener('ended', this.playEnd.bind(this))

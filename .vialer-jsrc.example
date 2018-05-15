@@ -28,7 +28,7 @@
                     "electron": "",
                     "firefox": "",
                     "webview": ""
-                }
+                },
                 "sentry": {
                     "apiKey": "",
                     "dsn": "",

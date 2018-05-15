@@ -1,13 +1,9 @@
 <component class="component-step-voipaccount">
-    <header>
-        {{$t('VoIP accounts')}}
-    </header>
+    <header class="ca">{{$t('voIP accounts')}}</header>
 
     <div class="step-description">
-        <span>
-            {{$t('Select the VoIP account you would like to use for your softphone')}}.
-        </span>
+        <span class="cf">{{$t('select the VoIP account you would like to use for your softphone.')}}</span>
     </div>
-    <VoipaccountPicker :label="$t('Available VoIP accounts')"/>
+    <VoipaccountPicker :label="$t('available VoIP accounts')"/>
     <slot name="progress"></slot>
 </component>

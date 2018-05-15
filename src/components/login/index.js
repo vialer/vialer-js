@@ -28,7 +28,7 @@ module.exports = (app) => {
                             callback: ({valid, message}) => {
                                 this.twoFactorToken.valid = valid
                                 this.validateApi = true
-                                this.twoFactorToken.message = message
+                                this.twoFactorToken.message = message.capitalize()
                             },
                             password: this.password,
                             token: this.twoFactorToken.value,

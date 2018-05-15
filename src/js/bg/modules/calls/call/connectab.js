@@ -93,7 +93,7 @@ class CallConnectAB extends Call {
             // For now don't make a distination between rejected_a and rejected_b.
             // Just use the latter.
             this.setState({status: 'rejected_b'})
-            let message = this.app.$t('An unknown error occured during call setup.')
+            let message = this.app.$t('an unknown error occured during call setup.')
             // Hope we dealt with all possible failures.
             if (res.data.error) message = this.app.$t(res.data.error)
             else if (res.data.clicktodial.b_number) message = this.app.$t(res.data.clicktodial.b_number.join(' '))

@@ -21,19 +21,19 @@ class AppForeground extends App {
     constructor(opts) {
         super(opts)
 
-        this.__fgReady = false
+        // Allow context debugging during development.
+        // Avoid leaking this global in production mode!
+        if (!(process.env.NODE_ENV === 'production')) global.fg = this
 
         // Create a remote notification.
         this.on('fg:notify', (message) => this.vm.$notify(message))
         // Make state modifications from AppBackground, but only
         // after fg had its initial state received from bg.
         this.on('fg:set_state', (data) => {
-            if (this.__fgReady) {
-                // When sending the whole background state, make sure that
-                // the env property of the foreground is never overwritten.
-                if (data.state && data.state.env) delete data.state.env
-                this.__mergeState(data)
-            }
+            // When sending the whole background state, make sure that
+            // the env property of the foreground is never overwritten.
+            if (data.state && data.state.env) delete data.state.env
+            this.__mergeState(data)
         })
 
         /**
@@ -84,11 +84,10 @@ class AppForeground extends App {
                 // serialize data between scripts, so this is done in
                 // webview mode as well for consistency's sake.
                 this.state = JSON.parse(state)
-                this.__fgReady = true
                 // (!) Don't inherit the env of the background script.
                 this.state.env = this.env
 
-                this.initViewModel()
+                this.__initViewModel()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
                 this.setState({ui: {visible: true}})
                 if (this.env.isExtension) {
@@ -110,17 +109,19 @@ class AppForeground extends App {
     }
 }
 
-
-let options = {env, modules: []}
-
-// Outside WebExtension mode, both scripts are running in the same
-// browser context. In that case, the AppBackground instance is
-// passed to the AppForeground direcly.
-if (!env.isExtension) options.apps = {bg: global.bg}
-
-Raven.context(function() {
-    global.fg = new AppForeground(options)
-})
-
-
-module.exports = AppForeground
+let fgOptions = {env, modules: []}
+// Used in browser context to allow a context closure without
+// having to make an additional JavaScript build target.
+if (env.isBrowser) {
+    if (env.isExtension) {
+        Raven.context(function() {
+            this.fg = new AppForeground(fgOptions)
+        })
+    } else {
+        global.AppForeground = AppForeground
+        global.fgOptions = fgOptions
+    }
+} else {
+    // Use with Node.
+    module.exports = {AppForeground, fgOptions}
+}

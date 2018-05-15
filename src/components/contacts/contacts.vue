@@ -2,18 +2,18 @@
     <div class="panel-content">
         <header>
             <div class="header-line">
-                <h1>{{$t('Contacts')}}</h1>
+                <h1 class="uc">{{$t('contacts')}}</h1>
                 <div class="vertical-devider"></div>
                 <div class="content-filters">
-                    <div class="filter" :class="classes('favorites-filter')" @click="toggleFilterFavorites()">
+                    <div class="filter cf" :class="classes('favorites-filter')" @click="toggleFilterFavorites()">
                         <icon name="star"/>
-                        {{$t('Favorites')}}
+                        {{$t('favorites')}}
                     </div>
                 </div>
             </div>
             <div class="header-line contacts-options">
                 <input class="input" autofocus type="email"
-                    :placeholder="$t('Find contact') + '...'"
+                    :placeholder="$t('find contact') + '...'"
                     :disabled="search.disabled"
                     v-model="search.input"/>
                 <div class="display-mode" :class="classes('display-mode', 'lean')" @click="setDisplayMode('lean')">
@@ -54,16 +54,16 @@
                 </div>
 
                 <div class="item-slider">
-                    <div class="item-slider-option green" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.number)" v-on:click.once="callContact(contact)">
-                        {{$t('Transfer')}}
+                    <div class="item-slider-option green cf" v-if="transferStatus === 'select' && !numbersOngoing.includes(contact.number)" v-on:click.once="callContact(contact)">
+                        {{$t('transfer')}}
                         <icon name="transfer"/>
                     </div>
                     <div class="item-slider-option green" v-if="callsReady && !transferStatus && contactIsCallable(contact)" v-on:click="callContact(contact)">
-                        {{$t('Call')}}
+                        {{$t('call')}}
                         <icon name="phone-circle" :class="contact.status"/>
                     </div>
                     <div class="item-slider-option grey" :class="classes('favorite-button', contact.favorite)" v-if="!transferStatus" v-on:click="toggleFavorite(contact)">
-                        {{$t('Fav.')}}
+                        Fav.
                         <icon name="star-circle" :class="contact.status"/>
                     </div>
                 </div>
@@ -74,14 +74,14 @@
                     <icon class="spinner" name="spinner"/>
                 </div>
                 <div class="info">
-                    <div class="name">{{$t('Loading contacts')}}...</div>
+                    <div class="name cf">{{$t('loading contacts')}}...</div>
                 </div>
             </div>
 
             <!-- No search results -->
             <div class="no-results" v-else-if="!filteredContacts.length">
                 <icon class="no-results-icon" name="contacts"/>
-                <div class="no-results-text">{{$t('No {target} found', {target: $t('contacts')})}}...</div>
+                <div class="no-results-text">{{$t('no {target} found', {target: $t('contacts')})}}...</div>
             </div>
         </div>
     </div>

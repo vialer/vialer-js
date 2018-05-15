@@ -20,14 +20,16 @@ class ModuleApp extends Module {
         super(app)
 
         // Start responding to network changes.
-        window.addEventListener('offline', (e) => {
-            this.app.logger.info(`${this}switched to offline modus`)
-            this.app.setState({app: {online: false}})
-        })
-        window.addEventListener('online', (e) => {
-            this.app.logger.info(`${this}switched to online modus`)
-            this.app.setState({app: {online: true}})
-        })
+        if (!app.env.isNode) {
+            window.addEventListener('offline', (e) => {
+                this.app.logger.info(`${this}switched to offline modus`)
+                this.app.setState({app: {online: false}})
+            })
+            window.addEventListener('online', (e) => {
+                this.app.logger.info(`${this}switched to online modus`)
+                this.app.setState({app: {online: true}})
+            })
+        }
     }
 
 
