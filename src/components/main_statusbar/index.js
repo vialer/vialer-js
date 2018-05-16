@@ -33,7 +33,9 @@ module.exports = (app) => {
             titles: function(block) {
                 let title = ''
                 if (block === 'indicator') {
-                    title += 'Status: '
+                    if (this.settings.webrtc.enabled) title += 'WebRTC: '
+                    else title += 'ConnectAB: '
+
                     if (['disconnected', 'reconnect', 'registration_failed'].includes(this.ua.status)) {
                         // Give an indication why we are not connected.
                         if (!this.app.online) title += this.$t('offline')
@@ -50,12 +52,11 @@ module.exports = (app) => {
                             } else {
                                 title += this.$t('not registered')
                             }
-                            title += ' (WebRTC)'
                         } else {
                             if (this.ua.status === 'connected') {
-                                title += `${this.$t('connected')} (ConnectAB)`
+                                title += this.$t('connected')
                             } else {
-                                title += `${this.$t(this.ua.status)} (ConnectAB)`
+                                title += this.$t(this.ua.status)
                             }
                         }
                     }

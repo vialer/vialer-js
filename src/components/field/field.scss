@@ -68,7 +68,7 @@
         margin-bottom: $spacer * 2;
     }
 
-    label {
-        clear: both;
+    .switch[type="checkbox"] + label {
+        display: block;
     }
 }

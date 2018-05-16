@@ -12,18 +12,16 @@ class App extends Skeleton {
 
     constructor(options) {
         super(options)
-        /**
-        * Environment sniffer.
-        */
+        // Environment sniffer.
         this.env = options.env
-
-        // Placeholder method for translations, until the store is initialized.
+        // Lazy placeholder method for translation definition. This method
+        // is replaced by the actual translation method after the store is
+        // initialized. Used to detect in-code translations before the
+        // application is initialized.
         this.$t = (text) => text
         this.filters = require('./filters')(this)
         this.helpers = require('./helpers')(this)
-        /**
-        * Contains all registered App modules.
-        */
+        // Contains all registered App modules.
         this.modules = {}
         this._modules = options.modules
 
