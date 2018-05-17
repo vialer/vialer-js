@@ -12,13 +12,7 @@
         font-weight: 500;
         height: $spacer * 3;
         line-height: $spacer * 3;
-        opacity: 0;
         vertical-align: middle;
-
-        &.show {
-            opacity: 1;
-        }
-
 
         svg {
             @include icon-size($spacer * 1.5);

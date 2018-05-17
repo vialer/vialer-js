@@ -16,7 +16,10 @@ if (global.window) context = new AudioContext()
 class BusyTone {
 
     constructor(app) {
+        if (app.env.isNode) return
+
         this.app = app
+        this.audio = new Audio()
     }
 
     createRingerLFO() {
@@ -34,11 +37,26 @@ class BusyTone {
     }
 
 
-
-    play(key) {
+    play(sink) {
         if (this.started) return
+
+        this.dest = context.createMediaStreamDestination()
+        this.audio.srcObject = this.dest.stream
+        this.audio.play()
+
+        if (!sink) {
+            const speaker = this.app.state.settings.webrtc.devices
+            if (speaker.enabled) {
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput
+            } else {
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput
+            }
+        }
+
+        this.audio.setSinkId(sink.id)
+
         const gainNode = context.createGain()
-        gainNode.connect(context.destination)
+        gainNode.connect(this.dest)
         this.oscillator = context.createOscillator()
         this.oscillator.connect(gainNode)
 
@@ -99,12 +117,19 @@ class DtmfTone {
     }
 
 
-    play(key) {
+    play(key, sink) {
         if (this.started) return
 
-        // DTMF tones are on the same sink as the headset output.
-        const outputSink = this.app.state.settings.webrtc.media.devices.output.selected.id
-        if (outputSink) this.audio.setSinkId(outputSink)
+        if (!sink) {
+            const speaker = this.app.state.settings.webrtc.devices.speaker
+            if (speaker.enabled) {
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput
+            } else {
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput
+            }
+        }
+
+        this.audio.setSinkId(sink)
 
         const frequencyPair = this.frequencies[key]
         this.freq1 = frequencyPair.f1
@@ -187,19 +212,26 @@ class RingbackTone {
     }
 
 
-    play() {
+    play(sink) {
         if (this.started) return
 
         this.dest = context.createMediaStreamDestination()
         this.audio.srcObject = this.dest.stream
         this.audio.play()
 
-        // The Ringback tone is on the same sink as the headset output.
-        const outputSink = this.app.state.settings.webrtc.media.devices.output.selected.id
-        if (outputSink) this.audio.setSinkId(outputSink)
+        if (!sink) {
+            const speaker = this.app.state.settings.webrtc.devices
+            if (speaker.enabled) {
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput.id
+            } else {
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput.id
+            }
+        }
+
+        this.audio.setSinkId(sink)
 
         let freq1, freq2
-        let gainNode = context.createGain()
+        const gainNode = context.createGain()
 
         if (this.region === 'europe') {
             freq1 = 425
@@ -222,11 +254,8 @@ class RingbackTone {
             filter.type = 'lowpass'
             filter.connect(this.dest)
             gainNode.connect(filter)
-
             this.oscillator.start(0)
         }
-
-
 
         gainNode.gain.setValueAtTime(0, context.currentTime)
         this.ringerLFOSource = context.createBufferSource()
@@ -262,21 +291,19 @@ class RingTone extends EventEmitter {
     }
 
 
-    play(loop = true) {
+    play(loop = true, sink) {
         this.loop = loop
-        const soundSink = this.app.state.settings.webrtc.media.devices.sounds.selected.id
-        if (soundSink) {
-            this.audio.setSinkId(this.app.state.settings.webrtc.media.devices.sounds.selected.id)
-        }
 
+        if (!sink) {
+            sink = this.app.state.settings.webrtc.devices.sinks.ringOutput
+        }
+        this.audio.setSinkId(sink.id)
         // Loop the sound.
         if (loop) {
             this.audio.addEventListener('ended', () => {
                 this.playing = false
-
             }, false)
         }
-
 
         this.audio.play()
         this.playing = true

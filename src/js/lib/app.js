@@ -54,26 +54,32 @@ class App extends Skeleton {
     /**
     * Initialize media access and system sounds.
     */
-    __initMedia() {
+    async __initMedia() {
+        // Sounds that are used in the application. They can both
+        // be triggered from `AppForeground` and `AppBackground`.
+        this.sounds = new Sounds(this)
+
         // Check media permission at the start of the bg/fg.
         if (!this.env.isFirefox && !this.env.isNode) {
-            navigator.mediaDevices.getUserMedia(this._getUserMediaFlags()).then((stream) => {
+            try {
+                await navigator.mediaDevices.getUserMedia(this._getUserMediaFlags())
                 this.setState({settings: {webrtc: {media: {permission: true}}}})
-            }).catch((err) => {
+            } catch (err) {
+                // There are no devices at all. Spawn a warning.
+                if (err.message === 'Requested device not found') {
+                    if (this.env.role.fg) {
+                        this.vm.$notify({icon: 'warning', message: this.$t('no audio devices found.'), type: 'warning'})
+                    }
+                }
+
                 // This error also may be triggered when there are no
-                // devices at all. The browser sometimes has issues
+                // devices at all. The browser sometime__initViewModels has issues
                 // finding any devices.
                 this.setState({settings: {webrtc: {media: {permission: false}}}})
-            })
+            }
         } else {
             this.setState({settings: {webrtc: {media: {permission: false}}}})
         }
-
-        /**
-        * Sounds that are used in the application. They can both
-        * be triggered from `AppForeground` and `AppBackground`.
-        */
-        this.sounds = new Sounds(this)
     }
 
 
@@ -105,7 +111,7 @@ class App extends Skeleton {
     * watchers from modules.
     * @param {Object} watchers - Store properties to watch for changes.
     */
-    __initViewModel(watchers) {
+    async __initViewModel(watchers) {
         const i18nStore = new I18nStore(this.state)
         Vue.use(i18n, i18nStore)
         let selectedLanguage = this.state.settings.language.selected.id
@@ -122,7 +128,7 @@ class App extends Skeleton {
             watch: watchers,
         })
 
-        this.__initMedia()
+        await this.__initMedia()
     }
 
 
@@ -244,7 +250,8 @@ class App extends Skeleton {
         }
 
         const userMediaFlags = this.userMediaFlags[this.state.settings.webrtc.media.type.selected.id]
-        const inputSink = this.state.settings.webrtc.media.devices.input.selected.id
+        const inputSink = this.state.settings.webrtc.devices.sinks.headsetInput.id
+
         if (inputSink && inputSink !== 'default') {
             this.logger.debug(`${this}usermedia stream on sink: ${inputSink}`)
             userMediaFlags.audio.deviceId = inputSink

@@ -11,8 +11,20 @@ module.exports = (app) => {
         staticRenderFns: templates.wizard_step_voipaccount.s,
         store: {
             app: 'app',
+            settings: 'settings',
             step: 'settings.wizard.step',
             webrtc: 'settings.webrtc',
+        },
+        validations: function() {
+            let validations = {
+                settings: {
+                    webrtc: {
+                        account: app.helpers.sharedValidations.bind(this)().settings.webrtc.account,
+                    },
+                },
+            }
+
+            return validations
         },
     }
 

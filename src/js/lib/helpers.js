@@ -15,7 +15,6 @@
 function helpers(app) {
 
     const closingStatus = ['answered_elsewhere', 'rejected_a', 'rejected_b', 'bye']
-
     let _helpers = {}
 
     _helpers.activeCall = function() {
@@ -48,7 +47,8 @@ function helpers(app) {
         if (!app.state.app.online) errors.push('offline')
         if (app.state.settings.webrtc.enabled) {
             if (!app.state.settings.webrtc.media.permission) errors.push('mediaPermission')
-            else if (!(app.state.calls.ua.status === 'registered')) errors.push('unregistered')
+            if (!(app.state.calls.ua.status === 'registered')) errors.push('unregistered')
+            if (!(app.state.settings.webrtc.devices.ready)) errors.push('device')
         } else {
             // ConnectAB mode.
             if (!app.state.calls.ua.status === 'connected') errors.push('disconnected')
@@ -127,6 +127,7 @@ function helpers(app) {
                 rejected_b: $t('callee is busy'),
             },
             callingDisabled: {
+                device: $t('selected audio device is not available.').capitalize(),
                 disconnected: $t('you are disconnected from the SIP service.').capitalize(),
                 mediaPermission: $t('go to audio settings and give the browser permission to use your microphone.').capitalize(),
                 offline: $t('you are disconnected from the internet; check your connectivity.').capitalize(),
@@ -174,7 +175,6 @@ function helpers(app) {
 
 
     _helpers.sharedMethods = function() {
-
         return {
             closeOverlay: function() {
                 app.setState({ui: {overlay: null}})
@@ -294,6 +294,41 @@ function helpers(app) {
                 return transferStatus
             },
             validVoipSettings: _helpers.validVoipSettings,
+        }
+    }
+
+
+    _helpers.sharedValidations = function() {
+        const v = Vuelidate.validators
+        return {
+            settings: {
+                webrtc: {
+                    account: {
+                        selected: {
+                            id: {
+                                customValid: Vuelidate.withParams({
+                                    message: '',
+                                    type: 'customValid',
+                                }, () => {
+                                    if (!this.settings.webrtc.enabled) return true
+                                    const account = this.settings.webrtc.account.selected
+                                    if (account.id) {
+                                        if (account.settings && account.settings.avpf && account.settings.encryption) {
+                                            return true
+                                        }
+                                        return false
+                                    }
+
+                                    return true
+                                }),
+                                requiredIf: v.requiredIf(() => {
+                                    return this.settings.webrtc.enabled
+                                }),
+                            },
+                        },
+                    },
+                },
+            },
         }
     }
 

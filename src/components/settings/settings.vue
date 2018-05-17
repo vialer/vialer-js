@@ -64,15 +64,6 @@
             :label="$t('remember session')"
             :model.sync="app.vault.store"
             :help="$t('automatically unlock your session after restart.')">
-            <div slot="checkbox-extra" v-if="app.vault.store" class="notification-box info">
-                <header><icon name="info"/><span class="cf">{{$t('about data security')}}</span></header>
-                <ul>
-                    <li>
-                        <span class="cf">{{$t('your data and credentials are stored encrypted in the browser by a password-generated key.')}}</span>
-                        <span class="cf">{{$t('make sure your computer is in a trusted environment before enabling this option.')}}</span>
-                    </li>
-                </ul>
-            </div>
         </Field>
 
         <Field name="telemetry_enabled" type="checkbox"
@@ -83,9 +74,8 @@
 
     <!-- Phone preferences -->
     <div class="tab" :class="{'is-active': tabs.active === 'phone'}">
-
         <Field name="webrtc_enabled" type="checkbox"
-            :disabled="env.isFirefox"
+            :disabled="env.isFirefox || !settings.webrtc.account.options.length"
             :label="$t('use as softphone')"
             :model.sync="settings.webrtc.enabled"
             :help="env.isFirefox ? $t('firefox doesn\'t support this feature yet.') : $t('use WebRTC to receive incoming calls with and place outgoing calls.')"/>
@@ -97,38 +87,48 @@
     <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
 
         <Field v-if="settings.webrtc.media.permission" name="input_device" type="select"
-            :label="$t('headset microphone')"
-            :model.sync="devices.input.selected"
-            :options="devices.input.options"
-            :placeholder="$t('select an input device')">
-            <MicPermission slot="select-extra"/>
+            :label="$t('headset audio input')"
+            :model.sync="devices.sinks.headsetInput"
+            :options="devices.input"
+            :validation="$v.settings.webrtc.devices.sinks.headsetInput.valid">
+            <MicPermission slot="select-extra" v-if="$v.settings.webrtc.devices.sinks.headsetInput.valid.customValid"/>
         </Field>
 
         <Field v-if="settings.webrtc.media.permission" name="output_device" type="select"
+            :help="$v.settings.webrtc.devices.sinks.headsetOutput.valid.customValid ? $t('does the audio play on the preferred device?') : ''"
             :label="$t('headset audio output')"
-            :model.sync="devices.output.selected"
-            :options="devices.output.options"
-            :placeholder="$t('select an output device')"/>
+            :model.sync="devices.sinks.headsetOutput"
+            :options="devices.output"
+            :validation="$v.settings.webrtc.devices.sinks.headsetOutput.valid">
+            <button slot="select-extra" class="ringtone-play button is-link select-button"
+                :disabled="playing.headsetOutput" @click="playSound('busyTone', 'headsetOutput')">
+                <span class="icon is-small"><icon name="ring"/></span>
+            </button>
+        </Field>
 
         <Field v-if="settings.webrtc.media.permission" name="sounds_device" type="select"
+            :help="$v.settings.webrtc.devices.sinks.ringOutput.valid.customValid ? $t('does the audio play on the preferred device?') : ''"
             :label="`${$t('ringtone audio')} ${$t('output')}`"
-            :model.sync="devices.sounds.selected"
-            :options="devices.sounds.options"
-            :placeholder="$t('select a output device for sounds')"/>
+            :model.sync="devices.sinks.ringOutput"
+            :options="devices.output"
+            :validation="$v.settings.webrtc.devices.sinks.ringOutput.valid">
 
-        <div class="ringtone">
-            <Field class="ringtone-select" name="ringtone" type="select"
-                :label="`${$t('ringtone audio')} ${$t('file')}`"
-                :model.sync="settings.ringtones.selected"
-                :options="settings.ringtones.options"
-                :placeholder="$t('select a ringtone')">
+            <button slot="select-extra" class="ringtone-play button is-link select-button"
+                :disabled="playing.ringOutput" @click="playSound('ringTone', 'ringOutput')">
+                <span class="icon is-small"><icon name="ring"/></span>
+            </button>
+        </Field>
 
-                <button slot="select-extra" class="ringtone-play button is-link select-button"
-                    :disabled="!sound.enabled" @click="playSound()">
-                    <span class="icon is-small"><icon name="ring"/></span>
-                </button>
-            </Field>
-        </div>
+        <Field v-if="user.developer" class="ringtone-select" name="ringtone" type="select"
+            :label="$t('ringtone audiofile')"
+            :model.sync="ringtones.selected"
+            :options="ringtones.options">
+
+            <button slot="select-extra" class="ringtone-play button is-link select-button"
+                :disabled="playing.ringOutput" @click="playSound('ringTone', 'ringOutput')">
+                <span class="icon is-small"><icon name="ring"/></span>
+            </button>
+        </Field>
 
         <Field v-if="user.developer" name="audio_codec" type="select"
             :label="$t('audio codec')"

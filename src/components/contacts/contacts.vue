@@ -58,7 +58,7 @@
                         {{$t('transfer')}}
                         <icon name="transfer"/>
                     </div>
-                    <div class="item-slider-option green" v-if="callsReady && !transferStatus && contactIsCallable(contact)" v-on:click="callContact(contact)">
+                    <div class="item-slider-option green" v-if="!callingDisabled && callsReady && !transferStatus && contactIsCallable(contact)" v-on:click="callContact(contact)">
                         {{$t('call')}}
                         <icon name="phone-circle" :class="contact.status"/>
                     </div>

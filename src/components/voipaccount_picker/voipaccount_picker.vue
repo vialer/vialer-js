@@ -4,6 +4,7 @@
         <Field name="webrtc_account" type="select"
             :disabled="!settings.webrtc.enabled"
             :empty="$t('no VoIP accounts')"
+            :help="$t('voIP account to use as your softphone.')"
             :label="label" :model.sync="selected"
             :options="settings.webrtc.account.options"
             :placeholder="$t('select a VoIP account')"
@@ -14,12 +15,13 @@
             </button>
 
             <template slot="select-after">
-                <div class="registration-notice" :class="{show: selected.id && (selected.settings && selected.settings.ua)}">
+                <div v-if="selected.id && (selected.settings && selected.settings.ua)" class="registration-notice">
                      <a class="cf" @click="openPlatformUrl(`phoneaccount/${selected.id}/change/`)">{{$t('registered')}}</a>:
                      <i v-if="selected.settings">{{selected.settings.ua}}</i>
                 </div>
                 <!-- Directions for the user to manage their VoIP accounts. -->
-                <template v-if="settings.webrtc.enabled">
+                <template>
+                    <!-- This message is shown when there are no voipaccount options. -->
                     <div class="notification-box info" v-if="!settings.webrtc.account.options.length">
                         <header><icon name="info"/><span class="cf">{{$t('a VoIP account is required.')}}</span></header>
                         <ul>
@@ -28,7 +30,8 @@
                         </ul>
                     </div>
 
-                    <div class="notification-box troubleshoot" v-if="selected.id && !validVoipSettings">
+                    <!-- Warn when the user is about to choose a voipaccouint with incorrect settings. -->
+                    <div class="notification-box troubleshoot" v-if="selected.id && !validVoipSettings && settings.webrtc.enabled">
                         <header>
                             <icon name="warning"/><span class="cf">{{$t('voIP account adjustment required in')}} {{vendor.portal.name}}</span>
                         </header>

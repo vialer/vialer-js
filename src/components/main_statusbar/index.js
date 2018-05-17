@@ -12,6 +12,7 @@ module.exports = (app) => {
                     else {
                         if (this.settings.webrtc.enabled) {
                             if (!this.settings.webrtc.media.permission) classes.error = true
+                            else if (!this.settings.webrtc.devices.ready) classes.error = true
                             else if (this.ua.status !== 'registered') classes.error = true
                             else if (this.dnd) classes.warning = true
                             else if (this.ua.status === 'registered') classes.ok = true
@@ -45,10 +46,14 @@ module.exports = (app) => {
                     } else {
                         if (this.settings.webrtc.enabled) {
                             if (this.ua.status === 'registered') {
-                                title += this.$t('registered')
                                 if (!this.settings.webrtc.media.permission) {
-                                    title += ` (${this.$t('no microphone access')})`
-                                } else if (this.dnd) title += ` (${this.$t('do not disturb')})`
+                                    title += this.$t('no microphone access')
+                                } else if (!this.settings.webrtc.devices.ready) {
+                                    title += this.$t('invalid audio device')
+                                } else {
+                                    title += this.$t('registered')
+                                    if (this.dnd) title += ` (${this.$t('do not disturb')})`
+                                }
                             } else {
                                 title += this.$t('not registered')
                             }

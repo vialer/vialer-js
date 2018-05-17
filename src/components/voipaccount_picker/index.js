@@ -25,7 +25,15 @@ module.exports = (app) => {
             },
         }, app.helpers.sharedMethods()),
         mounted: function() {
-            if (this.v) this.validationField = this.v.settings.webrtc.account.selected.id
+            this.validationField = this.v.settings.webrtc.account.selected.id
+            const selectedId = this.settings.webrtc.account.selected.id
+            if (!selectedId) {
+                let selected
+                if (this.settings.webrtc.account.options.length) {
+                    selected = app.utils.copyObject(this.settings.webrtc.account.options[0])
+                    app.setState({settings: {webrtc: {account: {selected}}}}, {persist: true})
+                }
+            }
         },
         props: {
             info: {default: true},
@@ -56,16 +64,18 @@ module.exports = (app) => {
                     if (match) {
                         app.setState({settings: {webrtc: {account: {selected: match}}}}, {persist: true})
                     } else {
-                        app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
-
+                        const selected = app.utils.copyObject(this.settings.webrtc.account.options[0])
+                        app.setState({settings: {webrtc: {account: {selected}}}}, {persist: true})
                     }
                 } else {
                     if (!options.length) {
-                        // Nothing selected and no options. Select an empty placeholder.
-                        app.setState({settings: {webrtc: {account: {selected: emptyAccount}}}}, {persist: true})
+                        // Nothing selected and no options. Select an empty placeholder
+                        // and disable webrtc alltogether.
+                        app.setState({settings: {webrtc: {account: {selected: emptyAccount}, enabled: false}}}, {persist: true})
                     } else {
                         // Nothing selected; but there are available options. Select the first option.
-                        app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
+                        const selected = app.utils.copyObject(this.settings.webrtc.account.options[0])
+                        app.setState({settings: {webrtc: {account: {selected}}}}, {persist: true})
                     }
                 }
 
@@ -78,20 +88,6 @@ module.exports = (app) => {
             * @param {Object} webrtcEnabled - New checkbox/switch value.
             */
             'settings.webrtc.enabled': function(webrtcEnabled) {
-                if (webrtcEnabled) {
-                    // No option is set in the VoIP account select yet.
-                    // This is required. Help the user by setting the first
-                    // account as the default. An info-message is shown if
-                    // there are no accounts yet.
-                    if (!this.settings.webrtc.account.selected.username) {
-                        // There are options to choose from.
-                        if (this.settings.webrtc.account.options.length) {
-                            app.setState({settings: {webrtc: {account: {selected: this.settings.webrtc.account.options[0]}}}}, {persist: true})
-                        }
-                    }
-                } else {
-                    app.setState({settings: {webrtc: {account: {selected: emptyAccount}}}}, {persist: true})
-                }
                 if (this.v) this.v.$touch()
             },
         },

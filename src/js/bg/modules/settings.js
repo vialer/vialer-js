@@ -39,8 +39,8 @@ class ModuleSettings extends Module {
             },
             language: {
                 options: [
-                    {id: 'nl', name: this.app.$t('dutch')},
-                    {id: 'en', name: this.app.$t('english')},
+                    {id: 'nl', name: this.app.$t('dutch').capitalize()},
+                    {id: 'en', name: this.app.$t('english').capitalize()},
                 ],
                 selected: {id: 'nl', name: this.app.$t('dutch')},
             },
@@ -74,22 +74,23 @@ class ModuleSettings extends Module {
                     ],
                     selected: {id: 1, name: 'G722'},
                 },
+                devices: {
+                    input: [],
+                    output: [],
+                    ready: true,
+                    sinks: {
+                        headsetInput: {id: 'default', name: this.app.$t('default').capitalize()},
+                        headsetOutput: {id: 'default', name: this.app.$t('default').capitalize()},
+                        ringOutput: {id: 'default', name: this.app.$t('default').capitalize()},
+                        speakerInput: {id: 'default', name: this.app.$t('default').capitalize()},
+                        speakerOutput: {id: 'default', name: this.app.$t('default').capitalize()},
+                    },
+                    speaker: {
+                        enabled: false,
+                    },
+                },
                 enabled: false,
                 media: {
-                    devices: {
-                        input: {
-                            options: [],
-                            selected: {id: null, name: null},
-                        },
-                        output: {
-                            options: [],
-                            selected: {id: null, name: null},
-                        },
-                        sounds: {
-                            options: [],
-                            selected: {id: null, name: null},
-                        },
-                    },
                     permission: false,
                     type: {
                         options: [
@@ -122,7 +123,7 @@ class ModuleSettings extends Module {
         const isAuthenticated = this.app.state.user.authenticated
 
         if (vaultUnlocked && mediaPermission && isAuthenticated) {
-            this.queryMediaDevices()
+            this.app.devices.verifySinks()
         }
 
         if (this.app.state.settings.telemetry.enabled) {
@@ -171,48 +172,11 @@ class ModuleSettings extends Module {
             /**
             * Read the devices list as soon there is media permission
             * and the user is authenticated. The devices list is stored
-            * in the encrypted part, so the vault must be open at this point.
+            * in the vault, so the vault must be open at this point.
             */
             'store.settings.webrtc.media.permission': () => {
-                if (this.app.state.user.authenticated) this.queryMediaDevices()
+                if (this.app.state.user.authenticated) this.app.devices.verifySinks()
             },
-        }
-    }
-
-
-    /**
-    * Query for media devices. This must be done only after the
-    * getUserMedia permission has been granted; otherwise the names
-    * of the devices aren't returned, due to browser security restrictions.
-    */
-    async queryMediaDevices() {
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices()
-            let inputOptions = []
-            let outputOptions = []
-            for (const device of devices) {
-                if (device.kind === 'audioinput') {
-                    inputOptions.push({id: device.deviceId, name: device.label})
-                } else if (device.kind === 'audiooutput') {
-                    outputOptions.push({id: device.deviceId, name: device.label})
-                }
-            }
-
-            this.app.setState({
-                settings: {
-                    webrtc: {
-                        media: {
-                            devices: {
-                                input: {options: inputOptions},
-                                output: {options: outputOptions},
-                                sounds: {options: outputOptions},
-                            },
-                        },
-                    },
-                },
-            }, {persist: true})
-        } catch (err) {
-            console.error(err)
         }
     }
 

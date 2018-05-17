@@ -54,8 +54,8 @@
 
 // Button beneath tabs.
 .tabs-actions {
-    padding: 0 ($spacer * 3);
-    padding-bottom: ($spacer * 3);
+    padding: $spacer ($spacer * 3);
+    padding-bottom: $spacer * 2;
 }
 
 .tab {

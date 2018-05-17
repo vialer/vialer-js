@@ -12,6 +12,10 @@
 
         .component-voipaccount-picker {
             align-items: center;
+
+            .notification-box {
+                margin-bottom: $spacer * 2;
+            }
         }
     }
 }

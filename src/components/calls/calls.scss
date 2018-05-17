@@ -1,4 +1,5 @@
 @import "../../scss/lib/variables";
+@import "../../scss/lib/mixins";
 
 .component-calls {
     // Push the soundmeter to the bottom.
@@ -18,6 +19,39 @@
             border-top: 1px solid darken($brand-variation-color, 5%);
         }
     }
+
+    .disabled-placeholder {
+        align-items: center;
+        color: $grey-color-lighter;
+        display: flex;
+        flex-direction: column;
+        margin-top: $spacer * 6;
+        width: 100%;
+
+        .disabled-icon {
+            @include icon-size($spacer * 8);
+            color: $grey-color-lighter;
+        }
+
+        .disabled-text {
+            color: $red-color;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-top: $spacer * 3;
+            text-align: center;
+            width: 100%;
+        }
+
+        .disabled-reason {
+            color: $grey-color;
+            font-style: italic;
+            margin-bottom: $spacer * 2;
+            margin-top: $spacer;
+            text-align: center;
+            width: 100%;
+        }
+    }
+
 
     .soundmeter {
         align-items: center;

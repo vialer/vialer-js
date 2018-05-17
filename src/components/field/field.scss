@@ -1,10 +1,16 @@
 @import "../../scss/lib/mixins";
 @import "../../scss/lib/variables";
+
 // Bulma form field with some small modifications.
+.field-password,
+.field-text {
+    &:not(:last-child) {
+        margin-bottom: 0;
+    }
+}
 
 .field {
-
-    &:not(:last-child) {
+    &:last-child {
         margin-bottom: 0;
     }
 
@@ -16,11 +22,15 @@
 
     .validation-message {
         // Make sure it doesn't collapse when there is no message.
-        height: 1rem;
+        color: $red-color;
+        font-size: 0.75rem;
         margin: 0;
         margin-top: $spacer / 4;
-        opacity: 0;
         transition: opacity 0.5s ease;
+
+        &.hide {
+            opacity: 0;
+        }
 
         &.show {
             opacity: 1;
@@ -33,7 +43,6 @@
 
     .control {
         .select {
-
             select {
                 border-bottom-right-radius: 0;
                 border-top-right-radius: 0;
@@ -64,11 +73,10 @@
 }
 
 .field-checkbox {
-    .notification-box {
-        margin-bottom: $spacer * 2;
-    }
+    margin-bottom: $spacer * 2;
 
     .switch[type="checkbox"] + label {
         display: block;
     }
+
 }

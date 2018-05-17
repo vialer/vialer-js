@@ -40,6 +40,11 @@ body {
         line-height: none;
     }
 
+    .help {
+        display: inline-block;
+        margin-top: $spacer;
+    }
+
     textarea,
     .input {
         box-shadow: none;
@@ -157,3 +162,8 @@ video {
     margin: 0 $spacer;
     width: 2px;
 }
+
+.spacer-bottom-1x {margin-bottom: $spacer;}
+.spacer-bottom-2x {margin-bottom: $spacer * 2;}
+.spacer-top-1x {margin-top: $spacer;}
+.spacer-top-2x {margin-top: $spacer * 2;}
