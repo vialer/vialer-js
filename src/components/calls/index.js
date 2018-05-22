@@ -4,7 +4,7 @@ module.exports = (app) => {
     */
     const Calls = {
         computed: app.helpers.sharedComputed(),
-        methods: {
+        methods: Object.assign({
             classes: function(block) {
                 let classes = {}
 
@@ -13,7 +13,7 @@ module.exports = (app) => {
                 }
                 return classes
             },
-        },
+        }, app.helpers.sharedMethods()),
         render: templates.calls.r,
         staticRenderFns: templates.calls.s,
         store: {

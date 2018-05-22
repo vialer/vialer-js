@@ -129,12 +129,14 @@ class Call {
     */
     async _initMedia() {
         // Set the output device from settings.
-        const {output} = this.app.state.settings.webrtc.media.devices
+        const devices = this.app.state.settings.webrtc.devices
         try {
-            if (output.selected.id && output.selected.id !== 'default') {
-                this.app.logger.info(`${this}call video element on sink ${output.selected.id}`)
-                await this.app.video.setSinkId(output.selected.id)
-            }
+            let outputSink
+            if (devices.speaker.enabled) outputSink = devices.sinks.speakerOutput.id
+            else outputSink = devices.sinks.headsetOutput.id
+
+            this.app.logger.info(`${this}call video element on sink ${outputSink}`)
+            await this.app.video.setSinkId(outputSink)
         } catch (err) {
             const message = this.app.$t('failed to set input or output device.')
             this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})

@@ -26,6 +26,12 @@ module.exports = (app) => {
                 canvasContext.fillRect(0, 0, meter.volume * canvasElement.width * 2.4, canvasElement.height)
                 this.rafID = window.requestAnimationFrame(this.drawLoop)
             },
+            updateSoundmeter: async function() {
+                this.stream = await navigator.mediaDevices.getUserMedia(app._getUserMediaFlags())
+                const mediaStreamSource = audioContext.createMediaStreamSource(this.stream)
+                meter = volumeLib.createAudioMeter(audioContext)
+                mediaStreamSource.connect(meter)
+            },
         }, app.helpers.sharedMethods()),
         mounted: async function() {
             canvasElement = this.$refs.meter
@@ -44,19 +50,19 @@ module.exports = (app) => {
         render: templates.soundmeter.r,
         staticRenderFns: templates.soundmeter.s,
         store: {
-            devices: 'settings.webrtc.media.devices',
+            devices: 'settings.webrtc.devices',
             settings: 'settings',
         },
         watch: {
+            'devices.ready': async function(isReady) {
+                if (isReady) this.updateSoundmeter()
+            },
             /**
             * Reinitialize the soundmeter when the
             * input device changes.
             */
-            'devices.input.selected.id': async function() {
-                this.stream = await navigator.mediaDevices.getUserMedia(app._getUserMediaFlags())
-                const mediaStreamSource = audioContext.createMediaStreamSource(this.stream)
-                meter = volumeLib.createAudioMeter(audioContext)
-                mediaStreamSource.connect(meter)
+            'devices.sinks.headsetInput.id': async function() {
+                this.updateSoundmeter()
             },
         },
     }

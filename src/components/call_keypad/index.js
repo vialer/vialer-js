@@ -49,6 +49,11 @@ module.exports = (app) => {
             inputChange: function(newVal) {
                 this.$emit('update:model', newVal)
             },
+            placeCall: function(number, start = true, transfer = false) {
+                if (this.mode === 'call') {
+                    this.createCall(number, start, transfer)
+                }
+            },
             pressKey: function(key) {
                 if (this.callingDisabled) return
                 if (!key) {

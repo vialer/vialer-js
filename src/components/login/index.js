@@ -63,13 +63,6 @@ module.exports = (app) => {
         },
         validations: function() {
             // Bind the API response message to the validator $params.
-            const apiResponse = Vuelidate.withParams({
-                message: this.twoFactorToken.message,
-                type: 'apiResponse',
-            }, () => {
-                return this.twoFactorToken.valid
-            })
-
             let validations = {
                 password: {
                     minLength: v.minLength(6),
@@ -77,7 +70,12 @@ module.exports = (app) => {
                 },
                 twoFactorToken: {
                     value: {
-                        apiResponse,
+                        customValid: Vuelidate.withParams({
+                            message: this.twoFactorToken.message,
+                            type: 'customValid',
+                        }, () => {
+                            return this.twoFactorToken.valid
+                        }),
                         numeric: v.numeric,
                         requiredIf: v.requiredIf(() => {
                             return this.user.twoFactor

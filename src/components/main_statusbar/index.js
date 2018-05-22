@@ -12,6 +12,7 @@ module.exports = (app) => {
                     else {
                         if (this.settings.webrtc.enabled) {
                             if (!this.settings.webrtc.media.permission) classes.error = true
+                            else if (!this.settings.webrtc.devices.ready) classes.error = true
                             else if (this.ua.status !== 'registered') classes.error = true
                             else if (this.dnd) classes.warning = true
                             else if (this.ua.status === 'registered') classes.ok = true
@@ -33,7 +34,9 @@ module.exports = (app) => {
             titles: function(block) {
                 let title = ''
                 if (block === 'indicator') {
-                    title += 'Status: '
+                    if (this.settings.webrtc.enabled) title += 'WebRTC: '
+                    else title += 'ConnectAB: '
+
                     if (['disconnected', 'reconnect', 'registration_failed'].includes(this.ua.status)) {
                         // Give an indication why we are not connected.
                         if (!this.app.online) title += this.$t('offline')
@@ -43,19 +46,22 @@ module.exports = (app) => {
                     } else {
                         if (this.settings.webrtc.enabled) {
                             if (this.ua.status === 'registered') {
-                                title += this.$t('registered')
                                 if (!this.settings.webrtc.media.permission) {
-                                    title += ` (${this.$t('no microphone access')})`
-                                } else if (this.dnd) title += ` (${this.$t('do not disturb')})`
+                                    title += this.$t('no microphone access')
+                                } else if (!this.settings.webrtc.devices.ready) {
+                                    title += this.$t('invalid audio device')
+                                } else {
+                                    title += this.$t('registered')
+                                    if (this.dnd) title += ` (${this.$t('do not disturb')})`
+                                }
                             } else {
                                 title += this.$t('not registered')
                             }
-                            title += ' (WebRTC)'
                         } else {
                             if (this.ua.status === 'connected') {
-                                title += `${this.$t('connected')} (ConnectAB)`
+                                title += this.$t('connected')
                             } else {
-                                title += `${this.$t(this.ua.status)} (ConnectAB)`
+                                title += this.$t(this.ua.status)
                             }
                         }
                     }

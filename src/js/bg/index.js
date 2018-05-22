@@ -5,6 +5,7 @@
 const Api = require('./lib/api')
 const App = require('../lib/app')
 const Crypto = require('./lib/crypto')
+const Devices = require('./lib/devices')
 const env = require('../lib/env')({role: 'bg'})
 const Store = require('./lib/store')
 const Telemetry = require('./lib/telemetry')
@@ -40,16 +41,14 @@ class AppBackground extends App {
 
         this.__mergeBusy = false
         this.__mergeQueue = []
-        this.__ready = false
+
         // Send the background script's state to the requesting event.
         this.on('bg:get_state', ({callback}) => {
-            // Race to the __ready flag from AppForeground.
-            // Add a one-time event if AppBackground is not yet ready, which
-            // releases the callback.
             callback(JSON.stringify(this.state))
         })
         this.on('bg:refresh_api_data', this._platformData.bind(this))
         this.on('bg:set_state', this.__mergeState.bind(this))
+
         this.__init()
     }
 
@@ -86,7 +85,6 @@ class AppBackground extends App {
             document.body.prepend(this.video)
         }
 
-
         // Start by initializing all modules.
         for (let module of this._modules) {
             this.modules[module.name] = new module.Module(this)
@@ -94,7 +92,6 @@ class AppBackground extends App {
 
         this.api = new Api(this)
         await this.__initStore()
-
         this.telemetry = new Telemetry(this)
         // Clear all state if the schema changed after a plugin update.
         // This is done here because of translations, which are only available
@@ -108,10 +105,7 @@ class AppBackground extends App {
         }
 
         if (!validSchema) this.__factoryDefaults(notification)
-        // From here on, a request to bg:get_state will be
-        // dealed with properly. Finish the callback wheb
-        // an AppForeground state request is pending.
-        this.__ready = true
+
         this.emit('ready')
     }
 
@@ -167,8 +161,10 @@ class AppBackground extends App {
             }
         }
 
-        this.__initViewModel(watchers)
-        // (!) State is reactive from here on.
+        // (!) State is reactive after initializing the view-model.
+        await this.__initViewModel(watchers)
+
+        this.devices = new Devices(this)
         // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()
@@ -260,10 +256,12 @@ class AppBackground extends App {
             user: {authenticated: true},
         }, {encrypt: false, persist: true})
 
-        // Set the default layer if it's still on unlock.
+        // Set the default layer if it's still set to login.
         if (this.state.ui.layer === 'login') {
             this.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
         }
+
+        this.emit('unlocked', {}, true)
     }
 
 
@@ -271,7 +269,7 @@ class AppBackground extends App {
     * Refresh data from the API endpoints for each module.
     */
     _platformData() {
-        this.logger.debug(`${this}(re)refreshing platform api data`)
+        this.logger.debug(`${this}refreshing platform api data`)
         for (let module in this.modules) {
             // Use 'load' instead of 'restore' to refresh the data on
             // browser restart.

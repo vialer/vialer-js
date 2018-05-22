@@ -105,14 +105,6 @@ class ModuleApp extends Module {
                     this.app.setState({app: {vault: {key: null}}}, {encrypt: false, persist: true})
                 }
             },
-            'store.app.vault.unlocked': (unlocked) => {
-                // Only respond as long the user is logged in.
-                if (!this.app.state.user.authenticated) return
-
-                if (unlocked && this.app.state.settings.webrtc.media.permission) {
-                    this.app.modules.settings.queryMediaDevices()
-                }
-            },
         }
     }
 

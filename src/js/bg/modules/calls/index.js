@@ -70,7 +70,9 @@ class ModuleCalls extends Module {
                 // Both a 'regular' new call and an attended transfer call will
                 // create or get a new Call and activate it.
                 let call = this._newCall({number, type})
-                if (start) call.start()
+
+                // An actual call may only be made when calling is enabled.
+                if (start && !this.app.helpers.callingDisabled()) call.start()
                 // Sync the others transfer state of other calls to the new situation.
                 this.__setTransferState()
                 // A newly created call is always activated unless
@@ -259,14 +261,17 @@ class ModuleCalls extends Module {
             const callIds = Object.keys(this.calls)
             const callOngoing = this.app.helpers.callOngoing()
             const closingCalls = this.app.helpers.callsClosing()
+            const deviceReady = this.app.state.settings.webrtc.devices.ready
             const dnd = this.app.state.availability.dnd
             const microphoneAccess = this.app.state.settings.webrtc.media.permission
 
             let acceptCall = true
             let declineReason
-            if (dnd || !microphoneAccess) {
+            if (dnd || !microphoneAccess || !deviceReady) {
                 acceptCall = false
-                declineReason = dnd ? 'dnd' : 'microphone'
+                if (dnd) declineReason = 'dnd'
+                if (!microphoneAccess) declineReason = 'microphone'
+                if (!deviceReady) declineReason = 'device'
             }
 
             if (callOngoing) {

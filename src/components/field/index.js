@@ -27,25 +27,25 @@ module.exports = (app) => {
              * @returns {Array} - An array of translated error messages.
              */
             validationMessage: function() {
-                let errorMessages = []
+                let err = []
                 const v = this.validation
 
-                if (!v) return errorMessages
+                if (!v) return err
 
-                if (v.apiResponse === false) {
-                    errorMessages.push(this.$t(v.$params.apiResponse.message))
+                if (v.customValid === false) {
+                    err.push(this.$t(v.$params.customValid.message).capitalize())
                 }
 
                 if (v.domain === false) {
-                    errorMessages.push(this.$t('fill in a valid domain.').capitalize())
+                    err.push(this.$t('fill in a valid domain.').capitalize())
                 }
 
                 if (v.email === false) {
-                    errorMessages.push(this.$t('fill in a valid email address.').capitalize())
+                    err.push(this.$t('fill in a valid email address.').capitalize())
                 }
 
                 if (v.maxLength === false) {
-                    errorMessages.push(this.$t(
+                    err.push(this.$t(
                         'fill in a value no longer than {max} characters.', {
                             max: v.$params.maxLength.max,
                         }).capitalize()
@@ -53,7 +53,7 @@ module.exports = (app) => {
                 }
 
                 if (v.minLength === false) {
-                    errorMessages.push(this.$t(
+                    err.push(this.$t(
                         'fill in a value of at least {min} characters.', {
                             min: v.$params.minLength.min,
                         }).capitalize()
@@ -61,32 +61,32 @@ module.exports = (app) => {
                 }
 
                 if (v.numeric === false) {
-                    errorMessages.push(this.$t('fill in a valid number.').capitalize())
+                    err.push(this.$t('fill in a valid number.').capitalize())
                 }
 
                 if (v.must_be_unique === false) {
-                    errorMessages.push(this.$t('fill in a unique value.').capitalize())
+                    err.push(this.$t('fill in a unique value.').capitalize())
                 }
 
                 if (v.required === false) {
-                    errorMessages.push(this.$t('this field is required.').capitalize())
+                    err.push(this.$t('this field is required.').capitalize())
                 }
 
                 if (v.requiredIf === false) {
-                    errorMessages.push(this.$t('this field is required.').capitalize())
+                    err.push(this.$t('this field is required.').capitalize())
                 }
 
                 if (v.sameAs === false) {
-                    errorMessages.push(this.$t('field "{fieldName}" must have the same value.', {
+                    err.push(this.$t('field "{fieldName}" must have the same value.', {
                         fieldName: v.$params.sameAs.eq,
                     }).capitalize())
                 }
 
                 if (v.url === false) {
-                    errorMessages.push(this.$t('fill in a valid url.').capitalize())
+                    err.push(this.$t('fill in a valid url.').capitalize())
                 }
 
-                return errorMessages.join('</br>')
+                return err.join('</br>')
             },
         },
         methods: {

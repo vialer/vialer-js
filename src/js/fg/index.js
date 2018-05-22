@@ -78,7 +78,7 @@ class AppForeground extends App {
         super.__initStore()
         // Initialize with the initial state from the background.
         this.emit('bg:get_state', {
-            callback: (state) => {
+            callback: async(state) => {
                 // Make sure that the webview doesn't use the referenced
                 // state object from the background. Extensions also
                 // serialize data between scripts, so this is done in
@@ -87,7 +87,7 @@ class AppForeground extends App {
                 // (!) Don't inherit the env of the background script.
                 this.state.env = this.env
 
-                this.__initViewModel()
+                await this.__initViewModel()
                 this.vm.$mount(document.querySelector('#app-placeholder'))
                 this.setState({ui: {visible: true}})
                 if (this.env.isExtension) {

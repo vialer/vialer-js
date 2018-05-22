@@ -117,40 +117,4 @@ html {
             margin-top: $spacer;
         }
     }
-
-    .disabled-placeholder {
-        align-items: center;
-        color: $grey-color-lighter;
-        display: flex;
-        flex-direction: column;
-        margin-top: $spacer * 6;
-        width: 100%;
-
-        .disabled-icon {
-            @include icon-size($spacer * 8);
-            color: $brand-color;
-        }
-
-        .disabled-text {
-            color: $brand-color;
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin-top: $spacer * 2;
-            text-align: center;
-            width: 75%;
-        }
-
-        .disabled-reason {
-            color: $grey-color;
-            margin-top: $spacer * 2;
-            text-align: center;
-            width: 75%;
-
-            ul {
-                li {
-                    margin-bottom: $spacer;
-                }
-            }
-        }
-    }
 }

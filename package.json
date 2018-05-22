@@ -1,7 +1,7 @@
 {
   "name": "vialer-js",
   "productName": "vialer-js",
-  "version": "3.0.162",
+  "version": "3.0.179",
   "description": "Click-to-Dial, status updates and queue monitoring for Firefox, Chrome & Electron.",
   "engines": {
     "node": ">=8.0.0"
@@ -9,7 +9,8 @@
   "scripts": {
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "test": "gulp test",
-    "lint": "./node_modules/.bin/eslint './src/**/*.js'"
+    "lint-js": "./node_modules/.bin/eslint './src/**/*.js'",
+    "lint-scss": "./node_modules/sass-lint/bin/sass-lint.js -v -c ./.sass-lint.yml 'src/**/*.scss' --max-warnings 0"
   },
   "repository": {
     "type": "git",
@@ -79,6 +80,7 @@
     "mkdirp": "^0.5.1",
     "rc": "^1.2.1",
     "run-sequence": "^1.2.2",
+    "sass-lint": "^1.12.1",
     "serve-index": "^1.9.0",
     "serve-static": "^1.12.1",
     "standard-version": "^4.3.0",

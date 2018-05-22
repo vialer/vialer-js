@@ -105,7 +105,8 @@ for (let brand in settings.brands) {
 }
 // Initialize the helpers, which make this file less dense.
 const helpers = new Helpers(settings)
-const WATCHLINKED = argv.linked ? argv.linked : false
+const WATCHLINKED = argv.linked ? true : false
+const WATCHTEST = argv.verify ? true : false
 
 
 let taskOptions = {}
@@ -396,7 +397,8 @@ gulp.task('js-vendor-fg', 'Generate third-party vendor js.', ['icons'], (done) =
 gulp.task('js-app-bg', 'Generate the extension background entry js.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'app_bg', [], () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
-        done()
+        if (WATCHTEST) runSequence(['test'], done)
+        else done()
     })
 }, {options: taskOptions.browser})
 
@@ -404,14 +406,16 @@ gulp.task('js-app-bg', 'Generate the extension background entry js.', (done) => 
 gulp.task('js-app-fg', 'Generate webextension fg/popout js.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', [], () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
-        done()
+        if (WATCHTEST) runSequence(['test'], done)
+        else done()
     })
 }, {options: taskOptions.browser})
 
 
 gulp.task('js-app-observer', 'Generate WebExtension icon observer which runs in all tab frames.', (done) => {
     helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', [], () => {
-        done()
+        if (WATCHTEST) runSequence(['test'], done)
+        else done()
     })
 }, {options: taskOptions.browser})
 

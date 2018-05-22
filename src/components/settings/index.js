@@ -8,9 +8,10 @@ module.exports = (app) => {
     const Settings = {
         data: function() {
             return {
-                sound: {
-                    enabled: true,
-                    inputlevel: 0,
+                playing: {
+                    headsetOutput: false,
+                    ringOutput: false,
+                    speakerOutput: false,
                 },
             }
         },
@@ -26,15 +27,27 @@ module.exports = (app) => {
                 }
                 return classes
             },
-            playSound: function() {
-                // Don't allow the user to frenzy-click the test-audio button.
-                if (app.sounds.ringTone.playing) return
+            playSound: function(soundName, sinkTarget) {
+                this.playing[sinkTarget] = true
 
-                app.sounds.ringTone.off('stop').on('stop', () => {
-                    this.sound.enabled = true
-                })
-                app.sounds.ringTone.play(false)
-                this.sound.enabled = false
+                if (app.sounds[soundName].off) {
+                    // Prevent frenzy-clicking the test-audio button.
+                    if (app.sounds[soundName].playing) return
+
+                    app.sounds[soundName].play(false, this.devices.sinks[sinkTarget])
+                    app.sounds[soundName].off('stop').on('stop', () => {
+                        this.playing[sinkTarget] = false
+                    })
+                } else {
+                    // Prevent frenzy-clicking the test-audio button.
+                    if (app.sounds[soundName].started) return
+
+                    app.sounds[soundName].play(this.devices.sinks[sinkTarget])
+                    setTimeout(() => {
+                        app.sounds[soundName].stop()
+                        this.playing[sinkTarget] = false
+                    }, 2500)
+                }
             },
             save: function(e) {
                 app.setState({
@@ -57,28 +70,16 @@ module.exports = (app) => {
         staticRenderFns: templates.settings.s,
         store: {
             app: 'app',
-            devices: 'settings.webrtc.media.devices',
+            devices: 'settings.webrtc.devices',
             env: 'env',
+            ringtones: 'settings.ringtones',
             settings: 'settings',
             tabs: 'ui.tabs.settings',
             user: 'user',
             vendor: 'app.vendor',
         },
         validations: function() {
-            const isValid = Vuelidate.withParams({
-                type: 'isValid',
-            }, () => {
-                const account = this.settings.webrtc.account.selected
-                if (account) {
-                    if (account.settings.avpf && account.settings.encryption) {
-                        return true
-                    }
-                    return false
-                }
-
-                return true
-            })
-
+            const sinkErrormessage = app.$t('selected audio device is not available.')
             let validations = {
                 settings: {
                     platform: {
@@ -92,21 +93,54 @@ module.exports = (app) => {
                         required: v.required,
                     },
                     webrtc: {
-                        account: {
-                            selected: {
-                                id: {
-                                    isValid,
-                                    requiredIf: v.requiredIf(() => {
-                                        return this.settings.webrtc.enabled
-                                    }),
+                        devices: {
+                            sinks: {
+                                headsetInput: {
+                                    valid: {
+                                        customValid: Vuelidate.withParams({
+                                            message: sinkErrormessage,
+                                            type: 'customValid',
+                                        }, (valid, headsetInput) => {
+                                            if (!this.settings.webrtc.enabled) return true
+                                            const storedDevice = this.devices.input.find((i) => i.id === headsetInput.id)
+                                            if (storedDevice) return storedDevice.valid
+                                            return true
+                                        }),
+                                    },
+                                },
+                                headsetOutput: {
+                                    valid: {
+                                        customValid: Vuelidate.withParams({
+                                            message: sinkErrormessage,
+                                            type: 'customValid',
+                                        }, (valid, headsetOutput) => {
+                                            if (!this.settings.webrtc.enabled) return true
+                                            const storedDevice = this.devices.output.find((i) => i.id === headsetOutput.id)
+                                            if (storedDevice) return storedDevice.valid
+                                            return false
+                                        }),
+                                    },
+                                },
+                                ringOutput: {
+                                    valid: {
+                                        customValid: Vuelidate.withParams({
+                                            message: sinkErrormessage,
+                                            type: 'customValid',
+                                        }, (valid, ringOutput) => {
+                                            if (!this.settings.webrtc.enabled) return true
+                                            const storedDevice = this.devices.output.find((i) => i.id === ringOutput.id)
+                                            if (storedDevice) return storedDevice.valid
+                                            return true
+                                        }),
+                                    },
                                 },
                             },
-                            validVoipSettings: app.helpers.validVoipSettings,
                         },
                     },
                 },
             }
-
+            // Add the validation that is shared with step_voipaccount.
+            validations.settings.webrtc.account = app.helpers.sharedValidations.bind(this)().settings.webrtc.account
             return validations
         },
         watch: {

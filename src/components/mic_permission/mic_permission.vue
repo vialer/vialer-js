@@ -3,13 +3,13 @@
         <template v-if="settings.webrtc.media.permission">
             <!-- Additional help to guide the user to the browser permission settings. -->
             <div class="mic-popout-instructions" v-if="soundmeter">
-                <div class="help cf">{{$t('check if the microphone responds to your voice.')}}</div>
+                <em class="help cf">{{$t('does the microphone of the preferred device respond?')}}</em>
                 <Soundmeter class="soundmeter"/>
             </div>
             <div class="mic-popout-instructions" v-else>
                 <icon name="video-cam" class="video-cam"/>
                 <i class="check"><icon name="check"/></i>
-                <div class="help cf">{{$t('the browser already has permission to use your computer\'s microphone.')}}</div>
+                <em class="help cf">{{$t('the browser already has permission to use your computer\'s microphone.')}}</em>
             </div>
         </template>
 
