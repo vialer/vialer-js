@@ -1,7 +1,7 @@
 [![Build status](https://travis-ci.com/VoIPGRID/vialer-js.svg?branch=develop)](https://travis-ci.com/VoIPGRID/vialer-js)
 
 # About Vialer-js
-Vialer-js is a free and open-source communication platform in development.
+Vialer-js is a free and open-source communication platform.
 It's purpose is to be an attractive unified communication tool to end-users,
 who value cross-platform user- and privacy-friendly features, like being able
 to accept and place calls over a phone network, setting up (p2p) video

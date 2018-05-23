@@ -106,7 +106,6 @@ class Helpers {
                         const _res = await webStore.publish('default', token)
                         if (_res.status.includes('OK')) {
                             // Upload stacktrace related files to Sentry.
-                            this.sentryRelease(brandName, buildType)
                             gutil.log(`Published ${brandName} Chrome WebExtension version ${PACKAGE.version}.`)
                             this.settings.BRAND_TARGET = OLD_BRAND_TARGET
                             this.settings.BUILD_TARGET = OLD_BUILD_TARGET
@@ -252,6 +251,7 @@ class Helpers {
             .pipe(envify({
                 ANALYTICS_ID: this.settings.brands[brandName].telemetry.analytics_id[buildType],
                 APP_NAME: this.settings.brands[brandName].name.production,
+                BRAND_NAME: brandName,
                 DEPLOY_TARGET: this.settings.DEPLOY_TARGET,
                 NODE_ENV: this.settings.NODE_ENV,
                 PLATFORM_URL: this.settings.brands[brandName].permissions,
@@ -269,8 +269,8 @@ class Helpers {
             }))
             .pipe(ifElse(this.settings.PRODUCTION, () => minifier()))
             .pipe(sourcemaps.write('./'))
-            .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')))
             .pipe(size(_extend({title: `${bundleName}.js`}, this.settings.SIZE_OPTIONS)))
+            .pipe(gulp.dest(path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')))
     }
 
 
@@ -306,20 +306,21 @@ class Helpers {
     }
 
 
-    sentryRelease(brandName, buildType) {
+    sentryManager(brandName, buildType) {
+        let release
+        // A release name is unique to the brand, the build target
+        // and the deploy target.
+        if (!this.settings.RELEASE) release = `${this.settings.VERSION}-${this.settings.DEPLOY_TARGET}-${brandName}-${buildType}`
+        else release = this.settings.RELEASE
+
         const sentry = this.settings.brands[brandName].telemetry.sentry
-        const releaseManager = createReleaseManager({
+        return createReleaseManager({
             apiKey: sentry.apiKey,
             host: sentry.host,
             org: sentry.org,
             project: sentry.project,
-            sourceMapBasePath: 'chrome-extension:///js/',
-            version: this.settings.PACKAGE.version,
-        })
-        releaseManager.create(() => {
-            const base = path.join(this.settings.BUILD_DIR, brandName, buildType, 'js')
-            gulp.src(path.join(base, '*'), {base})
-                .pipe(releaseManager.upload())
+            sourceMapBasePath: '~/js/',
+            version: release,
         })
     }
 

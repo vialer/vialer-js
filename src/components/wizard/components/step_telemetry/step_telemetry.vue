@@ -10,7 +10,7 @@
     <slot name="progress"></slot>
 
     <div class="buttons is-centered">
-        <button class="button is-primary cf" @click="toggleTelemetry(true)">{{$t('yes, let me help')}}</button>
-        <button class="button cf" @click="toggleTelemetry(false)">{{$t('no thanks')}}</button>
+        <button class="button is-primary cf test-step-telemetry-button-yes" @click="toggleTelemetry(true)">{{$t('yes, let me help')}}</button>
+        <button class="button cf test-step-telemetry-button-no" @click="toggleTelemetry(false)">{{$t('no thanks')}}</button>
     </div>
 </component>

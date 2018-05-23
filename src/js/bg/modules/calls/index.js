@@ -72,7 +72,9 @@ class ModuleCalls extends Module {
                 let call = this._newCall({number, type})
 
                 // An actual call may only be made when calling is enabled.
-                if (start && !this.app.helpers.callingDisabled()) call.start()
+                if (start && !this.app.helpers.callingDisabled()) {
+                    call.start()
+                }
                 // Sync the others transfer state of other calls to the new situation.
                 this.__setTransferState()
                 // A newly created call is always activated unless
@@ -373,6 +375,7 @@ class ModuleCalls extends Module {
     */
     __uaOptions() {
         const settings = this.app.state.settings
+
         // For webrtc this is a voipaccount, otherwise an email address.
         let options = {
             autostart: false,
@@ -390,7 +393,7 @@ class ModuleCalls extends Module {
             },
             traceSip: false,
             userAgentString: this._userAgent(),
-            wsServers: [`wss://${settings.sipEndpoint}`],
+            wsServers: `wss://${settings.sipEndpoint}`,
         }
 
         // Log in with the WebRTC voipaccount when it is enabled.
