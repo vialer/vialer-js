@@ -408,10 +408,12 @@ class Crypto {
     * Persist the encryption key to the unencrypted part
     * of the store, so the plugin can automatically unlock.
     * This is a tradeoff between usability and security.
+    * @returns {String} - The base64-encoded vault key.
     */
     async storeVaultKey() {
         const sessionKey = await this.__exportAESKey(this.sessionKey)
         this.app.setState({app: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
+        return sessionKey
     }
 
 

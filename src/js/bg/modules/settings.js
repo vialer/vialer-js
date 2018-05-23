@@ -127,13 +127,24 @@ class ModuleSettings extends Module {
         }
 
         if (this.app.state.settings.telemetry.enabled) {
-            const sentryDsn = this.app.state.settings.telemetry.sentryDsn
-            this.app.logger.info(`${this}sentry exception monitoring to ${sentryDsn}`)
-            Raven.config(sentryDsn, {
+            const release = process.env.VERSION + '-' + process.env.DEPLOY_TARGET + '-' + process.env.BRAND_NAME + '-' + this.app.env.name
+            this.app.logger.info(`${this}monitoring exceptions for release ${release}`)
+            Raven.config(process.env.SENTRY_DSN, {
                 allowSecretKey: true,
                 environment: process.env.DEPLOY_TARGET,
-                release: this.app.state.app.version.current,
+                release,
+                tags: {
+                    sipjs: SIP.version,
+                    vuejs: Vue.version,
+                },
             }).install()
+
+            Raven.setUserContext({
+                email: this.app.state.user.username,
+                id: `${this.app.state.user.client_id}/${this.app.state.user.id}`,
+            })
+        } else {
+            Raven.uninstall()
         }
     }
 

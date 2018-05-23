@@ -2,6 +2,7 @@ node_modules
 build
 dist
 docs/build
+super_secret.txt
 .tags
 .publish
 .vialer-jsrc

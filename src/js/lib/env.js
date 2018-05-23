@@ -27,6 +27,7 @@ function env({role}) {
         isNode: false,
         isPopout: false,
         isWindows: false,
+        name: 'unknown',
         role: {
             bg: false,
             fg: false,
@@ -41,10 +42,20 @@ function env({role}) {
     if (global.document) {
         ua = navigator.userAgent.toLowerCase()
 
-        if (ua.includes('edge')) _env.isEdge = true
-        else if (ua.includes('firefox')) _env.isFirefox = true
-        else if (ua.includes('chrome')) _env.isChrome = true
-    } else _env.isNode = true
+        if (ua.includes('edge')) {
+            _env.isEdge = true
+            _env.name = 'edge'
+        } else if (ua.includes('firefox')) {
+            _env.isFirefox = true
+            _env.name = 'firefox'
+        } else if (ua.includes('chrome')) {
+            _env.isChrome = true
+            _env.name = 'chrome'
+        }
+    } else {
+        _env.isNode = true
+        _env.name = 'node'
+    }
 
     if (global.navigator) {
         _env.isBrowser = true
