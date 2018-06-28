@@ -10,7 +10,7 @@ require('../../src/js/i18n/nl')
 const {AppBackground, bgOptions} = require('../../src/js/bg')
 
 
-test('Background app startup sequence.', function(t) {
+test('[bg] starting up sequence', function(t) {
     t.plan(4)
     const bg = new AppBackground(bgOptions)
     // There is no schema in the database on a fresh start.
@@ -32,7 +32,7 @@ test('Background app startup sequence.', function(t) {
 })
 
 
-test('Translation validity.', async function(t) {
+test('[bg] translation check', async function(t) {
     t.plan(3)
 
     const files = await glob('{src/js/**/*.js,src/components/**/{*.vue,*.js}}')

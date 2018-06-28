@@ -59,10 +59,9 @@
 
         <div class="buttons is-centered">
             <button v-if="app.session.available.length" type="button" class="button cf" @click="selectSession()">{{$t('change session')}}</button>
-            <button type="button" class="button is-primary cf" :disabled="$v.$invalid" @click="login">{{$t('log in')}}</button>
+            <button type="button" class="button is-primary cf test-login-button" :disabled="$v.$invalid" @click="login">{{$t('log in')}}</button>
         </div>
     </template>
-
 
     <footer>
         <div v-if="app.session.active" class="forgot-pw">
