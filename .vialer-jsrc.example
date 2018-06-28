@@ -17,7 +17,8 @@
                 },
                 "support": {
                     "email": "support@voipgrid.nl",
-                    "phone": "1234567890"
+                    "phone": "1234567890",
+                    "website": "https://vialer-js.io"
                 },
                 "type": "closed"
             },
