@@ -1,7 +1,7 @@
 /**
-* Gulp buildsystem. Takes care of tasks like bundling JavaScript,
-* deploying to stores, transpiling SCSS, minifying, concatting,
-* copying assets around, and more.
+* The Gulp buildsystem takes care of executing all tasks like bundling
+* JavaScript, automated deployment to stores, transpiling SCSS, minifying,
+* concatting, copying assets, etc...
 */
 const {_extend, promisify} = require('util')
 const archiver = require('archiver')
@@ -37,10 +37,10 @@ const test = require('tape')
 
 const writeFileAsync = promisify(fs.writeFile)
 
-
-// The main settings object containing info
-// from .vialer-jsrc and build flags.
+// The main settings object containing info from .vialer-jsrc and build flags.
 let settings = {}
+
+global.gulpSettings = settings
 
 settings.BUILD_ARCH = argv.arch ? argv.arch : 'x64' // all, or one or more of: ia32, x64, armv7l, arm64, mips64el
 settings.BUILD_DIR = process.env.BUILD_DIR || path.join('./', 'build')
@@ -53,6 +53,23 @@ settings.BUILD_TARGETS = ['chrome', 'docs', 'electron', 'edge', 'firefox', 'node
 if (!settings.BUILD_TARGETS.includes(settings.BUILD_TARGET)) {
     gutil.log(`Invalid build target: ${settings.BUILD_TARGET}`)
     process.exit(0)
+} else {
+    // Simple brand file verification.
+    for (let brand in settings.brands) {
+        try {
+            fs.statSync(`./src/brand/${brand}`)
+        } catch (err) {
+            gutil.log(`(!) Brand directory is missing for brand "${brand}"`)
+            process.exit(0)
+        }
+    }
+    // Force the build target to webview, since that is what
+    // Puppeteer needs atm.
+    if (argv._[0] === 'test-browser') {
+        settings.BUILD_TARGET = 'webview'
+        // Make this variable accessible by tests.
+        process.env.BRAND_TARGET = settings.BRAND_TARGET
+    }
 }
 
 // Default deploy target is `alpha` because it has the least impact.
@@ -69,6 +86,10 @@ settings.SRC_DIR = path.join('./', 'src')
 settings.SIZE_OPTIONS = {showFiles: true, showTotal: true}
 settings.TEMP_DIR = path.join(settings.BUILD_DIR, '__tmp')
 settings.VERBOSE = argv.verbose ? true : false
+settings.VERSION = argv.version ? argv.version : settings.PACKAGE.version
+// Override the pre-defined release name structure to specifically target
+// release names in Sentry.
+if (argv.release) settings.RELEASE = argv.release
 
 // Force production mode when running certain tasks from
 // the commandline or when using a deploy command.
@@ -79,30 +100,15 @@ if (argv._[0] && (['deploy', 'build-dist'].includes(argv._[0]) || argv._[0].incl
 } else {
     // Production mode is on when NODE_ENV environmental var is set.
     settings.PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
-
     if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 }
 
-settings.NODE_ENV = process.env.NODE_ENV
 
-// Loads the Vialer settings from ~/.vialer-jsrc into the
-// existing settings object.
+
+settings.NODE_ENV = process.env.NODE_ENV
+// Load the Vialer settings from ~/.vialer-jsrc into the existing settings.
 rc('vialer-js', settings)
 
-
-// Simple brand validation checks.
-if (!settings.brands[settings.BRAND_TARGET]) {
-    gutil.log(`(!) Brand ${settings.BRAND_TARGET} does not exist. Check vialer-jsrc.`)
-    process.exit(0)
-}
-for (let brand in settings.brands) {
-    try {
-        fs.statSync(`./src/brand/${brand}`)
-    } catch (err) {
-        gutil.log(`(!) Brand directory is missing for brand "${brand}"`)
-        process.exit(0)
-    }
-}
 // Initialize the helpers, which make this file less dense.
 const helpers = new Helpers(settings)
 const WATCHLINKED = argv.linked ? true : false
@@ -161,15 +167,25 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
 
 gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
     // Refresh the brand content with each build.
-    let targetTasks
     if (settings.BUILD_TARGET === 'docs') {
         runSequence(['docs'], done)
         return
-    } else if (settings.BUILD_TARGET === 'electron') targetTasks = ['js-electron']
-    else if (settings.BUILD_TARGET === 'webview') targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg']
-    else if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) targetTasks = ['js-vendor', 'js-app-bg', 'js-app-fg', 'js-app-observer', 'manifest']
+    }
+    let mainTasks = ['assets', 'templates', 'translations', 'html', 'scss', 'scss-vendor']
 
-    runSequence(['assets', 'templates', 'translations', 'html', 'scss', 'scss-vendor'].concat(targetTasks), done)
+    if (settings.BUILD_TARGET === 'electron') {
+        runSequence(mainTasks, ['js-electron'], () => {
+            done()
+        })
+    } else if (settings.BUILD_TARGET === 'webview') {
+        runSequence(mainTasks, ['js-vendor', 'js-app-bg', 'js-app-fg'], () => {
+            done()
+        })
+    } else if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) {
+        runSequence(mainTasks, ['js-vendor', 'js-app-bg', 'js-app-fg', 'js-app-observer'], 'manifest', () => {
+            done()
+        })
+    }
 }, {options: taskOptions.all})
 
 
@@ -257,36 +273,14 @@ gulp.task('build-run', 'Make a development build and run it in the target enviro
 }, {options: taskOptions.all})
 
 
-gulp.task('deploy', 'Deploy <BRAND_TARGET> to the <BUILD_TARGET> store.', async() => {
-    await helpers.deploy(settings.BRAND_TARGET, settings.BUILD_TARGET, helpers.distributionName(settings.BRAND_TARGET))
+gulp.task('deploy', 'Deploy <BRAND_TARGET> to the <BUILD_TARGET> store.', (done) => {
+    helpers.deploy(settings.BRAND_TARGET, settings.BUILD_TARGET, helpers.distributionName(settings.BRAND_TARGET))
+        .then(() => {
+            // Write release and source artifacts to sentry for more
+            // precise stacktraces in Sentry.
+            runSequence('sentry-sourcemaps', done)
+        })
 }, {options: taskOptions.browser})
-
-
-gulp.task('deploy-brand', 'Deploy <BRAND_TARGET> to all supported target stores.', async() => {
-    const targets = ['chrome', 'firefox']
-    for (const target of targets) {
-        await helpers.deploy(settings.BRAND_TARGET, target, helpers.distributionName(settings.BRAND_TARGET))
-    }
-}, {options: taskOptions.brandOnly})
-
-
-gulp.task('deploy-brands', 'Deploy all brands to <BUILD_TARGET> store.', async() => {
-    // Can't do this async, since settings are modified during deploy to work
-    // around gulp tasks not accepting parameters.
-    for (const brand of Object.keys(settings.brands)) {
-        await helpers.deploy(brand, settings.BUILD_TARGET, helpers.distributionName(brand))
-    }
-}, {options: taskOptions.targetOnly})
-
-
-gulp.task('deploy-brands-targets', 'Deploy all brands to all supported target stores.', async() => {
-    const targets = ['chrome', 'firefox']
-    for (const target of targets) {
-        for (const brand of Object.keys(settings.brands)) {
-            await helpers.deploy(brand, target, helpers.distributionName(brand))
-        }
-    }
-})
 
 
 gulp.task('docs', 'Generate docs.', (done) => {
@@ -372,10 +366,7 @@ gulp.task('js-electron-main', 'Copy Electron main thread js to build.', ['js-app
 
 
 gulp.task('js-vendor', (done) => {
-    runSequence([
-        'js-vendor-bg',
-        'js-vendor-fg',
-    ], async() => {
+    runSequence('icons', 'js-vendor-bg', 'js-vendor-fg', () => {
         if (settings.LIVERELOAD) livereload.changed('web.js')
         done()
     })
@@ -387,10 +378,12 @@ gulp.task('js-vendor-bg', 'Generate third-party vendor js.', [], (done) => {
 }, {options: taskOptions.all})
 
 
-gulp.task('js-vendor-fg', 'Generate third-party vendor js.', ['icons'], (done) => {
+gulp.task('js-vendor-fg', 'Generate third-party vendor js.', (done) => {
     helpers.jsEntry(
         settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/vendor', 'vendor_fg',
-        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`], done)
+        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`], () => {
+            done()
+        })
 }, {options: taskOptions.all})
 
 
@@ -462,8 +455,24 @@ gulp.task('scss-vendor', 'Generate vendor css.', () => {
 }, {options: taskOptions.all})
 
 
-gulp.task('sentry-release', 'Upload release for additional Sentry debugging info', () => {
-    helpers.sentryRelease(settings.BRAND_TARGET, settings.BUILD_TARGET)
+/**
+* This requires at least Sentry 8.17.0.
+* See https://github.com/getsentry/sentry/issues/5459 for more details.
+*/
+gulp.task('sentry-sourcemaps', 'Upload release artifacts to Sentry for better stacktraces', () => {
+    const sentryManager = helpers.sentryManager(settings.BRAND_TARGET, settings.BUILD_TARGET)
+    sentryManager.create(() => {
+        const base = path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')
+        gulp.src(path.join(base, '{*.js,*.map}'), {base})
+            .pipe(addsrc(path.join(settings.SRC_DIR, 'js', '**', '*.js'), {base: path.join('./')}))
+            .pipe(sentryManager.upload())
+    })
+})
+
+
+gulp.task('sentry-release-remove', 'Remove a Sentry release and all of its artifacts', (done) => {
+    const sentryManager = helpers.sentryManager(settings.BRAND_TARGET, settings.BUILD_TARGET)
+    sentryManager.remove(() => done)
 })
 
 
@@ -486,12 +495,26 @@ gulp.task('templates', 'Build Vue component templates', () => {
 })
 
 
-gulp.task('test', function() {
-    return gulp.src('test/**/*.js')
+gulp.task('test', 'Run all unit and integation tests', function() {
+    return gulp.src('test/bg/**/*.js')
         .pipe(tape({
             outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
-            timeout: 1000,
         }))
+})
+
+
+gulp.task('test-browser', 'Run all functional tests on the webview', ['build'], function() {
+    if (!settings.LIVERELOAD) {
+        helpers.startDevServer()
+    }
+
+    return gulp.src('test/browser/**/*.js')
+        .pipe(tape({
+            outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
+        }))
+        .on('end', () => {
+            if (!settings.LIVERELOAD) process.exit(0)
+        })
 })
 
 

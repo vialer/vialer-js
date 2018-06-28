@@ -1,13 +1,21 @@
+dist: trusty
 before_script:
-  - npm install -g gulp-cli
-  - cp .vialer-jsrc.example .vialer-jsrc
+- npm install -g gulp-cli
+- cp .vialer-jsrc.example .vialer-jsrc
 cache:
   directories:
-    - "node_modules"
+  - node_modules
 language: node_js
 node_js:
- - "node"
+- node
 script:
- - npm run lint-js
- - npm run lint-scss
- - npm test
+- npm run lint-js
+- npm run lint-scss
+- gulp test
+- gulp test-browser
+env:
+  global:
+  # CI_USERNAME: Run functional tests with this user.
+  - secure: y/+TeCJPybf88RUxPkZNtXSEH6g/y6U77jcxCc56+GlgmbWIQKtzPznIY92c06vZ8pyTYjm7uTGAPPcnfrXcsh92MOA9XOgZFN1TP/CaOYcROy//zeKrrAcvlXtZCCSjReniDo8zaiBWdabDnWoktf5R9fb6owWJzZSEJhlfSze4mWdhwW8QMA3OHP0++iBFhXgDmNJXob68pvgHmgqPpLqtZxRfqiGuvJS3FCHWeirzvxoCBOSn/5h40XfL4sp2ZCK75Te6e1avy+2Vvqa9TpfYenGpJkS56CdBa0rAIKRMgmn8jmGiARQtkAOJ+a9FP3C2yR0d8Pb7sGRkRU6dQt+qk82JLNUjCCUq1lA1h4dGU+WDFKEB/xFlJJR0xh+UqDejKAuJ/i1gqRgExyOVZblmG+OKEJHjQmHciluUYzbS70DyfquN+PxZdf35GRrGqtC+dtRAEjisu6tkge1fnA892pAj2E4NvK9FH+7TcF8B9kYZ4o2SB2YMnsS6CdI2KAZopv9XxiKQd+VPg3Yca0NJstlmEyLDDcpWTE2W1Pw3eOXf0XO7Go6j8gXyyxBp4BBARScQDDDHUOkFZ6+MmW1TLT0Hrua5C9q1o4beiCmr7gVSkPl1eC2mz0dtscwZElOeeNJAnRuVvPGOJqU7HhRLOkvN/jWzJ8H6PoCmoMY=
+  # CI_PASSWORD: Run functional tests with this password.
+  - secure: H9FDXDuNUFv4IibjS131kC+E3Kq/A6tYuMtjfieQua3JNd9jwtxfBgCe6wTFQdIvu1a8OCAjOWRr72k1hZjZeNT5oVdr2Z8dkgk5Alcq3Dr6disdpd6lYkiAtsglQThNoZRw3AM7aknJCeX0l609Ay7e5Ll+zeNGo1UHOHHqe4uavoc5dE3zc8k2Zng47e0QlU4Qvb+H7c9muU6R87P1UsvRbgzpnCXzw9ftimHgiDLlrIJA7BUSTA8PLlOqfJWnYADwxByIR28t3Yr0FZ6AM1VCPgEFRtlncrUnmn0fC9X16kpNYOAm0BABNpudp6oikoZKxxZSn7bhoBuwpyJkUy9UG8ImWalkWJNf2BjMVdkTMTQLzYwWiDgb0dGVt2LGgniurNlpJ9vH5ZQiL1j2xqDqkwsoV1exGR5RFFwCaYUVtd+LFW+cmvGi5gJ7NHh/HynNmBIWoIUO5dIDq3oA2zqu23M8wd6owNzycSo9ct3hAKercFv8ZcltFFpKqk2qU+Ys0dwpMjMA6f+TZdHfuQDEqE1VbxPbShcEmLr+g0o7b3rsF5K93CxlgEmR5Bh/mSDNE7SLRpVSUg4zy2bEMx7SUuGEp5GPOxiWRVfuzwr6qSXtXsvmP2lncPyiexJ4y12JtK8RMxh2TCpwe2ohTw2IcFgTxlRvZxI4KC2Nv5k=

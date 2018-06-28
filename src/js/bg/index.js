@@ -79,10 +79,19 @@ class AppBackground extends App {
             // The audio element is used to playback sounds with
             // (like ringtones, dtmftones). The video element is
             // used to attach the remote WebRTC stream to.
-            this.audio = document.createElement('audio')
-            this.video = document.createElement('video')
-            document.body.prepend(this.audio)
-            document.body.prepend(this.video)
+            this.localVideo = document.createElement('video')
+            this.localVideo.setAttribute('id', 'local')
+            this.localVideo.muted = true
+
+            this.remoteVideo = document.createElement('video')
+            this.remoteVideo.setAttribute('id', 'remote')
+            document.body.prepend(this.localVideo)
+            document.body.prepend(this.remoteVideo)
+
+            // Trigger play automatically. This is required for any audio
+            // to play during a call.
+            this.remoteVideo.addEventListener('canplay', () => this.remoteVideo.play())
+            this.localVideo.addEventListener('canplay', () => this.localVideo.play())
         }
 
         // Start by initializing all modules.
@@ -105,7 +114,6 @@ class AppBackground extends App {
         }
 
         if (!validSchema) this.__factoryDefaults(notification)
-
         this.emit('ready')
     }
 

@@ -136,7 +136,7 @@ class Call {
             else outputSink = devices.sinks.headsetOutput.id
 
             this.app.logger.info(`${this}call video element on sink ${outputSink}`)
-            await this.app.video.setSinkId(outputSink)
+            await this.app.remoteVideo.setSinkId(outputSink)
         } catch (err) {
             const message = this.app.$t('failed to set input or output device.')
             this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
@@ -151,7 +151,6 @@ class Call {
     * Some UI state plumbing to setup an outgoing Call.
     */
     _outgoing() {
-        this.remoteStream = new MediaStream()
         // Try to fill in the displayName from contacts.
         const contacts = this.app.state.contacts.contacts
         let displayName = ''
@@ -269,7 +268,6 @@ class Call {
     */
     accept() {
         if (!(this.state.type === 'incoming')) throw 'session must be incoming type'
-        this.remoteStream = new MediaStream()
     }
 
 

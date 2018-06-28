@@ -47,9 +47,9 @@ class BusyTone {
         if (!sink) {
             const speaker = this.app.state.settings.webrtc.devices
             if (speaker.enabled) {
-                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput.id
             } else {
-                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput.id
             }
         }
 
@@ -123,9 +123,9 @@ class DtmfTone {
         if (!sink) {
             const speaker = this.app.state.settings.webrtc.devices.speaker
             if (speaker.enabled) {
-                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput.id
             } else {
-                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput.id
             }
         }
 

@@ -68,12 +68,12 @@
     </div>
 
     <div class="call-actions" v-if="!call.hangup.disabled">
-        <div class="rounded-button action decline" v-if="callCanTerminate"
+        <div class="rounded-button action decline test-button-terminate" v-if="callCanTerminate"
             @click="callTerminate(call)">
             <icon name="hang-up"/>
         </div>
 
-        <div class="rounded-button action accept" v-if="call.status === 'invite'" @click="callAccept(call)">
+        <div class="rounded-button action accept test-button-accept" v-if="call.status === 'invite'" @click="callAccept(call)">
             <icon name="phone"/>
         </div>
     </div>

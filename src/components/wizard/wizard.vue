@@ -24,7 +24,7 @@
     </StepMicPermission>
 
     <div class="buttons is-centered" v-if="steps[step].ready !== null">
-        <button v-if="step === steps.length - 1" type="button" class="button is-primary cf" :disabled="!steps[step].ready" @click="finish()">{{$t('finish setup')}}</button>
-        <button v-else type="button" class="button is-primary cf" :disabled="!steps[step].ready" @click="nextStep()">{{$t('next')}}</button>
+        <button v-if="step === steps.length - 1" type="button" class="button is-primary cf test-wizard-button-finish" :disabled="!steps[step].ready" @click="finish()">{{$t('finish setup')}}</button>
+        <button v-else type="button" class="button is-primary cf test-wizard-button-next" :disabled="!steps[step].ready" @click="nextStep()">{{$t('next')}}</button>
     </div>
 </component>

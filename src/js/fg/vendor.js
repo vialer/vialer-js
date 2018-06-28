@@ -26,12 +26,9 @@ if (process.env.NODE_ENV === 'production') {
     Vue.config.devtools = false
 }
 
-
-
 global.Vuelidate = require('vuelidate')
 global.Vuelidate.validators = require('vuelidate/lib/validators')
 
 Vue.use(global.Vuelidate.default)
-
 
 global.Raven = require('raven-js')
