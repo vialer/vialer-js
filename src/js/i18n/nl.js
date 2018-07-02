@@ -194,7 +194,7 @@ global.translations.nl = {
     'voIP account adjustment required in': 'voIP-account aanpassing nodig in',
     'voIP account to use as your softphone.': 'voIP-account dat gebruikt wordt als softphone.',
     'voIP accounts': 'voIP-accounts',
-    'welcome back, {user}': 'welkom terug, {user}',
+    'welcome back!': 'welkom terug!',
     'welcome to your': 'welkom bij je',
     'yes, let me help': 'ja, ik wil helpen',
     'yesterday': 'gisteren',

@@ -3,9 +3,12 @@
 .component-notifications {
     left: 0;
     position: fixed;
-    top: $spacer * 5;
     width: $max-popup-width;
     z-index: 100000;
+
+    &.topbar {
+        top: $spacer * 5;
+    }
 
     &.sidebar {
         left: $spacer * 5;
@@ -15,23 +18,68 @@
     .notification {
         align-items: center;
         border-radius: 0;
-        color: $white;
         display: flex;
         flex-direction: row;
         height: $spacer * 7;
         justify-content: space-between;
         margin: 0;
         padding: 0;
+        transition: all 0.25s;
+
+        &.is-danger {
+            background: lighten($red-color, 40%);
+            border-bottom: 2px solid $red-color;
+            color: darken($red-color, 25%);
+
+            .icon svg {
+                fill: $red-color;
+            }
+        }
+
+        &.is-info {
+            background: lighten($blue-color, 40%);
+            border-bottom: 2px solid $blue-color;
+            color: darken($blue-color, 25%);
+
+            .icon svg {
+                fill: $blue-color;
+            }
+        }
+
+        &.is-success {
+            background: lighten($green-color, 40%);
+            border-bottom: 2px solid $green-color;
+            color: darken($green-color, 25%);
+
+            .icon svg {
+                fill: $green-color;
+            }
+        }
+
+        &.is-warning {
+            background: lighten($orange-color, 40%);
+            border-bottom: 2px solid $orange-color;
+            color: darken($orange-color, 25%);
+
+            .icon svg {
+                fill: $orange-color;
+            }
+        }
+
 
         .icon {
             height: 100%;
             line-height: $spacer * 6;
-            min-width: $spacer * 5;
+            min-width: $spacer * 6;
+
+            svg {
+                height: $spacer * 3;
+                width: $spacer * 3;
+            }
         }
 
         .message {
             flex-grow: 1;
-            padding-left: $spacer;
         }
 
         .actions {
@@ -44,4 +92,25 @@
             vertical-align: middle;
         }
     }
+
+    // Vue transition classes.
+    .notification-enter {
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    .notification-enter-to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .notification-leave-active {
+        transform: scale(0);
+    }
+
+    .notification-move {
+        opacity: 1;
+        transition: all 0.5s;
+    }
+
 }

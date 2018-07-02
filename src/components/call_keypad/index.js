@@ -101,9 +101,9 @@ module.exports = (app) => {
                 // Toggle developer features with a special number.
                 if (newNumber === '02*06*18') {
                     if (!this.user.developer) {
-                        this.$notify({icon: 'info', message: this.$t('developer mode activated'), type: 'success'})
+                        app.notify({icon: 'info', message: this.$t('developer mode activated'), type: 'success'})
                     } else {
-                        this.$notify({icon: 'info', message: this.$t('developer mode deactivated'), type: 'success'})
+                        app.notify({icon: 'info', message: this.$t('developer mode deactivated'), type: 'success'})
                     }
                     app.setState({user: {developer: !this.user.developer}}, {persist: true})
                 }

@@ -152,14 +152,14 @@ class Devices {
             // Always notify about a newly connected device.
             if (sinkChange.added.length) {
                 const message = this.app.$t('new audio device detected.')
-                this.app.emit('fg:notify', {icon: 'info', message, type: 'success'})
+                this.app.notify({icon: 'info', message, type: 'info'})
             }
 
             // There are options available; verify if the selected sinks are valid.
             if (this.validateSinks({input, output})) {
                 if (sinkChange.removed.length) {
                     const message = this.app.$t('unused audio device was removed.')
-                    this.app.emit('fg:notify', {icon: 'warning', message, type: 'warning'})
+                    this.app.notify({icon: 'warning', message, type: 'warning'})
                 }
                 // Only overwrite the device list when the current device
                 // is in the actual device list; so we can add a validation
@@ -167,7 +167,7 @@ class Devices {
                 this.app.setState({settings: {webrtc: {devices: {input, output}}}}, {persist: true})
             } else {
                 const message = this.app.$t('selected audio device is not available.')
-                this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
+                this.app.notify({icon: 'warning', message, type: 'danger'})
                 this.app.setState({ui: {layer: 'settings', tabs: {settings: {active: 'audio'}}}})
             }
         }

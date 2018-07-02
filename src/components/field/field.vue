@@ -71,7 +71,7 @@
     <em class="help cf" v-if="help">{{help}}</em>
     <slot name="select-after"></slot>
 
-    <span v-if="invalidFieldValue" class="validation-message is-danger" v-html="validationMessage"></span>
+    <span v-if="invalidFieldValue && validationMessage" class="validation-message is-danger" v-html="validationMessage"></span>
 </div>
 
 

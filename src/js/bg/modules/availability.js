@@ -74,6 +74,7 @@ class ModuleAvailability extends Module {
     * options when the module is loaded in the background.
     */
     async _platformData({callback = null} = {}) {
+        this.app.setState({settings: {webrtc: {account: {status: 'loading'}}}})
         let res = await this.app.api.client.get('api/userdestination/')
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             this.app.logger.warn(`${this}platform data request failed (${res.status})`)
@@ -132,6 +133,7 @@ class ModuleAvailability extends Module {
         if (selected.id && !this.app.state.availability.dnd) this.app.setState({ui: {menubar: {default: 'active'}}})
         else this.app.setState({ui: {menubar: {default: 'unavailable'}}})
 
+        this.app.setState({settings: {webrtc: {account: {status: null}}}})
         if (callback) callback()
     }
 

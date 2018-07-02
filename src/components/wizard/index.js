@@ -23,7 +23,7 @@ module.exports = (app) => {
             finish: function() {
                 app.setState({settings: {wizard: {completed: true, step: 0}}}, {persist: true})
                 app.emit('bg:calls:disconnect', {reconnect: true})
-                this.$notify({icon: 'settings', message: this.$t('almost done! Please check your audio settings.'), timeout: 0, type: 'success'})
+                app.notify({icon: 'settings', message: this.$t('almost done! Please check your audio settings.'), type: 'info'})
             },
             nextStep: function() {
                 if (this.steps[this.step].name === 'voipaccount') {
@@ -41,6 +41,17 @@ module.exports = (app) => {
                 }
                 app.setState({settings: {wizard: {step: this.step += 1}}}, {persist: true})
             },
+            validateStep: function(type) {
+                if (type === 'microphone') {
+                    if (this.settings.webrtc.media.permission) {
+                        this.steps.find((i) => i.name === 'microphone').ready = true
+                    }
+                } else if (type === 'voipaccount') {
+                    const selectedVoipaccountId = this.settings.webrtc.account.selected.id
+                    const accountsLoading = this.settings.webrtc.account.status === 'loading'
+                    this.steps.find((i) => i.name === 'voipaccount').ready = (this.validVoipSettings && selectedVoipaccountId && !accountsLoading) ? true : false
+                }
+            },
         }, app.helpers.sharedMethods()),
         /**
         * Adjusting the wizard steps is done when the component
@@ -50,12 +61,8 @@ module.exports = (app) => {
         mounted: function() {
             // The microphone step is ready when the permission
             // is already there.
-            if (this.settings.webrtc.media.permission) {
-                this.steps.find((i) => i.name === 'microphone').ready = true
-            }
-            const selectedVoipaccountId = this.settings.webrtc.account.selected.id
-            const voipaccountStep = this.steps.find((i) => i.name === 'voipaccount')
-            voipaccountStep.ready = (this.validVoipSettings && selectedVoipaccountId) ? true : false
+            this.validateStep('microphone')
+            this.validateStep('voipaccount')
         },
         render: templates.wizard.r,
         staticRenderFns: templates.wizard.s,
@@ -67,17 +74,17 @@ module.exports = (app) => {
         },
         watch: {
             permission: function(newPermission) {
-                if (this.settings.webrtc.media.permission) {
-                    this.steps.find((i) => i.name === 'microphone').ready = true
-                }
+                this.validateStep('microphone')
             },
             /**
             * The `voipaccount` step can only be passed when a VoIP account is selected.
             * @param {String} selectedVoipaccountId - The VoIP account that is being selected.
             */
             'settings.webrtc.account.selected.id': function(selectedVoipaccountId) {
-                const voipaccountStep = this.steps.find((i) => i.name === 'voipaccount')
-                voipaccountStep.ready = (this.validVoipSettings && selectedVoipaccountId) ? true : false
+                this.validateStep('voipaccount')
+            },
+            'settings.webrtc.account.status': function(status) {
+                this.validateStep('voipaccount')
             },
         },
     }

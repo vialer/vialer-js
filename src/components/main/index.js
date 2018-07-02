@@ -10,8 +10,14 @@ module.exports = (app) => {
 
                 if (block === 'notifications') {
                     if (this.user.authenticated) {
-                        classes.sidebar = true
+                        if (this.wizard.completed) {
+                            classes.sidebar = true
+                            classes.topbar = true
+                        }
+                    } else {
+                        classes.topbar = true
                     }
+
                 } else if (block === 'panel') {
                     if (this.user.authenticated) classes.sidebar = true
                     if (this.overlay) classes['no-scroll'] = true

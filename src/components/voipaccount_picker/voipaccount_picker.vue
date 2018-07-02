@@ -10,7 +10,7 @@
             :placeholder="$t('select a VoIP account')"
             :validation="validationField">
 
-            <button slot="select-extra" class="button is-link" :class="{'is-loading': loading}" :disabled="loading" @click="refreshVoipaccounts()">
+            <button slot="select-extra" class="button is-link" :class="{'is-loading': status === 'loading'}" :disabled="status === 'loading'" @click="refreshVoipaccounts()">
                 <span class="icon is-small"><icon name="refresh"/></span>
             </button>
 
@@ -22,7 +22,7 @@
                 <!-- Directions for the user to manage their VoIP accounts. -->
                 <template>
                     <!-- This message is shown when there are no voipaccount options. -->
-                    <div class="notification-box info" v-if="!settings.webrtc.account.options.length">
+                    <div class="notification-box info" v-if="!settings.webrtc.account.options.length && !(status === 'loading')">
                         <header><icon name="info"/><span class="cf">{{$t('a VoIP account is required.')}}</span></header>
                         <ul>
                             <li>{{$t('head over to')}} <a class="cf" @click="openPlatformUrl(`phoneaccount`)">{{$t('voIP accounts')}}</a> {{ $t('to create a VoIP account.') }}.</li>
