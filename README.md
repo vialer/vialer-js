@@ -1,4 +1,4 @@
-[![Build status](https://travis-ci.com/vialer/vialer-js.svg?branch=develop)](https://travis-ci.com/vialer/vialer-js)
+[![CircleCI](https://circleci.com/gh/vialer/vialer-js/tree/develop.svg?style=svg)](https://circleci.com/gh/vialer/vialer-js/tree/develop)
 
 # About Vialer-js
 Vialer-js is a free and open-source communication platform.
