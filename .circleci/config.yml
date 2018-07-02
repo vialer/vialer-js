@@ -29,6 +29,5 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: npm test
       - run: cp .vialer-jsrc.example .vialer-jsrc
-      - run: npm run test-browser
+      - run: npm test

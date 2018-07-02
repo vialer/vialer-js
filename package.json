@@ -8,8 +8,7 @@
     },
     "scripts": {
         "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-        "test": "gulp test",
-        "test-browser": "gulp test-browser",
+        "test": "gulp test;gulp test-browser",
         "lint-js": "./node_modules/.bin/eslint './src/**/*.js'",
         "lint-scss": "./node_modules/sass-lint/bin/sass-lint.js -v -c ./.sass-lint.yml 'src/**/*.scss' --max-warnings 0"
     },
