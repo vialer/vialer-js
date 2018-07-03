@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/vialer/vialer-js/tree/develop.svg?style=svg)](https://circleci.com/gh/vialer/vialer-js/tree/develop)
+[![CircleCI](https://circleci.com/gh/vialer/vialer-js/tree/develop.svg?style=svg)](https://circleci.com/gh/vialer/vialer-js/tree/develop) [![Join the chat at https://gitter.im/vialer-js/Lobby](https://badges.gitter.im/vialer-js/Lobby.svg)](https://gitter.im/vialer-js/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # About Vialer-js
 Vialer-js is a free and open-source communication platform.
