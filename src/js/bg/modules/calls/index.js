@@ -320,7 +320,7 @@ class ModuleCalls extends Module {
 
         this.ua.on('registered', () => {
             this.app.setState({calls: {ua: {status: 'registered'}}})
-            this.app.logger.info(`${this}ua registered`)
+            this.app.logger.info(`${this}registered on SIP endpoint`)
         })
 
 
@@ -332,13 +332,14 @@ class ModuleCalls extends Module {
 
         this.ua.on('connected', () => {
             this.app.setState({calls: {ua: {status: 'connected'}}})
-            this.app.logger.info(`${this}ua connected`)
+            this.app.logger.info(`${this}connected to SIP endpoint`)
             // Reset the retry interval timer..
             this.retry = Object.assign({}, this.retryDefault)
         })
 
 
         this.ua.on('disconnected', () => {
+            this.app.logger.debug(`${this}disconnected from SIP endpoint`)
             this.app.setState({calls: {ua: {status: 'disconnected'}}})
             // // Don't use SIPJS simpler reconnect logic, which doesn't have
             // // jitter and an increasing timeout.
@@ -349,7 +350,6 @@ class ModuleCalls extends Module {
             } else {
                 this.app.setState({calls: {ua: {status: 'inactive'}}})
                 this.retry = Object.assign({}, this.retryDefault)
-                this.app.logger.debug(`${this}ua disconnected (inactive)`)
                 this.reconnect = false
             }
 
@@ -730,18 +730,20 @@ class ModuleCalls extends Module {
     connect() {
         // Reconnect when already connected.
         if (this.ua && this.ua.isConnected()) {
+            this.app.logger.info(`${this}already connected; disconnecting`)
             this.disconnect(true)
             return
         }
 
+        this._uaOptions = this.__uaOptions()
+        this.app.logger.info(`${this}connecting to SIP endpoint ${this._uaOptions.wsServers}`)
         // Login with the WebRTC account or platform account.
-        let uaOptions = this.__uaOptions()
-        if (!uaOptions.authorizationUser || !uaOptions.password) {
+        if (!this._uaOptions.authorizationUser || !this._uaOptions.password) {
             this.app.logger.warn(`${this}cannot connect without username and password`)
         }
 
         // Fresh new instance is used each time, so we can reset settings properly.
-        this.ua = new SIP.UA(uaOptions)
+        this.ua = new SIP.UA(this._uaOptions)
         this.__uaEvents()
         this.ua.start()
     }

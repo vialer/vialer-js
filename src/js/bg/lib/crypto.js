@@ -285,17 +285,17 @@ class Crypto {
             base64Salt = this.__dataArrayToBase64(salt)
         }
 
-        this.app.setState({app: {vault: {salt: base64Salt, store: false}}}, {encrypt: false, persist: true})
-        this.pbkdf2Key = await crypto.subtle.importKey(
+        this.app.setState({app: {vault: {salt: base64Salt}}}, {encrypt: false, persist: true})
+        let sessionKey = await crypto.subtle.importKey(
             'raw', this.__stringToDataArray(`${username}${password}`),
             {name: 'PBKDF2'}, false, ['deriveKey', 'deriveBits'],
         )
 
         // Use a decent iteration count to make the hashing mechanism slow
         // enough, to make it less likely that the password can be brute-forced.
-        const sessionKey = await crypto.subtle.deriveKey(
+        sessionKey = await crypto.subtle.deriveKey(
             {hash: {name: 'SHA-256'}, iterations: 500000, name: 'PBKDF2', salt},
-            this.pbkdf2Key, {length: 256, name: 'AES-GCM'}, true, ['encrypt', 'decrypt'])
+            sessionKey, {length: 256, name: 'AES-GCM'}, true, ['encrypt', 'decrypt'])
         return sessionKey
     }
 
@@ -372,6 +372,10 @@ class Crypto {
     */
     async loadIdentity(username, password, e2e = false) {
         this.sessionKey = await this._generateVaultKey(username, password)
+        if (this.app.state.app.vault.store && !this.app.state.app.vault.key) {
+            this.storeVaultKey()
+        }
+
         if (!e2e) return
 
         const rsa = this.app.store.get('rsa')
@@ -411,6 +415,7 @@ class Crypto {
     * @returns {String} - The base64-encoded vault key.
     */
     async storeVaultKey() {
+        this.app.logger.info(`${this}storing vault key for session recovery`)
         const sessionKey = await this.__exportAESKey(this.sessionKey)
         this.app.setState({app: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
         return sessionKey

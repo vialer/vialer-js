@@ -139,7 +139,7 @@ class Call {
             await this.app.remoteVideo.setSinkId(outputSink)
         } catch (err) {
             const message = this.app.$t('failed to set input or output device.')
-            this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
+            this.app.notify({icon: 'warning', message, type: 'danger'})
             console.error(err)
         }
 

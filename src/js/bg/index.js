@@ -159,6 +159,8 @@ class AppBackground extends App {
             this.__initServices()
         }
 
+        this.devices = new Devices(this)
+
         // Each module can define watchers on store attributes, which makes
         // it easier to centralize data-related logic.
         let watchers = {}
@@ -172,7 +174,6 @@ class AppBackground extends App {
         // (!) State is reactive after initializing the view-model.
         await this.__initViewModel(watchers)
 
-        this.devices = new Devices(this)
         // Signal all modules that AppBackground is ready to go.
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._ready) this.modules[module]._ready()

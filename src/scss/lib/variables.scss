@@ -16,6 +16,7 @@ $brand-color: #de6b35 !default;
 $grey-color: #999 !default;
 $primary-color: #3c3c50 !default;
 $green-color: #28ca42 !default;
+$blue-color: hsl(217, 71%, 53%) !default;
 $red-color: #d9534f !default;
 $yellow-color: #ffc02f !default;
 
@@ -32,6 +33,7 @@ $warning: $orange-color;
 $yellow-color: $yellow;
 $white-color: $white;
 
+$info: $blue-color;
 $white: #fff;
 $success: $green-color;
 $danger: $red-color;

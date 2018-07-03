@@ -5,27 +5,20 @@ module.exports = (app) => {
     * @memberof fg.components
     */
     const VoipaccountPicker = {
-        computed: app.helpers.sharedComputed(),
-        data: function() {
-            return {
-                loading: false,
-                validationField: null,
-            }
-        },
+        computed: Object.assign({
+            validationField: function() {
+                if (this.status === 'loading') return null
+                return this.v.settings.webrtc.account.selected.id
+            },
+        }, app.helpers.sharedComputed()),
         methods: Object.assign({
             refreshVoipaccounts: function() {
                 // Call the API endpoint that is responsible for updating
                 // the user's voipaccount list.
-                this.loading = true
-                app.emit('bg:availability:platform_data', {
-                    callback: () => {
-                        this.loading = false
-                    },
-                })
+                app.emit('bg:availability:platform_data')
             },
         }, app.helpers.sharedMethods()),
         mounted: function() {
-            this.validationField = this.v.settings.webrtc.account.selected.id
             const selectedId = this.settings.webrtc.account.selected.id
             if (!selectedId) {
                 let selected
@@ -46,6 +39,7 @@ module.exports = (app) => {
             app: 'app',
             selected: 'settings.webrtc.account.selected',
             settings: 'settings',
+            status: 'settings.webrtc.account.status',
             user: 'user',
             vendor: 'app.vendor',
         },

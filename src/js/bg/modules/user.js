@@ -27,18 +27,22 @@ class ModuleUser extends Module {
         this.app.on('bg:user:logout', this.logout.bind(this))
         this.app.on('bg:user:unlock', async({username, password}) => {
             this.app.setSession(username)
+            this.app.setState({user: {status: 'loading'}})
+
             try {
                 await this.app.__unlockSession({password, username})
                 this.app.api.setupClient(username, this.app.state.user.token)
                 this.app.__initServices()
                 this.app.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
+                this.app.setState({user: {status: null}})
+                this.app.notify({icon: 'user', message: this.app.$t('welcome back!'), type: 'info'})
             } catch (err) {
                 this.app.setState({
                     ui: {layer: 'login'},
                     user: {authenticated: false},
                 }, {encrypt: false, persist: true})
                 const message = this.app.$t('failed to unlock session; check your password.')
-                this.app.emit('fg:notify', {icon: 'warning', message, type: 'danger'})
+                this.app.notify({icon: 'warning', message, type: 'danger'})
             }
         })
 
@@ -71,6 +75,7 @@ class ModuleUser extends Module {
                     sip: null,
                 },
             },
+            status: null,
             token: null,
             twoFactor: false,
             username: null,
@@ -99,9 +104,9 @@ class ModuleUser extends Module {
     * @param {String} [options.token] - A 2fa token to login with.
     */
     async login({callback, username, password, token}) {
-        if (this.app.state.app.session.active !== username) {
-            this.app.setSession(username)
-        }
+        if (this.app.state.app.session.active !== username) this.app.setSession(username)
+
+        this.app.setState({user: {status: 'loading'}})
 
         let apiParams
 
@@ -111,12 +116,12 @@ class ModuleUser extends Module {
         let res = await this.app.api.client.post('api/permission/apitoken/', apiParams)
         // A login failure. Give the user feedback about what went wrong.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
+            this.app.setState({user: {status: null}})
             let message
-            const icon = 'warning', type = 'warning'
             if (res.data.apitoken) {
                 if (res.data.apitoken.email || res.data.apitoken.password) {
                     message = this.app.$t('failed to login; please check your credentials.')
-                    this.app.emit('fg:notify', {icon, message, type})
+                    this.app.notify({icon: 'warning', message, type: 'warning'})
                 } else if (res.data.apitoken.two_factor_token) {
                     const validationMessage = res.data.apitoken.two_factor_token[0]
                     if (validationMessage === 'this field is required') {
@@ -133,7 +138,6 @@ class ModuleUser extends Module {
 
         const apiToken = res.data.api_token
         this.app.api.setupClient(username, apiToken)
-        await this.app.__unlockSession({password, username})
         res = await this.app.api.client.get('api/permission/systemuser/profile/')
 
         let user = res.data
@@ -141,25 +145,17 @@ class ModuleUser extends Module {
             // Only platform client users are able to use vendor platform
             // telephony features. Logout partner users.
             this.logout()
-            this.app.emit('fg:notify', {icon: 'settings', message: this.app.$t('this type of user is invalid.'), type: 'warning'})
+            this.app.notify({icon: 'settings', message: this.app.$t('this type of user is invalid.'), type: 'warning'})
             return
         }
 
         user.realName = [user.first_name, user.preposition, user.last_name].filter((i) => i !== '').join(' ')
-
-        let startLayer
-        if (!this.app.state.settings.wizard.completed) {
-            // On install, go to the settings page.
-            startLayer = 'settings'
-        } else {
-            startLayer = 'calls'
-            this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('welcome back, {user}', {user: user.realName}), type: 'success'})
-        }
+        await this.app.__unlockSession({password, username})
 
         this.app.setState({
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},
-            ui: {layer: startLayer, menubar: {default: 'active'}},
+            ui: {layer: 'settings', menubar: {default: 'active'}},
             user: {username},
         }, {encrypt: false, persist: true})
 
@@ -174,6 +170,7 @@ class ModuleUser extends Module {
         }, {persist: true})
 
         this.app.__initServices()
+        this.app.setState({user: {status: null}})
     }
 
 
@@ -183,9 +180,8 @@ class ModuleUser extends Module {
     */
     logout() {
         this.app.logger.info(`${this}logging out and cleaning up state`)
-        this.app.emit('fg:notify', {icon: 'user', message: this.app.$t('goodbye!'), type: 'success'})
         this.app.setState({
-            app: {vault: {key: null, store: false, unlocked: false}},
+            app: {vault: {key: null, unlocked: false}},
             user: {authenticated: false},
         }, {encrypt: false, persist: true})
         // Remove credentials from basic auth.
@@ -194,6 +190,7 @@ class ModuleUser extends Module {
         this.app.modules.calls.disconnect(false)
         this.app.emit('bg:user:logged_out', {}, true)
         this.app.setSession('new')
+        this.app.notify({icon: 'user', message: this.app.$t('goodbye!'), type: 'info'})
     }
 
 

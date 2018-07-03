@@ -24,9 +24,6 @@ class AppForeground extends App {
         // Allow context debugging during development.
         // Avoid leaking this global in production mode!
         if (!(process.env.NODE_ENV === 'production')) global.fg = this
-
-        // Create a remote notification.
-        this.on('fg:notify', (message) => this.vm.$notify(message))
         // Make state modifications from AppBackground, but only
         // after fg had its initial state received from bg.
         this.on('fg:set_state', (data) => {

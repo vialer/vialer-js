@@ -73,7 +73,7 @@ class CallSIP extends Call {
 
         this.session.on('bye', (e) => {
             if (e.getHeader('X-Asterisk-Hangupcausecode') === '58') {
-                this.app.emit('fg:notify', {
+                this.app.notify({
                     icon: 'warning',
                     message: this.app.$t('your VoIP account misses AVPF and encryption support.'),
                     type: 'warning',

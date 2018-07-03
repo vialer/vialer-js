@@ -16,9 +16,8 @@
 
         </p>
     </header>
-
     <!-- Show the session picker when there are sessions, but no session is activated yet.-->
-    <div class="sessions" v-if="!app.session.active && app.session.available.length">
+    <div class="sessions" v-if="!app.session.active && app.session.available.length && !(user.status === 'loading')">
         <div v-for="session in app.session.available" class="session">
             <i class="icon-session" @click="selectSession(session)"><icon name="user"/></i>
             <div class="description" @click="selectSession(session)">{{session}}</div>
@@ -42,7 +41,7 @@
 
         <div class="buttons is-centered">
             <button v-if="app.session.available.length" type="button" class="button cf" @click="selectSession()">{{$t('change session')}}</button>
-            <button type="button" class="button is-primary cf" :disabled="$v.$invalid" @click="login">{{$t('log in')}}</button>
+            <button type="button" class="button is-primary cf" :class="{'is-loading': user.status === 'loading'}" :disabled="$v.$invalid || user.status === 'loading'" @click="login">{{$t('log in')}}</button>
         </div>
     </template>
     <!-- Show username/pw when there are no sessions yet or when a new session is selected.-->
@@ -59,12 +58,12 @@
 
         <div class="buttons is-centered">
             <button v-if="app.session.available.length" type="button" class="button cf" @click="selectSession()">{{$t('change session')}}</button>
-            <button type="button" class="button is-primary cf test-login-button" :disabled="$v.$invalid" @click="login">{{$t('log in')}}</button>
+            <button type="button" class="button is-primary cf test-login-button" :class="{'is-loading': user.status === 'loading'}" :disabled="$v.$invalid || user.status === 'loading'" @click="login">{{$t('log in')}}</button>
         </div>
     </template>
 
     <footer>
-        <div v-if="app.session.active" class="forgot-pw">
+        <div class="forgot-pw">
             <a :href="`${url}user/password_reset/`" class="cf" target="_blank">{{$t('forgot your password?')}}</a>
         </div>
         <div class="help-message cf">{{$t('need help?')}}<br/> <span class="cf">{{$t('click on the')}}</span><i @click="setOverlay('about')"><icon name="help"/></i>{{$t('icon')}}</div>

@@ -19,6 +19,8 @@ class ModuleApp extends Module {
     constructor(app) {
         super(app)
 
+        this._notifications = {}
+
         // Start responding to network changes.
         if (!app.env.isNode) {
             window.addEventListener('offline', (e) => {
@@ -60,7 +62,7 @@ class ModuleApp extends Module {
             vault: {
                 key: null,
                 salt: null,
-                store: false,
+                store: true,
                 unlocked: false,
             },
             vendor: {
@@ -96,6 +98,24 @@ class ModuleApp extends Module {
 
     _watchers() {
         return {
+            /**
+            * Schedule removal of a newly add notification if it
+            * has a timeout property.
+            * @param {Array} notifications - A reference to the current content of notifications.
+            */
+            'store.app.notifications': (notifications) => {
+                for (const notification of notifications) {
+                    if (notification.timeout && !this._notifications[notification.id]) {
+                        this._notifications[notification.id] = setTimeout(() => {
+                            // Use the notification reference from state here,
+                            // or this method will not behave consistently.
+                            notifications = this.app.state.app.notifications.filter(i => i.id !== notification.id)
+                            this.app.setState({app: {notifications}})
+                            delete this._notifications[notification.id]
+                        }, notification.timeout)
+                    }
+                }
+            },
             'store.app.vault.store': (storeVaultKey) => {
                 // Only respond as long the user is logged in.
                 if (!this.app.state.user.authenticated) return

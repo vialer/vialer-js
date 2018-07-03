@@ -69,7 +69,7 @@ class App extends Skeleton {
                 // There are no devices at all. Spawn a warning.
                 if (err.message === 'Requested device not found') {
                     if (this.env.role.fg) {
-                        this.vm.$notify({icon: 'warning', message: this.$t('no audio devices found.'), type: 'warning'})
+                        this.notify({icon: 'warning', message: this.$t('no audio devices found.'), type: 'warning'})
                     }
                 }
 
@@ -276,6 +276,23 @@ class App extends Skeleton {
         }
 
         return state
+    }
+
+
+    /**
+    * Store a notification in the (memory) store, which lets
+    * the notification component render the notification.
+    * @param {Object} notification - A notification object to add.
+    */
+    notify(notification) {
+        if (typeof notification.timeout === 'undefined') {
+            if (notification.type === 'info') notification.timeout = 3000
+            else notification.timeout = 4500
+        }
+        notification.id = shortid.generate()
+        let notifications = this.state.app.notifications
+        notifications.push(notification)
+        this.setState({app: {notifications}})
     }
 
 

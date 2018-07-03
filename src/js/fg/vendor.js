@@ -26,6 +26,7 @@ if (process.env.NODE_ENV === 'production') {
     Vue.config.devtools = false
 }
 
+global.shortid = require('shortid')
 global.Vuelidate = require('vuelidate')
 global.Vuelidate.validators = require('vuelidate/lib/validators')
 

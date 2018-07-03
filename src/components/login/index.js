@@ -17,13 +17,10 @@ module.exports = (app) => {
         methods: Object.assign({
             login: function() {
                 if (this.$v.$invalid) return
+
                 if (this.app.session.active === 'new' || !this.app.session.available.length) {
-                    if (!this.user.twoFactor) {
-                        app.emit('bg:user:login', {
-                            password: this.password,
-                            username: this.user.username,
-                        })
-                    } else {
+                    if (this.user.twoFactor) {
+                        // Two-factor login flow.
                         app.emit('bg:user:login', {
                             callback: ({valid, message}) => {
                                 this.twoFactorToken.valid = valid
@@ -34,8 +31,12 @@ module.exports = (app) => {
                             token: this.twoFactorToken.value,
                             username: this.user.username,
                         })
+                    } else {
+                        app.emit('bg:user:login', {
+                            password: this.password,
+                            username: this.user.username,
+                        })
                     }
-
                 } else {
                     app.emit('bg:user:unlock', {
                         password: this.password,

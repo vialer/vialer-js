@@ -74,7 +74,8 @@ class ModuleContacts extends Module {
         // is completed until going to the next. This prevents the
         // server from being hammered.
         for (let contactId of Object.keys(this.contacts)) {
-            if (['registered', 'connected'].includes(this.app.state.calls.ua.status)) {
+            const contact = this.contacts[contactId]
+            if (contact && ['registered', 'connected'].includes(this.app.state.calls.ua.status)) {
                 const endpoints = this.contacts[contactId].endpoints
                 for (let endpointId of Object.keys(endpoints)) {
                     if (endpoints[endpointId].presence) {
