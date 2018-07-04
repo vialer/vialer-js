@@ -117,7 +117,8 @@ class Crypto {
      * @returns {String} - The stringified DataArray.
      */
     __dataArrayToString(dataArray) {
-        return String.fromCharCode.apply(null, new Uint8Array(dataArray))
+        if (this.app.env.isBrowser) return new TextDecoder('utf-8').decode(dataArray)
+        else return String.fromCharCode.apply(null, new Uint8Array(dataArray))
     }
 
 
@@ -333,7 +334,6 @@ class Crypto {
             name: 'AES-GCM',
             tagLength: 128,
         }, sessionKey, this.__base64ToDataArray(ciphertext.cipher))
-
         return this.__dataArrayToString(decrypted)
     }
 

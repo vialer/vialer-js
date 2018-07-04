@@ -11,7 +11,7 @@ const {AppBackground, bgOptions} = require('../../src/js/bg')
 
 
 test('[bg] starting up sequence', function(t) {
-    t.plan(4)
+    t.plan(3)
     const bg = new AppBackground(bgOptions)
     // There is no schema in the database on a fresh start.
     t.equal(bg.store.get('schema'), null, 'storage: schema absent on startup')
@@ -20,19 +20,20 @@ test('[bg] starting up sequence', function(t) {
         t.equal(bg.store.get('schema'), bg.store.schema, `storage: schema version (${bg.store.schema}) present after factory reset`)
     })
 
-    // See if the watcher mechanism works.
+    // UA status starts as `inactive`. There is a watcher for `store.calls.ua.status`,
+    // which adapts the mnubar status accordingly. This check makes sure that the
+    // watcher mechanism picks up the change.
     bg.on('ready', () => {
-        t.equal(bg.state.calls.ua.status, 'inactive', 'watchers: example initial property status')
         bg.state.user.authenticated = true
         bg.setState({calls: {ua: {status: 'registered'}}})
         Vue.nextTick(function() {
-            t.equal(bg.state.ui.menubar.default, 'disconnected', 'watchers: related property updated by watcher')
+            t.equal(bg.state.ui.menubar.base, 'disconnected', 'watchers: initialized watchers pick up changes')
         })
     })
 })
 
 
-test('[bg] translation check', async function(t) {
+test('[bg] translations', async function(t) {
     t.plan(3)
 
     const files = await glob('{src/js/**/*.js,src/components/**/{*.vue,*.js}}')
@@ -62,10 +63,10 @@ test('[bg] translation check', async function(t) {
         }
     }
 
-    t.notOk(faultyUppercase.length, 'translations are lower-case')
+    t.notOk(faultyUppercase.length, 'translations are all lower-case')
     if (faultyUppercase.length) t.comment(`affected translations: \r\n${faultyUppercase.join('\r\n')}`)
-    t.notOk(redundant.length, 'redundant translations')
+    t.notOk(redundant.length, 'no redundant translations')
     if (redundant.length) t.comment(`affected translations: \r\n${redundant.join('\r\n')}`)
-    t.notOk(missing.length, 'missing translations')
+    t.notOk(missing.length, 'no missing translations')
     if (missing.length) t.comment(`affected translations: \r\n${missing.join('\r\n')}`)
 })

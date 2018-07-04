@@ -20,12 +20,12 @@ class ModuleQueues extends Module {
 
         this.app.timer.registerTimer('bg:queues:size', () => {this._platformData(false)})
         this.app.on('bg:queues:selected', ({queue}) => {
-            this.app.setState({queues: {selected: {id: queue ? queue.id : null}}}, {persist: true})
-
-            if (this.app.env.isExtension) {
-                if (queue) this.app.setState({ui: {menubar: {default: this.queueMenubarIcon(queue.queue_size)}}})
-                else this.app.setState({ui: {menubar: {default: 'active'}}})
+            if (queue) {
+                this.app.setState({queues: {selected: {id: queue.id, size: queue.queue_size}}}, {persist: true})
+            } else {
+                this.app.setState({queues: {selected: {id: null, size: null}}}, {persist: true})
             }
+            this.app.modules.ui.menubarState()
             this.setQueueSizesTimer()
         })
     }
@@ -38,9 +38,27 @@ class ModuleQueues extends Module {
     _initialState() {
         return {
             queues: [],
-            selected: {id: null},
+            selected: {id: null, size: null},
             state: null,
         }
+    }
+
+
+    /**
+    * The menubar should show a queue size when a queue is
+    * selected, unless dnd is active. In that case we
+    * show the dnd icon.
+    * @returns {String} - The queue module related menubar state.
+    */
+    _menubarState() {
+        if (this.app.state.availability.dnd) return 'dnd'
+
+        const queue = this.app.state.queues.selected
+        if (queue.id) {
+            return this.queueMenubarIcon(queue.size)
+        }
+
+        return null
     }
 
 
@@ -79,14 +97,10 @@ class ModuleQueues extends Module {
             queue.queue_size = parseInt(queue.queue_size, 10)
             // Queue size is not available.
             if (isNaN(queue.queue_size)) queue.queue_size = '?'
-            // Update icon for toolbarbutton if this queuecallgroup
-            // was selected earlier.
-            if (queue.id === this.app.state.queues.selected.id) {
-                this.app.setState({ui: {menubar: {default: this.queueMenubarIcon(queue.queue_size)}}})
-            }
         }
 
         this.app.setState({queues: {queues: queues, status: null}}, {persist: true})
+        this.app.modules.ui.menubarState()
         this.setQueueSizesTimer()
     }
 

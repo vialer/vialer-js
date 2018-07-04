@@ -32,16 +32,15 @@ class ModuleAvailability extends Module {
             this.app.setState({availability: {available, destinations, selected}}, {persist: true})
 
             if (available) {
-                this.app.setState({ui: {menubar: {default: 'active'}}})
                 res = await this.app.api.client.put(endpoint, {
                     fixeddestination: selected.type === 'fixeddestination' ? selected.id : null,
                     phoneaccount: selected.type === 'phoneaccount' ? selected.id : null,
                 })
             } else {
-                this.app.setState({ui: {menubar: {default: 'unavailable'}}})
                 res = await this.app.api.client.put(endpoint, {fixeddestination: null, phoneaccount: null})
             }
 
+            this.app.modules.ui.menubarState()
             if (this.app.api.UNAUTHORIZED_STATUS.includes(res.status)) {
                 this.app.logger.warn(`${this}unauthorized availability request`)
                 return
@@ -129,10 +128,6 @@ class ModuleAvailability extends Module {
             settings: {webrtc: {account: {options: platformAccounts}}},
         }, {persist: true})
 
-        // Set an available icon when the user is available.
-        if (selected.id && !this.app.state.availability.dnd) this.app.setState({ui: {menubar: {default: 'active'}}})
-        else this.app.setState({ui: {menubar: {default: 'unavailable'}}})
-
         this.app.setState({settings: {webrtc: {account: {status: null}}}})
         if (callback) callback()
     }
@@ -146,12 +141,7 @@ class ModuleAvailability extends Module {
     _watchers() {
         return {
             'store.availability.dnd': (dndEnabled) => {
-                if (this.app.env.isExtension) {
-                    // Dnd is set. Set the menubar to inactive.
-                    if (dndEnabled) browser.browserAction.setIcon({path: 'img/menubar-unavailable.png'})
-                    // Restore the previous value.
-                    else browser.browserAction.setIcon({path: 'img/menubar-active.png'})
-                }
+                this.app.modules.ui.menubarState()
             },
         }
     }

@@ -3,46 +3,90 @@
 
 .component-queues {
 
-    .queue {
-        &:hover {
-            cursor: pointer;
-        }
+    .queues-list {
+        display: flex;
+        flex-flow: row wrap;
+        flex-wrap: wrap;
 
-        svg.icon-selected-queue {
-            @include icon-size($spacer * 2.5);
-            fill: $green-color;
-        }
+        .queue {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            margin: $spacer 0;
+            width: 100%;
 
-        .status-icon {
-            text-align: center;
-            vertical-align: center;
+            &:hover {
+                cursor: pointer;
+            }
 
-            // The queues icon is a somewhat deviant icons.
-            // It is a background with inside text, instead
-            // of a font.
-            .indicator {
-                @include icon-size($spacer * 3);
-                border-radius: 100%;
-                color: $white;
-                font-size: 0.8rem;
-                font-style: normal;
-                font-weight: 500;
-                letter-spacing: 0;
-                line-height: $spacer * 3;
-                vertical-align: center;
-                // Centers the icon in the middle of the background.
+            svg.icon-selected-queue {
+                @include icon-size($spacer * 2.5);
+                fill: $green-color;
+            }
 
-                &.quiet {background: $green-color;}
-                &.moderate {background: $yellow-color;}
-                &.busy {background: $orange-color;}
-                &.hectic {background: $red-color;}
+            .status-icon {
+                align-items: center;
+                display: flex;
+                padding-right: $spacer * 2;
+                text-align: center;
+
+                // The queues icon is a somewhat deviant icons.
+                // It is a background with inside text, instead
+                // of a font.
+                .indicator {
+                    @include icon-size($spacer * 4);
+                    border-radius: 100%;
+                    color: $white;
+                    font-size: 0.85rem;
+                    font-style: normal;
+                    font-weight: 600;
+                    letter-spacing: 0;
+                    line-height: $spacer * 4;
+                    vertical-align: center;
+                    // Centers the icon in the middle of the background.
+
+                    &.quiet {background: $green-color;}
+                    &.moderate {background: $yellow-color;}
+                    &.busy {background: $orange-color;}
+                    &.hectic {background: $red-color;}
+                }
+            }
+
+            .info {
+                flex-grow: 1;
+                min-width: 0;
+
+                .name {
+                    flex: 1;
+                    font-weight: 500;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                }
+
+                .description {
+                    color: $grey-color-darker;
+                }
+            }
+
+            .rounded-button {
+                @include icon-size($spacer * 5);
+                background: $white;
+                box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
+                line-height: 32px;
+                padding: 0;
+                text-align: center;
+
+                &:hover {
+                    background: $brand-color;
+                    color: #fff;
+                    cursor: pointer;
+                }
             }
         }
     }
 
     .notification-box.info {
-        margin: $spacer * 3;
-        margin-bottom: $spacer * 3;
         margin-top: $spacer * 3;
     }
 

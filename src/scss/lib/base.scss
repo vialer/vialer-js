@@ -98,64 +98,6 @@ video {
 
 .hide {display: none;}
 
-.list-items {
-    background: lighten($grey-color-lighter, 1%);
-
-    .list-item {
-        align-items: center;
-        display: flex;
-        justify-content: space-between;
-        padding: 8px;
-
-        .status-icon {
-            @include icon-size($spacer * 6);
-            align-items: center;
-            display: flex;
-            justify-content: center;
-        }
-
-        .info {
-            flex-grow: 1;
-
-            .name {
-                font-weight: 500;
-            }
-
-            .description {
-                color: $grey-color-darker;
-            }
-        }
-
-        &:nth-child(even) {background: $grey-color-lightest;}
-        &:nth-child(odd) {background: $grey-color-lighter;}
-
-        &:hover {
-            &:nth-child(even) {background: lighten($grey-color-lightest, 1%);}
-            &:nth-child(odd) {background: lighten($grey-color-lighter, 1%);}
-        }
-
-        .list-item-options {
-            align-items: center;
-            display: flex;
-        }
-
-        .rounded-button {
-            @include icon-size($spacer * 4);
-            background: $white;
-            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.1);
-            line-height: 32px;
-            padding: 0;
-            text-align: center;
-
-            &:hover {
-                background: $brand-color;
-                color: #fff;
-                cursor: pointer;
-            }
-        }
-    }
-}
-
 .vertical-devider {
     background: $grey-color-light;
     height: $spacer * 3;

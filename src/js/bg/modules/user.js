@@ -156,7 +156,7 @@ class ModuleUser extends Module {
         this.app.setState({
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},
-            ui: {layer: 'settings', menubar: {default: 'active'}},
+            ui: {layer: 'settings'},
             user: {username},
         }, {encrypt: false, persist: true})
 
@@ -192,6 +192,13 @@ class ModuleUser extends Module {
         this.app.emit('bg:user:logged_out', {}, true)
         this.app.setSession('new')
         this.app.notify({icon: 'user', message: this.app.$t('goodbye!'), type: 'info'})
+
+        // Fallback to the browser language or to english.
+        const languages = this.app.state.settings.language.options.map(i => i.id)
+        if (this.app.env.isBrowser && languages.includes(navigator.language)) {
+            this.app.logger.info(`${this}switching back to browser language: ${navigator.language}`)
+            Vue.i18n.set(navigator.language)
+        }
     }
 
 

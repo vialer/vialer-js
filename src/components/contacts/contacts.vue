@@ -39,19 +39,19 @@
                 <div class="contact-avatar">
                     <icon class="placeholder" name="user" v-if="displayMode === 'lean'"/>
                     <!-- Show the available endpoints -->
-                    <template v-for="endpoint in contact.endpoints">
+                    <div v-for="endpoint in contact.endpoints">
                         <icon class="call-color-status" name="availability"
                             v-if="['lean', 'regular'].includes(displayMode)" :class="endpoint.status"/>
                         <div class="call-color-status" v-else :class="endpoint.status"/>
-                    </template>
+                    </div>
                 </div>
 
                 <div class="contact-info">
                     <div class="name">{{contact.name}}</div>
                     <div class="description">
-                        <template v-for="endpoint in contact.endpoints">
+                        <div v-for="endpoint in contact.endpoints">
                             {{endpoint.number}}
-                        </template>
+                        </div>
                     </div>
                 </div>
                 <div class="contact-specials">

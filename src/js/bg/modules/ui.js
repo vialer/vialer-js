@@ -83,7 +83,7 @@ class ModuleUI extends Module {
         return {
             layer: 'login',
             menubar: {
-                default: 'inactive',
+                base: 'inactive',
                 event: null,
             },
             overlay: null,
@@ -106,7 +106,7 @@ class ModuleUI extends Module {
     * and the background script.
     */
     _ready() {
-        this.__menubarIcon(this.app.state.ui.menubar.default)
+        this.__menubarIcon(this.app.state.ui.menubar.base)
         if (this.app.env.isExtension) {
             this.app.setState({ui: {visible: false}})
             // A connection between the popup script and the background
@@ -152,7 +152,7 @@ class ModuleUI extends Module {
     */
     _restoreState(moduleStore) {
         moduleStore.menubar = {
-            default: 'inactive',
+            base: 'inactive',
             event: null,
         }
     }
@@ -165,11 +165,12 @@ class ModuleUI extends Module {
     */
     _watchers() {
         return {
-            'store.ui.menubar.default': (menubarIcon) => {
+            'store.ui.menubar.base': (menubarIcon) => {
                 this.__menubarIcon(menubarIcon)
             },
             'store.ui.menubar.event': (eventName) => {
                 if (this.app.env.isExtension) {
+                    // Reset all animations.
                     this.__menubarAnimation()
                     if (eventName) {
                         if (eventName === 'ringing') {
@@ -180,11 +181,57 @@ class ModuleUI extends Module {
                             browser.browserAction.setIcon({path: `img/menubar-${eventName}.png`})
                         }
                     } else {
-                        browser.browserAction.setIcon({path: `img/menubar-${this.app.state.ui.menubar.default}.png`})
+                        browser.browserAction.setIcon({path: `img/menubar-${this.app.state.ui.menubar.base}.png`})
                     }
                 }
             },
         }
+    }
+
+
+    /**
+    * Restore the menubar to a valid state. This is for instance needed
+    * when switching off a state like dnd or a selected queue.
+    * @param {String} [base] -
+    */
+    menubarState(base = null) {
+        const user = this.app.state.user
+        const uaStatus = this.app.state.calls.ua.status
+
+        if (base) {
+            this.app.setState({ui: {menubar: {base}}})
+            return
+        }
+
+        // Generic menubar behaviour.
+        if (this.app.state.app.session.active && !user.authenticated) base = 'lock'
+        else if (!user.authenticated) base = 'inactive'
+        else if (uaStatus === 'disconnected') base = 'disconnected'
+        else {
+            if (this.app.state.settings.webrtc.enabled) {
+                if (uaStatus === 'registered') {
+                    if (this.app.state.availability.dnd) base = 'dnd'
+                    else if (!this.app.state.availability.available) base = 'unavailable'
+                    else base = 'active'
+                } else base = 'disconnected'
+            } else {
+                // ConnectAB only connects to a SIP backend.
+                if (uaStatus === 'connected') {
+                    if (!this.app.state.availability.available) base = 'unavailable'
+                    else base = 'active'
+                } else base = 'disconnected'
+            }
+        }
+
+        // Modules can override the generic menubar behaviour using
+        // a custom `_menubarState` method.
+        for (let moduleName of Object.keys(this.app.modules)) {
+            if (this.app.modules[moduleName]._menubarState) {
+                const moduleMenubarState = this.app.modules[moduleName]._menubarState()
+                if (moduleMenubarState) base = moduleMenubarState
+            }
+        }
+        this.app.setState({ui: {menubar: {base}}})
     }
 
 
@@ -258,6 +305,7 @@ class ModuleUI extends Module {
             })
         }
     }
+
 }
 
 module.exports = ModuleUI

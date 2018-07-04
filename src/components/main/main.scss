@@ -71,7 +71,8 @@ html {
 
         // Split into grid columns for the menubar when logged in.
         &.sidebar {
-            grid-template-columns: ($spacer * 5) auto;
+            // Calculate grid second column.
+            grid-template-columns: ($spacer * 5) calc(100% - #{($spacer * 5)});
         }
 
         &.no-scroll {

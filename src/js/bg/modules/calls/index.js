@@ -610,27 +610,10 @@ class ModuleCalls extends Module {
             * status accordingly. The menubar states are slightly
             * different from the UA states, because there are conditions
             * involved, besides the UA's.
-            * @param {String} newUAStatus - What the UA status has become.
-            * @param {String} oldUAStatus - What the UA status was.
+            * @param {String} uaStatus - The new UA status.
             */
-            'store.calls.ua.status': (newUAStatus, oldUAStatus) => {
-                let menubarState = newUAStatus
-
-                if (!this.app.state.user.authenticated) {
-                    menubarState = 'inactive'
-                } else if (newUAStatus === 'disconnected') menubarState = 'disconnected'
-                else if (this.app.state.settings.webrtc.enabled) {
-                    if (newUAStatus === 'registered') {
-                        if (this.app.state.availability.dnd) menubarState = 'unavailable'
-                        else menubarState = 'active'
-                    } else menubarState = 'disconnected'
-                } else {
-                    // ConnectAB only connects to a SIP backend.
-                    if (newUAStatus === 'connected') menubarState = 'active'
-                    else menubarState = 'disconnected'
-                }
-
-                this.app.setState({ui: {menubar: {default: menubarState}}})
+            'store.calls.ua.status': (uaStatus) => {
+                this.app.modules.ui.menubarState()
             },
         }
     }
