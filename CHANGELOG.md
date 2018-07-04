@@ -1,5 +1,5 @@
-<a name="3.0.205"></a>
-## [3.0.205](https://github.com/voipgrid/vialer-js/compare/v3.0.106...v3.0.205) (2018-07-03)
+<a name="3.0.206"></a>
+## [3.0.206](https://github.com/voipgrid/vialer-js/compare/v3.0.106...v3.0.206) (2018-07-04)
 
 
 ### Bug Fixes
@@ -27,6 +27,7 @@
 * use correct ci dir name. ([50bf030](https://github.com/voipgrid/vialer-js/commit/50bf030))
 * use login instead of unlock. ([03d36ca](https://github.com/voipgrid/vialer-js/commit/03d36ca))
 * use npm ci. ([9de2539](https://github.com/voipgrid/vialer-js/commit/9de2539))
+* use shift instead of pop. unset loading on invalid unlock. ([5021876](https://github.com/voipgrid/vialer-js/commit/5021876))
 * VIALJS-54 only unset menubar ringing/calling event when there are no more ongoing calls. ([7b464e7](https://github.com/voipgrid/vialer-js/commit/7b464e7))
 * VIALJS-61 - cleanup ua reference causing Call setup to fail. ([dde2750](https://github.com/voipgrid/vialer-js/commit/dde2750))
 * voipaccount picker responsivity and refresh button. ([40354f5](https://github.com/voipgrid/vialer-js/commit/40354f5))
