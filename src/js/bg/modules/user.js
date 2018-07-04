@@ -153,6 +153,11 @@ class ModuleUser extends Module {
         user.realName = [user.first_name, user.preposition, user.last_name].filter((i) => i !== '').join(' ')
         await this.app.__unlockSession({password, username})
 
+        // Store the vault key on login when the setting is on,
+        //but the key is not there yet.
+        const vault = this.app.state.app.vault
+        if (vault.store && !vault.key) await this.app.crypto.storeVaultKey()
+
         this.app.setState({
             // The `installed` and `updated` flag are toggled off after login.
             app: {installed: false, updated: false},

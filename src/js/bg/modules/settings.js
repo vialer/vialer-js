@@ -39,8 +39,8 @@ class ModuleSettings extends Module {
             },
             language: {
                 options: [
-                    {id: 'nl', name: this.app.$t('dutch').capitalize()},
-                    {id: 'en', name: this.app.$t('english').capitalize()},
+                    {id: 'nl', name: this.app.$t('dutch')},
+                    {id: 'en', name: this.app.$t('english')},
                 ],
                 selected: {id: 'nl', name: this.app.$t('dutch')},
             },
