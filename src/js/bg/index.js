@@ -194,7 +194,7 @@ class AppBackground extends App {
             return
         } else if (this.__mergeQueue.length) {
             // See if a request is queued before starting.
-            this.__mergeQueue.pop()()
+            this.__mergeQueue.shift()()
         }
 
         // Flag that the operation is currently in use.
@@ -206,9 +206,15 @@ class AppBackground extends App {
             return
         }
 
+        const storeEndpoint = this.state.user.username
+        // This should never happen, but catch the error in case it does.
+        if (!storeEndpoint) {
+            throw new Error('cannot write to store without a state target')
+        }
+
         // Background is leading and is the only one that
         // writes to storage using encryption.
-        let storeKey = encrypt ? `${this.state.user.username}/state/vault` : `${this.state.user.username}/state`
+        let storeKey = encrypt ? `${storeEndpoint}/state/vault` : `${storeEndpoint}/state`
         let storeState = this.store.get(storeKey)
 
         if (storeState) {
@@ -237,7 +243,7 @@ class AppBackground extends App {
 
         // See if a request is queued before leaving.
         if (this.__mergeQueue.length) {
-            this.__mergeQueue.pop()()
+            this.__mergeQueue.shift()()
         }
     }
 

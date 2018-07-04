@@ -34,7 +34,6 @@ class ModuleUser extends Module {
                 this.app.api.setupClient(username, this.app.state.user.token)
                 this.app.__initServices()
                 this.app.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
-                this.app.setState({user: {status: null}})
                 this.app.notify({icon: 'user', message: this.app.$t('welcome back!'), type: 'info'})
             } catch (err) {
                 this.app.setState({
@@ -43,6 +42,8 @@ class ModuleUser extends Module {
                 }, {encrypt: false, persist: true})
                 const message = this.app.$t('failed to unlock session; check your password.')
                 this.app.notify({icon: 'warning', message, type: 'danger'})
+            } finally {
+                this.app.setState({user: {status: null}})
             }
         })
 

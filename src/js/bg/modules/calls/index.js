@@ -294,7 +294,7 @@ class ModuleCalls extends Module {
             }
 
             if (acceptCall) {
-                this.app.logger.info(`${this}accept incoming call.`)
+                this.app.logger.info(`${this}accept incoming call`)
                 // An ongoing call may be a closing call. In that case we first
                 // remove all the closing calls before starting the new one.
                 for (const callId of closingCalls) {
@@ -739,7 +739,7 @@ class ModuleCalls extends Module {
         this.app.logger.info(`${this}connecting to SIP endpoint ${this._uaOptions.wsServers}`)
         // Login with the WebRTC account or platform account.
         if (!this._uaOptions.authorizationUser || !this._uaOptions.password) {
-            this.app.logger.warn(`${this}cannot connect without username and password`)
+            this.app.logger.error(`${this}cannot connect without username and password`)
         }
 
         // Fresh new instance is used each time, so we can reset settings properly.
