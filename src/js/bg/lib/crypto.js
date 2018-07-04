@@ -372,9 +372,6 @@ class Crypto {
     */
     async loadIdentity(username, password, e2e = false) {
         this.sessionKey = await this._generateVaultKey(username, password)
-        if (this.app.state.app.vault.store && !this.app.state.app.vault.key) {
-            this.storeVaultKey()
-        }
 
         if (!e2e) return
 
@@ -415,7 +412,7 @@ class Crypto {
     * @returns {String} - The base64-encoded vault key.
     */
     async storeVaultKey() {
-        this.app.logger.info(`${this}storing vault key for session recovery`)
+        this.app.logger.info(`${this}enabling auto session recovery`)
         const sessionKey = await this.__exportAESKey(this.sessionKey)
         this.app.setState({app: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
         return sessionKey

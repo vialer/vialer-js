@@ -120,8 +120,10 @@ class ModuleApp extends Module {
                 // Only respond as long the user is logged in.
                 if (!this.app.state.user.authenticated) return
 
-                if (storeVaultKey) this.app.crypto.storeVaultKey()
-                else {
+                if (storeVaultKey) {
+                    this.app.crypto.storeVaultKey()
+                } else {
+                    this.app.logger.info(`${this}disabling auto session recovery`)
                     this.app.setState({app: {vault: {key: null}}}, {encrypt: false, persist: true})
                 }
             },

@@ -276,6 +276,14 @@ class AppBackground extends App {
             this.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
         }
 
+        // Store the vault key on login when the setting is on,
+        //but the key is not there yet.
+        const vault = this.state.app.vault
+        if (vault.store && !vault.key) {
+            await this.crypto.storeVaultKey()
+        }
+        // Get a fresh reference to the media permission on unlock.
+        this.__initMedia()
         this.emit('unlocked', {}, true)
     }
 
@@ -380,7 +388,6 @@ class AppBackground extends App {
         // Set the active session.
         if (sessionId && sessionId !== 'new') this.state.app.session.active = sessionId
         this.setState(this.state)
-        this.__initMedia()
     }
 
 

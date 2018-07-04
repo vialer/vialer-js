@@ -320,26 +320,26 @@ class ModuleCalls extends Module {
 
         this.ua.on('registered', () => {
             this.app.setState({calls: {ua: {status: 'registered'}}})
-            this.app.logger.info(`${this}registered on SIP endpoint`)
+            this.app.logger.info(`${this}registered at ${this._uaOptions.wsServers}`)
         })
 
 
         this.ua.on('unregistered', () => {
             this.app.setState({calls: {ua: {status: this.ua.isConnected() ? 'connected' : 'disconnected'}}})
-            this.app.logger.info(`${this}ua unregistered, switch back to ${this.app.state.calls.ua.status} status`)
+            this.app.logger.info(`${this}unregistered from ${this._uaOptions.wsServers}; back to ${this.app.state.calls.ua.status} status`)
         })
 
 
         this.ua.on('connected', () => {
             this.app.setState({calls: {ua: {status: 'connected'}}})
-            this.app.logger.info(`${this}connected to SIP endpoint`)
+            this.app.logger.info(`${this}connected to ${this._uaOptions.wsServers}`)
             // Reset the retry interval timer..
             this.retry = Object.assign({}, this.retryDefault)
         })
 
 
         this.ua.on('disconnected', () => {
-            this.app.logger.debug(`${this}disconnected from SIP endpoint`)
+            this.app.logger.debug(`${this}disconnected from ${this._uaOptions.wsServers}`)
             this.app.setState({calls: {ua: {status: 'disconnected'}}})
             // // Don't use SIPJS simpler reconnect logic, which doesn't have
             // // jitter and an increasing timeout.
@@ -355,7 +355,7 @@ class ModuleCalls extends Module {
 
             if (this.reconnect) {
                 // Reconnection timer logic is performed only here.
-                this.app.logger.debug(`${this}ua reconnecting in ${this.retry.timeout} ms`)
+                this.app.logger.debug(`${this}reconnecting to ${this._uaOptions.wsServers} in ${this.retry.timeout} ms`)
                 setTimeout(() => this.connect(), this.retry.timeout)
                 this.retry = this.app.timer.increaseTimeout(this.retry)
             }
@@ -418,7 +418,7 @@ class ModuleCalls extends Module {
 
 
     /**
-    * Reformat the SDP of the {@link https://sipjs.com/api/0.9.0/sessionDescriptionHandler/|SessionDescription}
+    * Reformat the SDP of the {@link https://sipjs.com/api/0.10.0/sessionDescriptionHandler/|SessionDescription}
     * when setting up a connection, so we can force opus or G722 codec to be
     * the preference of the backend.
     * @param {SessionDescription} sessionDescription - A Sip.js SessionDescription handler.
@@ -736,7 +736,7 @@ class ModuleCalls extends Module {
         }
 
         this._uaOptions = this.__uaOptions()
-        this.app.logger.info(`${this}connecting to SIP endpoint ${this._uaOptions.wsServers}`)
+        this.app.logger.info(`${this}connecting to ${this._uaOptions.wsServers}`)
         // Login with the WebRTC account or platform account.
         if (!this._uaOptions.authorizationUser || !this._uaOptions.password) {
             this.app.logger.error(`${this}cannot connect without username and password`)

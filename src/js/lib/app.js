@@ -55,10 +55,6 @@ class App extends Skeleton {
     * Initialize media access and system sounds.
     */
     async __initMedia() {
-        // Sounds that are used in the application. They can both
-        // be triggered from `AppForeground` and `AppBackground`.
-        this.sounds = new Sounds(this)
-
         // Check media permission at the start of the bg/fg.
         if (!this.env.isFirefox && !this.env.isNode) {
             try {
@@ -129,6 +125,9 @@ class App extends Skeleton {
             watch: watchers,
         })
 
+        // Sounds that are used in the application. Both
+        // initialized in `AppForeground` and `AppBackground`.
+        this.sounds = new Sounds(this)
         await this.__initMedia()
     }
 

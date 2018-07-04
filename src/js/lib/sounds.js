@@ -45,14 +45,13 @@ class BusyTone {
         this.audio.play()
 
         if (!sink) {
-            const speaker = this.app.state.settings.webrtc.devices
+            const speaker = this.app.state.settings.webrtc.devices.speaker
             if (speaker.enabled) {
-                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput.id
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput
             } else {
-                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput.id
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput
             }
         }
-
         this.audio.setSinkId(sink.id)
 
         const gainNode = context.createGain()
@@ -123,13 +122,13 @@ class DtmfTone {
         if (!sink) {
             const speaker = this.app.state.settings.webrtc.devices.speaker
             if (speaker.enabled) {
-                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput.id
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput
             } else {
-                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput.id
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput
             }
         }
 
-        this.audio.setSinkId(sink)
+        this.audio.setSinkId(sink.id)
 
         const frequencyPair = this.frequencies[key]
         this.freq1 = frequencyPair.f1
@@ -222,13 +221,13 @@ class RingbackTone {
         if (!sink) {
             const speaker = this.app.state.settings.webrtc.devices
             if (speaker.enabled) {
-                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput.id
+                sink = this.app.state.settings.webrtc.devices.sinks.speakerOutput
             } else {
-                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput.id
+                sink = this.app.state.settings.webrtc.devices.sinks.headsetOutput
             }
         }
 
-        this.audio.setSinkId(sink)
+        this.audio.setSinkId(sink.id)
 
         let freq1, freq2
         const gainNode = context.createGain()
