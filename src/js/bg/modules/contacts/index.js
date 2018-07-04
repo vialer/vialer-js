@@ -41,6 +41,7 @@ class ModuleContacts extends Module {
             displayMode: 'lean',
             filters: {
                 favorites: false,
+                online: true, // Hide contacts that don't have registered endpoints.
             },
             search: {
                 disabled: false,
@@ -119,7 +120,7 @@ class ModuleContacts extends Module {
 
 
     /**
-    * Compare, updates and creates Contact instances with appropriate state
+    * Compare, update and create Contact instances with appropriate state
     * from VoIP-accounts that are listed under a client on
     * the VoIPGRID platform.
     * @param {Array} voipaccounts - The endpoints to check against.

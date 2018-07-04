@@ -24,9 +24,9 @@ module.exports = (app) => {
                 } else if (block === 'remind-button') {
                     if (modifier.remind) classes.active = true
                 } else if (block === 'filter-missed-calls') {
-                    if (this.filters.missed) classes.active = true
+                    if (this.filters.missed) classes['active-red'] = true
                 } else if (block === 'filter-reminders') {
-                    if (this.filters.reminders) classes.active = true
+                    if (this.filters.reminders) classes['active-yellow'] = true
                 }
                 return classes
             },

@@ -189,6 +189,11 @@ class AppBackground extends App {
     * @param {Object} options - See the parameter description of super.
     */
     async __mergeState({action = 'upsert', encrypt = true, path = null, persist = false, state}) {
+        const storeEndpoint = this.state.user.username
+        // This could happen when an action is still queued, while the user
+        // is logging out at the same moment. The action is then ignored.
+        if (!storeEndpoint) return
+
         if (this.__mergeBusy) {
             this.__mergeQueue.push(() => this.__mergeState({action, encrypt, path, persist, state}))
             return
@@ -204,12 +209,6 @@ class AppBackground extends App {
         if (!persist) {
             this.__mergeBusy = false
             return
-        }
-
-        const storeEndpoint = this.state.user.username
-        // This should never happen, but catch the error in case it does.
-        if (!storeEndpoint) {
-            throw new Error('cannot write to store without a state target')
         }
 
         // Background is leading and is the only one that

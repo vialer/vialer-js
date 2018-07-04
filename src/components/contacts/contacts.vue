@@ -5,9 +5,13 @@
                 <h1 class="uc">{{$t('contacts')}}</h1>
                 <div class="vertical-devider"></div>
                 <div class="content-filters">
-                    <div class="filter cf" :class="classes('favorites-filter')" @click="toggleFilterFavorites()">
+                    <div class="filter cf" :class="classes('filter-favorites')" @click="toggleFilterFavorites()">
                         <icon name="star"/>
                         {{$t('favorites')}}
+                    </div>
+                    <div class="filter cf" :class="classes('filter-online')" @click="toggleFilterOnline()">
+                        <icon name="softphone"/>
+                        {{$t('online')}}
                     </div>
                 </div>
             </div>
@@ -41,6 +45,7 @@
                         <div class="call-color-status" v-else :class="endpoint.status"/>
                     </template>
                 </div>
+
                 <div class="contact-info">
                     <div class="name">{{contact.name}}</div>
                     <div class="description">

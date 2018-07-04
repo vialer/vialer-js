@@ -13,6 +13,9 @@ module.exports = (app) => {
                     const contact = this.contacts[contactId]
                     // Filter favorites only.
                     if (this.filters.favorites && !contact.favorite) continue
+                    if (this.filters.online) {
+                        if (!this.contactIsRegistered(contact)) continue
+                    }
 
                     const name = contact.name.toLowerCase()
                     if (name.includes(searchQuery)) {
@@ -57,9 +60,11 @@ module.exports = (app) => {
                 } else if (block === 'display-mode') {
                     if (modifier === this.displayMode) classes.active = true
                 } else if (block === 'favorite-button') {
-                    classes.active = modifier
-                } else if (block === 'favorites-filter') {
-                    classes.active = this.filters.favorites
+                    classes['active-yellow'] = modifier
+                } else if (block === 'filter-favorites') {
+                    classes['active-yellow'] = this.filters.favorites
+                } else if (block === 'filter-online') {
+                    classes['active-green'] = this.filters.online
                 }
                 return classes
             },
@@ -91,6 +96,9 @@ module.exports = (app) => {
             },
             toggleFilterFavorites: function() {
                 app.setState({contacts: {filters: {favorites: !this.filters.favorites}}}, {persist: true})
+            },
+            toggleFilterOnline: function() {
+                app.setState({contacts: {filters: {online: !this.filters.online}}}, {persist: true})
             },
         }, app.helpers.sharedMethods()),
         render: templates.contacts.r,

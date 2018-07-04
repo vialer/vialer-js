@@ -43,6 +43,10 @@ class Endpoint {
         this.app.__mergeDeep(this.state, state)
 
         if (this.id) {
+            if (!this.app.state.contacts.contacts[this.contact.id]) {
+                this.app.logger.debug(`${this}contact is empty`)
+                return
+            }
             Vue.set(this.app.state.contacts.contacts[this.contact.id].endpoints, this.id, this.state)
             // Send a complete state representation down the wire once.
             this.app.emit('fg:set_state', {action: 'upsert', path: `contacts.contacts.${this.contact.id}.endpoints.${this.id}`, state: this.state})
