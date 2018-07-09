@@ -19,25 +19,45 @@
             flex-direction: column;
             height: $spacer * 7;
             justify-content: center;
-            transition: all 250ms ease-in-out;
+            transition: all 200ms ease-in-out;
 
             svg {
                 @include icon-size($spacer * 3);
             }
 
             &.availability {
-                path[pid="0"] {fill: $white;}
-                path[pid="1"] {fill: $brand-color;}
+
+                path[pid="0"] {
+                    stroke: $white-color;
+                    stroke-width: 2;
+                }
 
                 &.available {
                     path[pid="0"] {fill: $green-color;}
                     path[pid="1"] {fill: $white;}
                 }
 
-                &.unavailable {
-                    path[pid="0"] {fill: $red-color;}
+                &.dnd {
+                    path[pid="0"] {
+                        fill: $orange-color;
+                        stroke: $white;
+                    }
                     path[pid="1"] {fill: $white;}
                 }
+
+                &.unavailable {
+                    path[pid="0"] {
+                        fill: $yellow-color;
+                        stroke: $white;
+                    }
+                    path[pid="1"] {fill: $white;}
+                }
+
+                &.active,
+                &:hover {
+                    path[pid="0"] {stroke: $grey-color;}
+                }
+
             }
 
             // Unread red-dot on top of the recent icon.

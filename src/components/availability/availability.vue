@@ -4,11 +4,12 @@
     <Field name="dnd_availability" type="checkbox"
         css="is-warning"
         :disabled="!webrtc.enabled"
-        :help="$t('decline incoming softphone calls.')"
+        :help="$t('decline all incoming softphone calls.')"
         :label="$t('do not disturb')"
         :model.sync="dnd"/>
 
-    <Field name="platform_availability" type="checkbox"
+    <Field name="platform_availability" type="checkbox" class="platform-availability"
+        :help="$t('changes the availability of your {user} within a routing.', {user: `${vendor.name} ${$t('user')}`})"
         :label="`${$t('availability')} ${vendor.name} ${$t('user')}`"
         :model.sync="available">
 

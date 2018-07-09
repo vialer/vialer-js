@@ -26,7 +26,8 @@ class PresenceSip extends Presence {
         let parser = new DOMParser()
         let xmlDoc = parser ? parser.parseFromString(notification.request.body, 'text/xml') : null
         let dialogNode = xmlDoc ? xmlDoc.getElementsByTagName('dialog-info')[0] : null
-        if (!dialogNode) throw Error('Notification message is missing a dialog node')
+        // Skip; an invalid dialog.
+        if (!dialogNode) return null
 
         let stateAttr = dialogNode.getAttribute('state')
         // let localNode = dialogNode.getElementsByTagName('local')[0]
@@ -67,8 +68,8 @@ class PresenceSip extends Presence {
             this.subscription = this.app.modules.calls.ua.subscribe(`${this.endpoint.state.id}@voipgrid.nl`, 'dialog')
             this.subscription.on('notify', (notification) => {
                 const status = this._statusFromDialog(notification)
-                this.endpoint.setState({status})
                 setTimeout(() => {
+                    if (status) this.endpoint.setState({status})
                     resolve(this.endpoint)
                 }, SUBSCRIBE_DELAY)
             })

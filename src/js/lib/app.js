@@ -111,11 +111,19 @@ class App extends Skeleton {
     async __initViewModel(watchers) {
         const i18nStore = new I18nStore(this.state)
         Vue.use(i18n, i18nStore)
+        const languages = this.state.settings.language.options.map(i => i.id)
         let selectedLanguage = this.state.settings.language.selected.id
-        for (const translation of Object.keys(translations)) {
-            Vue.i18n.add(selectedLanguage, translations[translation])
+        for (const [id, translation] of Object.entries(translations)) {
+            Vue.i18n.add(id, translation)
         }
+
+        if (!selectedLanguage && this.env.isBrowser) selectedLanguage = navigator.language
+
+        if (!languages.includes(selectedLanguage)) selectedLanguage = 'en'
+        this.logger.info(`${this}selected language: ${selectedLanguage}`)
         Vue.i18n.set(selectedLanguage)
+
+
         // Add a simple reference to the translation module.
         this.$t = Vue.i18n.translate
 
@@ -194,10 +202,10 @@ class App extends Skeleton {
                 }
             } else if (action === 'delete') {
                 const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
-                Vue.delete(_ref, path[path.length - 1])
+                this.vm.$delete(_ref, path[path.length - 1])
             } else if (action === 'replace') {
                 const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
-                Vue.set(_ref, path[path.length - 1], state)
+                this.vm.$set(_ref, path[path.length - 1], state)
             } else {
                 throw new Error(`invalid path action for __mergeState: ${action}`)
             }
@@ -218,7 +226,7 @@ class App extends Skeleton {
     __setKeyPath(obj, keypath, value) {
         if (keypath.length === 1) {
             // Arrived at the end of the path. Make the property reactive.
-            if (!obj[keypath[0]]) Vue.set(obj, keypath[0], value)
+            if (!obj[keypath[0]]) this.vm.$set(obj, keypath[0], value)
             return obj[keypath[0]]
         } else {
             return this.__setKeyPath(obj[keypath[0]], keypath.slice(1), value)

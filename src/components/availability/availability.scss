@@ -4,4 +4,16 @@
     select {
         width: 100%;
     }
+
+    .platform-availability {
+        .switch[type="checkbox"] {
+            & + label::before {
+                background: $yellow-color;
+            }
+
+            &:checked + label::before {
+                background: $green-color;
+            }
+        }
+    }
 }

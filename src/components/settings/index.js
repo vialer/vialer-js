@@ -157,6 +157,7 @@ module.exports = (app) => {
             * @param {Object} language - Selected language.
             */
             'settings.language.selected': function(language) {
+                app.logger.info(`${this} setting language to ${language.id}`)
                 Vue.i18n.set(language.id)
             },
         },

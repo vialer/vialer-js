@@ -20,16 +20,17 @@
     <!-- General preferences -->
     <div class="tab" :class="{'is-active': tabs.active === 'general'}">
 
-        <Field name="language" type="select"
-            :label="$t('application language')"
-            :model.sync="settings.language.selected"
-            :options="settings.language.options"
-            :placeholder="$t('select a language')"/>
-
         <Field name="click2dial" type="checkbox"
             :help="$t('add clickable icons next to phonenumbers in webpages.')"
             :label="`${$t('click-to-Dial')} ${$t('icons')}`"
             :model.sync="settings.click2dial.enabled"/>
+
+        <Field name="language" type="select"
+            :help="$t('language used throughout the application.')"
+            :label="$t('application language')"
+            :model.sync="settings.language.selected"
+            :options="settings.language.options"
+            :placeholder="$t('select a language')"/>
 
         <Field v-if="user.developer" name="language" type="textarea"
             :help="$t('blacklist sites that don\'t work well with Click-to-dial icons.')"

@@ -4,7 +4,7 @@
     <div class="step-description">
         <span class="cf">{{$t('by collecting information about anonymized usage and errors, we are able to improve this software at a faster pace.')}}</span>
         <br/>
-        <em class="help cf">{{$t('you can always change this option later from the privacy settings.')}}</em>
+        <em class="help cf">{{$t('you can change this later from the privacy settings.')}}</em>
     </div>
 
     <slot name="progress"></slot>

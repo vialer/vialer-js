@@ -73,7 +73,7 @@ class AppTab extends Skeleton {
                 } else {
                     if (this.observer) this.observer.disconnect()
                     // Remove icons.
-                    this.revertInsertedIcons()
+                    this.menubarState()
                     this.stylesheet.remove()
                 }
             }

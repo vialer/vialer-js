@@ -2,7 +2,7 @@
     <!-- Force the telemetry window to show up -->
     <Notifications :class="classes('notifications')"/>
     <Wizard v-if="!wizard.completed && user.authenticated"/>
-    <template v-else>
+    <div v-else>
         <div class="overlay" v-if="overlay">
             <div class="close-button" @click="closeOverlay()">
                 <icon name="close"/>
@@ -25,5 +25,5 @@
                 <Activity v-else-if="layer==='activity'"/>
             </template>
         </div>
-    </template>
+    </div>
 </component>

@@ -147,7 +147,7 @@ class AppBackground extends App {
         // The vault always starts in a locked position.
         this.setState({
             app: {vault: {unlocked: false}},
-            ui: {menubar: {default: 'inactive'}},
+            ui: {menubar: {base: 'inactive', event: null}},
         })
 
         // See if we can decipher the stored encrypted state when
@@ -164,9 +164,10 @@ class AppBackground extends App {
         // Each module can define watchers on store attributes, which makes
         // it easier to centralize data-related logic.
         let watchers = {}
+
         for (let module of Object.keys(this.modules)) {
             if (this.modules[module]._watchers) {
-                this.logger.debug(`${this}adding watchers for module ${module}`)
+                this.logger.debug(`${this}watchers for module: ${module}`)
                 Object.assign(watchers, this.modules[module]._watchers())
             }
         }
@@ -192,7 +193,7 @@ class AppBackground extends App {
         const storeEndpoint = this.state.user.username
         // This could happen when an action is still queued, while the user
         // is logging out at the same moment. The action is then ignored.
-        if (!storeEndpoint) return
+        if (persist && !storeEndpoint) return
 
         if (this.__mergeBusy) {
             this.__mergeQueue.push(() => this.__mergeState({action, encrypt, path, persist, state}))
@@ -374,12 +375,13 @@ class AppBackground extends App {
         if (sessionId && sessionId !== 'new') {
             this.__mergeDeep(this.state, this.store.get(`${sessionId}/state`))
             // Always pin these presets, no matter what the stored setting is.
+
             if (this.state.app.vault.key) {
                 this.state.app.vault.unlocked = true
             } else {
                 this.state.app.vault.unlocked = false
-                this.state.ui.menubar.default = 'lock'
             }
+            this.modules.ui.menubarState()
             Object.assign(this.state.user, {authenticated: false, username: sessionId})
         }
 
@@ -387,6 +389,7 @@ class AppBackground extends App {
         // Set the active session.
         if (sessionId && sessionId !== 'new') this.state.app.session.active = sessionId
         this.setState(this.state)
+        this.modules.ui.menubarState()
     }
 
 

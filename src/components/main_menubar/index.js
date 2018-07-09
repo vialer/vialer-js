@@ -14,7 +14,8 @@ module.exports = (app) => {
                 if (block === 'activity') {
                     classes.unread = this.unread
                 } else if (block === 'availability') {
-                    if (this.available) classes.available = true
+                    if (this.dnd) classes.dnd = true
+                    else if (this.available) classes.available = true
                     else classes.unavailable = true
                 } else if (block === 'calls') {
                     classes.disabled = !this.app.online
@@ -34,6 +35,7 @@ module.exports = (app) => {
         store: {
             app: 'app',
             available: 'availability.available',
+            dnd: 'availability.dnd',
             layer: 'ui.layer',
             unread: 'activity.unread',
         },
