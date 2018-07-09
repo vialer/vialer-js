@@ -46,16 +46,11 @@
             placeholder="https://"/>
 
         <Field v-if="user.developer || !settings.platform.enabled" name="sip_endpoint" type="text"
-            :label="$t('SIP server')"
-            :model.sync="settings.sipEndpoint"
+            :label="$t('webRTC endpoint')"
+            :model.sync="settings.webrtc.endpoint.uri"
             :help="$t('domainname of the SIP server with websocket support.')"
             :placeholder="$t('SIP server')"
-            :validation="$v.settings.sipEndpoint"/>
-
-        <Field v-if="vendor.type === 'open'" name="platform_enabled" type="checkbox"
-            :label="`${vendor.name} ${$t('platform integration')}`"
-            :model.sync="settings.platform.enabled"
-            :help="$t('add user availability, queues status monitoring and calling without WebRTC. A paid {vendor} account is required.', {vendor: vendor.name})"/>
+            :validation="$v.settings.webrtc.endpoint.uri"/>
     </div>
 
     <!-- Privacy settings -->
@@ -70,77 +65,27 @@
         <Field name="telemetry_enabled" type="checkbox"
             :label="$t('telemetry')"
             :model.sync="settings.telemetry.enabled"
-            :help="$t('by collecting information about anonymized usage and errors, we are able to improve this software at a faster pace.')"/>
+            :help="$t('we solely collect anonymized data about usage statistics and application errors with the purpose to improve the {name} more efficiently.', {name: app.name})"/>
     </div>
 
     <!-- Phone preferences -->
     <div class="tab" :class="{'is-active': tabs.active === 'phone'}">
+
         <Field name="webrtc_enabled" type="checkbox"
-            :disabled="env.isFirefox || !settings.webrtc.account.options.length"
+            :disabled="env.isFirefox"
             :label="$t('use as softphone')"
-            :model.sync="settings.webrtc.enabled"
+            :model.sync="settings.webrtc.toggle"
             :help="env.isFirefox ? $t('firefox doesn\'t support this feature yet.') : $t('use WebRTC to receive incoming calls with and place outgoing calls.')"/>
 
-        <VoipaccountPicker :label="$t('softphone VoIP account')" :v="$v"/>
+        <AccountPicker :label="$t('softphone VoIP account')" :v="$v" v-if="user.platform.account.selection"/>
     </div>
 
     <!-- Audio settings -->
     <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
-
-        <Field v-if="settings.webrtc.media.permission" name="input_device" type="select"
-            :label="$t('headset audio input')"
-            :model.sync="devices.sinks.headsetInput"
-            :options="devices.input"
-            :validation="$v.settings.webrtc.devices.sinks.headsetInput.valid">
-            <MicPermission slot="select-extra" v-if="$v.settings.webrtc.devices.sinks.headsetInput.valid.customValid"/>
-        </Field>
-
-        <Field v-if="settings.webrtc.media.permission" name="output_device" type="select"
-            :help="$v.settings.webrtc.devices.sinks.headsetOutput.valid.customValid ? $t('does the audio play on the preferred device?') : ''"
-            :label="$t('headset audio output')"
-            :model.sync="devices.sinks.headsetOutput"
-            :options="devices.output"
-            :validation="$v.settings.webrtc.devices.sinks.headsetOutput.valid">
-            <button slot="select-extra" class="ringtone-play button is-link select-button"
-                :disabled="playing.headsetOutput" @click="playSound('busyTone', 'headsetOutput')">
-                <span class="icon is-small"><icon name="ring"/></span>
-            </button>
-        </Field>
-
-        <Field v-if="settings.webrtc.media.permission" name="sounds_device" type="select"
-            :help="$v.settings.webrtc.devices.sinks.ringOutput.valid.customValid ? $t('does the audio play on the preferred device?') : ''"
-            :label="`${$t('ringtone audio')} ${$t('output')}`"
-            :model.sync="devices.sinks.ringOutput"
-            :options="devices.output"
-            :validation="$v.settings.webrtc.devices.sinks.ringOutput.valid">
-
-            <button slot="select-extra" class="ringtone-play button is-link select-button"
-                :disabled="playing.ringOutput" @click="playSound('ringTone', 'ringOutput')">
-                <span class="icon is-small"><icon name="ring"/></span>
-            </button>
-        </Field>
-
-        <Field v-if="user.developer" class="ringtone-select" name="ringtone" type="select"
-            :label="$t('ringtone audiofile')"
-            :model.sync="ringtones.selected"
-            :options="ringtones.options">
-
-            <button slot="select-extra" class="ringtone-play button is-link select-button"
-                :disabled="playing.ringOutput" @click="playSound('ringTone', 'ringOutput')">
-                <span class="icon is-small"><icon name="ring"/></span>
-            </button>
-        </Field>
-
-        <Field v-if="user.developer" name="audio_codec" type="select"
-            :label="$t('audio codec')"
-            :model.sync="settings.webrtc.codecs.selected"
-            :options="settings.webrtc.codecs.options"/>
-
-        <Field v-if="user.developer" name="media_type" type="select"
-            :help="$t('media options that can be used by the browser.')"
-            :label="$t('supported media')"
-            :model.sync="settings.webrtc.media.type.selected"
-            :options="settings.webrtc.media.type.options"/>
+        <DevicePicker v-if="settings.webrtc.media.permission"/>
+        <div v-else>
+            <MicPermission/>
+        </div>
     </div>
 
     <div class="tabs-actions field is-grouped">

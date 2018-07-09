@@ -1,30 +1,36 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
+
 
 // The most upper box containing account info and
 // icon-links to several locations.
 .component-call-switch {
+    background: $white-tint-color-light;
+    width: $spacer * 5;
 
     .call {
         @include icon-size($spacer * 5);
         align-items: center;
+        background: $white-tint-color-dark;
+        border-left: 1px solid $grey-color-lightest;
+        border-top: 1px solid $grey-color-lightest;
         display: flex;
         justify-content: center;
 
-        svg {fill: $white;}
+        &:hover {
+            background: $white-tint-color-bright;
 
-
-        // Create a new call. Make the button for adding a new call and
-        // a new call block less bright, so it doesn't interfere with
-        // the user's switch call flow.
-        &.add-call {
-            background: rgba(255, 255, 255, 0.1);
-
-            &:hover {
-                background: rgba(255, 255, 255, 0.2);
-                color: $white;
+            svg {
+                fill: $brand-color;
             }
         }
+
+        svg {
+            fill: $primary-color;
+            margin-left: -1px;
+        }
+
+
 
         &.hint {
             &.active {
@@ -38,42 +44,42 @@
 
         // An existing call object with status `new`.
         &.new-call {
-            background: rgba(255, 255, 255, 0.1);
-
-            &:hover {
-                background: rgba(255, 255, 255, 0.2);
-
-                svg {fill: $white;}
-            }
+            background: $green-color;
+            svg {fill: $white-color;}
 
             &.active {
-                background: rgba(255, 255, 255, 0.2);
-
-                svg {fill: $white;}
-                &:hover {background: $red-color;}
+                background: $red-color;
+                svg {fill: $white-color;}
             }
         }
 
-        &:hover,
+        // &:hover,
         &.active {
             cursor: pointer;
 
-            &.state-active {
-                background: $white;
-                color: $brand-variation-color;
-
-                svg {fill: $brand-variation-color;}
-            }
+            svg {fill: $brand-color;}
         }
 
+        &.state-active {
+            background: $brand-color;
+
+            svg {fill: $white-color;}
+        }
+
+
         &.state-accept {
-            background: lighten($green-color, 20%);
-            color: $white;
+            background: $green-color;
+
+            svg {
+                fill: $white-color;
+            }
+
         }
 
         &.state-hangup {
             background: $red-color;
-            color: $white;
+
+            svg {fill: $white-color}
         }
     }
 }

@@ -1,41 +1,6 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
-// Specific main panel styling per environment.
-html {
-    // Default mode as a menubar popup.
-    &.popup {
-        .panel {
-            // The popup's scrollbar is set on the contentarea beneath
-            // the top statusbar, which is $spacer * 5 pixels.
-            max-height: calc(#{$max-popup-height} - #{$spacer * 5});
-            // The minimal height should allow all sidebar icons
-            // to be invisible in a WebExtension popup.
-            min-height: $min-popup-height;
-        }
-    }
-
-    // The popup running in a tab.
-    &.popout {
-        .panel {
-            max-height: calc(100vh - #{$spacer * 5});
-            // The minimal height should allow all sidebar icons to show.
-            min-height: $min-popup-height;
-        }
-    }
-
-    // Electron-specific scrollable styling.
-    &.electron {
-        // Hide the vertical scrollbar.
-        overflow-y: hidden;
-
-        .panel {
-            // Limit the height that the desktop window can scroll to.
-            max-height: $max-popup-height;
-            overflow-y: auto;
-        }
-    }
-}
 
 .component-main {
     position: relative;
@@ -61,61 +26,47 @@ html {
         }
     }
 
-    .panel {
-        display: grid;
-        // Make sure that the main panel is always at least as high as the
-        // left menubar container.
-        min-height: 280px;
-        // Show a scrollbar when the content height exceeds the max-height.
-        overflow-y: auto;
-
-        // Split into grid columns for the menubar when logged in.
-        &.sidebar {
-            // Calculate grid second column.
-            grid-template-columns: ($spacer * 5) calc(100% - #{($spacer * 5)});
-        }
-
-        &.no-scroll {
-            overflow: hidden;
-        }
-
-        h1 {
-            color: $brand-color;
-            font-size: 1rem;
-            font-weight: 500;
-            margin-bottom: $spacer * 2;
-        }
-
-        .panel-content {
-            padding: $spacer * 3;
-
-            > header {
-                display: flex;
-                flex-direction: column;
-
-                .header-line {
-                    display: flex;
-                }
-            }
-        }
-    }
-
-    .no-results {
-        align-items: center;
-        color: $grey-color-lighter;
+    .app-view {
         display: flex;
         flex-direction: column;
-        margin-top: $spacer * 6;
-        width: 100%;
+        max-height: $max-popup-height;
 
-        .no-results-icon {
-            @include icon-size($spacer * 5);
+        .app-view-top {
+            min-height: $spacer * 5;
         }
 
-        .no-results-text {
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin-top: $spacer;
+        .app-view-main {
+            align-content: stretch;
+            display: flex;
+            flex-direction: row;
+            // Show a scrollbar when the content height exceeds the max-height.
+
+            .app-view-sidebar {
+                width: $spacer * 5;
+            }
+
+            .app-view-layer {
+                flex: 1;
+                min-height: $min-popup-height + ($spacer * 5);
+                overflow-y: auto;
+
+                &.padded {
+                    padding: $spacer * 3;
+                }
+
+                h1 {
+                    color: $brand-color;
+                    font-size: 1rem;
+                    font-weight: 500;
+                    margin-bottom: $spacer * 2;
+                }
+
+                header {
+                    .header-line {
+                        display: flex;
+                    }
+                }
+            }
         }
     }
 }

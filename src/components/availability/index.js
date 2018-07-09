@@ -4,56 +4,27 @@ module.exports = (app, actions) => {
     */
     const Availability = {
         computed: app.helpers.sharedComputed(),
+        data: function() {
+            return {
+                /**
+                * Please notice that the foreground Addon is expected
+                * to have a component called `AvailabilityPostfix`.
+                */
+                addons: app.plugins.availability.addons.map((addon) => {
+                    return addon.constructor.name.replace('Plugin', '')
+                }),
+            }
+        },
         methods: app.helpers.sharedMethods(),
         render: templates.availability.r,
         staticRenderFns: templates.availability.s,
         store: {
-            available: 'availability.available',
-            destinations: 'availability.destinations',
             dnd: 'availability.dnd',
-            placeholder: 'availability.placeholder',
-            selected: 'availability.selected',
-            user: 'user',
-            vendor: 'app.vendor',
             webrtc: 'settings.webrtc',
         },
         watch: {
-            available: function(available) {
-                // Sending an empty object like this will unset the
-                // user's availability.
-                let selected
-                const unavailable = {id: null, name: null, type: null}
-
-                // User wants to be available.
-                if (available) {
-                    // Set from remembered account.
-                    if (this.placeholder.id) selected = this.placeholder
-                    // No remembered value; choose the first available option.
-                    else if (this.destinations.length) selected = this.destinations[0]
-                    // No choice; just set to unavailable.
-                    else selected = unavailable
-                } else {
-                    // Availability is disabled. Set to unavailable.
-                    selected = unavailable
-                }
-
-                app.emit('bg:availability:update', {
-                    available,
-                    destinations: this.destinations,
-                    selected: selected,
-                })
-            },
             dnd: function(dnd) {
                 app.setState({availability: {dnd}}, {persist: true})
-            },
-            selected: function() {
-                // Save the user's last choice.
-                this.placeholder = app.utils.copyObject(this.selected)
-                app.emit('bg:availability:update', {
-                    available: this.available,
-                    destinations: this.destinations,
-                    selected: this.selected,
-                })
             },
         },
     }

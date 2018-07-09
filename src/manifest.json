@@ -1,7 +1,6 @@
 {
     "author": "Windshaft BV",
     "manifest_version": 2,
-    "homepage_url": "https://github.com/voipgrid/vialer-js",
     "description": "__MSG_extDescription__",
     "icons": {
         "16": "img/contextmenu.png",
@@ -19,7 +18,9 @@
         "scripts": [
             "js/vendor_bg.js",
             "js/templates.js",
-            "js/translations.js",
+            "js/app_i18n.js",
+            "js/app_i18n_plugins.js",
+            "js/app_bg_plugins.js",
             "js/app_bg.js"
         ]
     },

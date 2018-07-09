@@ -1,27 +1,8 @@
-// Already defined by vendor_fg.js in case of being part of a webview.
-if (!global.Vue) {
-    if (!global.translations) global.translations = {}
-    if (global.document) {
-        window.global = window
-        global.$ = document.querySelector.bind(document)
-        global.$$ = document.querySelectorAll.bind(document)
-    }
+// Already defined by vendor_fg.js when using a webview which runs
+// vendor_bg.js within the same context.
+if (!global.Vue) require('../lib/vendor')
 
-    global.Vue = require('vue/dist/vue.runtime')
-    global.EventEmitter = require('eventemitter3')
-    // Define custom tags here, so they are not interpreted by Vue.
-    global.VueStash = require('vue-stash').default
-    Vue.use(global.VueStash)
-    global.i18n = require('vue-i18n-stash')
-    global.I18nStore = require('vue-i18n-stash/src/store-stash')
-    global.Raven = require('raven-js')
-
-    if (process.env.NODE_ENV === 'production') {
-        Vue.config.productionTip = false
-        Vue.config.devtools = false
-    }
-}
-
+global.Raven = require('raven-js')
 // Specific to vendor_bg.js
 global.axios = require('axios')
 global.sdpTransform = require('sdp-transform')

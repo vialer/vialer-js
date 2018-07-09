@@ -1,0 +1,39 @@
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
+
+.component-wizard-account {
+    &.step {
+        .field {
+            text-align: left;
+
+            .control {
+                width: 100%;
+
+                .select {
+
+                    width: 100%;
+
+                    select {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+
+        .step-description {
+            align-items: center;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: $spacer * 2;
+        }
+
+        .component-account-picker {
+            align-items: center;
+            margin-bottom: $spacer * 2;
+
+            .notification-box {
+                margin-bottom: $spacer * 2;
+            }
+        }
+    }
+}

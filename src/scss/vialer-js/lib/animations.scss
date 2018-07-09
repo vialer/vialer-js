@@ -1,0 +1,118 @@
+@keyframes blink {
+    0% {opacity: .2;}
+    20% {opacity: 1;}
+    100% {opacity: .2;}
+}
+
+@keyframes grow {
+    0% {
+        display: none;
+        opacity: 0;
+    }
+
+    1% {
+        display: block;
+        opacity: 0;
+        transform: scale(0);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes hint-pulse {
+    0% {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $white;
+    }
+
+    50% {background-color: rgba(255, 255, 255, 0.2);}
+
+    100% {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: $white;
+    }
+}
+
+
+@keyframes hint-pulse-active {
+    0% {
+        background-color: rgba(255, 255, 255, 0.7);
+        color: $brand-accent-color;
+    }
+
+    50% {background-color: rgba(255, 255, 255, 1);}
+
+    100% {
+        background-color: rgba(255, 255, 255, 0.7);
+        color: $brand-accent-color;
+    }
+}
+
+@keyframes slide {
+    0% {
+        max-height: 0;
+    }
+
+    100% {
+        max-height: 100%;
+    }
+}
+
+@keyframes slide-out {
+    0% {
+        max-height: 100%;
+    }
+
+    100% {
+        max-height: 0%;
+    }
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes ringing-svg {
+    0% {filter: drop-shadow(0);}
+    50% {filter: drop-shadow(0 0 $spacer / 4 $red-color);}
+    100% {filter: drop-shadow(0);}
+}
+
+@keyframes ringing-element {
+    0% {box-shadow: 0;}
+    50% {box-shadow: rgba(saturate($red-color, 20%), 0.6) 0 0 0 0, inset darken($red-color, 1%) 0 0 9px, rgba(255, 0, 0, 0.5) 0 0 0 0;}
+    100% {box-shadow: 0;}
+}
+
+
+.animated {
+    -webkit-animation-duration: .5s;
+    animation-duration: .5s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    -webkit-animation-iteration-count: infinite;
+}
+@-webkit-keyframes bounce {
+    0%, 100% {
+        -webkit-transform: translateY(0);
+    }
+    50% {
+        -webkit-transform: translateY(-1px);
+    }
+}
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-1px);
+    }
+}

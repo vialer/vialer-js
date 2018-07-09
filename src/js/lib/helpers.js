@@ -35,6 +35,21 @@ function helpers(app) {
         return activeCall
     }
 
+
+    _helpers.callAccepted = function() {
+        let accepted = false
+        const calls = app.state.calls.calls
+
+        for (const callId of Object.keys(calls)) {
+            const status = calls[callId].status
+            // An active Call is not a new Call, but may be a closing Call.
+            if (status === 'accepted') accepted = true
+        }
+
+        return accepted
+    }
+
+
     /**
     * Helper function to determine whether calling functionality
     * should be activated or not. Used both within and outside
@@ -45,13 +60,15 @@ function helpers(app) {
         let errors = []
 
         if (!app.state.app.online) errors.push('offline')
-        if (app.state.settings.webrtc.enabled) {
-            if (!app.state.settings.webrtc.media.permission) errors.push('mediaPermission')
-            if (!(app.state.calls.ua.status === 'registered')) errors.push('unregistered')
-            if (!(app.state.settings.webrtc.devices.ready)) errors.push('device')
-        } else {
-            // ConnectAB mode.
-            if (!app.state.calls.ua.status === 'connected') errors.push('disconnected')
+        else {
+            if (app.state.settings.webrtc.enabled) {
+                if (!app.state.settings.webrtc.media.permission) errors.push('mediaPermission')
+                if (!(app.state.calls.ua.status === 'registered')) errors.push('unregistered')
+                if (!(app.state.settings.webrtc.devices.ready)) errors.push('device')
+            } else {
+                // Non-WebRTC modus.
+                if (!app.state.calls.ua.status === 'connected') errors.push('disconnected')
+            }
         }
 
         if (!errors.length) return false
@@ -127,11 +144,11 @@ function helpers(app) {
                 rejected_b: $t('callee is busy'),
             },
             callingDisabled: {
-                device: $t('selected audio device is not available.').capitalize(),
-                disconnected: $t('you are disconnected from the SIP service.').capitalize(),
-                mediaPermission: $t('go to audio settings and give the browser permission to use your microphone.').capitalize(),
-                offline: $t('you are disconnected from the internet; check your connectivity.').capitalize(),
-                unregistered: $t('not registered at the SIP service; check your connectivity.').capitalize(),
+                device: $t('audio device settings - invalid audio device').capitalize(),
+                disconnected: $t('not connected to service').capitalize(), // Non-WebRTC status.
+                mediaPermission: $t('microphone access denied').capitalize(),
+                offline: $t('internet connection is offline').capitalize(),
+                unregistered: $t('not registered at service').capitalize(),
             },
         }
     }
@@ -165,7 +182,7 @@ function helpers(app) {
     * Validate whether a selected account has the right settings.
     * @returns {Boolean} - Valid or invalid.
     */
-    _helpers.validVoipSettings = function() {
+    _helpers.validAccountSettings = function() {
         const selected = this.settings.webrtc.account.selected
         if (selected && selected.settings) {
             if (!selected.settings.avpf || !selected.settings.encryption) return false
@@ -186,20 +203,27 @@ function helpers(app) {
                 // value `null` and an empty string are not allowed.
                 if (number === null || number === '') return false
                 if (this.callingDisabled) return false
+
                 app.emit('bg:calls:call_create', {number, start, transfer})
                 return number
             },
             getTranslations: _helpers.getTranslations,
-            openPlatformUrl: function(path = '') {
-                app.emit('bg:user:update-token', {
-                    callback: ({token}) => {
-                        path = `client/${this.user.client_id}/${path}`
-                        path = `user/autologin/?token=${token}&username=${this.user.username}&next=/${path}`
-                        let url = `${app.state.settings.platform.url}${path}`
-                        if (app.env.isExtension) browser.tabs.create({url: url})
-                        window.open(url, '_blank')
-                    },
-                })
+            isTransferTarget: function(contact, number) {
+                let numbers = []
+                const calls = this.$store.calls.calls
+                for (let callId of Object.keys(calls)) {
+                    numbers.push(parseInt(calls[callId].number))
+                }
+
+                if (contact) {
+                    for (const contactId of Object.keys(contact.endpoints)) {
+                        if (numbers.includes(contact.endpoints[contactId].number)) return false
+                    }
+                } else if (number) {
+                    if (numbers.includes(number)) return false
+                }
+
+                return true
             },
             openPopoutView: function() {
                 // This is only available in extensions.
@@ -239,6 +263,7 @@ function helpers(app) {
     _helpers.sharedComputed = function() {
         return {
             activeCall: _helpers.activeCall,
+            callAccepted: _helpers.callAccepted,
             callingDisabled: _helpers.callingDisabled,
             callOngoing: _helpers.callOngoing,
             callsReady: _helpers.callsReady,
@@ -261,14 +286,6 @@ function helpers(app) {
             },
             minutes: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000 / 60) % 60
-            },
-            numbersOngoing: function() {
-                let numbers = []
-                const calls = this.$store.calls.calls
-                for (let callId of Object.keys(calls)) {
-                    numbers.push(parseInt(calls[callId].number))
-                }
-                return numbers
             },
             seconds: function() {
                 return Math.trunc((this.call.timer.current - this.call.timer.start) / 1000) % 60
@@ -293,7 +310,7 @@ function helpers(app) {
                 }
                 return transferStatus
             },
-            validVoipSettings: _helpers.validVoipSettings,
+            validAccountSettings: _helpers.validAccountSettings,
         }
     }
 

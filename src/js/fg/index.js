@@ -3,8 +3,9 @@
 * @namespace AppForeground
 */
 const App = require('../lib/app')
-const env = require('../lib/env')({role: 'fg'})
-
+const env = require('../lib/env')({section: 'fg'})
+const Media = require('../lib/media')
+const Sounds = require('../lib/sounds')
 
 /**
 * Reactive HTML User Interface that interacts with
@@ -38,6 +39,7 @@ class AppForeground extends App {
         */
         this.components = {
             About: require('../../components/about'),
+            AccountPicker: require('../../components/account_picker'),
             Activity: require('../../components/activity'),
             Availability: require('../../components/availability'),
             Call: require('../../components/call'),
@@ -45,6 +47,7 @@ class AppForeground extends App {
             Calls: require('../../components/calls'),
             CallSwitch: require('../../components/call_switch'),
             Contacts: require('../../components/contacts'),
+            DevicePicker: require('../../components/device_picker'),
             Field: require('../../components/field'),
             Login: require('../../components/login'),
             MainCallBar: require('../../components/main_callbar'),
@@ -52,12 +55,12 @@ class AppForeground extends App {
             MainStatusBar: require('../../components/main_statusbar'),
             MicPermission: require('../../components/mic_permission'),
             Notifications: require('../../components/notifications'),
-            Queues: require('../../components/queues'),
             Settings: require('../../components/settings'),
             Soundmeter: require('../../components/soundmeter'),
-            VoipaccountPicker: require('../../components/voipaccount_picker'),
             Wizard: require('../../components/wizard'),
         }
+
+        this.__loadPlugins(opts.plugins)
 
         for (const name of Object.keys(this.components)) {
             Vue.component(name, this.components[name](this))
@@ -84,14 +87,24 @@ class AppForeground extends App {
                 // (!) Don't inherit the env of the background script.
                 this.state.env = this.env
 
-                await this.__initViewModel()
+                this.__initViewModel({
+                    main: require('../../components/main')(this),
+                })
+                this.media = new Media(this)
+
+                this.sounds = new Sounds(this)
                 this.vm.$mount(document.querySelector('#app-placeholder'))
                 this.setState({ui: {visible: true}})
                 if (this.env.isExtension) {
                     // Keep track of the popup's visibility status by
                     // opening a long-lived connection to the background.
                     chrome.runtime.connect({name: 'vialer-js'})
+                    // This check is also required in the foreground, since
+                    // the popup opens a popout which is the only way an
+                    // extension can be given permission.
+                    this.media.poll()
                 }
+
             },
         })
     }
@@ -106,19 +119,20 @@ class AppForeground extends App {
     }
 }
 
-let fgOptions = {env, modules: []}
+const options = require('./lib/options')
+
 // Used in browser context to allow a context closure without
 // having to make an additional JavaScript build target.
 if (env.isBrowser) {
     if (env.isExtension) {
         Raven.context(function() {
-            this.fg = new AppForeground(fgOptions)
+            this.fg = new AppForeground(options)
         })
     } else {
         global.AppForeground = AppForeground
-        global.fgOptions = fgOptions
+        global.fgOptions = options
     }
 } else {
     // Use with Node.
-    module.exports = {AppForeground, fgOptions}
+    module.exports = {AppForeground, options}
 }

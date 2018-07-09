@@ -1,19 +1,5 @@
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/variables";
 
 .component-availability {
-    select {
-        width: 100%;
-    }
-
-    .platform-availability {
-        .switch[type="checkbox"] {
-            & + label::before {
-                background: $yellow-color;
-            }
-
-            &:checked + label::before {
-                background: $green-color;
-            }
-        }
-    }
+    clear: both;
 }

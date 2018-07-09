@@ -1,7 +1,8 @@
 node_modules
 build
 dist
-docs/build
+docs/screenshots
+package-lock.json
 super_secret.txt
 .tags
 .publish

@@ -1,0 +1,20 @@
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
+
+.component-wizard-mic-permission {
+
+    .component-mic-permission {
+        margin-bottom: $spacer;
+        margin-top: $spacer * 2;
+    }
+
+    .after-permission-text {
+        margin-bottom: $spacer * 2;
+
+        em {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+    }
+
+}

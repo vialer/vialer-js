@@ -1,7 +1,8 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 .component-activity {
+    width: 100%;
 
     .tabs-squeezed {
         margin: 0 $spacer * 9;
@@ -15,11 +16,6 @@
         justify-content: space-between;
         margin-bottom: $spacer * 2;
         position: relative;
-
-        &:hover {
-            @include item-slider-activate;
-            cursor: pointer;
-        }
 
         .activity-icon {
             align-items: center;
@@ -59,14 +55,22 @@
         }
 
         .activity-info {
+            display: flex;
             flex: 1;
+            flex-direction: column;
+            // Required to have ellipsis text overflow on .name.
+            min-width: 0;
 
-            header {
+            .name {
                 color: $grey-color-darkest;
                 font-weight: 500;
+                margin-right: $spacer * 2;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
-            footer {
+            .description {
                 color: $grey-color;
                 font-size: 0.8rem;
             }
@@ -76,7 +80,6 @@
             align-items: center;
             display: flex;
             justify-content: left;
-            width: $spacer * 6;
 
             span {
                 background: $red-color;
@@ -84,7 +87,7 @@
                 color: $white;
                 font-size: 0.7rem;
                 font-weight: 500;
-                padding: $spacer / 4 $spacer / 2;
+                padding: $spacer / 4 $spacer;
                 text-transform: uppercase;
             }
         }

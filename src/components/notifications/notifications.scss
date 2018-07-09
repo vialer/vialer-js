@@ -1,4 +1,4 @@
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/variables";
 
 .component-notifications {
     left: 0;
@@ -17,7 +17,10 @@
 
     .notification {
         align-items: center;
+        background: $grey-color-lightest;
         border-radius: 0;
+        border-top: 2px solid $brand-accent-color;
+        color: $grey-color-dark;
         display: flex;
         flex-direction: row;
         height: $spacer * 7;
@@ -26,35 +29,7 @@
         padding: 0;
         transition: all 0.25s;
 
-        &.is-danger {
-            background: lighten($red-color, 40%);
-            border-bottom: 2px solid $red-color;
-            color: darken($red-color, 25%);
-
-            .icon svg {
-                fill: $red-color;
-            }
-        }
-
-        &.is-info {
-            background: lighten($blue-color, 40%);
-            border-bottom: 2px solid $blue-color;
-            color: darken($blue-color, 25%);
-
-            .icon svg {
-                fill: $blue-color;
-            }
-        }
-
-        &.is-success {
-            background: lighten($green-color, 40%);
-            border-bottom: 2px solid $green-color;
-            color: darken($green-color, 25%);
-
-            .icon svg {
-                fill: $green-color;
-            }
-        }
+        .icon svg {fill: $brand-accent-color;}
 
         &.is-warning {
             background: lighten($orange-color, 40%);

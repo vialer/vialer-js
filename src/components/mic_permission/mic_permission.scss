@@ -1,5 +1,5 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 .component-mic-permission {
 
@@ -9,34 +9,89 @@
         margin-bottom: $spacer;
     }
 
-    .mic-popout-instructions {
+    .mic-details {
+        align-items: center;
+        display: flex;
+        flex-direction: column;
         position: relative;
 
-        .video-cam {
-            @include icon-size($spacer * 4);
-            margin-bottom: $spacer;
-            path[pid="0"] {fill: $primary-color;}
-            path[pid="1"] {fill: $white-color;}
-            rect[pid="2"] {fill: $red-color;}
+        &.popup {
+            margin-bottom: $spacer * 5;
         }
 
-        .check {
-            @include icon-size($spacer * 2.5);
+        .icon {
+            @include icon-size($spacer * 3);
             align-items: center;
-            background: $green-color;
             border-radius: 50%;
             display: inline-flex;
             flex-direction: column;
             justify-content: center;
-            margin-left: -$spacer * 2;
-            margin-top: $spacer * 2;
-            position: absolute;
+            margin-right: $spacer;
 
             svg {
                 @include icon-size($spacer * 1.5);
                 fill: $white-color;
             }
+        }
 
+        .browser-bar {
+            align-items: center;
+            background: $grey-color-lighter;
+            border-bottom-right-radius: $spacer * 2.5;
+            border-top-right-radius: $spacer * 2.5;
+            display: flex;
+            height: $spacer * 5;
+            justify-content: center;
+            line-height: $spacer * 6;
+            margin-bottom: $spacer * 2;
+            vertical-align: middle;
+            width: $spacer * 8;
+
+            .video-cam {
+                @include icon-size($spacer * 4);
+                fill: $black;
+            }
+
+            &.video-cam-disabled {
+                .video-cam {
+                    path[pid="1"] {fill: $white-color;}
+                    rect[pid="2"] {fill: $red-color;}
+                }
+            }
+
+            &.video-cam-enabled {
+                position: relative;
+            }
+        }
+
+        .success-message {
+            color: $grey-color;
+            font-size: 0.9rem;
+            font-weight: 500;
+
+            .icon {
+                background: $green-color;
+            }
+        }
+
+        .instruction {
+            color: $grey-color;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: $spacer * 2;
+            text-align: center;
+
+            .instruction-header {
+                margin-bottom: $spacer;
+            }
+
+            button {
+                margin-top: $spacer * 2;
+            }
+
+            .icon {
+                background: $brand-color;
+            }
         }
     }
 

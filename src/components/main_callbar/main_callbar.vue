@@ -1,5 +1,9 @@
 <component class="component-main-callbar" :class="{inactive: call.status === 'new'}">
-    <div></div>
+    <div class="status-left">
+        <span class="status-indicator tooltip tooltip-right">
+            <icon class="vendor-logo" name="phone"/>
+        </span>
+    </div>
     <div class="in-call-info">
         <div class="caller-status" v-if="call.status === 'new'">
             {{call.keypad.number}}

@@ -1,5 +1,5 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 .component-contacts {
 
@@ -15,7 +15,6 @@
             flex-direction: column;
             height: 36px;
             justify-content: center;
-            margin-right: $spacer;
 
             &:hover {
                 cursor: pointer;
@@ -30,7 +29,7 @@
             svg {
                 @include icon-size($spacer * 4);
                 color: $grey-color-light;
-                padding: $spacer / 2;
+                padding-left: $spacer;
             }
 
         }
@@ -61,7 +60,7 @@
             }
         }
 
-        // The most expanded mode. A Contact takes up the whole row.
+        // Expanded mode. A Contact takes up the whole row.
         &.lean {
             .contact {
                 width: 100%;
@@ -139,11 +138,6 @@
                 .favorite {
                     color: $yellow-color;
                 }
-            }
-
-            &:hover {
-                @include item-slider-activate;
-                cursor: pointer;
             }
         }
     }

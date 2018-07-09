@@ -1,26 +1,65 @@
 {
     "brands": {
-        "vialer": {
-            "permissions": "https://partner.voipgrid.nl/",
-            "sip_endpoint": "websocket.voipgrid.nl",
-            "homepage_url": "https://wiki.voipgrid.nl/index.php/Browser_Plugins",
-            "name": {
-                "alpha": "Vialer-alpha",
-                "beta": "Vialer-beta",
-                "production": "Vialer"
+        "bologna": {
+            "colors": {
+                "brand-color": "#2e3547",
+                "brand-accent-color": "#f2cc10",
+                "green-color": "#28ca42",
+                "grey-color": "#888",
+                "orange-color": "#f98644",
+                "primary-color": "#3c3c50",
+                "red-color": "#da534F"
             },
-            "vendor": {
-                "name": "Vialer",
-                "portal": {
-                    "name": "VoIPGRID portal",
-                    "url": "https://partner.voipgrid.nl/"
+            "plugins": {
+                "builtin": {
+                    "availability": {
+                        "addons": {
+                            "bg": [],
+                            "fg": [],
+                            "i18n": []
+                        }
+                    },
+                    "contacts": {
+                        "i18n": [],
+                        "providers": []
+                    },
+                    "user": {
+                        "adapter": "vjs-adapter-user-voip",
+                        "i18n": []
+                    }
                 },
-                "support": {
-                    "email": "support@voipgrid.nl",
-                    "phone": "1234567890",
-                    "website": "https://vialer-js.io"
+                "custom": {}
+            },
+            "name": {
+                "alpha": "Bologna-alpha",
+                "beta": "Bologna-beta",
+                "production": "Bologna"
+            },
+            "permissions": "",
+            "sip_endpoint": "",
+            "stun": [
+                "stun:stun3.l.google.com:19302",
+                "stun:stun4.l.google.com:19302"
+            ],
+            "store": {
+                "chrome": {
+                    "clientId": "",
+                    "clientSecret": "",
+                    "extensionId_alpha": "",
+                    "extensionId_beta": "",
+                    "extensionId_production": "",
+                    "refreshToken": ""
                 },
-                "type": "closed"
+                "firefox": {
+                    "apiKey": "",
+                    "apiSecret": "",
+                    "gecko": {
+                        "id_alpha": "",
+                        "id_beta": "",
+                        "id_production": "",
+                        "strict_min_version": ""
+                    }
+                }
             },
             "telemetry": {
                 "analytics_id": {
@@ -33,48 +72,40 @@
                 "sentry": {
                     "apiKey": "",
                     "dsn": "",
-                    "host": "https://sentry.voipgrid.nl",
-                    "org": "voipgrid",
-                    "project": "vialer-js"
+                    "host": "",
+                    "org": "",
+                    "project": "bologna"
                 }
             },
-            "colors": {
-                "brand-color": "#de6b35",
-                "brand-variation-color": "#fb791e",
-                "grey-color": "#999",
-                "primary-color": "#3c3c50",
-                "green-color": "#28ca42",
-                "orange-color": "#f98644",
-                "red-color": "#da534F"
-            },
-            "store": {
-                "firefox": {
-                    "gecko": {
-                        "id_alpha": "",
-                        "id_beta": "",
-                        "id_production": "",
-                         "strict_min_version": "50.0"
-                    },
-                    "apiKey": "",
-                    "apiSecret": ""
+            "tests": {
+                "alice": {
+                    "username": "",
+                    "password": ""
                 },
-                "chrome": {
-                    "extensionId_alpha": "",
-                    "extensionId_beta": "",
-                    "extensionId_production": "",
-                    "clientId": "",
-                    "clientSecret": "",
-                    "refreshToken": ""
+                "bob": {
+                    "username": "",
+                    "password": ""
+                },
+                "charlie": {
+                    "username": "",
+                    "password": ""
+                },
+                "endpoint": "",
+                "headless": false,
+                "port": 8999
+            },
+            "vendor": {
+                "name": "Bologna",
+                "portal": {
+                    "name": "",
+                    "url": ""
+                },
+                "support": {
+                    "email": "",
+                    "phone": "",
+                    "website": "https://vialer-js.io"
                 }
             }
-        }
-    },
-    "tests": {
-        "integration": {
-            "headless": true,
-            "username": "",
-            "password": "",
-            "port": 8999
         }
     }
 }

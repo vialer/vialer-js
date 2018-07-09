@@ -7,27 +7,24 @@ const {_extend, promisify} = require('util')
 const archiver = require('archiver')
 const fs = require('fs')
 const path = require('path')
+
 const addsrc = require('gulp-add-src')
 const argv = require('yargs').argv
 const childExec = require('child_process').exec
 const colorize = require('tap-colorize')
-const composer = require('gulp-uglify/composer')
-const concat = require('gulp-concat')
+
 const del = require('del')
 const flatten = require('gulp-flatten')
-const fuet = require('gulp-fuet')
-const ghPages = require('gulp-gh-pages')
-const gulp = require('gulp-help')(require('gulp'), {})
+const gulp = require('gulp-help')(require('gulp'), {
+    hideDepsMessage: true,
+    hideEmpty: true,
+})
 const gutil = require('gulp-util')
-const Helpers = require('./tasks/helpers')
+const Helpers = require('./tools/helpers')
 const livereload = require('gulp-livereload')
 const ifElse = require('gulp-if-else')
-const insert = require('gulp-insert')
 const imagemin = require('gulp-imagemin')
-const minifier = composer(require('uglify-es'), console)
 const mkdirp = promisify(require('mkdirp'))
-const notify = require('gulp-notify')
-const rc = require('rc')
 const runSequence = require('run-sequence')
 const size = require('gulp-size')
 const svgo = require('gulp-svgo')
@@ -35,120 +32,19 @@ const tape = require('gulp-tape')
 const template = require('gulp-template')
 const test = require('tape')
 
+
 const writeFileAsync = promisify(fs.writeFile)
 
 // The main settings object containing info from .vialer-jsrc and build flags.
-let settings = {}
+let settings = require('./tools/settings')(__dirname)
 
-global.gulpSettings = settings
-
-settings.BUILD_ARCH = argv.arch ? argv.arch : 'x64' // all, or one or more of: ia32, x64, armv7l, arm64, mips64el
-settings.BUILD_DIR = process.env.BUILD_DIR || path.join('./', 'build')
-settings.BUILD_PLATFORM = argv.platform ? argv.platform : 'linux' // all, or one or more of: darwin, linux, mas, win32
-settings.BRAND_TARGET = argv.brand ? argv.brand : 'vialer'
-settings.BUILD_TARGET = argv.target ? argv.target : 'chrome'
-settings.BUILD_TARGETS = ['chrome', 'docs', 'electron', 'edge', 'firefox', 'node', 'webview']
-
-// Exit when the build target is not in the allowed list.
-if (!settings.BUILD_TARGETS.includes(settings.BUILD_TARGET)) {
-    gutil.log(`Invalid build target: ${settings.BUILD_TARGET}`)
-    process.exit(0)
-} else {
-    // Simple brand file verification.
-    for (let brand in settings.brands) {
-        try {
-            fs.statSync(`./src/brand/${brand}`)
-        } catch (err) {
-            gutil.log(`(!) Brand directory is missing for brand "${brand}"`)
-            process.exit(0)
-        }
-    }
-    // Force the build target to webview, since that is what
-    // Puppeteer needs atm.
-    if (argv._[0] === 'test-browser') {
-        settings.BUILD_TARGET = 'webview'
-        // Make this variable accessible by tests.
-        process.env.BRAND_TARGET = settings.BRAND_TARGET
-    }
-}
-
-// Default deploy target is `alpha` because it has the least impact.
-settings.DEPLOY_TARGET = argv.deploy ? argv.deploy : 'alpha'
-// Exit when the deploy target is not in the allowed list.
-if (!['alpha', 'beta', 'production'].includes(settings.DEPLOY_TARGET)) {
-    gutil.log(`Invalid deployment target: '${settings.DEPLOY_TARGET}'`)
-    process.exit(0)
-}
-settings.LIVERELOAD = false
-settings.NODE_PATH = path.join(__dirname, 'node_modules') || process.env.NODE_PATH
-settings.PACKAGE = require('./package')
-settings.SRC_DIR = path.join('./', 'src')
-settings.SIZE_OPTIONS = {showFiles: true, showTotal: true}
-settings.TEMP_DIR = path.join(settings.BUILD_DIR, '__tmp')
-settings.VERBOSE = argv.verbose ? true : false
-settings.VERSION = argv.version ? argv.version : settings.PACKAGE.version
-// Override the pre-defined release name structure to specifically target
-// release names in Sentry.
-if (argv.release) settings.RELEASE = argv.release
-
-// Force production mode when running certain tasks from
-// the commandline or when using a deploy command.
-if (argv._[0] && (['deploy', 'build-dist'].includes(argv._[0]) || argv._[0].includes('deploy'))) {
-    settings.PRODUCTION = true
-    // Force NODE_ENV to production for envify.
-    process.env.NODE_ENV = 'production'
-} else {
-    // Production mode is on when NODE_ENV environmental var is set.
-    settings.PRODUCTION = argv.production ? argv.production : (process.env.NODE_ENV === 'production')
-    if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
-}
-
-
-
-settings.NODE_ENV = process.env.NODE_ENV
-// Load the Vialer settings from ~/.vialer-jsrc into the existing settings.
-rc('vialer-js', settings)
 
 // Initialize the helpers, which make this file less dense.
 const helpers = new Helpers(settings)
-const WATCHLINKED = argv.linked ? true : false
 const WATCHTEST = argv.verify ? true : false
 
 
-let taskOptions = {}
-if (settings.VERBOSE) {
-    taskOptions = {
-        all: {
-            'brand=vialer': '',
-            'target=chrome': 'chrome|docs|electron|firefox|node|webview',
-        },
-        brandOnly: {
-            'brand=vialer': '',
-        },
-        browser: {
-            'brand=vialer': '',
-            'target=chrome': 'chrome|firefox',
-        },
-        targetOnly: {
-            'target=chrome': 'chrome|electron|firefox|node|webview',
-        },
-        webview: {
-            'brand=vialer': '',
-            'target=chrome': 'electron|webview',
-        },
-    }
-}
-
-// Notify developer about some essential build flag values.
-gutil.log('BUILD FLAGS:')
-gutil.log(`- BRAND: ${settings.BRAND_TARGET}`)
-gutil.log(`- DEPLOY: ${settings.DEPLOY_TARGET}`)
-gutil.log(`- PRODUCTION: ${settings.PRODUCTION}`)
-gutil.log(`- TARGET: ${settings.BUILD_TARGET}`)
-gutil.log(`- VERBOSE: ${settings.VERBOSE}`)
-
-
-gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
+gulp.task('assets', 'Copy <brand> assets to <target>.', () => {
     const robotoPath = path.join(settings.NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
     return gulp.src(path.join(robotoPath, '{Roboto-Light.woff2,Roboto-Regular.woff2,Roboto-Medium.woff2}'))
         .pipe(flatten({newPath: './fonts'}))
@@ -159,70 +55,48 @@ gulp.task('assets', 'Copy (branded) assets to the build directory.', () => {
         .pipe(addsrc('./LICENSE'))
         .pipe(addsrc('./README.md'))
         .pipe(addsrc('./src/_locales/**', {base: './src/'}))
-        .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
+        .pipe(gulp.dest(path.join(settings.BUILD_DIR)))
         .pipe(size(_extend({title: 'assets'}, settings.SIZE_OPTIONS)))
         .pipe(ifElse(settings.LIVERELOAD, livereload))
-}, {options: taskOptions.all})
+})
 
 
-gulp.task('build', 'Make a branded unoptimized development build.', (done) => {
+gulp.task('build', 'Generate a <brand> build for <target>.', (done) => {
     // Refresh the brand content with each build.
+    gutil.log(`Building with target "${settings.BUILD_TARGET}"`)
     if (settings.BUILD_TARGET === 'docs') {
         runSequence(['docs'], done)
         return
     }
-    let mainTasks = ['assets', 'templates', 'translations', 'html', 'scss', 'scss-vendor']
+    let mainTasks = [
+        'assets', 'templates', 'i18n', 'html', 'scss', 'scss-vendor',
+        'js-vendor-bg', 'js-vendor-fg', 'js-app-bg', 'js-app-fg', 'js-app-plugins',
+    ]
 
     if (settings.BUILD_TARGET === 'electron') {
-        runSequence(mainTasks, ['js-electron'], () => {
-            done()
-        })
+        runSequence(mainTasks.concat(['js-electron']), () => {done()})
     } else if (settings.BUILD_TARGET === 'webview') {
-        runSequence(mainTasks, ['js-vendor', 'js-app-bg', 'js-app-fg'], () => {
-            done()
-        })
+        runSequence(mainTasks, () => {done()})
     } else if (['chrome', 'firefox'].includes(settings.BUILD_TARGET)) {
-        runSequence(mainTasks, ['js-vendor', 'js-app-bg', 'js-app-fg', 'js-app-observer'], 'manifest', () => {
-            done()
-        })
+        runSequence(mainTasks.concat(['js-app-observer', 'manifest']), () => {done()})
     }
-}, {options: taskOptions.all})
-
-
-gulp.task('build-targets', 'Build all targets.', (done) => {
-    // Refresh the brand content with each build.
-    let electronTargetTasks = ['assets', 'html', 'scss', 'js-electron-main', 'js-vendor']
-    let pluginTargetTasks = ['assets', 'html', 'scss', 'js-vendor', 'js-app-bg', 'js-app-fg', 'manifest']
-    settings.BUILD_TARGET = 'chrome'
-    runSequence(pluginTargetTasks, () => {
-        settings.BUILD_TARGET = 'firefox'
-        runSequence(pluginTargetTasks, () => {
-            settings.BUILD_TARGET = 'edge'
-            runSequence(pluginTargetTasks, () => {
-                settings.BUILD_TARGET = 'electron'
-                runSequence(electronTargetTasks, () => {
-                    done()
-                })
-            })
-        })
-    })
 })
 
 
-gulp.task('build-clean', 'Clear the build directory', async() => {
-    await del([path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, '**')], {force: true})
-    await mkdirp(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET))
-}, {options: taskOptions.all})
+gulp.task('build-clean', 'Remove the <brand> build of <target>.', async() => {
+    await del([path.join(settings.BUILD_DIR, '**')], {force: true})
+    await mkdirp(settings.BUILD_DIR)
+})
 
 
-gulp.task('build-dist', 'Make an optimized build suitable for distribution.', ['build'], (done) => {
+gulp.task('build-dist', 'Generate an optimized build and pack it for distribution.', ['build'], (done) => {
     const buildDir = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET)
     const distDir = path.join(__dirname, 'dist', settings.BRAND_TARGET)
     mkdirp(distDir).then(() => {
         let distName = helpers.distributionName(settings.BRAND_TARGET)
-
-        // Not using Gulp's Vinyl-based zip, because of a symlink issue that prevents
-        // the MacOS build to be zipped properly. See https://github.com/gulpjs/gulp/issues/1427
+        // Not using Gulp's Vinyl-based zip, because of a symlink issue that
+        // prevents the MacOS build to be zipped properly.
+        // See https://github.com/gulpjs/gulp/issues/1427 for more info.
         const output = fs.createWriteStream(path.join(distDir, distName))
         const archive = archiver('zip', {zlib: {level: 6}})
 
@@ -243,7 +117,7 @@ gulp.task('build-dist', 'Make an optimized build suitable for distribution.', ['
             // See: https://github.com/electron-userland/electron-packager/issues/769
             if (settings.BUILD_PLATFORM !== 'win32') buildParams += iconParam
             const distBuildName = `${settings.BRAND_TARGET}-${settings.BUILD_PLATFORM}-${settings.BUILD_ARCH}`
-            let execCommand = `electron-packager ${buildDir} ${settings.BRAND_TARGET} ${buildParams} --out=${distDir}`
+            const execCommand = `./node_modules/electron-packager/cli.js ${buildDir} ${settings.BRAND_TARGET} ${buildParams} --out=${distDir}`
             childExec(execCommand, undefined, (err, stdout, stderr) => {
                 if (stderr) gutil.log(stderr)
                 if (stdout) gutil.log(stdout)
@@ -252,65 +126,52 @@ gulp.task('build-dist', 'Make an optimized build suitable for distribution.', ['
             })
         }
     })
-}, {options: taskOptions.all})
+})
 
 
-gulp.task('build-run', 'Make a development build and run it in the target environment.', () => {
+gulp.task('build-run', 'Generate an unoptimized build and run it in the target environment.', (done) => {
     let command = `gulp build --target ${settings.BUILD_TARGET} --brand ${settings.BRAND_TARGET}`
     const buildDir = `./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`
     if (settings.BUILD_TARGET === 'chrome') command = `${command};chromium --user-data-dir=/tmp/vialer-js --load-extension=${buildDir} --no-first-run`
     else if (settings.BUILD_TARGET === 'firefox') command = `${command};web-ext run --no-reload --source-dir ${buildDir}`
     else if (settings.BUILD_TARGET === 'electron') {
-        command = `${command};electron --js-flags='--harmony-async-await' ${buildDir}/main.js`
+        const electronPath = './node_modules/electron/dist/electron'
+        command = `${command};${electronPath} --js-flags='--harmony-async-await' ${buildDir}/main.js`
     } else if (settings.BUILD_TARGET === 'webview') {
-        helpers.startDevServer()
+        helpers.startDevService()
         const urlTarget = `http://localhost:8999/${settings.BRAND_TARGET}/webview/index.html`
         command = `${command};chromium --disable-web-security --new-window ${urlTarget}`
     }
     childExec(command, undefined, (err, stdout, stderr) => {
         if (err) gutil.log(err)
     })
-}, {options: taskOptions.all})
+})
 
 
-gulp.task('deploy', 'Deploy <BRAND_TARGET> to the <BUILD_TARGET> store.', (done) => {
+gulp.task('deploy', 'Deploy <brand> to the <target> store.', (done) => {
     helpers.deploy(settings.BRAND_TARGET, settings.BUILD_TARGET, helpers.distributionName(settings.BRAND_TARGET))
         .then(() => {
             // Write release and source artifacts to sentry for more
             // precise stacktraces in Sentry.
-            runSequence('sentry-sourcemaps', done)
+            runSequence('sentry-release-publish', done)
         })
-}, {options: taskOptions.browser})
-
-
-gulp.task('docs', 'Generate docs.', (done) => {
-    let execCommand = `node ${settings.NODE_PATH}/jsdoc/jsdoc.js ./ -R ./README.md -c ./.jsdoc.json -d ${settings.BUILD_DIR}/docs --package ./package.json`
-    childExec(execCommand, undefined, (err, stdout, stderr) => {
-        if (stderr) gutil.log(stderr)
-        if (stdout) gutil.log(stdout)
-        if (settings.LIVERELOAD) livereload.changed('rtd.js')
-        done()
-    })
 })
 
 
-gulp.task('docs-deploy', 'Publish docs on github pages.', ['docs'], () => {
-    return gulp.src(path.join(settings.BUILD_DIR, 'docs', '**', '*')).pipe(ghPages())
-})
-
-
-gulp.task('html', 'Preprocess and build application HTML.', () => {
-    // The index.html file is shared with the electron build target.
-    // Appropriate scripts are inserted based on the build target.
+/**
+* The index.html file is shared with the electron build target.
+* Appropriate scripts are inserted based on the build target.
+*/
+gulp.task('html', 'Generate HTML index file.', () => {
     return gulp.src(path.join('src', 'index.html'))
         .pipe(template({settings}))
         .pipe(flatten())
-        .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
+        .pipe(gulp.dest(settings.BUILD_DIR))
         .pipe(ifElse(settings.LIVERELOAD, livereload))
-}, {options: taskOptions.all})
+})
 
 
-gulp.task('__tmp-icons', 'Copy default SVG icons and brand icons to a temp dir.', (done) => {
+gulp.task('__tmp-icons', '', (done) => {
     return gulp.src('./src/svg/*.svg', {base: 'src'})
         .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/svg/*.svg`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
         .pipe(gulp.dest(path.join(settings.TEMP_DIR, settings.BRAND_TARGET)))
@@ -321,148 +182,154 @@ gulp.task('__tmp-icons', 'Copy default SVG icons and brand icons to a temp dir.'
 
 /**
 * Process all images with Vue-svgicon into Javascript Vue components,
-* which can be included as regular components.
+* which can be included as regular components. The icons JavaScript is added
+* from the foreground source.
 * TODO: Integrate vue-svgicon with Gulp.
 */
-gulp.task('icons', 'Build an SVG iconset.', ['__tmp-icons'], (done) => {
-    const srcDir = path.join(settings.TEMP_DIR, settings.BRAND_TARGET, 'svg')
-    // The icons JavaScript is added inside the source.
-    const srcBuildDir = path.join(settings.SRC_DIR, 'brand', settings.BRAND_TARGET, 'icons')
-    let execCommand = `node_modules/vue-svgicon/bin/svg.js -s ${srcDir} -t ${srcBuildDir}`
+gulp.task('icons', 'Generate Vue icon components from SVG.', ['__tmp-icons'], (done) => {
+    // Use relative paths or vsvg will choke.
+    let srcDir = path.join('build', '__tmp', settings.BRAND_TARGET, 'svg')
+    const srcBuildDir = path.join('src', 'brand', settings.BRAND_TARGET, 'icons')
+    let execCommand = `node_modules/vue-svgicon/dist/lib/index.js -s ${srcDir} -t ${srcBuildDir}`
     childExec(execCommand, undefined, (_err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
         if (stdout) gutil.log(stdout)
         done()
     })
+})
 
-}, {options: taskOptions.all})
 
-
-gulp.task('js-electron', 'Generate Electron application.', (done) => {
-    const settingsFile = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET, 'settings.json')
-    runSequence([
-        'js-vendor',
-        'js-app-bg',
-        'js-app-fg',
-        'js-electron-main',
-    ], async() => {
+gulp.task('js-electron', 'Generate Electron application JavaScript.', (done) => {
+    if (settings.BUILD_TARGET !== 'electron') {
+        gutil.log(`Electron task doesn\'t make sense for build target ${settings.BUILD_TARGET}`)
+        return
+    }
+    runSequence(['js-vendor-bg', 'js-vendor-fg', 'js-app-bg', 'js-app-fg'], async() => {
         // Vendor-specific info for Electron's main.js file.
-        let mainSettings = {
-            name: settings.brands[settings.BRAND_TARGET].name[settings.DEPLOY_TARGET],
-            vendor: settings.brands[settings.BRAND_TARGET].vendor,
-        }
-        await writeFileAsync(settingsFile, JSON.stringify(mainSettings))
+        fs.createReadStream('./src/js/main.js').pipe(
+            fs.createWriteStream(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}/main.js`)
+        )
+
+        const electronBrandSettings = settings.brands[settings.BRAND_TARGET].vendor
+        const settingsFile = `./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}/settings.json`
+        await writeFileAsync(settingsFile, JSON.stringify(electronBrandSettings))
         done()
     })
 })
 
 
-gulp.task('js-electron-main', 'Copy Electron main thread js to build.', ['js-app-bg', 'js-app-fg'], () => {
-    return gulp.src('./src/js/main.js', {base: './src/js/'})
-        .pipe(gulp.dest(`./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}`))
-        .pipe(size(_extend({title: 'electron-main'}, settings.SIZE_OPTIONS)))
-        .pipe(ifElse(settings.LIVERELOAD, livereload))
+gulp.task('js-vendor-bg', 'Generate vendor JavaScript for the background app section.', [], (done) => {
+    helpers.jsEntry('./src/js/bg/vendor.js', 'vendor_bg', []).then(() => {done()})
 })
 
 
-gulp.task('js-vendor', (done) => {
-    runSequence('icons', 'js-vendor-bg', 'js-vendor-fg', () => {
-        if (settings.LIVERELOAD) livereload.changed('web.js')
-        done()
-    })
-})
-
-
-gulp.task('js-vendor-bg', 'Generate third-party vendor js.', [], (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/vendor', 'vendor_bg', [], done)
-}, {options: taskOptions.all})
-
-
-gulp.task('js-vendor-fg', 'Generate third-party vendor js.', (done) => {
-    helpers.jsEntry(
-        settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/vendor', 'vendor_fg',
-        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`], () => {
+gulp.task('js-vendor-fg', 'Generate vendor JavaScript for the foreground app section.', ['icons'], (done) => {
+    helpers.jsEntry('./src/js/fg/vendor.js', 'vendor_fg',
+        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`])
+        .then(() => {
             done()
         })
-}, {options: taskOptions.all})
+})
 
 
-gulp.task('js-app-bg', 'Generate the extension background entry js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'bg/index', 'app_bg', [], () => {
-        if (settings.LIVERELOAD) livereload.changed('web.js')
-        if (WATCHTEST) runSequence(['test'], done)
+gulp.task('js-app-bg', 'Generate background app section JavaScript.', (done) => {
+    helpers.jsEntry('./src/js/bg/index.js', 'app_bg', []).then(() => {
+        if (settings.LIVERELOAD) livereload.changed('app_bg.js')
+        if (WATCHTEST) runSequence(['test-unit'], done)
         else done()
     })
-}, {options: taskOptions.browser})
+})
 
 
-gulp.task('js-app-fg', 'Generate webextension fg/popout js.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'fg/index', 'app_fg', [], () => {
-        if (settings.LIVERELOAD) livereload.changed('web.js')
-        if (WATCHTEST) runSequence(['test'], done)
+gulp.task('js-app-fg', 'Generate foreground app section JavaScript.', (done) => {
+    helpers.jsEntry('./src/js/fg/index.js', 'app_fg', []).then(() => {
+        if (settings.LIVERELOAD) livereload.changed('app_fg.js')
+        if (WATCHTEST) runSequence(['test-unit'], done)
         else done()
     })
-}, {options: taskOptions.browser})
+})
 
 
-gulp.task('js-app-observer', 'Generate WebExtension icon observer which runs in all tab frames.', (done) => {
-    helpers.jsEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer/index', 'app_observer', [], () => {
-        if (WATCHTEST) runSequence(['test'], done)
+gulp.task('js-app-plugins', 'Generate app sections plugin JavaScript.', ['i18n'], (done) => {
+    const builtin = settings.brands[settings.BRAND_TARGET].plugins.builtin
+    const custom = settings.brands[settings.BRAND_TARGET].plugins.custom
+
+    Promise.all([
+        helpers.jsPlugins(Object.assign(builtin, custom), 'bg'),
+        helpers.jsPlugins(Object.assign(builtin, custom), 'fg'),
+    ]).then(() => {
+        if (settings.LIVERELOAD) livereload.changed('app_plugins_bg.js')
+        done()
+    })
+})
+
+
+gulp.task('js-app-observer', 'Generate tab app section Javascript.', (done) => {
+    helpers.jsEntry('./src/js/observer/index.js', 'app_observer', []).then(() => {
+        if (WATCHTEST) runSequence(['test-unit'], done)
         else done()
     })
-}, {options: taskOptions.browser})
+})
 
 
-gulp.task('manifest', 'Create a browser-specific manifest file.', async() => {
+gulp.task('manifest', 'Generate a browser-specific manifest file.', async() => {
     let manifest = helpers.getManifest(settings.BRAND_TARGET, settings.BUILD_TARGET)
-    const manifestTarget = path.join(__dirname, 'build', settings.BRAND_TARGET, settings.BUILD_TARGET, 'manifest.json')
-    await mkdirp(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET))
+    const manifestTarget = path.join(settings.BUILD_DIR, 'manifest.json')
+    await mkdirp(settings.BUILD_DIR)
     await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))
-}, {options: taskOptions.browser})
+})
 
 
-gulp.task('scss', 'Compile all css.', [], (done) => {
-    runSequence([
-        'scss-app',
-        'scss-observer',
-    ], () => {
-        // Targetting webext.css for livereload changed only works in the
-        // webview.
+gulp.task('scss', 'Generate all CSS files.', [], (done) => {
+    runSequence(['scss-app', 'scss-observer'], () => {
         if (settings.LIVERELOAD) livereload.changed('app.css')
         done()
     })
-}, {options: taskOptions.all})
+})
 
 
-gulp.task('scss-app', 'Generate application css.', () => {
-    return helpers.scssEntry(
-        settings.BRAND_TARGET,
-        settings.BUILD_TARGET,
-        'app',
-        !settings.PRODUCTION,
-        // Mixin the component scss.
-        path.join(settings.SRC_DIR, 'components', '**', '*.scss'))
-}, {options: taskOptions.all})
+gulp.task('scss-app', 'Generate application CSS.', () => {
+    let sources = [path.join(settings.SRC_DIR, 'components', '**', '*.scss')]
+    const builtin = settings.brands[settings.BRAND_TARGET].plugins.builtin
+    const custom = settings.brands[settings.BRAND_TARGET].plugins.custom
+
+    const sectionModules = Object.assign(builtin, custom)
+    for (const moduleName of Object.keys(sectionModules)) {
+        const sectionModule = sectionModules[moduleName]
+        if (sectionModule.addons && sectionModule.addons.fg.length) {
+            for (const addon of sectionModule.addons.fg) {
+                const dirName = addon.split('/')[0]
+                gutil.log(`[fg] addon styles for ${moduleName} (${addon})`)
+                sources.push(path.join(settings.NODE_PATH, dirName, 'src', 'components', '**', '*.scss'))
+            }
+        } else if (sectionModule.parts && sectionModule.parts.includes('fg')) {
+            gutil.log(`[fg] addon styles for ${moduleName} (${sectionModule.name})`)
+            // The module may include a path to the source file.
+            sources.push(path.join(settings.NODE_PATH, sectionModule.name, 'src', 'components', '**', '*.scss'))
+        }
+    }
+    return helpers.scssEntry('./src/scss/vialer-js/app.scss', !settings.PRODUCTION, sources)
+})
 
 
-gulp.task('scss-observer', 'Generate observer css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'observer', !settings.PRODUCTION)
-}, {options: taskOptions.all})
+gulp.task('scss-observer', 'Generate observer CSS.', () => {
+    return helpers.scssEntry('./src/scss/vialer-js/observer.scss', !settings.PRODUCTION)
+})
 
 
-gulp.task('scss-vendor', 'Generate vendor css.', () => {
-    return helpers.scssEntry(settings.BRAND_TARGET, settings.BUILD_TARGET, 'vendor', false)
-}, {options: taskOptions.all})
+gulp.task('scss-vendor', 'Generate vendor CSS.', () => {
+    return helpers.scssEntry('./src/scss/vialer-js/vendor.scss', false)
+})
 
 
 /**
 * This requires at least Sentry 8.17.0.
 * See https://github.com/getsentry/sentry/issues/5459 for more details.
 */
-gulp.task('sentry-sourcemaps', 'Upload release artifacts to Sentry for better stacktraces', () => {
+gulp.task('sentry-release-publish', 'Publish release sourcemap artifacts to Sentry for better stacktraces.', () => {
     const sentryManager = helpers.sentryManager(settings.BRAND_TARGET, settings.BUILD_TARGET)
     sentryManager.create(() => {
-        const base = path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')
+        const base = path.join(settings.BUILD_DIR, 'js')
         gulp.src(path.join(base, '{*.js,*.map}'), {base})
             .pipe(addsrc(path.join(settings.SRC_DIR, 'js', '**', '*.js'), {base: path.join('./')}))
             .pipe(sentryManager.upload())
@@ -470,32 +337,39 @@ gulp.task('sentry-sourcemaps', 'Upload release artifacts to Sentry for better st
 })
 
 
-gulp.task('sentry-release-remove', 'Remove a Sentry release and all of its artifacts', (done) => {
+gulp.task('sentry-release-remove', 'Remove release and its artifacts from Sentry.', (done) => {
     const sentryManager = helpers.sentryManager(settings.BRAND_TARGET, settings.BUILD_TARGET)
     sentryManager.remove(() => done)
 })
 
 
-gulp.task('templates', 'Build Vue component templates', () => {
-    gulp.src('./src/components/**/*.vue')
-        .pipe(fuet({
-            commonjs: false,
-            namespace: 'global.templates',
-            pathfilter: ['src', 'components'],
-        }))
-        .on('error', notify.onError('Error: <%= error.message %>'))
-        .pipe(ifElse(settings.PRODUCTION, () => minifier()))
-        .on('end', () => {
-            if (settings.LIVERELOAD) livereload.changed('templates.js')
-        })
-        .pipe(concat('templates.js'))
-        .pipe(insert.prepend('global.templates={};'))
-        .pipe(gulp.dest(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')))
-        .pipe(size(_extend({title: 'templates'}, settings.SIZE_OPTIONS)))
+gulp.task('templates', 'Generate builtin and plugin Vue component templates.', () => {
+    let sources = ['./src/components/**/*.vue']
+    const builtin = settings.brands[settings.BRAND_TARGET].plugins.builtin
+    const custom = settings.brands[settings.BRAND_TARGET].plugins.custom
+
+    const sectionPlugins = Object.assign(builtin, custom)
+    for (const moduleName of Object.keys(sectionPlugins)) {
+        const sectionPlugin = sectionPlugins[moduleName]
+
+        if (sectionPlugin.addons && sectionPlugin.addons.fg.length) {
+            for (const addon of sectionPlugin.addons.fg) {
+                const dirName = addon.split('/')[0]
+                gutil.log(`[fg] addon templates for ${moduleName} (${addon})`)
+                sources.push(path.join(settings.NODE_PATH, dirName, 'src', 'components', '**', '*.vue'))
+            }
+        } else if (sectionPlugin.parts && sectionPlugin.parts.includes('fg')) {
+            gutil.log(`[fg] custom templates for ${moduleName} (${sectionPlugin.name})`)
+            // The module may include a path to the source file.
+            sources.push(path.join(settings.NODE_PATH, sectionPlugin.name, 'src', 'components', '**', '*.vue'))
+        }
+    }
+
+    helpers.compileTemplates(sources)
 })
 
 
-gulp.task('test', 'Run all unit and integation tests', function() {
+gulp.task('test-unit', 'Run unit and integation tests.', function() {
     return gulp.src('test/bg/**/*.js')
         .pipe(tape({
             outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
@@ -503,115 +377,113 @@ gulp.task('test', 'Run all unit and integation tests', function() {
 })
 
 
-gulp.task('test-browser', 'Run all functional tests on the webview', ['build'], function() {
-    if (!settings.LIVERELOAD) {
-        helpers.startDevServer()
-    }
+/**
+* Defined as extra task which makes it easier to respond
+* when the tests are finished, due to gulp-task not being
+* able to deal with `end` events.
+*/
+gulp.task('__test-browser', '', function() {
+    return gulp.src('test/browser/**/index.js').pipe(tape({bail: true}))
+})
 
-    return gulp.src('test/browser/**/*.js')
-        .pipe(tape({
-            outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
-        }))
-        .on('end', () => {
-            if (!settings.LIVERELOAD) process.exit(0)
-        })
+gulp.task('test-browser', 'Run browser tests on a served webview.', function(done) {
+    // Force the build target.
+    helpers.startDevService()
+    settings.BUILD_TARGET = 'webview'
+    runSequence(['build'], ['__test-browser'], () => {
+        process.exit(0)
+        done()
+    })
 })
 
 
-gulp.task('translations', 'Generate translations', (done) => {
-    return gulp.src('./src/js/i18n/*.js', {base: './src/js/'})
-        .pipe(concat('translations.js'))
-        .pipe(ifElse(settings.PRODUCTION, () => minifier()))
-        .pipe(gulp.dest(path.join(settings.BUILD_DIR, settings.BRAND_TARGET, settings.BUILD_TARGET, 'js')))
-        .pipe(size(_extend({title: 'js-translations'}, settings.SIZE_OPTIONS)))
-        .pipe(ifElse(settings.LIVERELOAD, livereload))
+gulp.task('i18n', 'Generate i18n translations.', (done) => {
+    const builtin = settings.brands[settings.BRAND_TARGET].plugins.builtin
+    const custom = settings.brands[settings.BRAND_TARGET].plugins.custom
+    Promise.all([
+        helpers.jsPlugins(Object.assign(builtin, custom), 'i18n'),
+        helpers.jsEntry('./src/js/i18n/index.js', 'app_i18n', []),
+    ]).then(() => {
+        if (settings.LIVERELOAD) livereload.changed('app_i18n.js')
+        done()
+    })
 })
 
 
-gulp.task('watch', 'Start development server and watch for changes.', () => {
-    settings.LIVERELOAD = true
-    helpers.startDevServer()
+gulp.task('watch', 'Run developer watch modus.', () => {
+    helpers.startDevService()
 
-    // Watch files related to working on the documentation.
-    if (settings.BUILD_TARGET === 'docs') {
-        gutil.log('Watching docs')
-        gulp.watch([
-            path.join(__dirname, 'src', '**', '*.js'),
-            path.join(__dirname, '.jsdoc.json'),
-            path.join(__dirname, 'README.md'),
-            path.join(__dirname, 'docs', 'manuals', '**'),
-        ], () => {
-            gulp.start('docs')
-        })
-    }
-
-
-    if (settings.BUILD_TARGET === 'node') {
+    if (settings.BUILD_TARGET === 'electron') {
+        gulp.watch([path.join(settings.SRC_DIR, 'js', 'main.js')], ['js-electron'])
+    } else if (settings.BUILD_TARGET === 'node') {
+        gulp.watch([path.join(settings.SRC_DIR, 'js', '**', '*.js')], ['test-unit'])
         // Node development doesn't require transpilation.
-        gulp.watch([path.join(__dirname, 'src', 'js', '**', '*.js')], ['test'])
-    } else {
-        gulp.watch([
-            path.join(__dirname, 'src', 'components', '**', '*.js'),
-            path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
-            path.join(__dirname, 'src', 'js', 'fg', '**', '*.js'),
-        ], ['js-app-fg'])
-
-        gulp.watch([
-            path.join(__dirname, 'src', 'js', 'bg', '**', '*.js'),
-            path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
-        ], ['js-app-bg'])
-
-        gulp.watch([
-            path.join(__dirname, 'src', 'js', 'observer', '**', '*.js'),
-            path.join(__dirname, 'src', 'js', 'lib', '**', '*.js'),
-        ], ['js-app-observer'])
-
-        if (settings.BUILD_TARGET === 'electron') {
-            gulp.watch([path.join(__dirname, 'src', 'js', 'main.js')], ['js-electron'])
-        }
+        // No other watchers are required at this moment.
+        return
+    } else if (!['electron', 'webview'].includes(settings.BUILD_TARGET)) {
+        gulp.watch(path.join(settings.SRC_DIR, 'manifest.json'), ['manifest'])
+        gulp.watch(path.join(settings.SRC_DIR, 'brand.json'), ['build'])
     }
 
-    gulp.watch(path.join(__dirname, 'src', 'js', '{bg/vendor.js,fg/vendor.js}'), ['js-vendor'])
-
-    if (!['electron', 'webview'].includes(settings.BUILD_TARGET)) {
-        gulp.watch(path.join(__dirname, 'src', 'manifest.json'), ['manifest'])
-        gulp.watch(path.join(__dirname, 'src', 'brand.json'), ['build'])
-    }
-
-    // Watch files related to working on assets.
     gulp.watch([
-        path.join(__dirname, 'src', '_locales', '**', '*.json'),
-        path.join(__dirname, 'src', 'js', 'lib', 'thirdparty', '**', '*.js'),
+        path.join(settings.SRC_DIR, '_locales', '**', '*.json'),
+        path.join(settings.SRC_DIR, 'js', 'lib', 'thirdparty', '**', '*.js'),
     ], ['assets'])
 
-    // Watch files related to working on the html and css.
-    gulp.watch(path.join(__dirname, 'src', 'index.html'), ['html'])
+
     gulp.watch([
-        path.join(__dirname, 'src', 'scss', '**', '*.scss'),
-        `!${path.join(__dirname, 'src', 'scss', 'observer.scss')}`,
-        path.join(__dirname, 'src', 'components', '**', '*.scss'),
+        path.join(settings.SRC_DIR, 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, 'vjs-adapter-*', 'src', 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, 'vjs-provider-*', 'src', 'js', 'i18n', '*.js'),
+    ], ['i18n'])
+
+    gulp.watch(path.join(settings.SRC_DIR, 'index.html'), ['html'])
+
+    gulp.watch([
+        path.join(settings.SRC_DIR, 'js', 'bg', '**', '*.js'),
+        path.join(settings.SRC_DIR, 'js', 'lib', '**', '*.js'),
+    ], ['js-app-bg'])
+
+    gulp.watch([
+        path.join(settings.SRC_DIR, 'components', '**', '*.js'),
+        path.join(settings.SRC_DIR, 'js', 'lib', '**', '*.js'),
+        path.join(settings.SRC_DIR, 'js', 'fg', '**', '*.js'),
+    ], ['js-app-fg'])
+
+    gulp.watch([
+        // Glob for addons and custom modules includes both component and module js.
+        path.join(settings.NODE_PATH, 'vjs-adapter-*', 'src', '**', '*.js'),
+        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', '**', '*.js'),
+        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', '**', '*.js'),
+        path.join(settings.NODE_PATH, 'vjs-provider-*', 'src', '**', '*.js'),
+    ], ['js-app-plugins'])
+
+    gulp.watch([
+        path.join(settings.SRC_DIR, 'js', 'observer', '**', '*.js'),
+        path.join(settings.SRC_DIR, 'js', 'lib', '**', '*.js'),
+    ], ['js-app-observer'])
+
+    gulp.watch(path.join(settings.SRC_DIR, 'js', 'bg', 'vendor.js'), ['js-vendor-bg'])
+    gulp.watch(path.join(settings.SRC_DIR, 'js', 'fg', 'vendor.js'), ['js-vendor-fg'])
+
+    gulp.watch([
+        path.join(settings.SRC_DIR, 'scss', '**', '*.scss'),
+        `!${path.join(settings.SRC_DIR, 'scss', 'observer.scss')}`,
+        path.join(settings.SRC_DIR, 'components', '**', '*.scss'),
+        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', 'components', '**', '*.scss'),
+        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'components', '**', '*.scss'),
     ], ['scss-app'])
 
-    gulp.watch(path.join(__dirname, 'src', 'scss', 'observer.scss'), ['scss-observer'])
-    gulp.watch(path.join(__dirname, 'src', 'scss', 'vendor.scss'), ['scss-vendor'])
+    gulp.watch(path.join(settings.SRC_DIR, 'scss', 'observer.scss'), ['scss-observer'])
+    gulp.watch(path.join(settings.SRC_DIR, 'scss', 'vendor.scss'), ['scss-vendor'])
 
-    gulp.watch(path.join(__dirname, 'src', 'components', '**', '*.vue'), ['templates'])
-    gulp.watch(path.join(__dirname, 'src', 'js', 'i18n', '**', '*.js'), ['translations'])
-    gulp.watch(path.join(__dirname, 'test', '**', '*.js'), ['test'])
+    gulp.watch([
+        path.join(settings.SRC_DIR, 'components', '**', '*.vue'),
+        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', 'components', '**', '*.vue'),
+        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'components', '**', '*.vue'),
+    ], ['templates'])
 
-
-    // Add linked packages here that are used during development.
-    if (WATCHLINKED) {
-        gutil.log('Watching linked development packages')
-        gulp.watch([
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'static', 'styles', '*.css'),
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'static', 'js', '*.js'),
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'publish.js'),
-            path.join(settings.NODE_PATH, 'jsdoc-rtd', 'tmpl', '**', '*.tmpl'),
-        ], ['docs'])
-
-        gulp.watch([
-            path.join(settings.NODE_PATH, 'fuet-notify', 'src', 'js', '*.js'),
-        ], ['js-vendor'])
-    }
+    gulp.watch(path.join(settings.ROOT_DIR, 'test', 'bg', '**', '*.js'), ['test-unit'])
 })

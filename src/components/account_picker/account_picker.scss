@@ -1,0 +1,25 @@
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
+
+.component-account-picker {
+
+    .field-select {
+        margin-bottom: 0;
+    }
+
+    .registration-notice {
+        font-size: 0.7rem;
+        font-weight: 500;
+        height: $spacer * 3;
+        line-height: $spacer * 3;
+        vertical-align: middle;
+
+        svg {
+            @include icon-size($spacer * 1.5);
+            color: $brand-color;
+            display: inline-block;
+            margin-bottom: $spacer / 4;
+            margin-right: $spacer / 2;
+        }
+    }
+}

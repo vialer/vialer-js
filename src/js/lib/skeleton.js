@@ -34,7 +34,7 @@ class Skeleton extends EventEmitter {
         if (this.env.isExtension) {
             this.ipcListener()
             // Allows parent scripts to use the same EventEmitter syntax.
-            if (this.env.role.tab) {
+            if (this.env.section.tab) {
                 window.addEventListener('message', (event) => {
                     if (this.verbose) this.logger.debug(`${this}emit '${event.data.event}' event from child`)
                     this.emit(event.data.event, event.data.data, true)
@@ -44,8 +44,8 @@ class Skeleton extends EventEmitter {
 
         // Sets the verbosity of the logger.
         if (process.env.NODE_ENV === 'production') {
-            if (this.env.role.bg || this.env.role.fg) this.logger.setLevel('info')
-            else if (this.env.role.observer) this.logger.setLevel('error')
+            if (this.env.section.bg || this.env.section.fg) this.logger.setLevel('info')
+            else if (this.env.section.observer) this.logger.setLevel('error')
         } else {
             if (this.env.isNode) this.logger.setLevel('error')
             else this.logger.setLevel('debug')
@@ -55,7 +55,7 @@ class Skeleton extends EventEmitter {
         // of manually.
         if (process.env.VERBOSE === true) this.verbose = true
         else this.verbose = false
-        this.logger.info(`${this}verbose mode: ${this.verbose}`)
+        this.logger.debug(`${this}verbose mode: ${this.verbose}`)
     }
 
 
@@ -140,8 +140,8 @@ class Skeleton extends EventEmitter {
                 // callstatus or observer script. Otherwise the event is
                 // ignored, because otherwise all events emitted on the tab will
                 // also be processed by the callstatus and observer scripts.
-                if (this.env.role.callstatus || this.env.role.observer) {
-                    if (this.env.role.observer && message.data.frame && message.data.frame === 'observer') {
+                if (this.env.section.callstatus || this.env.section.observer) {
+                    if (this.env.section.observer && message.data.frame && message.data.frame === 'observer') {
                         this.emit(message.event, message.data, true)
                     }
                 } else {

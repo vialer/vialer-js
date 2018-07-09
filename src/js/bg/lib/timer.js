@@ -79,7 +79,6 @@ class Timer {
     * @param {Boolean} reset - Whether to rerun the timer function after *timeout* and resolving the timer function.
     */
     setTimeout(timerId, timeout, reset) {
-        this.app.logger.debug(`${this}set timeout for ${timerId}`)
         if (this.getRegisteredTimer(timerId)) {
             registeredTimers[timerId].timeout = timeout
             // *reset* indicates whether to re-run *timerFunction* after

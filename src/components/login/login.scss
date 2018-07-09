@@ -1,7 +1,9 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 .component-login {
+    padding: $spacer * 4;
+
     header {
         text-align: center;
         width: 100%;
@@ -12,21 +14,25 @@
         }
 
         .welcome-message {
-            color: $grey-color-darker;
+            color: $grey-color;
             padding-bottom: $spacer * 3;
             padding-top: $spacer * 2;
 
             .session-name {
                 color: $brand-color;
-                font-size: 0.9rem;
                 font-style: italic;
             }
         }
     }
 
+    .buttons {
+        padding-bottom: $spacer;
+    }
+
     footer {
         color: $grey-color;
         font-size: 0.75rem;
+        margin-top: $spacer;
         text-align: center;
 
         .forgot-pw {
@@ -50,10 +56,6 @@
     }
 
 
-    .buttons {
-        padding-top: $spacer;
-    }
-
     .sessions {
         display: flex;
         flex-flow: row wrap;
@@ -63,10 +65,8 @@
 
         .new-session-text {
             color: $grey-color;
-            font-size: 0.8rem;
-            font-style: italic;
             margin-bottom: $spacer;
-            margin-top: $spacer / 2;
+            margin-top: $spacer * 2;
         }
 
         .new-session {
@@ -83,7 +83,7 @@
 
         .session {
             align-items: center;
-            background: $grey-color-lighter;
+            background: $grey-color-lightest;
             border-bottom: 2px solid $grey-color-lighter;
             border-top: 2px solid transparent;
             display: flex;
@@ -109,7 +109,7 @@
             }
 
             &:hover {
-                border-bottom: 2px solid $brand-color;
+                border-bottom: 2px solid $brand-accent-color;
                 cursor: pointer;
 
                 .icon-session svg {

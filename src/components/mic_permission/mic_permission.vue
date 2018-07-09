@@ -1,33 +1,43 @@
 <component class="component-mic-permission">
     <div class="field">
-        <template v-if="settings.webrtc.media.permission">
-            <!-- Additional help to guide the user to the browser permission settings. -->
-            <div class="mic-popout-instructions" v-if="soundmeter">
-                <em class="help cf">{{$t('does the microphone of the preferred device respond?')}}</em>
-                <Soundmeter class="soundmeter"/>
-            </div>
-            <div class="mic-popout-instructions" v-else>
-                <icon name="video-cam" class="video-cam"/>
-                <i class="check"><icon name="check"/></i>
-                <em class="help cf">{{$t('the browser already has permission to use your computer\'s microphone.')}}</em>
-            </div>
-        </template>
 
-        <!-- Give the user instructions how to enable the microphone in the popout -->
-        <div class="mic-popout-instructions" v-else-if="!settings.webrtc.media.permission && env.isPopout">
-            <icon name="video-cam-disabled" class="video-cam"/>
-            <p>
-                <span class="cf">{{$t('inspect the browser navigation bar for microphone access.')}}</span>
-                <span class="cf">{{$t('close this tab afterwards.')}}</span>
-            </p>
+        <div v-if="settings.webrtc.media.permission">
+            <!-- Additional help to guide the user to the browser permission settings. -->
+            <div class="mic-details">
+                <div class="browser-bar video-cam-enabled">
+                    <icon name="video-cam" class="video-cam"/>
+                </div>
+
+                <div class="success-message cf">
+                    <i class="icon check"><icon name="check"/></i>
+                    <span class="cf">{{$t('the microphone can be used.')}}</span><br/>
+                    <span v-if="env.isExtension"><em>chrome://settings/content/microphone</em></span>
+                </div>
+            </div>
         </div>
 
-        <span v-if="!settings.webrtc.media.permission && !env.isPopout">
-            <div class="mic-popout-notice cf">{{$t('this action will open a new tab to display the request.')}}</div>
-            <a class="button is-primary" @click="openPopoutView">
-                <span class="icon is-small"><icon name="microphone"/></span>
-                <span class="cf">{{$t('give permission')}}</span>
-            </a>
-        </span>
+        <div v-else class="mic-details popout">
+            <div class="browser-bar video-cam-disabled">
+                <icon name="video-cam-disabled" class="video-cam"/>
+            </div>
+            <div class="instruction">
+                <div class="instruction-header cf"><i class="icon">
+                    <icon name="info"/></i>
+                    <span class="cf">{{$t('no microphone access', {name: app.name})}}</span>
+                </div>
+                <span v-if="!env.isExtension || (env.isExtension && env.isPopout)" class="cf">
+                    {{$t('click on the device access icon in the browser navigation bar to fix this. The icon looks similar to the one above.', {name: app.name})}}
+                </span>
+                <div v-else>
+                    <span class="cf">
+                        {{$t('click on the microphone access button to open {name} in a browser tab. The permission can be adjusted from there.', {name: app.name})}}
+                    </span>
+                    <button class="button is-primary" @click="openPopoutView">
+                        <span class="icon is-small"><icon name="microphone"/></span>
+                        <span class="cf">{{$t('microphone access')}}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 </component>

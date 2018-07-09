@@ -89,6 +89,13 @@ module.exports = (app) => {
                 return err.join('</br>')
             },
         },
+        data: function() {
+            let data = {}
+            if (this.type === 'password') {
+                data.visible = false
+            }
+            return data
+        },
         methods: {
             classes: function(block) {
                 let classes = {}
@@ -123,6 +130,12 @@ module.exports = (app) => {
                     }
                 }
                 return emptyOption
+            },
+            /**
+            * Toggles visibility flag on a password field.
+            */
+            toggleVisible() {
+                this.visible = !this.visible
             },
             /**
             * Emit the child component's state back to it's

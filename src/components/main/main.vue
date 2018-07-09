@@ -1,29 +1,27 @@
 <component class="component-main" id="app">
     <!-- Force the telemetry window to show up -->
     <Notifications :class="classes('notifications')"/>
-    <Wizard v-if="!wizard.completed && user.authenticated"/>
-    <div v-else>
-        <div class="overlay" v-if="overlay">
-            <div class="close-button" @click="closeOverlay()">
-                <icon name="close"/>
-            </div>
-            <About v-if="overlay==='about'"/>
+
+    <div class="overlay" v-if="overlay">
+        <div class="close-button" @click="closeOverlay()">
+            <icon name="close"/>
         </div>
+        <component v-bind:is="overlay"/>
+    </div>
 
-        <MainStatusBar v-if="!callOngoing"/>
-        <MainCallBar v-if="callOngoing && call.active" :call="call" v-for="call in calls"/>
+    <Login v-if="!user.authenticated"/>
+    <Wizard v-else-if="!wizard.completed && user.authenticated"/>
+    <div v-else class="app-view">
+        <MainStatusBar v-if="!callOngoing" class="app-view-top"/>
 
-        <div class="panel" :class="classes('panel')">
-            <Login v-if="!user.authenticated" class="panel-content"/>
-            <template v-else>
-                <MainMenuBar/>
-                <Availability v-if="layer==='availability'"/>
-                <Contacts v-else-if="layer==='contacts'"/>
-                <Queues v-else-if="layer==='queues'"/>
-                <Settings v-else-if="layer==='settings'"/>
-                <Calls v-else-if="layer==='calls'"/>
-                <Activity v-else-if="layer==='activity'"/>
-            </template>
+        <template v-for="call in calls">
+            <MainCallBar v-if="callOngoing && call.active" :call="call" class="app-view-top"/>
+        </template>
+
+        <div class="app-view-main">
+            <MainMenuBar class="app-view-sidebar"/>
+            <!-- Dynamic component rendered based on layer name. -->
+            <component v-bind:is="layer" class="app-view-layer"/>
         </div>
     </div>
 </component>

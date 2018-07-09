@@ -1,0 +1,70 @@
+@import "vialer-js/lib/variables";
+
+html {
+    overflow-y: hidden;
+}
+
+a, a:visited {
+    color: $grey-color;
+}
+
+a:hover {
+    color: $brand-accent-color;
+}
+
+ol,
+ul {
+    li {
+        padding: $spacer / 4;
+        text-align: left;
+
+        &::before {
+            background: $brand-color;
+            border-radius: 50%;
+            color: $white-color;
+            content: "";
+            display: inline-block;
+            height: $spacer * 1.25;
+            line-height: $spacer * 1.5;
+            margin-right: $spacer * 1.5;
+            text-align: center;
+            width: $spacer * 1.25;
+        }
+    }
+
+    ol li::before {
+        background: lighten($brand-color, 10%);
+
+        ol li::before {
+            background: lighten($brand-color, 20%);
+        }
+    }
+}
+
+
+ol {
+    counter-reset: default-counter;
+    list-style: none;
+
+    li {
+        counter-increment: default-counter;
+
+        &::before {
+            color: $white-color;
+            content: counter(default-counter);
+            font-size: 0.8rem;
+            font-weight: bold;
+            height: $spacer * 2.5;
+            line-height: $spacer * 2.5;
+            width: $spacer * 2.5;
+        }
+    }
+
+    ol li::before {
+        background: lighten($brand-color, 10%);
+
+        ol li::before {
+            background: lighten($brand-color, 20%);
+        }
+    }
+}

@@ -1,10 +1,9 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 // The most upper box containing account info and
 // icon-links to several locations.
 .component-main-statusbar {
-
     color: $grey-color;
     display: flex;
     font-size: 0.8rem;
@@ -32,7 +31,7 @@
     }
 
     &.ok {
-        background: $grey-color-lighter;
+        background: $grey-color-lightest;
 
 
         .status-left .status-indicator svg {
@@ -90,7 +89,7 @@
         }
 
         .username {
-            margin-left: $spacer;
+            margin: 0 $spacer;
         }
 
     }

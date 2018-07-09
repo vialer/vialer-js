@@ -154,7 +154,7 @@ class Crypto {
         const keydata = await crypto.subtle.exportKey('raw', aesKey)
         //returns the exported key data
         let base64Keydata = this.__dataArrayToBase64(keydata)
-        this.app.logger.info(`${this}exported AES-GCM session key`)
+        this.app.logger.debug(`${this}exported AES-GCM session key`)
         return base64Keydata
     }
 
@@ -275,18 +275,19 @@ class Crypto {
     * @returns {Promise} - Resolves with an AES-GCM key.
     */
     async _generateVaultKey(username, password) {
-        let base64Salt
+        let base64Salt = this.app.state.app.vault.salt
         let salt
+
         // The salt is bound to the username and is therefor required.
-        if (this.app.state.app.vault && this.app.state.app.vault.salt && this.app.state.user.username) {
-            base64Salt = this.app.state.app.vault.salt
+        if (base64Salt) {
             salt = this.__base64ToDataArray(base64Salt)
         } else {
             salt = crypto.getRandomValues(new Uint8Array(16))
             base64Salt = this.__dataArrayToBase64(salt)
+            this.app.setState({app: {vault: {salt: base64Salt}}}, {encrypt: false, persist: true})
         }
 
-        this.app.setState({app: {vault: {salt: base64Salt}}}, {encrypt: false, persist: true})
+
         let sessionKey = await crypto.subtle.importKey(
             'raw', this.__stringToDataArray(`${username}${password}`),
             {name: 'PBKDF2'}, false, ['deriveKey', 'deriveBits'],
@@ -314,6 +315,51 @@ class Crypto {
                 true, ['encrypt', 'decrypt'])
         } catch (err) {
             console.error(err)
+        }
+    }
+
+
+    /**
+    * An identity is foremost a sessionkey that is used to encrypt
+    * locally stored data with. It can also provide means to setup a secure
+    * communication channel with between two endpoints. In that case a transient
+    * ECDH key and a static RSA-PSS key is used to negotiate a PFS secret key
+    * between the two endpoints.
+    * @param {String} username - The username to unlock local data with.
+    * @param {String} password - The password to unlock local data with.
+    * @param {Boolean} e2e - Whether to create an asymmetric encryption key.
+    */
+    async createIdentity(username, password, e2e = false) {
+        this.sessionKey = await this._generateVaultKey(username, password)
+
+        if (!e2e) return
+
+        const rsa = this.app.store.get('rsa')
+        if (!rsa) {
+            try {
+                this.rsa = await crypto.subtle.generateKey(this.__cryptoParams.rsa.params, true, this.__cryptoParams.rsa.uses)
+            } catch (err) {
+                console.error(err)
+            }
+
+            let [privateKey, publicKey] = await Promise.all([
+                this.__exportPrivateKey(this.rsa.privateKey),
+                this.__exportPublicKey(this.rsa.publicKey),
+            ])
+
+            const rsaEncrypted = await this.encrypt(this.sessionKey, JSON.stringify({privateKey, publicKey}))
+            this.app.store.set('rsa', rsaEncrypted)
+        } else {
+            try {
+                let decryptedRsa = JSON.parse(await this.decrypt(this.sessionKey, rsa))
+                let [privateKey, publicKey] = await Promise.all([
+                    this.__importPrivateKey(decryptedRsa.privateKey, this.__cryptoParams.rsa.params, ['sign']),
+                    this.__importPublicKey(decryptedRsa.publicKey, this.__cryptoParams.rsa.params, ['verify']),
+                ])
+                this.rsa = {privateKey, publicKey}
+            } catch (err) {
+                console.error(`${this}unable to decrypt rsa identity`)
+            }
         }
     }
 
@@ -361,58 +407,13 @@ class Crypto {
 
 
     /**
-    * An identity is foremost a sessionkey that is used to encrypt
-    * locally stored data with. It can also provide means to setup a secure
-    * communication channel with between two endpoints. In that case a transient
-    * ECDH key and a static RSA-PSS key is used to negotiate a PFS secret key
-    * between the two endpoints.
-    * @param {String} username - The username to unlock local data with.
-    * @param {String} password - The password to unlock local data with.
-    * @param {Boolean} e2e - Whether to create an asymmetric encryption key.
-    */
-    async loadIdentity(username, password, e2e = false) {
-        this.sessionKey = await this._generateVaultKey(username, password)
-
-        if (!e2e) return
-
-        const rsa = this.app.store.get('rsa')
-        if (!rsa) {
-            try {
-                this.rsa = await crypto.subtle.generateKey(this.__cryptoParams.rsa.params, true, this.__cryptoParams.rsa.uses)
-            } catch (err) {
-                console.error(err)
-            }
-
-            let [privateKey, publicKey] = await Promise.all([
-                this.__exportPrivateKey(this.rsa.privateKey),
-                this.__exportPublicKey(this.rsa.publicKey),
-            ])
-
-            const rsaEncrypted = await this.encrypt(this.sessionKey, JSON.stringify({privateKey, publicKey}))
-            this.app.store.set('rsa', rsaEncrypted)
-        } else {
-            try {
-                let decryptedRsa = JSON.parse(await this.decrypt(this.sessionKey, rsa))
-                let [privateKey, publicKey] = await Promise.all([
-                    this.__importPrivateKey(decryptedRsa.privateKey, this.__cryptoParams.rsa.params, ['sign']),
-                    this.__importPublicKey(decryptedRsa.publicKey, this.__cryptoParams.rsa.params, ['verify']),
-                ])
-                this.rsa = {privateKey, publicKey}
-            } catch (err) {
-                console.error(`${this}unable to decrypt rsa identity`)
-            }
-        }
-    }
-
-
-    /**
     * Persist the encryption key to the unencrypted part
     * of the store, so the plugin can automatically unlock.
     * This is a tradeoff between usability and security.
     * @returns {String} - The base64-encoded vault key.
     */
     async storeVaultKey() {
-        this.app.logger.info(`${this}enabling auto session recovery`)
+        this.app.logger.debug(`${this}enable auto session recovery`)
         const sessionKey = await this.__exportAESKey(this.sessionKey)
         this.app.setState({app: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
         return sessionKey

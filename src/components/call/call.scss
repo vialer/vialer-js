@@ -1,25 +1,26 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 .component-call {
-    align-items: center;
-    color: $white;
+    color: $primary-color;
     display: flex;
+    flex: 1;
     flex-direction: column;
+    min-height: 350px;
     padding: $spacer * 3;
-    padding-bottom: $spacer;
+    padding-bottom: 0;
+
 
     .call-info {
-        align-self: flex-start;
         font-weight: 400;
         text-align: center;
-        width: 100%;
 
         .contact-avatar {
-            @include icon-size($spacer * 8);
-            background: $grey-color-lightest;
+            @include icon-size($spacer * 10);
+            background: $brand-color;
+            border: 2px solid $white-tint-color-light;
             border-radius: 50%;
-            color: $grey-color-dark;
+            color: $white-color;
             margin-bottom: $spacer;
             padding: $spacer;
             z-index: 100;
@@ -35,6 +36,7 @@
         }
 
         .info-status {
+            color: $grey-color;
             font-size: 1rem;
             font-weight: 500;
             margin-top: $spacer / 2;
@@ -43,46 +45,55 @@
     }
 
     .call-options {
-        align-items: center;
         display: flex;
         flex-direction: row;
         justify-content: center;
         margin-top: $spacer * 3;
         padding: 0 ($spacer * 5);
-        width: 100%;
 
         .rounded-button-with-text {
             padding: $spacer * 0.75;
             text-align: center;
 
             .rounded-button {
-                border: 2px solid $white;
+                background: $white-color;
+                border: 2px solid darken($grey-color-lightest, 5%);
+                color: $grey-color;
                 margin-bottom: $spacer;
+                user-select: none;
 
                 svg {
                     @include icon-size($spacer * 3);
                 }
 
-                &:hover,
+                &:hover {color: $grey-color;}
+
                 &.active {
-                    background: $white;
+                    border: 2px solid $brand-color;
                     color: $brand-color;
+
+                    + p {
+                        color: $grey-color;
+                    }
                 }
 
                 &.disabled {
-                    border: 2px solid rgba(255, 255, 255, 0.5);
-                    color: rgba(255, 255, 255, 0.5);
+                    background: rgba($grey-color-lighter, 0.2);
+                    border: 2px solid rgba($white-color, 0.7);
+                    color: rgba($grey-color, 0.7);
                     cursor: not-allowed;
 
-                    &:hover {
-                        background: none;
+                    + p {
+                        color: $grey-color-lighter;
                     }
                 }
             }
 
             p {
+                color: lighten($grey-color, 15%);
                 font-size: 0.9rem;
                 font-weight: 500;
+                user-select: none;
             }
         }
 
@@ -120,7 +131,6 @@
         align-items: center;
         display: flex;
         flex-direction: column;
-        width: 100%;
 
         .transfer-buttons {
             display: flex;
@@ -130,10 +140,12 @@
             width: 100%;
 
             .transfer-button {
+                background: $white-color;
                 border: 2px solid $white;
                 border-radius: $spacer / 2;
-                font-size: 0.7rem;
-                font-weight: bold;
+                color: $grey-color-dark;
+                font-size: 0.8rem;
+                font-weight: 500;
                 line-height: $spacer * 4;
                 margin: 0 ($spacer * 2);
                 padding: 0 $spacer;
@@ -142,7 +154,6 @@
 
                 &.active,
                 &:hover {
-                    background: $white;
                     color: $brand-color;
                     cursor: pointer;
                 }
@@ -165,7 +176,9 @@
         }
 
         .transfer-text {
-            font-size: 1rem;
+            color: $grey-color-dark;
+            font-size: 0.9rem;
+            font-weight: 500;
             margin-bottom: $spacer;
             text-align: center;
         }
@@ -191,12 +204,12 @@
     }
 
     .action {
-        box-shadow: 0 $spacer 14px 0 rgba(0, 0, 0, 0.4);
         margin: $spacer;
 
         &.decline {
             background: $red-color;
             color: $white;
+            &:hover {background: darken($red-color, 6%);}
         }
 
         &.accept {
@@ -206,9 +219,9 @@
         }
 
         &.dial {
-            background: $green-color;
+            background: $brand-accent-color;
             color: $white;
-            &:hover {background: darken($green-color, 3%);}
+            &:hover {background: darken($brand-accent-color, 3%);}
         }
 
         &.disabled {

@@ -1,87 +1,66 @@
 [![CircleCI](https://circleci.com/gh/vialer/vialer-js/tree/develop.svg?style=svg)](https://circleci.com/gh/vialer/vialer-js/tree/develop)
 
-# Quickstart
-## Requirements
-* Node.js 10.0.0 or higher
-* Npm 6 or higher
-* Electron executable for the desktop version (optional)
+Take me to the [quickstart guide](https://vialer-js.io/topics/quickstart).
+
+# The Vialer-js project
+Vialer-js is a free, pluggable, open-source communication platform that
+focusses on **customization**, **development pace** and **platform reach**.
+Its philosophy is to empower developers and vendors to build their own
+communication tools at a fast pace, while maintaining flexibility of
+the most opinionated implementation details.
+
+## Customization
+From application functionality to the documentation look-and-feel; all parts
+about Vialer-js can be styled, branded to fit a corporate identity or customized
+through the use of plugins that hook into the core functionality. The build system
+accomodates this branding flexibility and offers an easy way to customize
+naming, testing, default configurations and more.
+
+![login screen](/screens/alice-1-login.png "Bologna login")
+![device wizard](/screens/alice-6-wizard-devices.png "Bologna device wizard")
+![dialpad](/screens/alice-8-dialpad-call.png "Bologna dialpad")
+![outgoing call](/screens/bob-2-calldialog-incoming-accepted.png "Bologna outgoing call")
+
+## Development pace
+The *Bologna* Vialer-js brand uses [SIP-over-websockets](https://sipjs.com/)
+and relies on a suitable [SRTP backend](https://github.com/sipwise/rtpengine)
+to tap in to all of the call features a PBX like [Asterisk](https://www.asterisk.org/)
+or [Freeswitch](https://freeswitch.com/oss/) has to offer: PSTN connectivity,
+on-hold, waiting music, transfers, queues, IVR and callgroups. Besides dealing
+with audio calls, video [through a PBX](https://blogs.asterisk.org/2017/09/20/asterisk-15-multi-stream-media-sfu/)
+may be another interesting application to your end-users. However, having a
+PBX in-between a call may not always be the desired situation.
+\
+\
+A decentralized approach with a custom WebRTC signalling protocol and p2p
+connections between call participants may be more appropriate in situations
+where scalability and/or privacy concerns dictate that (video) data needs to
+flow between peers instead of through a centralized service. Another reason to
+use a custom signalling protocol, would be that features like
+[chat and file transfers](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel)
+are much easier to implement without having to deal with the complexity of
+the SIP protocol.
+\
+\
+The purpose of Vialer-js is not only to facilitate different use-cases,
+but also to be able to integrate them in one unified communication experience
+for your end-users. In our view, a user will be entirely free to use a
+VoIP-service provider with Vialer-js, while at the same time being able to
+communicate p2p with their friends over a decentralized signalling network.
+
+## Platform reach
+Vialer-js is a readable environment-agnostic ES2017 codebase that uses a simple
+but powerful reactive data-oriented design. This allows Vialer-js to run
+on a range of platforms with a suitable JavaScript runtime. At the moment,
+our priority is to first to offer a Blink-compatible WebExtension, followed
+by an Electron desktop app, headless Node.js support, using custom website
+widgets and we would like to investigate whether an Android mobile WebView
+would be a suitable medium for a mobile application.
 
 
-## Setup
-Checkout the project and install its dependencies from npm:
-```bash
-git clone git@github.com:VoIPGRID/vialer-js.git
-cd vialer-js
-npm i
-# Setup the default settings file:
-cp ./.vialer-jsrc.example ~/.vialer-jsrc
-# Build a Chrome extension:
-gulp build
-```
-
-Go to `chrome://extensions` in your Chrome/Chromium browser and point to the
-`build/vialer/chrome` directory. You now have a Vialer-js softphone running
-as a Chrome WebExtension! Checkout {@tutorial install} to
-learn more about different builds.
-
-
-# About Vialer-js
-Vialer-js is a free and open-source communication platform.
-It's purpose is to be an attractive unified communication tool to end-users,
-who value cross-platform user- and privacy-friendly features, like being able
-to accept and place calls over a phone network, setting up (p2p) video
-conferences, chatting and sharing files; all over secured encrypted channels.
-
-<img align="left" src="https://vialer-js.io/screenshot-1.png" height="200">
-<img align="left" src="https://vialer-js.io/screenshot-2.png" height="200">
-<img align="left" src="https://vialer-js.io/screenshot-3.png" height="200">
-<img src="https://vialer-js.io/screenshot-4.png" height="200">
-
-Written in environment-agnostic JavaScript, using a simple but powerful reactive
-data-orientated design, it can operate as a WebExtension for Blink &
-Gecko-compatible browsers, a website widget, a desktop app(Electron)
-or as a headless Node.js application, while at the same time keeping it easy
-for developers to implement new features for all platforms at once at a very
-fast pace.
-
-As a developer platform, the Vialer-js project aims to be open and accessible
-to developers that may be interested in adding their own custom endpoint
-protocol to Vialer-js, which is much faster to implement than building all
-the involved plumbing themselves. Vialer-js may also be an attractive option
-for those interested in creating their own softphones, without having to
-reinvent the wheel.
-
-The core of the software is designed around the notion of a generic 'Call'
-abstraction, that allows it to be flexible about using different technology
-stacks, while keeping the core functionality generic. Core functionality
-includes:
-
-* Audio for: DTMF, Busy, ringback & build-time selected ringtone
-* Audio device selection for headset input/output and ringtone device
-* Automated builds and deploys using gulp
-* Brandable design
-* Call dialogs with context switching
-* Call notifications with animated menubar icons and system notifications
-* Clickable call icons and call status next to phonenumbers in browser tabs
-* Configuration screen + developer modus
-* Configuration wizard
-* Contacts & endpoints
-* Dialpad with Contact autocomplete and volume meter
-* Do-not-disturb
-* Password-encrypted data storage (WebCrypto/PBKDF2)]
-* Keyboard shortcuts (WebExtension-only) for several Call actions
-* Multi-language support (NL/EN only at the moment)
-* Non-blocking UX for Call management
-* Online/offline detection & status monitoring
-* Reactive flexible UI & data store (Vue & Vue-stash)
-* Recent calls list
-* Telemetry opt-in (Google-analytics events & Sentry exception logging)
-* User sessions
-
-The `CallSIP` implementation can be harnessed to use Vialer-js as a softphone
-when used in combination with an SIP-over-websocket compatible PBX infrastructure.
-It supports most of the features you would expect from a PBX softphone, like:
-* Blind & attended transfer
-* On-hold & call switching
-* DTMF support
-* VoIP-account selection and feature detection (avpf/encryption)
+## Want to learn more?
+Great! Nice to have you interested in this project. Head over to the [quickstart guide](https://vialer-js.io/topics/quickstart)
+to learn more about how to work with Vialer-js. Are you interested in contributing or
+would you like to see some feature implemented? Please read our [code of conduct](https://github.com/vialer/vialer-js/blob/develop/.github/CODE_OF_CONDUCT.md)
+and [contributing guide](https://github.com/vialer/vialer-js/blob/develop/.github/CONTRIBUTING.md) first.
+Have any non-technical questions? Feel free to [contact us](mailto:vialer@wearespindle.com).
