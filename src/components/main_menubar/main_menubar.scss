@@ -1,15 +1,12 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 .component-main-menubar {
     background: $brand-color;
-    display: flex;
-    flex: 1 0 $spacer * 5;
-    flex-direction: column;
-    text-align: center;
 
     .options {
-        position: fixed;
+        // Keeps the menubar icons from scrolling with the main content.
+
         width: $spacer * 5;
 
         .option {
@@ -19,7 +16,7 @@
             flex-direction: column;
             height: $spacer * 7;
             justify-content: center;
-            transition: all 200ms ease-in-out;
+            transition: background 150ms ease-in-out;
 
             svg {
                 @include icon-size($spacer * 3);
@@ -66,18 +63,27 @@
 
                 &::after {
                     @include icon-size(14px);
-                    background: $red-color;
+                    animation: bounce .5s ease-in-out infinite;
+                    background: $brand-accent-color;
                     border-radius: 50%;
+                    bottom: 13px;
                     content: "";
+                    left: 3px;
                     position: absolute;
-                    right: 4px;
-                    top: 13px;
                     z-index: 10;
                 }
             }
 
             &.calls {
-                &.calls-active {color: $green-color;}
+                &.calls-active {
+                    background: lighten($brand-color, 10%);
+
+                    &.active {
+                        background: $white;
+                        svg {fill: $brand-color;}
+                    }
+                    svg {fill: $white-color;}
+                }
             }
 
 

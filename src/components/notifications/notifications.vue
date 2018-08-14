@@ -7,7 +7,7 @@
             <div class="message cf" v-if="html" v-html="message"></div>
             <div class="message cf" v-else>{{item.message}}</div>
             <div class="actions">
-                <button class="delete test-delete" @click="close(item)"></button>
+                <button class="delete test-delete-notification" @click="close(item)"></button>
             </div>
         </li>
     </transition-group>

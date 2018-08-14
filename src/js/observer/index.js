@@ -333,7 +333,7 @@ class AppTab extends Skeleton {
 }
 
 
-let env = require('../lib/env')({role: 'observer'})
+let env = require('../lib/env')({section: 'observer'})
 global.tab = new AppTab({env})
 
 

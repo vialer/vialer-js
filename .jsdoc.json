@@ -17,33 +17,27 @@
         "default": {
             "staticFiles": {
               "include": [
-                  "./docs/logo.png",
-                  "./docs/screenshot-1.png",
-                  "./docs/screenshot-2.png",
-                  "./docs/screenshot-3.png",
-                  "./docs/screenshot-4.png"
+                  "./docs/logo.png"
+              ],
+              "paths": [
+                  "./screenshots"
               ]
             }
         },
-        "title": "Vialer-js",
+        "title": "Vialer-js - Pluggable WebRTC communication platform.",
         "logo": {
             "url": "logo.png",
             "width": "90px",
             "height": "72px"
         },
         "name": "Vialer-js",
-        "footerText": "&copy; Windshaft BV",
-        "useCollapsibles": true,
-        "tabNames": {
-            "api": "Explore code",
-            "tutorials": "Getting started"
-        }
+        "footerText": "&copy; Windshaft B.V.",
+        "useCollapsibles": true
     },
     "opts": {
         "encoding": "utf8",
         "private": true,
         "recurse": true,
-        "template": "node_modules/jsdoc-rtd",
-        "tutorials": "./docs/manuals"
+        "template": "node_modules/jsdoc-spindle"
     }
 }

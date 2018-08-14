@@ -8,12 +8,16 @@
         <link href="css/app.css" rel="stylesheet" />
         <script src="js/vendor_fg.js"></script>
         <script src="js/templates.js"></script>
-        <script src="js/translations.js"></script>
+        <script src="js/app_i18n_plugins.js"></script>
+        <script src="js/app_i18n.js"></script>
         <%if (['electron', 'webview'].includes(settings.BUILD_TARGET)) { %>
         <script src="js/vendor_bg.js"></script>
+        <script src="js/app_fg_plugins.js"></script>
+        <script src="js/app_bg_plugins.js"></script>
         <script src="js/app_bg.js"></script>
         <script src="js/app_fg.js"></script>
         <% } else { %>
+        <script src="js/app_fg_plugins.js"></script>
         <script src="js/app_fg.js"></script>
         <% } %>
     </head>

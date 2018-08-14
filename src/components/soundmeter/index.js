@@ -27,7 +27,7 @@ module.exports = (app) => {
                 this.rafID = window.requestAnimationFrame(this.drawLoop)
             },
             updateSoundmeter: async function() {
-                this.stream = await navigator.mediaDevices.getUserMedia(app._getUserMediaFlags())
+                this.stream = await navigator.mediaDevices.getUserMedia(app.media._getUserMediaFlags())
                 const mediaStreamSource = audioContext.createMediaStreamSource(this.stream)
                 meter = volumeLib.createAudioMeter(audioContext)
                 mediaStreamSource.connect(meter)
@@ -37,7 +37,7 @@ module.exports = (app) => {
             canvasElement = this.$refs.meter
             canvasContext = canvasElement.getContext('2d')
             try {
-                this.stream = await navigator.mediaDevices.getUserMedia(app._getUserMediaFlags())
+                this.stream = await navigator.mediaDevices.getUserMedia(app.media._getUserMediaFlags())
                 const mediaStreamSource = audioContext.createMediaStreamSource(this.stream)
                 meter = volumeLib.createAudioMeter(audioContext)
                 mediaStreamSource.connect(meter)

@@ -8,16 +8,14 @@
         <span class="status-indicator tooltip tooltip-right" :data-tooltip="titles('indicator')">
 
             <template v-if="settings.webrtc.enabled">
-                <icon class="error" name="mute" v-if="!settings.webrtc.media.permission"/>
+                <icon class="spinner" name="spinner" v-if="status === 'loading'"/>
+                <icon class="error" name="mute" v-else-if="!settings.webrtc.media.permission"/>
                 <icon class="error" name="mute" v-else-if="!settings.webrtc.devices.ready"/>
                 <icon class="error" name="softphone" v-else-if="ua.status !== 'registered'"/>
                 <icon class="warning" name="dnd" v-else-if="dnd"/>
                 <icon class="ok" name="softphone" v-else-if="ua.status === 'registered'"/>
             </template>
-            <template v-else>
-                <icon v-if="ua.status !== 'connected'" class="error" name="user" />
-                <icon v-else class="ok" name="user" />
-            </template>
+            <icon name="user" v-else />
         </span>
 
         <span class="username">{{user.username}}</span>

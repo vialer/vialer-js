@@ -1,11 +1,12 @@
 <component class="component-calls" :class="classes('component')">
     <!-- There should always be a call active when viewing this component. -->
     <div class="calls-container">
-        <div class="disabled-placeholder" v-if="callingDisabled && !callOngoing">
+        <!-- Don't notify about call inability until the calls module is done loading. -->
+        <div class="disabled-placeholder" v-if="(callingDisabled && !callOngoing) && status !== 'loading'">
             <icon class="disabled-icon" name="dialpad-off"/>
             <div class="disabled-text">
-                <span class="cf">{{$t('calling is momentarily disabled.')}}</span>
-                <span class="cf">{{$t('possible reason')}}:</span>
+                <span class="cf">{{$t('service unavailable.')}}</span><br/>
+                <span class="cf">{{$t('what\'s wrong?')}}</span>
             </div>
             <div class="disabled-reason">
                 <ul>
@@ -18,5 +19,5 @@
         <Call v-else-if="activeCall" :call="activeCall"/>
         <CallSwitch v-if="callOngoing" :call="activeCall"/>
     </div>
-    <Soundmeter class="soundmeter"  v-if="!callingDisabled"/>
+    <Soundmeter class="soundmeter"  v-if="(status === 'loading') || !callingDisabled"/>
 </component>

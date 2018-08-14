@@ -18,6 +18,7 @@ module.exports = (app) => {
         staticRenderFns: templates.calls.s,
         store: {
             calls: 'calls.calls',
+            status: 'calls.status',
         },
         watch: {
             calls: {

@@ -1,0 +1,71 @@
+@import "vialer-js/lib/variables";
+
+.component-sidebar {
+    background: $grey-color-lightest;
+    display: flex;
+    flex-direction: column;
+
+    .header {
+        align-items: center;
+        background: $brand-color;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: $spacer;
+
+        .header-logo {
+            height: 90px;
+            text-align: center;
+            width: 100%;
+
+            img {
+                margin: 0 auto;
+                max-height: 100%;
+                max-width: 100%;
+            }
+        }
+
+        .header-title {
+            color: $white-color;
+            font-size: 1.4rem;
+            font-weight: 500;
+            text-align: center;
+            text-transform: uppercase;
+            width: 100%;
+        }
+
+        .header-brand {
+            color: $brand-accent-color;
+            font-size: 0.9rem;
+            text-align: center;
+            text-transform: uppercase;
+            width: 100%;
+        }
+    }
+
+    .navigation {
+
+        .navigation-header {
+            background: $brand-accent-color;
+            color: $white-color;
+            font-weight: 500;
+            padding: $spacer;
+            text-transform: uppercase;
+        }
+
+        .navigation-link {
+            color: $grey-color-darker;
+            display: block;
+            font-weight: 500;
+            padding: $spacer;
+            width: 100%;
+
+
+            &.is-active,
+            &:hover {
+                background: $white-color;
+                cursor: pointer;
+            }
+        }
+    }
+}

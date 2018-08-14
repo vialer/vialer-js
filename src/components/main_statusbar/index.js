@@ -9,6 +9,7 @@ module.exports = (app) => {
                 let classes = {}
                 if (block === 'component') {
                     if (!this.user.authenticated) classes.ok = true
+                    else if (this.status === 'loading') classes.ok = true
                     else {
                         if (this.settings.webrtc.enabled) {
                             if (!this.settings.webrtc.media.permission) classes.error = true
@@ -27,7 +28,7 @@ module.exports = (app) => {
             logout: app.helpers.logout,
             refreshApiData: function() {
                 if (!this.app.online) return
-                app.notify({icon: 'refresh', message: `${app.$t('reloaded application data')}...`, type: 'success'})
+                app.notify({icon: 'refresh', message: `${app.$t('application data is reloaded.')}`, type: 'success'})
                 app.emit('bg:refresh_api_data')
                 app.emit('bg:calls:disconnect', {reconnect: true})
             },
@@ -55,7 +56,11 @@ module.exports = (app) => {
                                     if (this.dnd) title += ` (${this.$t('do not disturb')})`
                                 }
                             } else {
-                                title += this.$t('not registered')
+                                if (this.ua.status === 'connected') {
+                                    title += this.$t('connected')
+                                } else {
+                                    title += this.$t('not registered')
+                                }
                             }
                         } else {
                             if (this.ua.status === 'connected') {
@@ -64,6 +69,12 @@ module.exports = (app) => {
                                 title += this.$t(this.ua.status)
                             }
                         }
+                    }
+
+                    if (this.selected.username) {
+                        title += ` (${this.selected.username})`
+                    } else {
+                        title += ` (${this.$t('no account')})`
                     }
                 }
 
@@ -77,7 +88,9 @@ module.exports = (app) => {
             dnd: 'availability.dnd',
             env: 'env',
             layer: 'ui.layer',
+            selected: 'settings.webrtc.account.selected',
             settings: 'settings',
+            status: 'calls.status',
             ua: 'calls.ua',
             user: 'user',
             vendor: 'app.vendor',

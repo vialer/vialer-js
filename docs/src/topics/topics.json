@@ -1,0 +1,20 @@
+{
+    "topics": [
+        {
+            "name": "quickstart",
+            "title": "Quickstart guide"
+        },
+        {
+            "name": "platforms",
+            "title": "Supported platforms"
+        },
+        {
+            "name": "customize",
+            "title": "Customize your build"
+        },
+        {
+            "name": "publish",
+            "title": "Publish information"
+        }
+    ]
+}

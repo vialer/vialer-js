@@ -1,0 +1,54 @@
+@import "bulma/sass/utilities/initial-variables";
+
+// Paths.
+$font-path: "../fonts";
+
+// Dimensions: spacing units.
+$spacer: 8px;
+
+// Dimensions: The boundaries of the popup.
+$max-popup-width: 500px;
+$min-popup-height: 300px;
+$max-popup-height: 600px;
+
+// Colors: Base variable color palette; overriden by vialer-jsrc colors object.
+$brand-accent-color: #333 !default;
+$brand-color: #de6b35 !default;
+$grey-color: #999 !default;
+$primary-color: #3c3c50 !default;
+$green-color: #28ca42 !default;
+$blue-color: hsl(217, 71%, 53%) !default;
+$red-color: #d9534f !default;
+$yellow-color: #ffc02f !default;
+
+// Colors: Derivate colors from the base color palette.
+$grey-color-darkest: darken($grey-color, 30%);
+$grey-color-darker: darken($grey-color, 15%);
+$grey-color-dark: darken($grey-color, 5%);
+$grey-color-light: lighten($grey-color, 25%);
+$grey-color-lighter: lighten($grey-color, 33%);
+$grey-color-lightest: lighten($grey-color, 42%);
+
+$white-tint-color-dark: lighten($grey-color, 44%);
+$white-tint-color-light: lighten($grey-color, 45%);
+$white-tint-color-bright: lighten($grey-color, 46%);
+
+// Shared (Bulma)
+$warning: $orange-color;
+$yellow-color: $yellow;
+$white-color: $white;
+
+$info: $blue-color;
+$white: #fff;
+$success: $green-color;
+$danger: $red-color;
+
+$primary: $brand-color;
+$link: $brand-color;
+$family-primary: "Roboto";
+
+$fa-font-path: $font-path;
+$text: $primary-color;
+
+
+$width-desktop: 1024px;

@@ -29,13 +29,13 @@ class Api {
         }
 
         this.client = axios.create(options)
-        this.app.logger.info(`${this}setup axios api client`)
+        this.app.logger.debug(`${this}setup axios api client`)
         this.client.interceptors.response.use(function(response) {
             return response
         }, (err) => {
             // Catch Network Errors.
             if (err.message === 'Network Error') {
-                return Promise.resolve({status: 'Network Error'})
+                return Promise.reject({status: 'Network Error'})
             }
             // Reject all status codes from 500 and timeouts.
             if (!err.response || err.response.status >= 500) {

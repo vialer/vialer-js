@@ -8,7 +8,7 @@ function filters(app) {
         let fuzzy
 
         if (delta < 30) {
-            fuzzy = app.$t('just then')
+            fuzzy = app.$t('just now')
         } else if (delta < minute) {
             fuzzy = `${delta} ${app.$t('seconds ago')}`
         } else if (delta < 2 * minute) {

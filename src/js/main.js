@@ -11,7 +11,9 @@ const {ipcMain} = require('electron')
 
 const settings = require('./settings')
 
-
+require('electron-reload')(__dirname, {
+    electron: path.join(__dirname, 'node_modules', 'electron', 'dist', 'electron')
+})
 /**
 * Initialize an Electron application.
 */
@@ -47,9 +49,10 @@ class AppElectron {
         // Create the browser window.
         this.mainWindow = new BrowserWindow({
             autoHideMenuBar: true,
-            height: 186,
+            backgroundColor: '#ffffff',
+            height: 300,
             icon: path.join(__dirname, 'img', 'electron-icon.png'),
-            resizable: false,
+            resizable: true,
             show: false,
             title: settings.name,
             width: 500,
@@ -60,6 +63,7 @@ class AppElectron {
             if (data.height !== currentSize[1]) {
                 if (data.height > 600) data.height = 600
                 this.mainWindow.setSize(500, data.height, true)
+                event.sender.send('resize-window-done')
             }
         })
 

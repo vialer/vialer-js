@@ -1,22 +1,14 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 .component-wizard {
+    padding: $spacer * 4;
 
     .step {
         align-items: center;
         display: flex;
         flex-direction: column;
-        padding: $spacer * 4;
-        padding-bottom: 0;
         text-align: center;
-
-        .field {
-            align-items: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
 
         > header {
             color: $brand-color;
@@ -24,13 +16,14 @@
         }
 
         .step-description {
-            color: $grey-color-darker;
+            color: $grey-color-dark;
             padding: $spacer * 2 0;
             text-align: center;
             width: 75%;
         }
 
         .step-container {
+            color: $grey-color-dark;
             width: 75%;
         }
     }
@@ -52,10 +45,6 @@
                 background: $brand-color;
             }
         }
-    }
-
-    .buttons {
-        margin-bottom: $spacer * 4;
     }
 
 }

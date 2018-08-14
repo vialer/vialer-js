@@ -33,6 +33,7 @@ module.exports = (app) => {
                         })
                     } else {
                         app.emit('bg:user:login', {
+                            endpoint: this.settings.webrtc.endpoint.uri,
                             password: this.password,
                             username: this.user.username,
                         })
@@ -50,7 +51,8 @@ module.exports = (app) => {
             removeSession: function(session) {
                 app.emit('bg:user:remove_session', {session})
             },
-            selectSession: function(session) {
+            selectSession: function(session = null) {
+                this.password = ''
                 app.emit('bg:user:set_session', {session})
             },
         }, app.helpers.sharedMethods()),
@@ -58,9 +60,18 @@ module.exports = (app) => {
         staticRenderFns: templates.login.s,
         store: {
             app: 'app',
+            availability: 'availability',
+            calls: 'calls',
+            settings: 'settings',
             url: 'settings.platform.url',
             user: 'user',
             vendor: 'app.vendor',
+        },
+        updated: function() {
+            // Validation needs to be reset after an update, so
+            // the initial validation is only done after a user
+            // action.
+            this.$v.$reset()
         },
         validations: function() {
             // Bind the API response message to the validator $params.
@@ -85,7 +96,6 @@ module.exports = (app) => {
                 },
                 user: {
                     username: {
-                        email: v.email,
                         requiredIf: v.requiredIf(() => {
                             return !this.app.session.active
                         }),
@@ -96,6 +106,9 @@ module.exports = (app) => {
             return validations
         },
         watch: {
+            'settings.webrtc.endpoint.uri': function(uri) {
+                app.setState({settings: {webrtc: {endpoint: {uri}}}})
+            },
             'twoFactorToken.value': function() {
                 this.twoFactorToken.valid = true
             },

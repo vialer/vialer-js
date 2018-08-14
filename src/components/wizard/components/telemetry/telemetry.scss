@@ -1,0 +1,16 @@
+@import "vialer-js/lib/variables";
+
+.component-wizard-telemetry {
+    .button.back {
+        margin-bottom: $spacer * 2;
+        width: 70px;
+    }
+
+    .buttons {
+        .button {
+            // Give the choices a fixed width to make them spread out
+            // nicely  across the middle.
+            width: 140px;
+        }
+    }
+}

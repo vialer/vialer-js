@@ -1,0 +1,64 @@
+@import "vialer-js/lib/variables";
+
+.component-view-page {
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    padding: $spacer * 3;
+
+    pre {
+        margin: $spacer * 2 0;
+        overflow: visible;
+    }
+
+    p {
+        margin: $spacer 0;
+
+    }
+
+    h1 {
+        color: $brand-color;
+        font-size: 2rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    h2 {
+        color: $brand-color;
+        font-size: 1.7rem;
+        font-weight: 500;
+        margin-top: $spacer * 2;
+
+        &::first-letter {
+            color: $brand-accent-color;
+        }
+    }
+
+    h3 {
+        color: $grey-color-darker;
+        font-size: 1.3rem;
+        font-weight: 500;
+        margin-top: $spacer;
+        text-transform: uppercase;
+    }
+
+    strong {
+        font-weight: 500;
+    }
+
+    &.readme {
+
+        @media only screen and (min-width: $width-desktop) {
+            p {
+                columns: 2;
+            }
+        }
+
+        img {
+            border: 1px solid $grey-color-lightest;
+            float: left;
+            margin: 0 $spacer;
+            max-width: calc(50% - #{$spacer * 2});
+        }
+    }
+}

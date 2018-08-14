@@ -1,5 +1,5 @@
-@import "../../scss/lib/mixins";
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 // Bulma form field with some small modifications.
 .field-password,
@@ -10,15 +10,27 @@
 }
 
 .field {
+    align-items: flex-start;
+    justify-content: left;
 
     &:last-child {
         margin-bottom: 0;
     }
 
     .label {
+        width: 100%;
+
         &:not(:last-child) {
             margin-bottom: 0;
         }
+    }
+
+    .control {
+        display: flex;
+    }
+
+    .help {
+        width: 100%;
     }
 
     .validation-message {
@@ -47,7 +59,6 @@
             select {
                 border-bottom-right-radius: 0;
                 border-top-right-radius: 0;
-                max-width: 300px;
 
                 &:active,
                 &:focus {
@@ -78,6 +89,28 @@
 
     .switch[type="checkbox"] + label {
         display: block;
+    }
+}
+
+.field-password {
+    .control {
+        .input {
+
+            +.icon {
+                pointer-events: auto;
+
+                &.visible {
+                    color: $brand-accent-color;
+                }
+
+                svg:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+
+
+
     }
 
 }

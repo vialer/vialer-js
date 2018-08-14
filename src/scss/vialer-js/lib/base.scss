@@ -1,0 +1,237 @@
+// Generic styles. Keep this file below 300 lines.
+html,
+body {
+    height: auto;
+    margin: 0;
+    padding: 0;
+    zoom: 1;
+
+    &.extension {
+        width: $max-popup-width;
+    }
+}
+
+// Animations get in the way while running browser tests
+// and while taking documentation screenshots, so we
+// forcefully suppress them when a testrunner is using
+// the application.
+html {
+    &.test {
+        * {
+            transition: none !important; // sass-lint:disable-line no-important
+        }
+    }
+}
+
+body {
+    color: $primary-color;
+
+    component {
+        display: block;
+    }
+
+    // Bulma label class override.
+    .label {
+        color: $primary-color;
+        font-weight: 500;
+    }
+
+    .rounded-button {
+        border-radius: 100%;
+        padding: $spacer * 2;
+        transition: all 300ms ease;
+
+        &:hover {
+            cursor: pointer;
+        }
+    }
+
+    .button {
+        font-size: 1rem;
+        font-weight: 500;
+        line-height: none;
+    }
+
+    .help {
+        display: inline-block;
+        margin-top: $spacer;
+    }
+
+    .control {
+        textarea,
+        .input {
+            box-shadow: none;
+
+            &:focus,
+            &:active {
+                border: 1px solid $brand-color;
+                box-shadow: 0 0 1px 1px rgba($brand-color, 0.3);
+            }
+
+            &[type="password"],
+            &[type="text"] {
+                height: $spacer * 5;
+
+                & + .icon {
+                    height: $spacer * 5;
+                }
+            }
+        }
+    }
+
+
+    .switch[type="checkbox"] {
+        & + label {
+            font-weight: 500;
+        }
+
+        &:checked + label {
+            &::before {
+                background: $brand-accent-color;
+            }
+        }
+    }
+}
+
+// A generic link class that can be used on non-html elements
+// that function like a link.
+.link {
+    &:hover {
+        color: $brand-color;
+        cursor: pointer;
+    }
+}
+
+video {
+    display: none;
+}
+
+* {
+    box-sizing: border-box;
+    outline: none;
+}
+
+::selection {
+    background: $brand-color;
+    color: $white;
+}
+
+.hide {display: none;}
+
+.vertical-devider {
+    background: $grey-color-light;
+    height: $spacer * 3;
+    margin: 0 $spacer;
+    width: 2px;
+}
+
+.spacer-bottom-1x {margin-bottom: $spacer;}
+.spacer-bottom-2x {margin-bottom: $spacer * 2;}
+.spacer-top-1x {margin-top: $spacer;}
+.spacer-top-2x {margin-top: $spacer * 2;}
+
+// General loading indicator.
+.loading-indicator {
+    color: $grey-color-light;
+    display: flex;
+    flex-direction: column;
+    margin: $spacer * 10 0;
+    width: 100%;
+
+    div {
+        align-self: center;
+
+        svg {
+            @include icon-size($spacer * 9);
+        }
+
+        &.text {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: $spacer * 3;
+
+            // Animated loading dots.
+            span {
+                animation-duration: 1.4s;
+                animation-fill-mode: both;
+                animation-iteration-count: infinite;
+                animation-name: blink;
+
+                &:nth-child(2) {animation-delay: .2s;}
+                &:nth-child(3) {animation-delay: .4s;}
+            }
+        }
+    }
+}
+
+.no-results-indicator {
+    color: $grey-color-light;
+    display: flex;
+    flex-direction: column;
+    margin-top: $spacer * 5;
+    width: 100%;
+
+    div {
+        align-self: center;
+
+        svg {
+            @include icon-size($spacer * 6);
+        }
+
+        &.text {
+            font-size: 1.4rem;
+            font-style: italic;
+            margin-top: $spacer;
+        }
+    }
+}
+
+::-webkit-scrollbar {
+    width: $spacer * 1.25;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: $brand-color;
+}
+
+
+ol {
+    counter-reset: default-counter;
+    list-style: none;
+
+    li {
+        counter-increment: default-counter;
+        font-size: 0.9rem;
+        margin: 0.25rem;
+        padding: $spacer / 2;
+        text-align: left;
+        width: 100%;
+
+        &::before {
+            background: $brand-color;
+            border-radius: 50%;
+            color: $white-color;
+            content: counter(default-counter);
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: bold;
+            height: $spacer * 2.5;
+            line-height: $spacer * 2.5;
+            margin-right: $spacer * 1.5;
+            text-align: center;
+            width: $spacer * 2.5;
+        }
+    }
+
+    ol li::before {
+        background: lighten($brand-color, 10%);
+
+        ol li::before {
+            background: lighten($brand-color, 20%);
+        }
+    }
+}

@@ -58,7 +58,7 @@
                 {{$t('blind transfer')}}
             </div>
         </div>
-        <div class="transfer-text">{{$t('select a transfer recipient.')}}</div>
+        <div class="transfer-text cf">{{$t('select a transfer recipient')}}:</div>
         <CallKeypad :model.sync="call.keypad.number" display="dense" :call="call" mode="call" :number="call.keypad.number"/>
     </div>
     <!-- Show attended/blind transfer option and a dense keypad when transfer is active and the call is still active -->

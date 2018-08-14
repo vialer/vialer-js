@@ -60,7 +60,7 @@ module.exports = (app) => {
                 } else if (block === 'display-mode') {
                     if (modifier === this.displayMode) classes.active = true
                 } else if (block === 'favorite-button') {
-                    classes['active-yellow'] = modifier
+                    classes.active = modifier
                 } else if (block === 'filter-favorites') {
                     classes['active-yellow'] = this.filters.favorites
                 } else if (block === 'filter-online') {

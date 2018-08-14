@@ -1,11 +1,12 @@
-@import "../../scss/lib/variables";
+@import "vialer-js/lib/mixins";
+@import "vialer-js/lib/variables";
 
 // The most upper box containing account info and
 // icon-links to several locations.
 .component-main-callbar {
     align-items: center;
-    background: $green-color;
-    color: $white;
+    background: $brand-accent-color;
+    color: $white-color;
     display: flex;
     font-size: 0.8rem;
     font-weight: 500;
@@ -15,7 +16,7 @@
 
     // Another call that isn't started yet.
     &.inactive {
-        background: $brand-variation-color;
+        background: $brand-accent-color;
         color: #fff;
     }
 
@@ -24,6 +25,8 @@
         color: $brand-color;
         &:hover {color: $brand-color;}
     }
+
+
 
     .status-left {
         // Don't wrap but put dots at the end if it doesn't fit.
@@ -34,7 +37,12 @@
         white-space: nowrap;
 
         .status-indicator {
+            text-align: center;
             width: $spacer * 5;
+
+            svg {
+                @include icon-size($spacer * 3);
+            }
 
             i {
                 font-size: 1.2rem;

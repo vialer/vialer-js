@@ -41,10 +41,13 @@
 
 <div class="field field-password" v-else-if="type === 'password'">
     <label class="label ca" :class="classes('label')" :for="name">{{label}}</label>
-    <div class="control">
-        <input type="password" :class="classes('input')"
+    <div class="control has-icons-right">
+        <input :type="visible ? 'text' : 'password'" :class="classes('input')"
             @input="updateModel($event)" :value="model"
             :id="name" :name="name" :placeholder="placeholder.capitalize()" :disabled="disabled"/>
+        <span :class="{visible}" class="icon is-small is-right" @click="toggleVisible()">
+            <icon name="eye"/>
+        </span>
     </div>
     <em class="help cf" v-if="help">{{help}}</em>
     <span class="validation-message help is-danger" :class="{hide: !invalidFieldValue, show: invalidFieldValue}" v-html="validationMessage"></span>
@@ -57,12 +60,12 @@
         <div v-bind:class="classes('select')">
             <select v-on:change="updateModel($event)" :id="name"
                 :name="name" :v-bind:value="model" :disabled="disabled || !options.length">
-                <template v-if="!options.length">
-                    <option value="" disabled selected class="cf">{{$t(empty)}}</option>
-                </template>
+                <option v-if="!options.length" value="" disabled selected class="cf">{{$t(empty)}}</option>
                 <option :selected="option[idfield] == model.id" :value="option[idfield]" v-for="option in options" v-else>
                     <template v-if="option[idfield] === null && placeholder">{{placeholder.capitalize()}}</template>
-                    <template v-else>{{$t(option.name).capitalize()}}</template>
+                    <template v-else-if="option.name">{{$t(option.name).capitalize()}}</template>
+                    <template v-else>{{$t(option.name)}}
+                    </template>
                 </option>
             </select>
         </div>

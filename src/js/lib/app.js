@@ -1,5 +1,5 @@
+require('module-alias/register')
 const Skeleton = require('./skeleton')
-const Sounds = require('./sounds')
 
 
 /**
@@ -12,25 +12,31 @@ class App extends Skeleton {
 
     constructor(options) {
         super(options)
-        // Environment sniffer.
+        // Environment detection.
         this.env = options.env
-        // Lazy placeholder method for translation definition. This method
-        // is replaced by the actual translation method after the store is
-        // initialized. Used to detect in-code translations before the
-        // application is initialized.
+        this.i18n = new I18nTranslations(this, options.plugins)
+
         this.$t = (text) => text
         this.filters = require('./filters')(this)
         this.helpers = require('./helpers')(this)
+
         // Contains all registered App modules.
-        this.modules = {}
-        this._modules = options.modules
+        this.plugins = {}
+        this.__plugins = options.plugins
 
         // Use shorthand naming for the event target, because
         // the script context is part of the event name as a
         // convention.
-        if (this.env.role.bg) this._emitTarget = 'fg'
-        else if (this.env.role.fg) this._emitTarget = 'bg'
-        else throw new Error(`invalid app role: ${this.env.role}`)
+        if (this.env.section.bg) {
+            this._emitTarget = 'fg'
+            this._appSection = 'bg'
+        } else if (this.env.section.fg) {
+            this._emitTarget = 'bg'
+            this._appSection = 'fg'
+        } else if (this.env.section.app) {
+            this._emitTarget = 'app'
+            this._appSection = 'app'
+        } else throw new Error(`invalid app section: ${this.env.section}`)
     }
 
 
@@ -52,42 +58,14 @@ class App extends Skeleton {
 
 
     /**
-    * Initialize media access and system sounds.
-    */
-    async __initMedia() {
-        // Check media permission at the start of the bg/fg.
-        if (!this.env.isFirefox && !this.env.isNode) {
-            try {
-                await navigator.mediaDevices.getUserMedia(this._getUserMediaFlags())
-                this.setState({settings: {webrtc: {media: {permission: true}}}})
-            } catch (err) {
-                this.logger.error(err)
-                // There are no devices at all. Spawn a warning.
-                if (err.message === 'Requested device not found') {
-                    if (this.env.role.fg) {
-                        this.notify({icon: 'warning', message: this.$t('no audio devices found.'), type: 'warning'})
-                    }
-                }
-
-                // This error also may be triggered when there are no
-                // devices at all. The browser sometime__initViewModels has issues
-                // finding any devices.
-                this.setState({settings: {webrtc: {media: {permission: false}}}})
-            }
-        } else {
-            this.setState({settings: {webrtc: {media: {permission: false}}}})
-        }
-    }
-
-
-    /**
     * Application parts using this class should provide their own
     * initStore implementation. The foreground script for instance
     * gets its state from the background, while the background
     * gets its state from localstorage or from a
     * hardcoded default fallback.
+    * @param {Object} initialState - Extra state to begin with.
     */
-    __initStore() {
+    __initStore(initialState = {}) {
         /**
         * The state is a reactive store that is used to respond
         * to changes in data. The UI totally depends on the store
@@ -95,9 +73,9 @@ class App extends Skeleton {
         * to changes with the use of watchers.
         * @memberof App
         */
-        this.state = {
+        this.state = Object.assign({
             env: this.env,
-        }
+        }, initialState)
     }
 
 
@@ -106,37 +84,54 @@ class App extends Skeleton {
     * to the store. Translations can be dynamically added. Then initialize Vue
     * with the Vue-stash store, the root rendering component and gathered
     * watchers from modules.
-    * @param {Object} watchers - Store properties to watch for changes.
+    * @param {Object} options - Options to pass to Vue.
+    * @param {Object} options.main - Main component to initialize with.
+    * @param {Object} options.settings - Extra settings passed to Vue.
     */
-    async __initViewModel(watchers) {
+    __initViewModel({main, settings = {}} = {}) {
+        this.logger.info(`${this}init viewmodel`)
         const i18nStore = new I18nStore(this.state)
-        Vue.use(i18n, i18nStore)
-        const languages = this.state.settings.language.options.map(i => i.id)
-        let selectedLanguage = this.state.settings.language.selected.id
-        for (const [id, translation] of Object.entries(translations)) {
+        Vue.use(I18nStash, i18nStore)
+
+        for (const [id, translation] of Object.entries(this.i18n.translations)) {
             Vue.i18n.add(id, translation)
         }
 
-        if (!selectedLanguage && this.env.isBrowser) selectedLanguage = navigator.language
+        if (!this.state.settings) {
+            Vue.i18n.set('en')
+        } else {
+            let selectedLanguage = this.state.settings.language.selected.id
 
-        if (!languages.includes(selectedLanguage)) selectedLanguage = 'en'
-        this.logger.info(`${this}selected language: ${selectedLanguage}`)
-        Vue.i18n.set(selectedLanguage)
+            if (!selectedLanguage) {
+                let newLanguage
+                if (this.env.isBrowser) {
+                    // Try to figure out the language from the environment.
+                    // Check only the first part of en-GB/en-US.
+                    newLanguage = this.state.settings.language.options.find((i) => i.id === navigator.language.split('-')[0])
+                    if (newLanguage) {
+                        selectedLanguage = newLanguage.id
+                        this.setState({settings: {language: {selected: newLanguage}}})
+                    }
+                }
 
+                // Fallback to English language as a last resort.
+                if (!newLanguage) {
+                    newLanguage = this.state.settings.language.options[0]
+                    selectedLanguage = newLanguage.id
+                    this.setState({settings: {language: {selected: newLanguage}}})
+                }
+            }
 
-        // Add a simple reference to the translation module.
+            this.logger.info(`${this}selected language: ${selectedLanguage}`)
+            Vue.i18n.set(selectedLanguage)
+        }
+
+        // Add a shortcut to the translation module.
         this.$t = Vue.i18n.translate
-
-        this.vm = new Vue({
+        this.vm = new Vue(Object.assign({
             data: {store: this.state},
-            render: h => h(require('../../components/main')(this)),
-            watch: watchers,
-        })
-
-        // Sounds that are used in the application. Both
-        // initialized in `AppForeground` and `AppBackground`.
-        this.sounds = new Sounds(this)
-        await this.__initMedia()
+            render: h => h(main),
+        }, settings))
     }
 
 
@@ -151,8 +146,47 @@ class App extends Skeleton {
 
 
     /**
+    * Load section plugins from browserified modules. This is basically
+    * the browser-side of the `jsPlugins` browserify handler in
+    * `tools/helpers.js`.
+    * @param {Object} plugins - See .vialer-jsrc.example for the format.
+    */
+    __loadPlugins(plugins) {
+        // Start by initializing builtin plugins.
+        for (const builtin of plugins.builtin) {
+            if (builtin.addons) {
+                const addonModules = builtin.addons[this._appSection].map((addon) => {
+                    return require(`${addon}/src/js/${this._appSection}`)
+                })
+                this.plugins[builtin.name] = new builtin.module(this, addonModules)
+            } else if (builtin.providers) {
+                const providerModules = builtin.providers.map((mod) => {
+                    return require(`${mod}/src/js/${this._appSection}`)
+                })
+                this.plugins[builtin.name] = new builtin.module(this, providerModules)
+            } else if (builtin.adapter) {
+                const adapterModule = require(`${builtin.adapter}/src/js/${this._appSection}`)
+                this.plugins[builtin.name] = new builtin.module(this, adapterModule)
+            } else {
+                // Other plugins without any config.
+                this.plugins[builtin.name] = new builtin.module(this, null)
+            }
+        }
+
+        // Then process custom modules.
+        for (const moduleName of Object.keys(this.__plugins.custom)) {
+            const customPlugin = this.__plugins.custom[moduleName]
+            if (customPlugin.parts.includes(this._appSection)) {
+                const CustomPlugin = require(`${customPlugin.name}/src/js/${this._appSection}`)
+                this.plugins[moduleName] = new CustomPlugin(this)
+            }
+        }
+    }
+
+
+    /**
     * A recursive method that merges two or more objects with
-    * nested objects together. Existing values from target are
+    * nesting together. Existing values from target are
     * overwritten by sources.
     * @param {Object} target - The store or a fragment of it.
     * @param {...*} sources - One or more objects to merge to target.
@@ -165,10 +199,12 @@ class App extends Skeleton {
         if (this.__isObject(target) && this.__isObject(source)) {
             for (const key in source) {
                 if (this.__isObject(source[key])) {
-                    if (!target[key]) Object.assign(target, { [key]: {} })
+                    if (!target[key]) Object.assign(target, {[key]: {}})
                     this.__mergeDeep(target[key], source[key])
+                } else if (Array.isArray(source[key])) {
+                    Object.assign(target, {[key]: source[key]})
                 } else {
-                    Object.assign(target, { [key]: source[key] })
+                    target[key] = source[key]
                 }
             }
         }
@@ -188,27 +224,29 @@ class App extends Skeleton {
     * @param {Object} state - An object to merge into the store.
     */
     __mergeState({action = 'upsert', encrypt = true, path = null, persist = false, state}) {
-        if (!path) this.__mergeDeep(this.state, state)
-        else {
-            path = path.split('.')
-            if (action === 'upsert') {
-                let _ref = this.__getKeyPath(this.state, path)
-                // Needs to be created first.
-                if (typeof _ref === 'undefined') {
-                    this.__setKeyPath(this.state, path, state)
-                } else {
-                    _ref = path.reduce((o, i)=>o[i], this.state)
-                    this.__mergeDeep(_ref, state)
-                }
-            } else if (action === 'delete') {
-                const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
-                this.vm.$delete(_ref, path[path.length - 1])
-            } else if (action === 'replace') {
-                const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
-                this.vm.$set(_ref, path[path.length - 1], state)
+        if (!path) {
+            this.__mergeDeep(this.state, state)
+            return
+        }
+
+        path = path.split('.')
+        if (action === 'upsert') {
+            let _ref = this.__getKeyPath(this.state, path)
+            // Needs to be created first.
+            if (typeof _ref === 'undefined') {
+                this.__setKeyPath(this.state, path, state)
             } else {
-                throw new Error(`invalid path action for __mergeState: ${action}`)
+                _ref = path.reduce((o, i)=>o[i], this.state)
+                this.__mergeDeep(_ref, state)
             }
+        } else if (action === 'delete') {
+            const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
+            this.vm.$delete(_ref, path[path.length - 1])
+        } else if (action === 'replace') {
+            const _ref = path.slice(0, path.length - 1).reduce((o, i)=>o[i], this.state)
+            this.vm.$set(_ref, path[path.length - 1], state)
+        } else {
+            throw new Error(`invalid path action for __mergeState: ${action}`)
         }
     }
 
@@ -235,40 +273,6 @@ class App extends Skeleton {
 
 
     /**
-    * Return the getUserMedia flags based on the user's settings.
-    * @returns {Object} - Supported flags for getUserMedia.
-    */
-    _getUserMediaFlags() {
-        this.userMediaFlags = {
-            AUDIO_NOPROCESSING: {
-                audio: {
-                    echoCancellation: false,
-                    googAudioMirroring: false,
-                    googAutoGainControl: false,
-                    googAutoGainControl2: false,
-                    googEchoCancellation: false,
-                    googHighpassFilter: false,
-                    googNoiseSuppression: false,
-                    googTypingNoiseDetection: false,
-                },
-            },
-            AUDIO_PROCESSING: {
-                audio: {},
-            },
-        }
-
-        const userMediaFlags = this.userMediaFlags[this.state.settings.webrtc.media.type.selected.id]
-        const inputSink = this.state.settings.webrtc.devices.sinks.headsetInput.id
-
-        if (inputSink && inputSink !== 'default') {
-            this.logger.debug(`${this}usermedia stream forced to sink: ${inputSink}`)
-            userMediaFlags.audio.deviceId = inputSink
-        }
-        return userMediaFlags
-    }
-
-
-    /**
     * Initializes each module's store and combines the result
     * in a global state object, which is converted to
     * reactive getters/setters by Vue-stash.
@@ -276,9 +280,9 @@ class App extends Skeleton {
     */
     _initialState() {
         let state = {}
-        for (let moduleName of Object.keys(this.modules)) {
-            if (this.modules[moduleName]._initialState) {
-                state[moduleName] = this.modules[moduleName]._initialState()
+        for (let moduleName of Object.keys(this.plugins)) {
+            if (this.plugins[moduleName]._initialState) {
+                state[moduleName] = this.plugins[moduleName]._initialState()
             }
         }
 
@@ -321,6 +325,7 @@ class App extends Skeleton {
         let stateClone = state
         if (!this.env.isExtension) stateClone = JSON.parse(JSON.stringify(state))
         this.emit(`${this._emitTarget}:set_state`, {action, encrypt, path, persist, state: stateClone})
+        return
     }
 }
 

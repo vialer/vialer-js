@@ -21,7 +21,7 @@ module.exports = (app) => {
             },
             callIcon: function(call) {
                 if (call.status === 'new') {
-                    if (call.active) return 'close'
+                    if (call.active) return 'dialpad'
                     else return 'dialpad'
                 } else if (['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
                     return 'hang-up'
@@ -35,7 +35,7 @@ module.exports = (app) => {
             callTitle: function(call) {
                 const translations = app.helpers.getTranslations().call
                 if (call.status === 'new') {
-                    if (call.active) return this.$t('close new call')
+                    if (call.active) return this.$t('close new call').capitalize()
                     else return `${this.$t('select new call')}`.capitalize()
                 } else {
                     let text = `${call.number} - `
@@ -70,13 +70,13 @@ module.exports = (app) => {
                 return classes
             },
             newCallAllowed: function() {
-                let available = true
+                let allowed = true
                 for (let callId of Object.keys(this.calls)) {
                     if (['new', 'create', 'invite'].includes(this.calls[callId].status)) {
-                        available = false
+                        allowed = false
                     }
                 }
-                return available
+                return allowed
             },
         }, app.helpers.sharedMethods()),
         render: templates.call_switch.r,
