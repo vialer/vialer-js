@@ -9,20 +9,17 @@ jobs:
 
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          key: v4-{{ checksum "package.json" }}
 
-      - run: npm install
+      - run:
+          command:
+            npm install
 
       - save_cache:
+          key: v4-{{ checksum "package.json" }}
           paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
+            - "node_modules"
 
       - run: cp .vialer-jsrc.example .vialer-jsrc
       - run: npm run test
