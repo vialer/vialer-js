@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="32px"
+   height="26px"
+   viewBox="0 0 32 26"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="logo-brand.svg"
+   inkscape:export-filename="/home/spindle/logo.png"
+   inkscape:export-xdpi="3840"
+   inkscape:export-ydpi="3840"
+   inkscape:version="0.92.2 2405546, 2018-03-11">
+  <metadata
+     id="metadata18">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title>Vialer ICN</dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="2560"
+     inkscape:window-height="1411"
+     id="namedview16"
+     showgrid="false"
+     inkscape:pagecheckerboard="true"
+     inkscape:zoom="25.673415"
+     inkscape:cx="15.836901"
+     inkscape:cy="11.301037"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Icons-set" />
+  <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+  <title
+     id="title2">Vialer ICN</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <defs
+     id="defs7">
+    <path
+       d="M16.1225148,25.6 C15.6174721,25.6 12.8980118,22.5272977 12.8980118,21.9347051 C12.8980118,20.8592593 15.3843755,20.2666667 16.1225148,20.2666667 C16.860654,20.2666667 19.3470177,20.8592593 19.3470177,21.9347051 C19.3470177,22.5272977 16.6275574,25.6 16.1225148,25.6 Z M21.7415233,19.2 C21.4501673,19.2 19.1817528,16.952809 16.1225148,16.952809 C13.0424656,16.952809 10.8156734,19.2 10.5035062,19.2 C10.0040388,19.2 6.98642307,15.9640449 6.98642307,15.4247191 C6.98642307,15.2224719 7.06966764,15.0426966 7.1945345,14.9078652 C9.42132678,12.5258427 13.0424656,11.2 16.1225148,11.2 C19.2025639,11.2 22.8237028,12.5258427 25.0504951,14.9078652 C25.1753619,15.0426966 25.2586065,15.2224719 25.2586065,15.4247191 C25.2586065,15.9640449 22.2409908,19.2 21.7415233,19.2 Z M15.8077443,3.05674398 C13.3130713,3.05674398 10.7845684,3.75117571 10.0799207,4.08047707 C9.9084279,4.16062037 9.91735541,4.33301682 9.91735541,4.35990867 C9.91735541,5.1503987 9.92092855,6.1277271 9.92807484,7.29189386 C9.94276729,7.55273031 9.99749155,7.9349797 9.56380163,8.68044452 C9.13011171,9.42590935 4.87052523,12.4050126 4.51790639,12.4050126 C4.16528754,12.4050126 3.63869062,12.4027845 1.81703768,10.4541678 C-0.004615267,8.50555114 5.88787347e-08,8.05520486 5.88787861e-08,7.68696516 C5.88788118e-08,7.31872547 0.124884026,7.00419212 0.374655706,6.74335567 C2.49036876,4.53391751 4.92927917,2.84617756 7.6914601,1.6800852 C10.3507939,0.5600228 13.1202795,-3.74633398e-14 16,0 C18.8797206,4.14488015e-14 21.6492062,0.5600228 24.30854,1.6800852 C27.0707209,2.84617756 29.4820595,4.42988858 31.5977725,6.63932674 C31.8475442,6.90016319 32,7.31872547 32,7.68696516 C32,8.05520486 31.7849453,8.53318305 30.1300135,10.3034094 C28.4750817,12.0736358 27.5606224,12.4307762 27.0305656,12.1270733 C26.5005089,11.8233704 23.4920972,9.90496702 22.9859848,9.37255094 C22.4798724,8.84013486 22.1052209,8.18638599 22.0318794,7.53788756 C22.0657229,6.23993179 22.0826446,5.20326059 22.0826446,4.42787395 C22.0826446,4.38005154 22.0949258,4.07158215 21.8234029,3.98311588 C20.6840175,3.61188689 18.3024173,3.05674398 15.8077443,3.05674398 Z"
+       id="path-1" />
+  </defs>
+  <g
+     id="Icons-set"
+     style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1">
+    <mask
+       id="mask-2"
+       fill="white">
+      <use
+         xlink:href="#path-1"
+         id="use9"
+         x="0"
+         y="0"
+         width="100%"
+         height="100%" />
+    </mask>
+    <circle
+       style="display:inline;opacity:1;fill:#2e3547;fill-opacity:1;stroke:none;stroke-width:5.34502363;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+       id="path832"
+       cx="16.277544"
+       cy="12.972459"
+       r="12.31144"
+       inkscape:export-filename="/home/spindle/projects/vialer-js/src/brand/bologna/img/logo-16.png"
+       inkscape:export-xdpi="62.381004"
+       inkscape:export-ydpi="62.381004" />
+    <use
+       id="Vialer-ICN"
+       xlink:href="#path-1"
+       style="display:inline;fill:#ffffff;fill-opacity:1"
+       x="0"
+       y="0"
+       width="100%"
+       height="100%"
+       inkscape:export-filename="/home/spindle/projects/vialer-js/src/brand/bologna/img/logo-16.png"
+       inkscape:export-xdpi="62.381004"
+       inkscape:export-ydpi="62.381004"
+       transform="matrix(0.59936712,0,0,0.59936712,6.6860617,6.0868023)" />
+  </g>
+</svg>

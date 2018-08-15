@@ -42,14 +42,14 @@ Store-related branding material includes:
 ### Store credentials
 Deployment to the Firefox and Chrome store is automated. In order to deploy
 to either one, you first need to fill in API credentials in `.vialer-jsrc`.
-For Firefox, fill in the `apiKey` and `apiSecret` from the [API key](https://addons.mozilla.org/nl/developers/addon/api/key/) management page.
-For Chrome, the initial setup requires an `extensionId`, `clientId`, `clientSecret`
-and a `refreshToken`. See this [manual](https://github.com/DrewML/chrome-webstore-upload/blob/master/How%20to%20generate%20Google%20API%20keys.md)
+For Chrome, the required store credentials are `extensionId`, `clientId`, `clientSecret`
+and `refreshToken`. See this [manual](https://github.com/DrewML/chrome-webstore-upload/blob/master/How%20to%20generate%20Google%20API%20keys.md)
 on how to lookup these fields. Check the Google [developer dashboard](https://chrome.google.com/webstore/developer/dashboard?)
 for the newly published plugin's status. The plugin will generally be updated to all users
 within several hours, when the browser checks for extension updates. You can [manually override](https://developer.chrome.com/apps/autoupdate#testing)
 this behaviour in Chrome to see if the new version is updated correctly.
 
+For Firefox, fill in the `apiKey` and `apiSecret` from the [API key](https://addons.mozilla.org/nl/developers/addon/api/key/) management page.
 The Mozilla WebExtension release process is partly automated, but also has random
 manual reviews. Checkout the [Mozilla developer dashboard](https://addons.mozilla.org/nl/developers/addon/vialer/versions)
 for the release status. You can contact an AMO-editor on [irc](irc://mozilla.org/%23amo)
