@@ -20,12 +20,13 @@ module.exports = (app) => {
             if (this.v) this.v.$touch()
             if (this.v) this.v.$reset()
 
-            // Small hack to satisfy validation when the account options
-            // are already loaded, before the user enters this component
-            // in the wizard.
-            if (this.settings.webrtc.account.options.length) {
-                const selected = this.settings.webrtc.account.options[0]
-                Object.assign(app.state.settings.webrtc.account.selected, selected)
+            // Satisfy validation when the account options are already loaded,
+            // before the user enters this component in the wizard.
+            const options = this.settings.webrtc.account.options
+            let selected = this.settings.webrtc.account.selected
+
+            if (options.length && !selected.username) {
+                Object.assign(selected, app.utils.copyObject(options[0]))
             }
         },
         props: {
@@ -54,20 +55,18 @@ module.exports = (app) => {
             */
             'settings.webrtc.account.options': function(options) {
                 const account = this.settings.webrtc.account.selected
+                const selected = app.state.settings.webrtc.account.selected
                 if (account.id && options.length) {
                     // Always update the selected option from the updated
                     // option list, because a setting may have changes.
                     // Select the first option if it isn't.
                     const match = options.find((i) => i.id === account.id)
-                    if (match) {
-                        Object.assign(app.state.settings.webrtc.account.selected, match)
-                    }
+                    if (match) Object.assign(selected, match)
                 } else if (options.length && (app.state.settings.webrtc.enabled || app.state.settings.webrtc.toggle)) {
                     // Nothing selected; but there are available options and
                     // we are currently in either a WebRTC modus or about to
                     // go to WebRTC modus: Select the first available option.
-                    const selected = app.utils.copyObject(this.settings.webrtc.account.options[0])
-                    Object.assign(app.state.settings.webrtc.account.selected, selected)
+                    Object.assign(selected, app.utils.copyObject(this.settings.webrtc.account.options[0]))
                 }
 
                 if (this.v) this.v.$touch()
@@ -79,9 +78,10 @@ module.exports = (app) => {
             * @param {Object} enabled - New checkbox/switch value.
             */
             'settings.webrtc.toggle': function(enabled) {
-                if (enabled && this.settings.webrtc.account.options.length) {
-                    const selected = app.utils.copyObject(this.settings.webrtc.account.options[0])
-                    Object.assign(app.state.settings.webrtc.account.selected, selected)
+                const options = this.settings.webrtc.account.options
+                let selected = this.settings.webrtc.account.selected
+                if (enabled && !selected.username && options.length) {
+                    Object.assign(app.state.settings.webrtc.account.selected, app.utils.copyObject(options[0]))
                 }
 
                 if (this.v) this.v.$touch()

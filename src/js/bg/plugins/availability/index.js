@@ -28,6 +28,7 @@ class PluginAvailability extends Plugin {
         for (const addon of this.addons) {
             if (addon._platformData) this.app.on('bg:availability:platform_data', addon._platformData.bind(this))
             if (addon._updateAvailability) this.app.on('bg:availability:update', addon._updateAvailability.bind(this))
+            if (addon._selectAccount) this.app.on('bg:availability:account_select', addon._selectAccount.bind(this))
         }
     }
 

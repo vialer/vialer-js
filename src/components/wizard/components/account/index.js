@@ -7,7 +7,7 @@ module.exports = (app, shared) => {
             stepValid: function() {
                 const selectedAccountId = this.settings.webrtc.account.selected.id
                 const accountsLoading = this.settings.webrtc.account.status === 'loading'
-                if (this.validAccountSettings && selectedAccountId && !accountsLoading) {
+                if (selectedAccountId && !accountsLoading) {
                     return true
                 }
                 return false
@@ -16,8 +16,15 @@ module.exports = (app, shared) => {
         methods: Object.assign({
             chooseAccount: function() {
                 const selected = this.account.selected
-                app.setState({settings: {webrtc: {account: {selected}, toggle: true}}}, {persist: true})
-                this.stepNext()
+                app.setState({settings: {webrtc: {account: {status: 'loading'}}}})
+                app.emit('bg:availability:account_select', {
+                    account: selected,
+                    callback: ({account}) => {
+                        app.setState({settings: {webrtc: {account: {selected: account, status: null}, toggle: true}}}, {persist: true})
+                        this.stepNext()
+                    },
+                })
+
             },
         }, shared().methods),
         mounted: function() {

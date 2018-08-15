@@ -209,6 +209,7 @@ class PluginSettings extends Plugin {
                     this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
                 } else {
                     // Unset the selected account triggers an account reset.
+                    this.app.logger.debug(`${this}account selection watcher: reset account`)
                     this.app.plugins.calls.disconnect(false)
                     this.app.emit('bg:availability:account_reset', {}, true)
                 }
