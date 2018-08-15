@@ -1,6 +1,8 @@
 [![CircleCI](https://circleci.com/gh/vialer/vialer-js/tree/develop.svg?style=svg)](https://circleci.com/gh/vialer/vialer-js/tree/develop)
 
-Take me to the [quickstart guide](https://vialer-js.io/topics/quickstart).
+Install [Bologna Alpha](https://chrome.google.com/webstore/detail/bologna-alpha/adgookjhbldhfflndfdgkcbmpmfhapgc) Chrome extension
+\
+Take me to the [quickstart guide](https://vialer-js.io/topics/quickstart)
 
 # The Vialer-js project
 Vialer-js is a free, pluggable, open-source communication platform that

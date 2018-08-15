@@ -111,7 +111,8 @@ class Helpers {
             if (buildType === 'chrome') {
                 runSequence('build-dist', async() => {
                     const api = this.settings.brands[brandName].store.chrome
-                    const zipFile = fs.createReadStream(`./dist/${brandName}/${distributionName}`)
+                    const distTarget = `./dist/${brandName}/${distributionName}`
+                    const zipFile = fs.createReadStream(distTarget)
 
                     let res, token
 
@@ -125,6 +126,7 @@ class Helpers {
 
                     try {
                         token = await webStore.fetchToken()
+                        gutil.log(`Token retrieved, uploading ${distTarget}`)
                         res = await webStore.uploadExisting(zipFile, token)
                     } catch (err) {
                         gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
@@ -190,10 +192,11 @@ class Helpers {
     * @returns {String} - The distribution name to use.
     */
     distributionName(brandName) {
-        let distName
-        if (this.settings.BUILD_TARGET === 'electron') {
-            distName = `${this.settings.BRAND_TARGET}-${this.settings.BUILD_PLATFORM}-${this.settings.BUILD_ARCH}-${this.settings.PACKAGE.version}.zip`
-        } else distName = `${this.settings.BRAND_TARGET}-${this.settings.BUILD_TARGET}-${this.settings.PACKAGE.version}.zip`
+        let distName = `${this.settings.BRAND_TARGET}-${this.settings.BUILD_TARGET}-${this.settings.PACKAGE.version}`
+        if (this.settings.BUILD_TARGET === 'electron') distName += `-${this.settings.BUILD_ARCH}`
+
+        if (this.settings.DEPLOY_TARGET !== 'production') distName += `-${this.settings.DEPLOY_TARGET}`
+        distName += '.zip'
         return distName
     }
 

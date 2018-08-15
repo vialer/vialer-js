@@ -1,7 +1,7 @@
 {
     "name": "vialer-js",
     "productName": "vialer-js",
-    "version": "4.0.0",
+    "version": "4.0.2",
     "description": "Open-source WebRTC softphone & communication platform.",
     "engines": {
         "node": ">=8.0.0"
@@ -108,7 +108,7 @@
         "sdp-transform": "2.4.x",
         "shortid": "2.x.x",
         "sip.js": "0.10.x",
-        "vjs-adapter-user-voip": "github:vialer/vjs-adapter-user-voip#master",
+        "vjs-adapter-user-voip": "1.x.x",
         "vue": "2.5.x",
         "vue-i18n-stash": "git+https://github.com/wearespindle/vue-stash-i18n.git#master",
         "vue-stash": "2.0.1-beta",
