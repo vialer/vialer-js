@@ -43,7 +43,7 @@ Store-related branding material includes:
 Deployment to the Firefox and Chrome store is automated. In order to deploy
 to either one, you first need to fill in API credentials in `.vialer-jsrc`.
 For Chrome, the required store credentials are `extensionId`, `clientId`, `clientSecret`
-and `refreshToken`. See this [manual](https://github.com/DrewML/chrome-webstore-upload/blob/master/How%20to%20generate%20Google%20API%20keys.md)
+and `refreshToken`. See this [manual](https://developer.chrome.com/webstore/using_webstore_api)
 on how to lookup these fields. Check the Google [developer dashboard](https://chrome.google.com/webstore/developer/dashboard?)
 for the newly published plugin's status. The plugin will generally be updated to all users
 within several hours, when the browser checks for extension updates. You can [manually override](https://developer.chrome.com/apps/autoupdate#testing)

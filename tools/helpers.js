@@ -125,11 +125,12 @@ class Helpers {
                     })
 
                     try {
+                        gutil.log('Retrieving Google store access token')
                         token = await webStore.fetchToken()
-                        gutil.log(`Token retrieved, uploading ${distTarget}`)
+                        gutil.log(`Access token retrieved; uploading ${distTarget}`)
                         res = await webStore.uploadExisting(zipFile, token)
                     } catch (err) {
-                        gutil.log(`An error occured during uploading: ${JSON.stringify(res, null, 4)}`)
+                        gutil.log(`An error occured during uploading: ${JSON.stringify(err, null, 4)}`)
                         return
                     }
 
