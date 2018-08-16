@@ -474,16 +474,12 @@ class Helpers {
         const app = connect()
         livereload.listen({silent: false})
 
-        const staticContent = serveStatic(this.settings.BUILD_DIR)
-
         if (mode === 'spa') {
+            app.use(serveStatic(this.settings.BUILD_DIR))
             app.use((req, res, next) => {
-                if (['js', 'css', 'fonts', 'img', 'screens'].includes(req.url.split('/')[1])) {
-                    staticContent(req, res)
-                } else {
-                    fs.createReadStream(path.join(this.settings.BUILD_DIR, 'index.html')).pipe(res)
-                }
+                return fs.createReadStream(path.join(this.settings.BUILD_DIR, 'index.html')).pipe(res)
             })
+
         } else {
             app.use(mount('/', serveIndex(this.settings.BUILD_DIR, {icons: true})))
             app.use(mount('/', serveStatic(this.settings.BUILD_DIR)))

@@ -11,63 +11,50 @@
 
         .item-options {
             display: flex;
-            opacity: 0.3;
-            transition: opacity 0.25s;
-
-            &:hover {
-                opacity: 1;
-            }
 
             .item-option {
                 align-items: center;
+                background: none;
                 border: 0;
-                border-radius: $spacer;
-                color: $white-color;
+                color: $grey-color-lighter;
                 display: flex;
                 justify-content: center;
                 margin-left: $spacer / 2;
-                padding: $spacer / 2;
+                padding: 0;
+                transition: color ease-in-out 0.1s;
                 user-select: none;
 
                 svg {
-                    @include icon-size($spacer * 2.5);
+                    @include icon-size($spacer * 3);
                 }
 
                 &.green {
-                    background: $green-color;
-                    color: $white;
-
                     &[disabled] {
-                        background: $grey-color-light;
+                        color: $grey-color-lightest;
 
                         &:hover {
-                            background: $grey-color-light;
                             color: $grey-color-lightest;
                             cursor: not-allowed;
                         }
                     }
 
                     &:hover {
-                        background: darken($green-color, 10%);
+                        color: $green-color;
                     }
                 }
 
                 &.grey {
-                    background: $grey-color-light;
-                    color: $white-color;
-
                     &.active {
-                        background: $yellow-color;
-                        color: $white-color;
+                        color: $yellow-color;
 
                         &:hover {
-                            background: darken($yellow-color, 10%);
+                            color: $yellow-color;
                         }
                     }
 
+                    // Suggests going to an active state.
                     &:hover {
-                        background: darken($grey-color-light, 10%);
-                        color: $white-color;
+                        color: lighten($yellow-color, 20%);
                     }
                 }
 
@@ -87,25 +74,8 @@
                     margin-left: 0;
                     padding: $spacer / 4;
 
-                    &.green {
-                        color: $green-color;
-
-                        &:hover {
-                            background: none;
-                        }
-                    }
-
-                    &.grey {
-                        color: $grey-color-light;
-
-                        &:hover {
-                            background: none;
-                        }
-
-                        &.active {
-                            background: none;
-                            color: $yellow-color;
-                        }
+                    svg {
+                        @include icon-size($spacer * 2);
                     }
                 }
             }
@@ -118,10 +88,10 @@
         .item {
             .item-options {
                 margin-right: $spacer;
-                .item-option {
 
+                .item-option {
                     svg {
-                        @include icon-size($spacer * 1.75);
+                        @include icon-size($spacer * 2.5);
                     }
                 }
             }

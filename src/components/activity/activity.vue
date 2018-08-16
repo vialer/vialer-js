@@ -5,13 +5,13 @@
             <h1 class="uc">{{$t('activity')}}</h1>
             <div class="vertical-devider"></div>
             <div class="content-filters">
-                <div class="filter cf" :class="classes('filter-missed-calls')" @click="toggleFilterMissedCalls()">
-                    <icon name="missed-call"/>
-                    {{$t('missed')}}
-                </div>
-                <div class="filter cf" :class="classes('filter-reminders')" @click="toggleFilterReminders()">
+                <div class="filter" :class="classes('filter-reminders')" @click="toggleFilterReminders()">
                     <icon name="idea"/>
-                    {{$t('reminders')}}
+                    <span class="cf">{{$t('reminders')}}</span>
+                </div>
+                <div class="filter" :class="classes('filter-missed-calls')" @click="toggleFilterMissedCalls()">
+                    <icon name="missed-call"/>
+                    <span class="cf">{{$t('missed')}}</span>
                 </div>
             </div>
         </div>
@@ -39,12 +39,12 @@
             </div>
 
             <div class="item-options">
-                <div class="item-option green cf" v-on:click="callRecent(activity)">
+                <button class="item-option grey" :class="classes('remind-button', activity)" v-on:click="toggleReminder(activity)">
+                    <icon name="idea"/>
+                </button>
+                <button class="item-option green" v-on:click="callRecent(activity)">
                     <icon name="phone-circle"/>
-                </div>
-                <div class="item-option grey cf" :class="classes('remind-button', activity)" v-on:click="toggleReminder(activity)">
-                    <icon name="star-circle"/>
-                </div>
+                </button>
             </div>
         </div>
     </div>

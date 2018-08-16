@@ -5,13 +5,13 @@
             <h1 class="uc">{{$t('contacts')}}</h1>
             <div class="vertical-devider"></div>
             <div class="content-filters">
-                <div class="filter cf" :class="classes('filter-favorites')" @click="toggleFilterFavorites()">
+                <div class="filter" :class="classes('filter-favorites')" @click="toggleFilterFavorites()">
                     <icon name="star"/>
-                    {{$t('favorites')}}
+                    <span class="cf">{{$t('favorites')}}</span>
                 </div>
-                <div class="filter cf" :class="classes('filter-online')" @click="toggleFilterOnline()">
+                <div class="filter" :class="classes('filter-online')" @click="toggleFilterOnline()">
                     <icon name="softphone"/>
-                    {{$t('online')}}
+                    <span class="cf">{{$t('online')}}</span>
                 </div>
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="field field-text">
                 <div class="control">
                     <input class="input" autofocus type="input"
-                        :placeholder="$t('find contact') + '...'"
+                        :placeholder="$t('find contact').capitalize() + '...'"
                         :disabled="search.disabled"
                         v-model="search.input"/>
                 </div>
@@ -45,18 +45,18 @@
         </div>
 
         <div class="no-results-indicator" v-else-if="!filteredContacts.length">
-            <div><icon name="user"/></div>
+            <div><icon name="softphone"/></div>
             <div class="text cf">{{$t('no {target}', {target: $t('contacts')})}}...</div>
         </div>
 
         <div v-else class="contact item" v-for="contact in filteredContacts" :class="{'disabled': calls.length}">
-            <div class="contact-avatar">
+
+            <div class="contact-representation">
                 <icon class="placeholder" name="user" v-if="displayMode === 'lean'"/>
                 <!-- Show the available endpoints -->
-                <div v-for="endpoint in contact.endpoints">
-                    <icon class="call-color-status" name="availability"
-                        v-if="['lean', 'regular'].includes(displayMode)" :class="endpoint.status"/>
-                    <div class="call-color-status" v-else :class="endpoint.status"/>
+                <div class="endpoint-container" v-for="endpoint in contact.endpoints">
+                    <icon class="endpoint-status-icon" name="availability" v-if="displayMode === 'lean'" :class="endpoint.status"/>
+                    <div class="endpoint-status-led" v-else :class="endpoint.status"/>
                 </div>
             </div>
 
@@ -69,17 +69,18 @@
                 </div>
             </div>
 
-            <div class="item-options">
+            <div class="contact-options item-options">
                 <button class="item-option grey" :class="classes('favorite-button', contact.favorite)" v-on:click="toggleFavorite(contact)">
                     <icon name="star-circle" :class="contact.status"/>
                 </button>
-                <button class="item-option green cf" v-show="transferStatus === 'select'" :disabled="!isTransferTarget(contact)" v-on:click.once="callContact(contact)">
+                <button class="item-option green" v-show="transferStatus === 'select'" :disabled="!isTransferTarget(contact)" v-on:click.once="callContact(contact)">
                     <icon name="transfer"/>
                 </button>
                 <button class="item-option green" v-show="!transferStatus" :disabled="callingDisabled || !callsReady || !contactIsCallable(contact)" v-on:click="callContact(contact)">
                     <icon name="phone-circle" :class="contact.status"/>
                 </button>
             </div>
+
         </div>
     </div>
 </component>

@@ -142,7 +142,7 @@ gulp.task('scss-app', 'Generate documentation CSS.', (done) => {
 
 
 gulp.task('scss-vendor', 'Generate vendor CSS.', () => {
-    const entryExtra = [path.join(settings.NODE_PATH, 'highlight.js', 'styles', 'monokai.css')]
+    const entryExtra = [path.join(settings.NODE_PATH, 'highlight.js', 'styles', 'github.css')]
     return helpers.scssEntry('./src/scss/vendor.scss', !settings.PRODUCTION, entryExtra)
 })
 

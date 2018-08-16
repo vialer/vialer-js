@@ -18,10 +18,10 @@ through the use of plugins that hook into the core functionality. The build syst
 accomodates this branding flexibility and offers an easy way to customize
 naming, testing, default configurations and more.
 
-![login screen](https://vialer-js.io/screens/alice-1-login.png "Bologna login")
-![device wizard](https://vialer-js.io/screens/alice-6-wizard-devices.png "Bologna device wizard")
-![dialpad](https://vialer-js.io/screens/alice-8-dialpad-call.png "Bologna dialpad")
-![outgoing call](https://vialer-js.io/screens/bob-2-calldialog-incoming-accepted.png "Bologna outgoing call")
+![login screen](/screens/alice-login.png "Bologna login")
+![device wizard](/screens/alice-wizard-devices.png "Bologna device wizard")
+![dialpad](/screens/alice-dialpad-call.png "Bologna dialpad")
+![outgoing call](/screens/bob-calldialog-incoming-accepted.png "Bologna outgoing call")
 
 ## Development pace
 The *Bologna* Vialer-js brand uses [SIP-over-websockets](https://sipjs.com/)

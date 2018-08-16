@@ -21,7 +21,9 @@ Object.assign(brand.tests, {
     step: function(runner) {
         if (!this.steps[runner._name]) this.steps[runner._name] = 0
         this.steps[runner._name] += 1
-        return `${runner._name}-${this.steps[runner._name]}-`
+        // Don't use steps in the filename, because the step number
+        // may defer per build.
+        return `${runner._name}-`
     },
     steps: {},
 })

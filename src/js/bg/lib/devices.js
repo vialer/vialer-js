@@ -93,8 +93,8 @@ class Devices {
 
 
     /**
-    * Verify that the devices selected as sink are still
-    * available in the the browser's device list.
+    * Verify that devices selected as sink are still
+    * available in the browser's device list.
     * @param {Object} options - Options to pass.
     * @param {Array} options.input - Input devices that were queried.
     * @param {Array} options.output - Output devices that were queried.
@@ -161,15 +161,15 @@ class Devices {
             if (sinkDiff.removed.length) this.app.logger.debug(`${this}sink(s) removed:\n${sinkDiff.removed.map((i) => i.name).join('\n')}`)
 
             // Always notify about a newly connected device.
-            if (sinkDiff.added.length) {
-                const message = this.app.$t('new audio device detected.')
+            for (const device of sinkDiff.added) {
+                const message = this.app.$t('device "{name}" added.', {name: device.name})
                 this.app.notify({icon: 'info', message, type: 'info'})
             }
 
             // There are options available; verify if the selected sinks are valid.
             if (this.validateSinks({input, output})) {
-                if (sinkDiff.removed.length) {
-                    const message = this.app.$t('unused audio device was removed.')
+                for (const device of sinkDiff.removed) {
+                    const message = this.app.$t('device "{name}" removed.', {name: device.name})
                     this.app.notify({icon: 'warning', message, type: 'warning'})
                 }
                 // Only overwrite the device list when the current device
@@ -177,8 +177,11 @@ class Devices {
                 // error on the non-existing device.
                 this.app.setState({settings: {webrtc: {devices: {input, output}}}}, {persist: true})
             } else {
-                const message = this.app.$t('selected audio device is not available.')
-                this.app.notify({icon: 'warning', message, type: 'danger'})
+                for (const device of this.cached.input.filter((i) => !i.valid).concat(this.cached.output.filter((i) => !i.valid))) {
+                    const message = this.app.$t('device "{name}" is unavailable.', {name: device.name})
+                    this.app.notify({icon: 'warning', message, type: 'danger'})
+                }
+
                 this.app.setState({ui: {layer: 'settings', tabs: {settings: {active: 'audio'}}}})
             }
         }
