@@ -62,7 +62,7 @@ class PluginSettings extends Plugin {
             },
             webrtc: {
                 account: {
-                    options: [], // A platform integration provides options.
+                    options: [], // Platform integration provides options.
                     selected: {id: null, password: null, uri: null, username: null},
                     status: null,
                 },
@@ -88,7 +88,7 @@ class PluginSettings extends Plugin {
                         enabled: false,
                     },
                 },
-                enabled: false,
+                enabled: true,
                 endpoint: {
                     uri: process.env.SIP_ENDPOINT,
                 },
@@ -103,7 +103,7 @@ class PluginSettings extends Plugin {
                     },
                 },
                 stun: process.env.STUN,
-                toggle: false,
+                toggle: true,
             },
             wizard: {
                 completed: false,
@@ -187,37 +187,6 @@ class PluginSettings extends Plugin {
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: enabled, eventName: 'telemetry', override: true})
             },
             /**
-            * Deal with (de)selection changes for an account when
-            * updating the Settings object. The updated selected
-            * account may not have all required fields yet. These are
-            * queried with the call to `bg:user:account_select`.
-            * @param {String} newId - New selected account account.
-            * @param {String} oldId - Previously selected account id.
-            */
-            'store.settings.webrtc.account.selected.id': async(newId, oldId) => {
-                const enabled = this.app.state.settings.webrtc.enabled
-
-                // Expects a fallback account to be set.
-                if (!newId) {
-                    this.app.plugins.calls.connect({register: false})
-                    return
-                }
-
-                this.app.logger.debug(`${this}account id watcher: ${oldId} => ${newId}`)
-                // This event is used, so an external API may have some time
-                // to retrieve credentials. This way, we don't have to store
-                // full credentials of all accounts.
-                this.app.emit('bg:user:account_select', {
-                    account: {id: newId},
-                    callback: ({account}) => {
-                        // Only connect when WebRTC is enabled.
-                        if (enabled) {
-                            this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
-                        }
-                    },
-                }, true)
-            },
-            /**
             * The default value is true.
             * @param {Boolean} enabled - Permission granted?
             */
@@ -238,7 +207,7 @@ class PluginSettings extends Plugin {
                     // and the connection is made.
                     await this.app.setState({settings: {webrtc: {enabled: true}}}, {persist: true})
                     this.app.logger.debug(`${this}webrtc switched on; connecting.`)
-                    this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
+                    // this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
                 } else {
                     const fallback = this.app.utils.copyObject(this.app.state.user.platform.account.fallback)
                     this.app.logger.info(`${this}reset account to platform account ${fallback.username}`)

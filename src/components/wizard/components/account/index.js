@@ -15,14 +15,13 @@ module.exports = (app, shared) => {
         }, app.helpers.sharedComputed()),
         methods: Object.assign({
             chooseAccount: function() {
-                const selected = this.account.selected
                 app.setState({settings: {webrtc: {account: {status: 'loading'}}}})
                 // Calling the event to change the account directly, so we
                 // can hook into the callback to go to the next step.
                 app.emit('bg:user:account_select', {
-                    account: selected,
+                    accountId: this.account.selected.id,
                     callback: ({account}) => {
-                        app.setState({settings: {webrtc: {account: {status: null}}}})
+                        app.setState({settings: {webrtc: {account: {selected: account, status: null}}}}, {persist: true})
                         this.stepNext()
                     },
                 })

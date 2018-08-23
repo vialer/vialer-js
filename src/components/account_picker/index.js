@@ -80,7 +80,7 @@ module.exports = (app) => {
             */
             toggle: function(newToggle) {
                 if (newToggle) {
-                    const match = this.options.find((i) => i.id === this.user.platform.account.selected.id)
+                    const match = this.options.find((i) => i.id === this.user.platform.account.placeholder.id)
                     if (match) Object.assign(this.selected, app.utils.copyObject(match))
                 }
                 this.v.$reset()

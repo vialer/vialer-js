@@ -16,13 +16,21 @@ module.exports = (app) => {
                 return classes
             },
             save: function(e) {
-                // Strip properties from the settings object that we don't
-                // want to update, because they are not part of a
-                // user-initiated setting.
-                let settings = app.utils.copyObject(this.settings)
-                delete settings.webrtc.account.options
-                // Disable dnd after a save to keep condition checks simple.
-                app.setState({availability: {dnd: false}, settings}, {persist: true})
+                // This event is used, so an external API may have some time
+                // to retrieve credentials. This way, we don't have to store
+                // full credentials of all accounts.
+                app.emit('bg:user:account_select', {
+                    accountId: this.settings.webrtc.account.selected.id,
+                    callback: ({account}) => {
+                        // Modify properties on the cloned settings object
+                        // before writing to the store.
+                        let settings = app.utils.copyObject(this.settings)
+                        delete settings.webrtc.account.options
+                        settings.webrtc.account.selected = account
+                        app.setState({availability: {dnd: false}, settings}, {persist: true})
+                        app.emit('bg:calls:connect')
+                    },
+                }, true)
 
                 // Update the vault settings.
                 app.setState({app: {vault: this.app.vault}}, {encrypt: false, persist: true})

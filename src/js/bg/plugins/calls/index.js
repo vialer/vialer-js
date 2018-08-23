@@ -110,6 +110,7 @@ class PluginCalls extends Plugin {
         */
         this.app.on('bg:calls:call_terminate', ({callId}) => this.calls[callId].terminate())
 
+        this.app.on('bg:calls:connect', ({}) => this.connect({register: this.app.state.settings.webrtc.enabled}))
         this.app.on('bg:calls:disconnect', ({reconnect}) => this.disconnect(reconnect))
 
         this.app.on('bg:calls:dtmf', ({callId, key}) => this.calls[callId].session.dtmf(key))
@@ -260,6 +261,7 @@ class PluginCalls extends Plugin {
         * ongoing will be silently terminated.
         */
         this.ua.on('invite', (session) => {
+            this.app.logger.debug(`${this}<event:invite>`)
             const callIds = Object.keys(this.calls)
             const callOngoing = this.app.helpers.callOngoing()
             const closingCalls = this.app.helpers.callsClosing()
@@ -298,7 +300,7 @@ class PluginCalls extends Plugin {
                 // An ongoing call may be a closing call. In that case we first
                 // remove all the closing calls before starting the new one.
                 for (const callId of closingCalls) {
-                    this.app.logger.info(`${this}deleting closing call ${callId}.`)
+                    this.app.logger.debug(`${this}deleting closing call ${callId}.`)
                     this.deleteCall(this.calls[callId])
                 }
             }
@@ -319,41 +321,42 @@ class PluginCalls extends Plugin {
 
 
         this.ua.on('registered', () => {
+            this.app.logger.debug(`${this}<event:registered>`)
             if (this.__registerPromise) {
                 this.__registerPromise.resolve()
                 delete this.__registerPromise
             }
             this.app.setState({calls: {status: null, ua: {status: 'registered'}}})
-            this.app.logger.info(`${this}registered at ${this._uaOptions.wsServers}`)
         })
 
 
         this.ua.on('registrationFailed', () => {
+            this.app.logger.debug(`${this}<event:registrationFailed>`)
             if (this.__registerPromise) {
                 this.__registerPromise.reject()
                 this.disconnect()
                 delete this.__registerPromise
             }
-            this.app.setState({calls: {status: null}})
+            this.app.setState({calls: {status: null, ua: {status: 'registration_failed'}}})
         })
 
 
         this.ua.on('unregistered', () => {
+            this.app.logger.debug(`${this}<event:unregistered>`)
             this.app.setState({calls: {ua: {status: this.ua.isConnected() ? 'connected' : 'disconnected'}}})
-            this.app.logger.debug(`${this}unregistered from ${this._uaOptions.wsServers}`)
         })
 
 
         this.ua.on('connected', () => {
+            this.app.logger.debug(`${this}<event:connected>`)
             this.app.setState({calls: {ua: {status: 'connected'}}})
-            this.app.logger.info(`${this}connected to ${this._uaOptions.wsServers}`)
             // Reset the retry interval timer..
             this.retry = Object.assign({}, this.retryDefault)
         })
 
 
         this.ua.on('disconnected', () => {
-            this.app.logger.debug(`${this}disconnected from ${this._uaOptions.wsServers}`)
+            this.app.logger.debug(`${this}<event:disconnected>`)
             this.app.setState({calls: {ua: {status: 'disconnected'}}})
             // // Don't use SIPJS simpler reconnect logic, which doesn't have
             // // jitter and an increasing timeout.
@@ -375,10 +378,6 @@ class PluginCalls extends Plugin {
                 }, this.retry.timeout)
                 this.retry = this.app.timer.increaseTimeout(this.retry)
             }
-        })
-
-        this.ua.on('registrationFailed', (reason) => {
-            this.app.setState({calls: {ua: {status: 'registration_failed'}}})
         })
     }
 
@@ -825,6 +824,7 @@ class PluginCalls extends Plugin {
     * @param {Boolean} reconnect - Whether try to reconnect.
     */
     disconnect(reconnect = true) {
+        this.app.logger.info(`${this}disconnecting from ${this._uaOptions.wsServers}`)
         this.reconnect = reconnect
         // Directly try to reconnect.
         if (reconnect) {
