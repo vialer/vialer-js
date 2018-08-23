@@ -53,12 +53,12 @@
 
 // A select field with a button attached next to it.
 .field-select {
-
     .control {
         .select {
             select {
                 border-bottom-right-radius: 0;
                 border-top-right-radius: 0;
+                width: 100%;
 
                 &:active,
                 &:focus {

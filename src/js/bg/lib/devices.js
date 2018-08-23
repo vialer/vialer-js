@@ -7,7 +7,7 @@ class Devices {
 
         this.app.on('bg:devices:verify-sinks', async({callback}) => {
             await this.verifySinks()
-            callback()
+            if (callback) callback()
         })
 
         // Detect changes in connected devices while running.
@@ -126,7 +126,6 @@ class Devices {
             // Mark the device invalid and mark whole validation as
             // invalid.
             if (!browserSinks.input.find((i) => i.id === sink.id) && !browserSinks.output.find((i) => i.id === sink.id)) {
-                this.app.logger.debug(`${this}sink '${sink.name}' is gone`)
                 storedDevice.valid = false
                 valid = false
             }
@@ -134,7 +133,7 @@ class Devices {
 
         storedDevices.ready = valid
         this.app.setState(storedDevices, {path: 'settings.webrtc.devices'})
-        this.app.logger.debug(`${this}audio sinks are valid: ${valid ? 'yes' : 'no'}`)
+        this.app.logger.debug(`${this}audio sink list is ${valid ? 'valid' : 'invalid'}`)
         return valid
     }
 
@@ -144,11 +143,12 @@ class Devices {
     * page when one of the sinks is incorrectly set.
     */
     async verifySinks() {
+        // Cached query; what currently is in store.
         this.cached = this.app.utils.copyObject({
             input: this.app.state.settings.webrtc.devices.input,
             output: this.app.state.settings.webrtc.devices.output,
         })
-
+        // Fresh query.
         const {input, output} = await this.query()
 
         if (!this.cached.input.length || !this.cached.output.length) {
@@ -157,32 +157,43 @@ class Devices {
             this.app.setState({settings: {webrtc: {devices: {input, output}}}}, {persist: true})
         } else {
             const sinkDiff = this.compareSinks({input, output})
-            if (sinkDiff.added.length) this.app.logger.debug(`${this}sink(s) added:\n${sinkDiff.added.map((i) => i.name).join('\n')}`)
-            if (sinkDiff.removed.length) this.app.logger.debug(`${this}sink(s) removed:\n${sinkDiff.removed.map((i) => i.name).join('\n')}`)
 
-            // Always notify about a newly connected device.
+            // Notify about newly connected devices.
             for (const device of sinkDiff.added) {
-                const message = this.app.$t('device "{name}" added.', {name: device.name})
-                this.app.notify({icon: 'info', message, type: 'info'})
+                const message = this.app.$t('added: "{name}"', {name: device.name})
+                // Also log this to Sentry.
+                this.app.logger.info(`${this}${message}`)
+                this.app.notify({icon: 'microphone', message, type: 'info'})
             }
 
             // There are options available; verify if the selected sinks are valid.
             if (this.validateSinks({input, output})) {
+                // Notify about devices that are *safely* removed from the devices list.
                 for (const device of sinkDiff.removed) {
-                    const message = this.app.$t('device "{name}" removed.', {name: device.name})
-                    this.app.notify({icon: 'warning', message, type: 'warning'})
+                    const message = this.app.$t('removed: "{name}"', {name: device.name})
+                    // Also log this to Sentry.
+                    this.app.logger.info(`${this}${message}`)
+                    this.app.notify({icon: 'microphone', message, type: 'info'})
                 }
                 // Only overwrite the device list when the current device
                 // is in the actual device list; so we can add a validation
                 // error on the non-existing device.
                 this.app.setState({settings: {webrtc: {devices: {input, output}}}}, {persist: true})
             } else {
-                for (const device of this.cached.input.filter((i) => !i.valid).concat(this.cached.output.filter((i) => !i.valid))) {
-                    const message = this.app.$t('device "{name}" is unavailable.', {name: device.name})
-                    this.app.notify({icon: 'warning', message, type: 'danger'})
+                const invalidInput = this.app.state.settings.webrtc.devices.input.filter((i) => !i.valid)
+                const invalidOutput = this.app.state.settings.webrtc.devices.output.filter((i) => !i.valid)
+
+                for (const device of invalidInput.concat(invalidOutput)) {
+                    const message = this.app.$t('unavailable: "{name}"', {name: device.name})
+                    this.app.notify({icon: 'microphone', message, type: 'warning'})
                 }
 
-                this.app.setState({ui: {layer: 'settings', tabs: {settings: {active: 'audio'}}}})
+                // Only steer the user to the settings page when WebRTC is
+                // already enabled; otherwise the whole audio tab should
+                // not be accessible at all.
+                if (this.app.state.settings.webrtc.enabled) {
+                    this.app.setState({ui: {layer: 'settings', tabs: {settings: {active: 'audio'}}}})
+                }
             }
         }
     }

@@ -61,20 +61,18 @@
             <select v-on:change="updateModel($event)" :id="name"
                 :name="name" :v-bind:value="model" :disabled="disabled || !options.length">
                 <option v-if="!options.length" value="" disabled selected class="cf">{{$t(empty)}}</option>
-                <option :selected="option[idfield] == model.id" :value="option[idfield]" v-for="option in options" v-else>
-                    <template v-if="option[idfield] === null && placeholder">{{placeholder.capitalize()}}</template>
-                    <template v-else-if="option.name">{{$t(option.name).capitalize()}}</template>
-                    <template v-else>{{$t(option.name)}}
-                    </template>
+                <option :value="null" v-else-if="placeholder">{{placeholder.capitalize()}}</option>
+
+                <option v-if="option.name" :selected="option[idfield] === model.id" :value="option[idfield]" v-for="option in options">
+                    {{$t(option.name).capitalize()}}
                 </option>
             </select>
         </div>
         <slot name="select-extra"></slot>
     </div>
     <em class="help cf" v-if="help">{{help}}</em>
-    <slot name="select-after"></slot>
-
     <span v-if="invalidFieldValue && validationMessage" class="validation-message is-danger" v-html="validationMessage"></span>
+    <slot name="select-after"></slot>
 </div>
 
 

@@ -164,7 +164,11 @@ module.exports = (app) => {
                     } else {
                         for (const option of this.options) {
                             if (String(option.id) === String(value)) {
-                                this.$emit('update:model', option)
+                                // Do not pass a reference or you may end up
+                                // in a situation that changing a field's
+                                // selected option, also changes the item in
+                                // the options Array.
+                                this.$emit('update:model', app.utils.copyObject(option))
                             }
                         }
                     }

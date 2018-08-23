@@ -39,6 +39,9 @@ module.exports = (app) => {
                 }
             },
         },
+        mounted: function() {
+            this.$v.$touch()
+        },
         render: templates.device_picker.r,
         staticRenderFns: templates.device_picker.s,
         store: {
@@ -71,7 +74,6 @@ module.exports = (app) => {
                                             message: sinkErrormessage,
                                             type: 'customValid',
                                         }, (valid, headsetInput) => {
-                                            if (!this.settings.webrtc.enabled) return true
                                             const storedDevice = this.devices.input.find((i) => i.id === headsetInput.id)
                                             if (storedDevice) return storedDevice.valid
                                             return true
@@ -84,7 +86,6 @@ module.exports = (app) => {
                                             message: sinkErrormessage,
                                             type: 'customValid',
                                         }, (valid, headsetOutput) => {
-                                            if (!this.settings.webrtc.enabled) return true
                                             const storedDevice = this.devices.output.find((i) => i.id === headsetOutput.id)
                                             if (storedDevice) return storedDevice.valid
                                             return false
@@ -97,7 +98,6 @@ module.exports = (app) => {
                                             message: sinkErrormessage,
                                             type: 'customValid',
                                         }, (valid, ringOutput) => {
-                                            if (!this.settings.webrtc.enabled) return true
                                             const storedDevice = this.devices.output.find((i) => i.id === ringOutput.id)
                                             if (storedDevice) return storedDevice.valid
                                             return true

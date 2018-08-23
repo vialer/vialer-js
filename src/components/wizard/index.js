@@ -5,7 +5,10 @@ module.exports = (app) => {
         return {
             methods: {
                 finishWizard: function() {
-                    app.setState({settings: {wizard: {completed: true}}}, {persist: true})
+                    app.setState({settings: {
+                        webrtc: {toggle: true},
+                        wizard: {completed: true},
+                    }}, {persist: true})
                     app.notify({icon: 'settings', message: this.$t('all set! We hope you enjoy the {name}.', {name: this.app.name}), type: 'info'})
                 },
                 stepBack: function() {

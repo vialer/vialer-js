@@ -327,19 +327,21 @@ function helpers(app) {
                                     message: '',
                                     type: 'customValid',
                                 }, () => {
-                                    if (!this.settings.webrtc.enabled) return true
-                                    const account = this.settings.webrtc.account.selected
-                                    if (account.id) {
-                                        if (account.settings && account.settings.avpf && account.settings.encryption) {
-                                            return true
+                                    if (!this.settings.webrtc.toggle) {
+                                        return true
+                                    } else {
+                                        const account = this.settings.webrtc.account.selected
+                                        if (account.id) {
+                                            if (account.settings && account.settings.avpf && account.settings.encryption) {
+                                                return true
+                                            }
                                         }
-                                        return false
                                     }
 
-                                    return true
+                                    return false
                                 }),
                                 requiredIf: v.requiredIf(() => {
-                                    return this.settings.webrtc.enabled
+                                    return this.settings.webrtc.toggle
                                 }),
                             },
                         },

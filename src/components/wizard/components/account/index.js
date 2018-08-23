@@ -16,14 +16,20 @@ module.exports = (app, shared) => {
         methods: Object.assign({
             chooseAccount: function() {
                 const selected = this.account.selected
-                app.setState({settings: {webrtc: {account: {selected}, toggle: true}}}, {persist: true})
-                this.stepNext()
+                app.setState({settings: {webrtc: {account: {status: 'loading'}}}})
+                // Calling the event to change the account directly, so we
+                // can hook into the callback to go to the next step.
+                app.emit('bg:user:account_select', {
+                    account: selected,
+                    callback: ({account}) => {
+                        app.setState({settings: {webrtc: {account: {status: null}}}})
+                        this.stepNext()
+                    },
+                })
             },
         }, shared().methods),
         mounted: function() {
-            // Reset validation, so it may not be triggered when
-            // the platform service retrieves account choices.
-            this.$v.$reset()
+            // Enable account selection in the frontend.
             app.state.settings.webrtc.toggle = true
         },
         render: templates.wizard_account.r,

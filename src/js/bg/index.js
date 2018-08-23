@@ -115,7 +115,7 @@ class AppBackground extends App {
     * @param {Boolean} contacts - Whether to subsribe to Contact Presence.
     */
     __initServices(callService = false) {
-        this.logger.info(`${this}init connectivity services (callservice: ${callService ? 'yes' : 'no'})`)
+        this.logger.info(`${this}init connectivity services (sip: ${callService ? 'yes' : 'no'})`)
         if (this.state.app.online) {
             if (callService) {
                 this.plugins.calls.connect({register: this.state.settings.webrtc.enabled})

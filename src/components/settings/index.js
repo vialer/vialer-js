@@ -27,6 +27,9 @@ module.exports = (app) => {
                 // Update the vault settings.
                 app.setState({app: {vault: this.app.vault}}, {encrypt: false, persist: true})
                 app.notify({icon: 'settings', message: app.$t('settings are updated.'), type: 'success'})
+
+                // Verify currently selected devices after saving settings again.
+                app.emit('bg:devices:verify-sinks')
             },
         }, app.helpers.sharedMethods()),
         mounted: async function() {
@@ -60,9 +63,9 @@ module.exports = (app) => {
                 },
             }
             // Add the validation that is shared with step_voipaccount, but
-            // only if the user is supposed to choose between voiapccount options.
+            // only if the user is supposed to choose between account options.
             if (this.user.platform.account.selection) {
-                validations.settings.webrtc = {account: app.helpers.sharedValidations.bind(this)().settings.webrtc.account}
+                validations.settings.webrtc.account = app.helpers.sharedValidations.bind(this)().settings.webrtc.account
             }
 
             return validations

@@ -187,35 +187,39 @@ class PluginSettings extends Plugin {
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: enabled, eventName: 'telemetry', override: true})
             },
             /**
-            * Deal with (de)selection of an account by connecting or disconnecting
-            * from the Calls endpoint when the involved data changes.
-            * The `toggle` flag is an intention to switch webrtc to
-            * `enabled` status.This is because the enabled flag represents
-            * the current mode of operation in the UI. We don't want to
-            * influence the UI while dealing with something like a
-            * webrtc-enabled switch.
-            * @param {String} newUsername - New selected account username.
-            * @param {String} oldUsername - Previous selected account username.
+            * Deal with (de)selection changes for an account when
+            * updating the Settings object. The updated selected
+            * account may not have all required fields yet. These are
+            * queried with the call to `bg:user:account_select`.
+            * @param {String} newId - New selected account account.
+            * @param {String} oldId - Previously selected account id.
             */
-            'store.settings.webrtc.account.selected.username': async(newUsername, oldUsername) => {
-                const toggle = this.app.state.settings.webrtc.toggle
-                if (toggle && !this.app.state.settings.webrtc.enabled) {
-                    await this.app.setState({settings: {webrtc: {enabled: true}}}, {persist: true})
+            'store.settings.webrtc.account.selected.id': async(newId, oldId) => {
+                const enabled = this.app.state.settings.webrtc.enabled
+
+                // Expects a fallback account to be set.
+                if (!newId) {
+                    this.app.plugins.calls.connect({register: false})
+                    return
                 }
 
-                if (newUsername) {
-                    this.app.logger.debug(`${this}account selection watcher: ${oldUsername} => ${newUsername}`)
-                    // Give the data store a chance to update.
-                    this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
-                } else {
-                    // Unset the selected account triggers an account reset.
-                    this.app.plugins.calls.disconnect(false)
-                    this.app.emit('bg:availability:account_reset', {}, true)
-                }
+                this.app.logger.debug(`${this}account id watcher: ${oldId} => ${newId}`)
+                // This event is used, so an external API may have some time
+                // to retrieve credentials. This way, we don't have to store
+                // full credentials of all accounts.
+                this.app.emit('bg:user:account_select', {
+                    account: {id: newId},
+                    callback: ({account}) => {
+                        // Only connect when WebRTC is enabled.
+                        if (enabled) {
+                            this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
+                        }
+                    },
+                }, true)
             },
             /**
             * The default value is true.
-            * @param {Boolean} enabled - Whether the permission is granted.
+            * @param {Boolean} enabled - Permission granted?
             */
             'store.settings.webrtc.media.permission': (enabled) => {
                 if (enabled) {
@@ -223,15 +227,23 @@ class PluginSettings extends Plugin {
                 }
             },
             /**
-            * There is a distinction between `webrtc.enabled` and `webrtc.toggle`.
-            * The `webrtc.toggle` is used to trigger enabling and disabling of
-            * WebRTC, while the `webrtc.enabled` flag is used to keep track of
-            * the application status, depending on the value of `webrtc.enabled`.
-            * @param {Boolean} toggle - Should WebRTC be enabled or not.
+            * The `toggle` flag is an intention to switch WebRTC on or off.
+            * The `enabled` flag is to mark the current operation modus.
+            * @param {Boolean} toggled - Whether WebRTC should be enabled or not.
             */
-            'store.settings.webrtc.toggle': (toggle) => {
-                // this.app.setState({settings: {webrtc: {enabled: toggle, toggle}}}, {persist: true})
-                if (!toggle) this.app.emit('bg:availability:account_reset', {}, true)
+            'store.settings.webrtc.toggle': async(toggled) => {
+                if (toggled) {
+                    // Mainly used in the wizard to set an account with WebRTC
+                    // turned off. At the end of the wizard WebRTC is turned on
+                    // and the connection is made.
+                    await this.app.setState({settings: {webrtc: {enabled: true}}}, {persist: true})
+                    this.app.logger.debug(`${this}webrtc switched on; connecting.`)
+                    this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
+                } else {
+                    const fallback = this.app.utils.copyObject(this.app.state.user.platform.account.fallback)
+                    this.app.logger.info(`${this}reset account to platform account ${fallback.username}`)
+                    await this.app.setState({settings: {webrtc: {account: {selected: fallback}, enabled: false}}}, {persist: true})
+                }
             },
         }
     }

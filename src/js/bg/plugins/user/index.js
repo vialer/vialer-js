@@ -22,6 +22,9 @@ class PluginUser extends Plugin {
         super(app)
 
         this.adapter = new UserAdapter(app)
+
+        this.app.on('bg:user:account_select', this.adapter._selectAccount.bind(this))
+
         // Other implementation may use other user identifiers than email,
         // that's why the main event uses `username` instead of `email`.
         this.app.on('bg:user:login', (...args) => {

@@ -757,7 +757,7 @@ class PluginCalls extends Plugin {
     */
     connect({account = {}, endpoint = null, register = true} = {}) {
         if (!account.username || !account.password || !account.uri) {
-            this.app.logger.debug(`${this}using account info from state`)
+            this.app.logger.debug(`${this}using account from selected state`)
             account = this.app.state.settings.webrtc.account.selected
         }
 
