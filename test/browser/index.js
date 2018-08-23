@@ -14,8 +14,11 @@ settings.BUILD_TARGET = 'webview'
 
 const brand = settings.brands[BRAND]
 
-// Allows to override the headless setting with an environment flag.
-const HEADLESS = process.env.HEADLESS ? true : brand.tests.headless
+// Allows overriding the headless setting with an environment flag.
+let HEADLESS
+if (process.env.HEADLESS) {
+    HEADLESS = process.env.HEADLESS === '1' ? true : false
+} else HEADLESS = brand.tests.headless
 
 Object.assign(brand.tests, {
     step: function(runner) {
@@ -40,17 +43,20 @@ if (process.env[`CI_USERNAME_ALICE_${BRAND.toUpperCase()}`]) {
     brand.tests.endpoint = process.env[`CI_ENDPOINT_${BRAND.toUpperCase()}`]
     brand.tests.alice.username = process.env[`CI_USERNAME_ALICE_${BRAND.toUpperCase()}`]
     brand.tests.alice.password = process.env[`CI_PASSWORD_ALICE_${BRAND.toUpperCase()}`]
+    brand.tests.alice.id = process.env[`CI_ID_ALICE_${BRAND.toUpperCase()}`]
     brand.tests.bob.username = process.env[`CI_USERNAME_BOB_${BRAND.toUpperCase()}`]
     brand.tests.bob.password = process.env[`CI_PASSWORD_BOB_${BRAND.toUpperCase()}`]
+    brand.tests.bob.id = process.env[`CI_ID_BOB_${BRAND.toUpperCase()}`]
 }
 
 
 /**
 * Each test user has its own browser.
 * @param {String} name - Name of the testrunner.
+* @param {Object} options - Options to pass to the runner.
 * @returns {Object} - Browser and pages.
 */
-async function createBrowser(name) {
+async function createBrowser(name, options) {
     let browser = await puppeteer.launch({
         args: [
             '--disable-notifications',
@@ -79,7 +85,6 @@ test('[browser] <alice> I am logging in.', async(t) => {
     let [browserAlice, browserBob] = await Promise.all([createBrowser('alice'), createBrowser('bob')])
     let alice = browserAlice.pages[0]
     let bob = browserBob.pages[0]
-
 
     alice.setViewport({height: 600, width: 500})
     bob.setViewport({height: 600, width: 500})

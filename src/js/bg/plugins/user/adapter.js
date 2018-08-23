@@ -38,9 +38,7 @@ class UserAdapter {
             user: {username},
         }, {encrypt: false, persist: true})
 
-        await this.app.setState({
-            user: userFields},
-        {persist: true})
+        await this.app.setState({user: userFields}, {persist: true})
     }
 
 

@@ -18,6 +18,8 @@ module.exports = function(settings) {
             // Wait for the select to be filled by the platform API call.
             await runner.waitFor('.component-wizard-account')
             await runner.waitFor('select option:not([disabled="disabled"])')
+
+            await runner.select('select', brand.tests[runner._name].id)
             if (screens) await runner.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(runner)}wizard-account.png`)})
             await runner.click('.test-wizard-account-next')
         }

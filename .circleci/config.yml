@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: v4-{{ checksum "package.json" }}
+          key: v5-{{ checksum "package.json" }}
 
       - run:
           command:

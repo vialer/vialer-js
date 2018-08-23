@@ -79,14 +79,17 @@
             },
             "tests": {
                 "alice": {
+                    "id": "",
                     "username": "",
                     "password": ""
                 },
                 "bob": {
+                    "id": "",
                     "username": "",
                     "password": ""
                 },
                 "charlie": {
+                    "id": "",
                     "username": "",
                     "password": ""
                 },
