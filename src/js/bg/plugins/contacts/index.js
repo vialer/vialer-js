@@ -35,6 +35,11 @@ class PluginContacts extends Plugin {
             this.contacts = {}
             this.app.setState({}, {action: 'replace', path: 'contacts.contacts'})
         })
+
+        // Start subscribing to presence info after being registered.
+        this.app.on('calls:connected', () => {
+            this.subscribeContacts()
+        })
     }
 
 
@@ -101,11 +106,17 @@ class PluginContacts extends Plugin {
     }
 
 
-    _watchers() {
-        return {
-            'store.settings.wizard.completed': (completed) => {
-                if (completed) this.subscribe()
-            },
+    /**
+    * Reset the state of a contact endpoint before
+    * updating it.
+    */
+    resetEndpointsStatus() {
+        for (const contact of Object.values(this.contacts)) {
+            for (const endpoint of Object.values(contact.endpoints)) {
+                if (endpoint.presence) {
+                    endpoint.setState({status: 'unavailable'})
+                }
+            }
         }
     }
 
@@ -115,16 +126,14 @@ class PluginContacts extends Plugin {
     * is completed until going to the next. This prevents the platform
     * server from being hammered.
     */
-    async subscribe() {
-        const contacts = Object.keys(this.contacts)
-        this.app.logger.info(`${this}<platform> presence updates from ${contacts.length} contacts`)
-        for (let contactId of contacts) {
-            const contact = this.contacts[contactId]
+    async subscribeContacts() {
+        this.resetEndpointsStatus()
+        this.app.logger.info(`${this}updating contact endpoint presence status`)
+        for (const contact of Object.values(this.contacts)) {
             if (contact && ['registered', 'connected'].includes(this.app.state.calls.ua.status)) {
-                const endpoints = this.contacts[contactId].endpoints
-                for (let endpointId of Object.keys(endpoints)) {
-                    if (endpoints[endpointId].presence) {
-                        await endpoints[endpointId].presence.subscribe()
+                for (const endpoint of Object.values(contact.endpoints)) {
+                    if (endpoint.presence) {
+                        await endpoint.presence.subscribe()
                     }
                 }
             }

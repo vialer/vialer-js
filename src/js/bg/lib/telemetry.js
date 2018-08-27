@@ -13,7 +13,7 @@ class Telemetry {
         this.app = app
         this.settings = this.app.state.settings.telemetry
 
-        this.settings.clientId = this.getClientId()
+        this.settings.analyticsClientId = this.getAnalyticsClientId()
         this.telemetryServer = 'https://www.google-analytics.com/r/collect'
         // Allow sending events from the foreground.
         this.app.on('bg:telemetry:event', ({eventName, eventAction, eventLabel, override}) => {
@@ -54,17 +54,17 @@ class Telemetry {
     * it to/from localStorage.
     * @returns {String} - A persistent client ID.
     */
-    getClientId() {
-        if (!this.settings.clientId) {
+    getAnalyticsClientId() {
+        if (!this.settings.analyticsClientId) {
             var d = new Date().getTime()
-            this.settings.clientId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            this.settings.analyticsClientId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
                 var r = (d + Math.random() * 16) % 16 | 0
                 d = Math.floor(d / 16)
                 return (c=='x' ? r : (r&0x3|0x8)).toString(16)
             })
         }
 
-        return this.settings.clientId
+        return this.settings.analyticsClientId
     }
 
 

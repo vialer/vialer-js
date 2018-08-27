@@ -1,5 +1,5 @@
 // sass-lint:disable no-important
-
+//
 @import "lib/variables";
 @import "lib/fonts";
 
@@ -29,19 +29,19 @@
                     background-image: url("../img/click-to-dial.png") !important;
                     background-position: center center !important;
                     background-repeat: no-repeat !important;
-                    border-radius: 9px !important;
+                    background-size: contain;
+                    border-radius: $spacer !important;
                     box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2) !important;
                     box-sizing: border-box !important;
                     display: inline-block !important;
                     font-size: $spacer !important;
-                    height: 18px !important;
-                    line-height: 18px !important;
-                    margin: 0 4px !important;
-                    margin-top: -2px !important;
+                    height: 1rem !important;
+                    line-height: 1rem !important;
+                    margin-left: $spacer / 2 !important;
                     padding: 0 !important;
                     text-align: right !important;
                     transition: all 300ms ease !important;
-                    width: 18px !important;
+                    width: 1rem !important;
 
                     // The label class toggles the data-content label.
                     &.ctd-label {
@@ -78,6 +78,4 @@
             }
         }
     }
-
-
 }

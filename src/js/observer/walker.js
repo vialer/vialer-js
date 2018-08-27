@@ -71,7 +71,7 @@ class Walker {
         else {
             // check for attributes on *parents*
             const closestRoleElement = element.closest('[role]')
-            const closestIsBlockedRole = (closestRoleElement && closestRoleElement.toLowerCase() in this.blockedRoles)
+            const closestIsBlockedRole = (closestRoleElement && closestRoleElement.nodeName.toLowerCase() in this.blockedRoles)
             const closestAriaLabelledBy = element.closest('[aria-labelledby]')
             const closestContentEditable = element.closest('[contenteditable]')
             if (closestContentEditable || closestAriaLabelledBy || closestIsBlockedRole) return true

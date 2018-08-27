@@ -134,7 +134,7 @@ class Call {
             if (devices.speaker.enabled) outputSink = devices.sinks.speakerOutput.id
             else outputSink = devices.sinks.headsetOutput.id
 
-            this.app.logger.info(`${this}call video element on sink ${outputSink}`)
+            this.app.logger.debug(`${this}change sink of remote video element to ${outputSink}`)
             await this.app.media.remoteVideo.setSinkId(outputSink)
         } catch (err) {
             const message = this.app.$t('failed to set input or output device.')
@@ -158,8 +158,8 @@ class Call {
         }
 
         if (!this.silent) {
-            // Always set this call to be the active call as soon a new
-            // connection has been made.
+            // Always set this call to be the active call as soon
+            // a new connection has been made.
             this.module.activateCall(this, true)
             let message = ''
             if (displayName) message = `${this.state.number}: ${displayName}`

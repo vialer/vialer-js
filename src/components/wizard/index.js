@@ -32,7 +32,7 @@ module.exports = (app) => {
     const Wizard = {
         computed: app.helpers.sharedComputed(),
         created: function() {
-            if (!this.user.platform.account.selection) {
+            if (!this.settings.webrtc.account.selection) {
                 app.setState({
                     settings: {
                         webrtc: {enabled: true, toggle: true},

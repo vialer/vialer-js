@@ -255,6 +255,39 @@ class PluginCalls extends Plugin {
     * Deal with events coming from a UA.
     */
     __uaEvents() {
+        this.ua.on('connected', () => {
+            this.app.logger.debug(`${this}<event:connected>`)
+            this.app.setState({calls: {ua: {status: 'connected'}}})
+            // Reset the retry interval timer..
+            this.retry = Object.assign({}, this.retryDefault)
+            this.app.emit('calls:connected', {}, true)
+        })
+
+
+        this.ua.on('disconnected', () => {
+            this.app.logger.debug(`${this}<event:disconnected>`)
+            this.app.setState({calls: {ua: {status: 'disconnected'}}})
+            // // Don't use SIPJS simpler reconnect logic, which doesn't have
+            // // jitter and an increasing timeout.
+            this.ua.stop()
+
+            if (this.app.state.user.authenticated) {
+                this.app.setState({calls: {ua: {status: 'disconnected'}}})
+            } else {
+                this.app.setState({calls: {ua: {status: 'inactive'}}})
+                this.retry = Object.assign({}, this.retryDefault)
+                this.reconnect = false
+            }
+
+            if (this.reconnect) {
+                // Reconnection timer logic is performed only here.
+                this.app.logger.debug(`${this}reconnecting to ${this._uaOptions.wsServers} in ${this.retry.timeout} ms`)
+                setTimeout(() => {
+                    this.connect({register: this.app.state.settings.webrtc.enabled})
+                }, this.retry.timeout)
+                this.retry = this.app.timer.increaseTimeout(this.retry)
+            }
+        })
         /**
         * An incoming call. Call-waiting is not implemented.
         * A new incoming call on top of a call that is already
@@ -327,6 +360,7 @@ class PluginCalls extends Plugin {
                 delete this.__registerPromise
             }
             this.app.setState({calls: {status: null, ua: {status: 'registered'}}})
+            this.app.emit('calls:registered', {}, true)
         })
 
 
@@ -344,40 +378,6 @@ class PluginCalls extends Plugin {
         this.ua.on('unregistered', () => {
             this.app.logger.debug(`${this}<event:unregistered>`)
             this.app.setState({calls: {ua: {status: this.ua.isConnected() ? 'connected' : 'disconnected'}}})
-        })
-
-
-        this.ua.on('connected', () => {
-            this.app.logger.debug(`${this}<event:connected>`)
-            this.app.setState({calls: {ua: {status: 'connected'}}})
-            // Reset the retry interval timer..
-            this.retry = Object.assign({}, this.retryDefault)
-        })
-
-
-        this.ua.on('disconnected', () => {
-            this.app.logger.debug(`${this}<event:disconnected>`)
-            this.app.setState({calls: {ua: {status: 'disconnected'}}})
-            // // Don't use SIPJS simpler reconnect logic, which doesn't have
-            // // jitter and an increasing timeout.
-            this.ua.stop()
-
-            if (this.app.state.user.authenticated) {
-                this.app.setState({calls: {ua: {status: 'disconnected'}}})
-            } else {
-                this.app.setState({calls: {ua: {status: 'inactive'}}})
-                this.retry = Object.assign({}, this.retryDefault)
-                this.reconnect = false
-            }
-
-            if (this.reconnect) {
-                // Reconnection timer logic is performed only here.
-                this.app.logger.debug(`${this}reconnecting to ${this._uaOptions.wsServers} in ${this.retry.timeout} ms`)
-                setTimeout(() => {
-                    this.connect({register: this.app.state.settings.webrtc.enabled})
-                }, this.retry.timeout)
-                this.retry = this.app.timer.increaseTimeout(this.retry)
-            }
         })
     }
 
@@ -762,7 +762,7 @@ class PluginCalls extends Plugin {
 
         // Reconnect when already connected.
         if (this.ua && this.ua.isConnected()) {
-            this.app.logger.debug(`${this}closing existing connection`)
+            this.app.logger.debug(`${this}already connected; reconnecting`)
             this.disconnect(true)
             return
         }
@@ -824,7 +824,7 @@ class PluginCalls extends Plugin {
     * @param {Boolean} reconnect - Whether try to reconnect.
     */
     disconnect(reconnect = true) {
-        this.app.logger.info(`${this}disconnecting from ${this._uaOptions.wsServers}`)
+        this.app.logger.info(`${this}disconnecting from ${this._uaOptions.wsServers} (reconnect: ${reconnect ? 'yes': 'no'})`)
         this.reconnect = reconnect
         // Directly try to reconnect.
         if (reconnect) {

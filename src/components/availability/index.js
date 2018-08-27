@@ -11,7 +11,7 @@ module.exports = (app, actions) => {
                 * to have a component called `AvailabilityPostfix`.
                 */
                 addons: app.plugins.availability.addons.map((addon) => {
-                    return addon.constructor.name.replace('Plugin', '')
+                    return addon.name
                 }),
             }
         },

@@ -235,3 +235,13 @@ ol {
         }
     }
 }
+
+// Small helper classes to apply proper capitalizing without polluting translations.
+.lc {text-transform: lowercase;}
+.uc {text-transform: uppercase;}
+.ca {text-transform: capitalize;}
+
+.cf {
+    display: inline-block;
+    &::first-letter {text-transform: uppercase;}
+}

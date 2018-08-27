@@ -11,7 +11,6 @@
                 <div class="success-message cf">
                     <i class="icon check"><icon name="check"/></i>
                     <span class="cf">{{$t('the microphone can be used.')}}</span><br/>
-                    <span v-if="env.isExtension"><em>chrome://settings/content/microphone</em></span>
                 </div>
             </div>
         </div>

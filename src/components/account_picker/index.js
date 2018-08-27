@@ -5,7 +5,7 @@ module.exports = (app) => {
     const AccountPicker = {
         computed: Object.assign({
             validationField: function() {
-                if (this.status === 'loading') return null
+                if (this.account.status === 'loading') return null
                 return this.v.settings.webrtc.account.selected.id
             },
         }, app.helpers.sharedComputed()),
@@ -17,7 +17,7 @@ module.exports = (app) => {
             },
         }, app.helpers.sharedMethods()),
         mounted: function() {
-            if (this.status === 'loading') {
+            if (this.account.status === 'loading') {
                 // Still loading; let the account status watcher
                 // trigger first validation.
                 this._holdFirstValidation = true
@@ -34,15 +34,9 @@ module.exports = (app) => {
         render: templates.account_picker.r,
         staticRenderFns: templates.account_picker.s,
         store: {
-            app: 'app',
-            options: 'settings.webrtc.account.options',
-            selected: 'settings.webrtc.account.selected',
+            account: 'settings.webrtc.account',
             settings: 'settings',
-            status: 'settings.webrtc.account.status',
             toggle: 'settings.webrtc.toggle',
-            user: 'user',
-            vendor: 'app.vendor',
-            voip: 'availability.voip',
         },
         watch: {
             /**
@@ -51,10 +45,10 @@ module.exports = (app) => {
             * have different properties.
             * @param {Array} options - Reactive array with VoIP account options.
             */
-            options: function(options) {
-                if (this.selected.id && options.length) {
-                    const match = options.find((i) => i.id === this.selected.id)
-                    if (match) Object.assign(this.selected, app.utils.copyObject(match))
+            'account.options': function(options) {
+                if (this.account.selected.id && options.length) {
+                    const match = options.find((i) => i.id === this.account.selected.id)
+                    if (match) Object.assign(this.account.selected, app.utils.copyObject(match))
                 }
 
                 this.v.$touch()
@@ -67,7 +61,7 @@ module.exports = (app) => {
             * takes a bit long.
             * @param {String|null} newStatus - The new status of the account loader.
             */
-            status: function(newStatus) {
+            'account.status': function(newStatus) {
                 if (this._holdFirstValidation && !newStatus) {
                     this.v.$reset()
                     this._holdFirstValidation = false
@@ -80,8 +74,8 @@ module.exports = (app) => {
             */
             toggle: function(newToggle) {
                 if (newToggle) {
-                    const match = this.options.find((i) => i.id === this.user.platform.account.placeholder.id)
-                    if (match) Object.assign(this.selected, app.utils.copyObject(match))
+                    const match = this.account.options.find((i) => i.id === this.account.placeholder.id)
+                    if (match) Object.assign(this.account.selected, app.utils.copyObject(match))
                 }
                 this.v.$reset()
             },

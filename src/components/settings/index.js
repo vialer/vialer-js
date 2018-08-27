@@ -19,18 +19,20 @@ module.exports = (app) => {
                 // This event is used, so an external API may have some time
                 // to retrieve credentials. This way, we don't have to store
                 // full credentials of all accounts.
+                let accountId = null
+                if (this.settings.webrtc.toggle) accountId = this.settings.webrtc.account.selected.id
                 app.emit('bg:user:account_select', {
-                    accountId: this.settings.webrtc.account.selected.id,
+                    accountId,
                     callback: ({account}) => {
                         // Modify properties on the cloned settings object
                         // before writing to the store.
                         let settings = app.utils.copyObject(this.settings)
                         delete settings.webrtc.account.options
-                        settings.webrtc.account.selected = account
+                        delete settings.webrtc.account.selected
                         app.setState({availability: {dnd: false}, settings}, {persist: true})
                         app.emit('bg:calls:connect')
                     },
-                }, true)
+                }, 'both')
 
                 // Update the vault settings.
                 app.setState({app: {vault: this.app.vault}}, {encrypt: false, persist: true})
@@ -72,7 +74,7 @@ module.exports = (app) => {
             }
             // Add the validation that is shared with step_voipaccount, but
             // only if the user is supposed to choose between account options.
-            if (this.user.platform.account.selection) {
+            if (this.settings.webrtc.account.selection) {
                 validations.settings.webrtc.account = app.helpers.sharedValidations.bind(this)().settings.webrtc.account
             }
 

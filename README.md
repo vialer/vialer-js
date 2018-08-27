@@ -52,12 +52,14 @@ communicate p2p with their friends over a decentralized signalling network.
 
 ## Platform reach
 Vialer-js is a readable environment-agnostic ES2017 codebase that uses a simple
-but powerful reactive data-oriented design. This allows Vialer-js to run
-on a range of platforms with a suitable JavaScript runtime. At the moment,
-our priority is to first to offer a Blink-compatible WebExtension, followed
-by an Electron desktop app, headless Node.js support, using custom website
-widgets and we would like to investigate whether an Android mobile WebView
-would be a suitable medium for a mobile application.
+but powerful reactive data-oriented design. This allows it to run on several
+suitable JavaScript runtimes. At the moment, this includes:
+* Blink-compatible WebExtension browsers (Opera, Chrome, Chromium)
+* Electron desktop app
+
+Headless Node.js support is implemented partially, to be able to run
+unit tests without having to mock data. Calling from Node.js is not supported
+yet though. 
 
 
 ## Want to learn more?

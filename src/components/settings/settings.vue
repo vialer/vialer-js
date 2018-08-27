@@ -38,14 +38,14 @@
             :model.sync="settings.click2dial.blacklist"
             :placeholder="$t('use one line per site.')"/>
 
-        <Field v-if="user.developer && settings.platform.enabled" name="platform_url" type="text"
+        <Field v-if="user.developer" name="platform_url" type="text"
             :label="$t('platform URL')"
             :model.sync="settings.platform.url"
             :help="$t('this URL is used to communicate with the platform API; don\'t change it unless you know what you\'re doing.')"
             :validation="$v.settings.platform.url"
             placeholder="https://"/>
 
-        <Field v-if="user.developer || !settings.platform.enabled" name="sip_endpoint" type="text"
+        <Field v-if="user.developer" name="sip_endpoint" type="text"
             :label="$t('webRTC endpoint')"
             :model.sync="settings.webrtc.endpoint.uri"
             :help="$t('domainname of the SIP server with websocket support.')"
@@ -77,7 +77,7 @@
             :model.sync="settings.webrtc.toggle"
             :help="env.isFirefox ? $t('firefox doesn\'t support this feature yet.') : $t('use WebRTC to receive incoming calls with and place outgoing calls.')"/>
 
-        <AccountPicker :label="$t('softphone VoIP account')" :v="$v" v-if="user.platform.account.selection"/>
+        <AccountPicker :label="$t('softphone VoIP account')" :v="$v" v-if="settings.webrtc.account.selection"/>
     </div>
 
     <!-- Audio settings -->

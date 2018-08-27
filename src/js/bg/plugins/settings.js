@@ -45,7 +45,6 @@ class PluginSettings extends Plugin {
                 selected: {id: null, name: null},
             },
             platform: {
-                enabled: true,
                 url: process.env.PLATFORM_URL,
             },
             ringtones: {
@@ -55,15 +54,28 @@ class PluginSettings extends Plugin {
                 selected: {id: 1, name: 'default.ogg'},
             },
             telemetry: {
+                analyticsClientId: null,
                 analyticsId: process.env.ANALYTICS_ID,
-                clientId: null,
                 enabled: false,
                 sentryDsn: process.env.SENTRY_DSN,
             },
             webrtc: {
                 account: {
-                    options: [], // Platform integration provides options.
+                    // Account to use when no account is selected at all.
+                    fallback: {
+                        id: null,
+                        password: null,
+                        username: null,
+                    },
+                    // <Platform> may provide account options.
+                    options: [],
+                    // Remembers the last selected option.
+                    placeholder: {
+                        id: null,
+                    },
                     selected: {id: null, password: null, uri: null, username: null},
+                    // Whether user can select <platform> accounts from options.
+                    selection: true,
                     status: null,
                 },
                 codecs: {
@@ -121,7 +133,7 @@ class PluginSettings extends Plugin {
         }
 
         // The selection flag determines whether the UI should include endpoint selection.
-        state.webrtc.endpoint.selection = Boolean(state.webrtc.endpoint.uri)
+        state.webrtc.account.selection = Boolean(state.webrtc.endpoint.uri)
         return state
     }
 
@@ -193,25 +205,6 @@ class PluginSettings extends Plugin {
             'store.settings.webrtc.media.permission': (enabled) => {
                 if (enabled) {
                     this.app.devices.verifySinks()
-                }
-            },
-            /**
-            * The `toggle` flag is an intention to switch WebRTC on or off.
-            * The `enabled` flag is to mark the current operation modus.
-            * @param {Boolean} toggled - Whether WebRTC should be enabled or not.
-            */
-            'store.settings.webrtc.toggle': async(toggled) => {
-                if (toggled) {
-                    // Mainly used in the wizard to set an account with WebRTC
-                    // turned off. At the end of the wizard WebRTC is turned on
-                    // and the connection is made.
-                    await this.app.setState({settings: {webrtc: {enabled: true}}}, {persist: true})
-                    this.app.logger.debug(`${this}webrtc switched on; connecting.`)
-                    // this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
-                } else {
-                    const fallback = this.app.utils.copyObject(this.app.state.user.platform.account.fallback)
-                    this.app.logger.info(`${this}reset account to platform account ${fallback.username}`)
-                    await this.app.setState({settings: {webrtc: {account: {selected: fallback}, enabled: false}}}, {persist: true})
                 }
             },
         }
