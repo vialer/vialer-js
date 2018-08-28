@@ -123,8 +123,9 @@ test('[browser] <alice> I am logging in.', async(t) => {
 
         // Open a second tab and get another tab ready.
         test('[browser] <alice> I am calling bob.', async(__t) => {
+            // Wait until the status indicates a registered device.
+            await alice.waitFor('.test-status-registered')
             // Enter a number and press the call button.
-            await alice.waitFor('.component-call-keypad')
             await alice.click('.component-call-keypad .test-key-2')
             await alice.click('.component-call-keypad .test-key-2')
             await alice.click('.component-call-keypad .test-key-9')

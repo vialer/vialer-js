@@ -12,7 +12,7 @@
             <icon class="error" name="mute" v-else-if="!settings.webrtc.devices.ready"/>
             <icon class="error" name="softphone" v-else-if="ua.status !== 'registered'"/>
             <icon class="warning" name="dnd" v-else-if="dnd"/>
-            <icon class="ok" name="softphone" v-else-if="ua.status === 'registered'"/>
+            <icon class="ok test-status-registered" name="softphone" v-else-if="ua.status === 'registered'"/>
         </span>
 
         <span class="username">{{user.username}}</span>
