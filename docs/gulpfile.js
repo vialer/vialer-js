@@ -112,13 +112,11 @@ gulp.task('screenshots', 'Generate userstory screenshots.', (done) => {
 
 gulp.task('pages', 'Generate topics JSON.', async(done) => {
     const description = JSON.parse((await fs.readFile('src/topics/topics.json')))
-    const readme = (await fs.readFile(path.join(settings.ROOT_DIR, 'README.md'))).toString('utf8')
 
     let files = await Promise.all(
-        description.topics.map((topic) => fs.readFile(`src/topics/${topic.name}.md`))
+        description.topics.map((topic) => fs.readFile(`src/topics/${topic.name}.vue`))
     )
     let data = {
-        readme,
         topics: [],
     }
 
@@ -169,13 +167,11 @@ gulp.task('watch', 'Run developer watch modus.', () => {
         `!${path.join(settings.SRC_DIR, 'js', 'vendor.js')}`,
     ], ['js-app'])
 
-
     gulp.watch([path.join(settings.SRC_DIR, 'js', 'vendor.js')], ['js-vendor'])
     gulp.watch(path.join(settings.SRC_DIR, 'scss', 'vendor.scss'), ['scss-vendor'])
     gulp.watch([
-        path.join(settings.ROOT_DIR, 'README.md'),
         path.join(settings.SRC_DIR, 'topics', 'topics.json'),
-        path.join(settings.SRC_DIR, 'topics', '*.md'),
+        path.join(settings.SRC_DIR, 'topics', '*.vue'),
     ], ['pages'])
     gulp.watch([path.join(settings.SRC_DIR, 'components', '**', '*.vue')], ['templates'])
 })

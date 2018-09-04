@@ -27,6 +27,8 @@ class AppDocs extends App {
             this.components[name] = Vue.component(name, components[name](this))
         }
 
+        Vue.component('VRuntimeTemplate', require('v-runtime-template/dist/v-runtime-template.cjs'))
+
         this.__initStore({
             pages: global.pages,
             vendor: {

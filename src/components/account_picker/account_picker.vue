@@ -1,12 +1,12 @@
 <component class="component-account-picker">
 
-    <Field name="webrtc_account" type="select"
+    <Field name="webrtc_account" type="select-search"
         :disabled="!settings.webrtc.toggle"
         :empty="(account.status === 'loading') ? `${$t('loading accounts').capitalize()}...` : $t('no accounts').capitalize()"
-        :help="$t('voIP account that can be used by the softphone.')"
+        :help="$t('account that will be used to call with.')"
         :label="label" :model.sync="account.selected"
         :options="account.options"
-        :placeholder="`${$t('please select an account')}...`"
+        :placeholder="`${$t('no account selected')}...`"
         :validation="validationField">
 
         <button slot="select-extra" class="button is-link"

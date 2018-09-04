@@ -5,15 +5,17 @@
             <li :class="classes('tabs', 'general')" @click="setTab('settings', 'general')">
                 <a><span class="icon is-small"><icon name="user"/></span><span class="cf">{{$t('general')}}</span></a>
             </li>
-            <li :class="classes('tabs', 'privacy')" @click="setTab('settings', 'privacy')">
-                <a><span class="icon is-small"><icon name="lock-on"/></span><span class="cf">{{$t('privacy')}}</span></a>
-            </li>
+
             <li :class="classes('tabs', 'phone')" @click="setTab('settings', 'phone')">
                 <a><span class="icon is-small"><icon name="phone"/></span><span class="cf">{{$t('calling')}}</span></a>
             </li>
-            <li :class="classes('tabs', 'audio')" @click="setTab('settings', 'audio', settings.webrtc.enabled)">
-                <a><span class="icon is-small"><icon name="microphone"/></span><span>Audio</span></a>
+            <li :class="classes('tabs', 'devices')" @click="setTab('settings', 'devices', settings.webrtc.enabled)">
+                <a><span class="icon is-small"><icon name="microphone"/></span><span class="cf">{{$t('devices')}}</span></a>
             </li>
+            <li :class="classes('tabs', 'privacy')" @click="setTab('settings', 'privacy')">
+                <a><span class="icon is-small"><icon name="lock-on"/></span><span class="cf">{{$t('privacy')}}</span></a>
+            </li>
+
         </ul>
     </div>
 
@@ -53,6 +55,32 @@
             :validation="$v.settings.webrtc.endpoint.uri"/>
     </div>
 
+    <!-- Phone preferences -->
+    <div class="tab tab-phone" :class="{'is-active': tabs.active === 'phone'}">
+
+        <Field name="webrtc_enabled" type="checkbox"
+            :disabled="env.isFirefox"
+            :label="$t('use as softphone')"
+            :model.sync="settings.webrtc.toggle"
+            :help="env.isFirefox ? $t('firefox doesn\'t support this feature yet.') : $t('use WebRTC to receive incoming calls with and place outgoing calls.')"/>
+
+        <AccountPicker :label="$t('softphone account')" :v="$v" v-if="settings.webrtc.account.selection"/>
+
+        <Field name="audio_post_processing" type="select"
+            :disabled="!settings.webrtc.toggle"
+            :help="$t('use WebRTC audio post-processor for: echo cancelling, audio mirroring, auto-gain control, high-pass filter, noise suppression and typing noise detection.')"
+            :label="$t('audio post-processing')"
+            :model.sync="settings.webrtc.media.type.selected"
+            :options="settings.webrtc.media.type.options"/>
+
+    </div>
+
+    <!-- Device settings -->
+    <div class="tab" :class="{'is-active': tabs.active === 'devices'}">
+        <DevicePicker v-if="settings.webrtc.media.permission"/>
+        <MicPermission v-else/>
+    </div>
+
     <!-- Privacy settings -->
     <div class="tab" :class="{'is-active': tabs.active === 'privacy'}">
 
@@ -65,27 +93,7 @@
         <Field name="telemetry_enabled" type="checkbox"
             :label="$t('telemetry')"
             :model.sync="settings.telemetry.enabled"
-            :help="$t('we solely collect anonymized data about usage statistics and application errors with the purpose to improve the {name} more efficiently.', {name: app.name})"/>
-    </div>
-
-    <!-- Phone preferences -->
-    <div class="tab" :class="{'is-active': tabs.active === 'phone'}">
-
-        <Field name="webrtc_enabled" type="checkbox"
-            :disabled="env.isFirefox"
-            :label="$t('use as softphone')"
-            :model.sync="settings.webrtc.toggle"
-            :help="env.isFirefox ? $t('firefox doesn\'t support this feature yet.') : $t('use WebRTC to receive incoming calls with and place outgoing calls.')"/>
-
-        <AccountPicker :label="$t('softphone VoIP account')" :v="$v" v-if="settings.webrtc.account.selection"/>
-    </div>
-
-    <!-- Audio settings -->
-    <div class="tab" :class="{'is-active': tabs.active === 'audio'}">
-        <DevicePicker v-if="settings.webrtc.media.permission"/>
-        <div v-else>
-            <MicPermission/>
-        </div>
+            :help="$t('we are able to improve the {name} faster, when you allow us to process anonymized data about usage statistics and application errors for analysis.', {name: app.name})"/>
     </div>
 
     <div class="tabs-actions field is-grouped">

@@ -1,5 +1,3 @@
-global.Vue = require('vue/dist/vue.runtime')
-
 Vue.config.ignoredElements = ['component']
 
 global.VueSVGIcon = require('vue-svgicon')

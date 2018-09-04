@@ -4,6 +4,21 @@ module.exports = (app) => {
     */
     const Field = {
         computed: {
+            filteredOptions: function(event) {
+                let filteredOptions = []
+
+                for (const option of this.options) {
+                    // Case insensitive search.
+                    if (option.name.toLowerCase().includes(this.searchQuery.toLowerCase())) {
+                        filteredOptions.push(option)
+                    }
+                }
+                return filteredOptions
+            },
+            hasButton: function() {
+                if (!this.$slots['select-extra']) return false
+                return Boolean(this.$slots['select-extra'].length)
+            },
             /**
              * Validation flag being used to conditionally render
              * validation-helper styling.
@@ -94,6 +109,17 @@ module.exports = (app) => {
             if (this.type === 'password') {
                 data.visible = false
             }
+
+            if (this.type === 'select-search') {
+                // Input value that is used to filter the options with.
+                data.searchQuery = ''
+                // Placeholder on the input that marks the current selected item.
+                data.searchPlaceholder = ''
+                // Toggle search filter options.
+                data.searchVisible = false
+                // The item that is going to be selected (not the actual model).
+                data.searchSelected = this.model
+            }
             return data
         },
         methods: {
@@ -104,7 +130,11 @@ module.exports = (app) => {
                     if (this.invalidFieldValue) classes['is-danger'] = true
                 } else if (block === 'select') {
                     classes.select = true
+                    classes['has-button'] = this.hasButton
                     if (this.invalidFieldValue) classes['is-danger'] = true
+                } else if (block === 'select-search') {
+                    classes['has-button'] = this.hasButton
+                    classes['select-search'] = true
                 } else if (block === 'label') {
                     // Field has no validation at all.
                     if (this.validation) {
@@ -130,6 +160,60 @@ module.exports = (app) => {
                     }
                 }
                 return emptyOption
+            },
+            searchSelect(event, option, keyModifier, updateModel) {
+                let selectedOption = null
+                if (option) {
+                    // Option click select.
+                    selectedOption = option
+                } else if (keyModifier) {
+                    // Navigational select.
+                    if (keyModifier === 'enter') {
+                        if (!this.searchSelected.id) selectedOption = this.filteredOptions[0]
+                        else {
+                            selectedOption = this.searchSelected
+                        }
+                    } else if (['up', 'down', 'page-down', 'page-up'].includes(keyModifier)) {
+                        if (!this.searchSelected.id) selectedOption = this.filteredOptions[0]
+                        else {
+                            const itemIndex = this.filteredOptions.findIndex((i) => i.id === this.searchSelected.id)
+                            if (keyModifier === 'down' && this.filteredOptions.length > itemIndex) {
+                                selectedOption = this.filteredOptions[itemIndex + 1]
+                            } else if (keyModifier === 'up' && itemIndex > 0) {
+                                selectedOption = this.filteredOptions[itemIndex - 1]
+                            } else if (keyModifier === 'page-down') {
+                                if (this.filteredOptions.length >= itemIndex + 5) {
+                                    selectedOption = this.filteredOptions[itemIndex + 5]
+                                }
+                            } else if (keyModifier === 'page-up') {
+                                if (this.filteredOptions.length >= itemIndex - 5 && (itemIndex - 5) >= 0) {
+                                    selectedOption = this.filteredOptions[itemIndex - 5]
+                                }
+                            }
+                        }
+                    } else if (keyModifier === 'query') {
+                        selectedOption = this.filteredOptions[0]
+                    }
+                } else {
+                    // Click/focus.
+                    if (!this.searchSelected.id) selectedOption = this.filteredOptions[0]
+                    else selectedOption = this.searchSelected
+                }
+
+                if (selectedOption) {
+                    this.searchSelected = selectedOption
+                    if (updateModel) {
+                        this.searchQuery = ''
+                        this.searchVisible = false
+                        this.searchPlaceholder = selectedOption.name
+                        this.$emit('update:model', selectedOption)
+                    } else {
+                        this.searchVisible = true
+                    }
+                }
+            },
+            searchToggle(event, el, visible) {
+                this.searchVisible = visible
             },
             /**
             * Toggles visibility flag on a password field.
@@ -217,6 +301,20 @@ module.exports = (app) => {
         },
         render: templates.field.r,
         staticRenderFns: templates.field.s,
+        updated: function() {
+            if (this.type === 'select-search') {
+                // Keep the scroll position centered on the selected option.
+                let $ = {widget: this.$refs.widget}
+                if (!$.widget) return
+
+                $.input = this.$refs.input
+                $.options = this.$refs.options
+                $.selectedOption = $.widget.querySelector(`#option-${this.searchSelected.id}`)
+                if ($.selectedOption) {
+                    $.options.scrollTop = $.selectedOption.offsetTop - $.input.offsetHeight - $.selectedOption.offsetHeight
+                }
+            }
+        },
     }
 
     return Field

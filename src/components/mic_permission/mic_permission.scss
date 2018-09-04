@@ -30,7 +30,6 @@
 
             svg {
                 @include icon-size($spacer * 1.5);
-                fill: $white-color;
             }
         }
 
@@ -64,36 +63,43 @@
             }
         }
 
-        .success-message {
-            color: $grey-color;
+        .permission-message {
+            color: $grey-color-darker;
             font-size: 0.9rem;
             font-weight: 500;
+            padding-bottom: $spacer;
 
             .icon {
                 background: $green-color;
+                color: $white-color;
+            }
+
+            &.no-permission {
+                color: $grey-color-darker;
+                margin-bottom: $spacer;
+
+                .icon {
+                    background: $red-color;
+
+                    svg {
+                        fill: $white-color;
+                    }
+                }
             }
         }
 
         .instruction {
-            color: $grey-color;
             font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: $spacer * 2;
-            text-align: center;
+            font-style: italic;
+        }
 
-            .instruction-header {
-                margin-bottom: $spacer;
-            }
-
-            button {
-                margin-top: $spacer * 2;
-            }
+        button {
+            color: $grey-color-darker;
+            margin-top: $spacer * 2;
 
             .icon {
-                background: $brand-color;
+                fill: $grey-color-darkest;
             }
         }
     }
-
-
 }

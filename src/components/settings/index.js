@@ -10,7 +10,7 @@ module.exports = (app) => {
             classes: function(block, modifier) {
                 let classes = {}
                 if (block === 'tabs') {
-                    if (modifier === 'audio' && !this.settings.webrtc.enabled) classes.disabled = true
+                    if (modifier === 'devices' && !this.settings.webrtc.enabled) classes.disabled = true
                     if (modifier === this.tabs.active) classes['is-active'] = true
                 }
                 return classes

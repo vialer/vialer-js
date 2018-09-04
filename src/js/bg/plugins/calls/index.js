@@ -410,7 +410,6 @@ class PluginCalls extends Plugin {
                     audio: true,
                     video: false,
                 },
-                modifiers: [this._formatSdp.bind(this)],
                 peerConnectionOptions: {
                     rtcConfiguration: {
                         iceServers: this.app.state.settings.webrtc.stun.map((i) => ({urls: i})),
@@ -436,45 +435,6 @@ class PluginCalls extends Plugin {
         }
 
         return options
-    }
-
-
-    /**
-    * Reformat the SDP of the {@link https://sipjs.com/api/0.10.0/sessionDescriptionHandler/|SessionDescription}
-    * when setting up a connection, so we can force opus or G722 codec to be
-    * the preference of the backend.
-    * @param {SessionDescription} sessionDescription - A Sip.js SessionDescription handler.
-    * @returns {SessionDescription} A SessionDescription with a modfied sdp object.
-    */
-    _formatSdp(sessionDescription) {
-        const selectedCodec = this.app.state.settings.webrtc.codecs.selected.name
-
-        // (!) The `opus` codec must always be in the sdp.
-        let allowedCodecs = ['telephone-event', 'opus']
-        if (selectedCodec !== 'opus') allowedCodecs.push(selectedCodec)
-
-        let sdpObj = sdpTransform.parse(sessionDescription.sdp)
-        let rtp = {media: []}
-        let payloads = []
-        let fmtps = []
-        for (let codec of sdpObj.media[0].rtp) {
-            if (allowedCodecs.includes(codec.codec)) {
-                rtp.media.push(codec)
-                payloads.push(codec.payload)
-            }
-        }
-
-        for (let fmtp of sdpObj.media[0].fmtp) {
-            if (payloads.includes(fmtp.payload)) {
-                fmtps.push(fmtp)
-            }
-        }
-        sdpObj.media[0].rtp = rtp.media
-        sdpObj.media[0].payloads = payloads.join(' ')
-        sdpObj.media[0].fmtp = fmtps
-
-        sessionDescription.sdp = sdpTransform.write(sdpObj)
-        return Promise.resolve(sessionDescription)
     }
 
 
@@ -757,8 +717,11 @@ class PluginCalls extends Plugin {
     connect({account = {}, endpoint = null, register = true} = {}) {
         if (!account.username || !account.password || !account.uri) {
             this.app.logger.debug(`${this}using account from selected state`)
-            account = this.app.state.settings.webrtc.account.selected
+            account = this.app.state.settings.webrtc.account.using
+        } else {
+            this.app.setState({settings: {webrtc: {account: {using: account}}}})
         }
+
 
         // Reconnect when already connected.
         if (this.ua && this.ua.isConnected()) {
@@ -824,7 +787,7 @@ class PluginCalls extends Plugin {
     * @param {Boolean} reconnect - Whether try to reconnect.
     */
     disconnect(reconnect = true) {
-        this.app.logger.info(`${this}disconnecting from ${this._uaOptions.wsServers} (reconnect: ${reconnect ? 'yes': 'no'})`)
+        this.app.logger.info(`${this}disconnecting from ${this._uaOptions.wsServers} (reconnect: ${reconnect ? 'yes' : 'no'})`)
         this.reconnect = reconnect
         // Directly try to reconnect.
         if (reconnect) {
@@ -833,9 +796,8 @@ class PluginCalls extends Plugin {
         } else {
             this.app.setState({calls: {status: null}})
         }
-        if (this.ua && this.ua.isConnected()) {
-            this.ua.stop()
-        }
+
+        this.ua.stop()
     }
 
 

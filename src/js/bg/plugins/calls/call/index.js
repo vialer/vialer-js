@@ -128,16 +128,16 @@ class Call {
     */
     async _initSinks() {
         // Set the output device from settings.
+        let outputSink
         const devices = this.app.state.settings.webrtc.devices
-        try {
-            let outputSink
-            if (devices.speaker.enabled) outputSink = devices.sinks.speakerOutput.id
-            else outputSink = devices.sinks.headsetOutput.id
+        if (devices.speaker.enabled) outputSink = devices.sinks.speakerOutput.id
+        else outputSink = devices.sinks.headsetOutput.id
 
-            this.app.logger.debug(`${this}change sink of remote video element to ${outputSink}`)
+        this.app.logger.debug(`${this}change sink of remote video element to ${outputSink}`)
+        try {
             await this.app.media.remoteVideo.setSinkId(outputSink)
         } catch (err) {
-            const message = this.app.$t('failed to set input or output device.')
+            const message = this.app.$t('failed to set output sink.')
             this.app.notify({icon: 'warning', message, type: 'danger'})
             console.error(err)
         }

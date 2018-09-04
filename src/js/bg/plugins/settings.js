@@ -64,26 +64,18 @@ class PluginSettings extends Plugin {
                     // Account to use when no account is selected at all.
                     fallback: {
                         id: null,
+                        name: null,
                         password: null,
                         username: null,
                     },
                     // <Platform> may provide account options.
                     options: [],
                     // Remembers the last selected option.
-                    placeholder: {
-                        id: null,
-                    },
-                    selected: {id: null, password: null, uri: null, username: null},
+                    selected: {id: null, name: null, password: null, uri: null, username: null},
                     // Whether user can select <platform> accounts from options.
                     selection: true,
                     status: null,
-                },
-                codecs: {
-                    options: [
-                        {id: 1, name: 'G722'},
-                        {id: 2, name: 'opus'},
-                    ],
-                    selected: {id: 1, name: 'G722'},
+                    using: {id: null, name: null, password: null, uri: null, username: null},
                 },
                 devices: {
                     input: [],
@@ -108,10 +100,10 @@ class PluginSettings extends Plugin {
                     permission: true,
                     type: {
                         options: [
-                            {id: 'AUDIO_NOPROCESSING', name: this.app.$t('audio without processing')},
-                            {id: 'AUDIO_PROCESSING', name: this.app.$t('audio with processing')},
+                            {id: 'AUDIO_NOPROCESSING', name: this.app.$t('disabled')},
+                            {id: 'AUDIO_PROCESSING', name: this.app.$t('enabled')},
                         ],
-                        selected: {id: 'AUDIO_NOPROCESSING', name: this.app.$t('audio without processing')},
+                        selected: {id: 'AUDIO_NOPROCESSING', name: this.app.$t('disabled')},
                     },
                 },
                 stun: process.env.STUN,

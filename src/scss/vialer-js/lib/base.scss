@@ -56,41 +56,6 @@ body {
         display: inline-block;
         margin-top: $spacer;
     }
-
-    .control {
-        textarea,
-        .input {
-            box-shadow: none;
-
-            &:focus,
-            &:active {
-                border: 1px solid $brand-color;
-                box-shadow: 0 0 1px 1px rgba($brand-color, 0.3);
-            }
-
-            &[type="password"],
-            &[type="text"] {
-                height: $spacer * 5;
-
-                & + .icon {
-                    height: $spacer * 5;
-                }
-            }
-        }
-    }
-
-
-    .switch[type="checkbox"] {
-        & + label {
-            font-weight: 500;
-        }
-
-        &:checked + label {
-            &::before {
-                background: $brand-accent-color;
-            }
-        }
-    }
 }
 
 // A generic link class that can be used on non-html elements

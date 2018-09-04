@@ -55,15 +55,21 @@
 .field-select {
     .control {
         .select {
+            &.has-button {
+                select {
+                    border-bottom-right-radius: 0;
+                    border-top-right-radius: 0;
+                }
+            }
+
             select {
-                border-bottom-right-radius: 0;
-                border-top-right-radius: 0;
+                border: 1px solid $grey-color-lightest;
+                box-shadow: none;
+                color: $grey-color-darker;
                 width: 100%;
 
-                &:active,
                 &:focus {
-                    border: 1px solid $grey-color-light;
-                    box-shadow: 0 0 0 1px inset lighten($brand-color, 20%);
+                    border: 1px solid lighten($brand-color, 20%);
                 }
             }
 
@@ -80,6 +86,72 @@
         button {
             border-bottom-left-radius: 0;
             border-top-left-radius: 0;
+        }
+    }
+}
+
+.field-select-search {
+    .control {
+        position: relative;
+
+        .select-search {
+            width: 300px;
+
+            input {
+                border: 1px solid $grey-color-lightest;
+                color: $grey-color-darker;
+                font-size: 1rem;
+                height: $spacer * 4.5;
+                outline: none;
+                padding: $spacer;
+                position: relative;
+                user-select: none;
+                width: 100%;
+
+                &::placeholder {
+                    color: $grey-color-darker;
+                }
+
+                &:active,
+                &:focus {
+                    border: 1px solid lighten($brand-color, 20%);
+                }
+            }
+        }
+
+        button {
+            border-bottom-left-radius: 0;
+            border-top-left-radius: 0;
+        }
+    }
+
+
+    .filtered-options {
+        background: $white-color;
+        border: 1px solid lighten($brand-color, 20%);
+        border-top: 1px solid $white-color;
+        margin-top: -1px;
+        max-height: 162px;
+        overflow: auto;
+        position: fixed;
+        width: 300px;
+        z-index: 100000;
+
+        .option {
+            color: $grey-color-darker;
+            padding: $spacer / 2;
+            user-select: none;
+
+            &.selected {
+                background: $brand-color;
+                color: $white-color;
+            }
+
+            &:hover {
+                background: $brand-color;
+                color: $white-color;
+                cursor: pointer;
+            }
         }
     }
 }
@@ -108,9 +180,51 @@
                 }
             }
         }
+    }
+}
 
 
+// Override some of the default styling of Bulma inputs.
+.control {
 
+    input[disabled] {
+        background: $grey-color-lightest;
+
+        &:focus {
+            border: 1px solid $grey-color-lightest;
+        }
     }
 
+    textarea,
+    .input {
+        box-shadow: none;
+
+        &:focus,
+        &:active {
+            border: 1px solid $brand-color;
+            box-shadow: 0 0 1px 1px rgba($brand-color, 0.3);
+        }
+
+        &[type="password"],
+        &[type="text"] {
+            height: $spacer * 5;
+
+            & + .icon {
+                height: $spacer * 5;
+            }
+        }
+    }
+}
+
+
+.switch[type="checkbox"] {
+    & + label {
+        font-weight: 500;
+    }
+
+    &:checked + label {
+        &::before {
+            background: $brand-accent-color;
+        }
+    }
 }

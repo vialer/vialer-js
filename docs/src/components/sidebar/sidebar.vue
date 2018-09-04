@@ -10,8 +10,9 @@
     </header>
     <nav class="navigation">
         <div class="navigation-header">Developer topics</div>
-        <router-link class="navigation-link" :to="{name: 'view_topic', params: {topic_id: topic.name}}" v-for="(topic, name) in topics">
+        <router-link class="navigation-link" v-if="topic.name !== 'quickstart'" :to="{name: 'view_topic', params: {topic_id: topic.name}}" v-for="(topic, name) in topics">
             {{topic.title}}
         </router-link>
+        <router-link class="navigation-link" v-if="topic.name === 'quickstart'" v-for="(topic, name) in topics" :to="{name: 'view_quickstart'}">
     </nav>
 </component>

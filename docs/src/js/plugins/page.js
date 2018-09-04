@@ -7,7 +7,7 @@ class PluginPage extends Plugin {
 
         app.router.addRoutes([{
             component: app.components.ViewPage,
-            name: 'view_readme',
+            name: 'view_quickstart',
             path: '/',
         }])
 

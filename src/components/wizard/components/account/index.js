@@ -7,7 +7,7 @@ module.exports = (app, shared) => {
             stepValid: function() {
                 const selectedAccountId = this.settings.webrtc.account.selected.id
                 const accountsLoading = this.settings.webrtc.account.status === 'loading'
-                if (this.validAccountSettings && selectedAccountId && !accountsLoading) {
+                if (selectedAccountId && !accountsLoading) {
                     return true
                 }
                 return false
@@ -21,7 +21,6 @@ module.exports = (app, shared) => {
                 app.emit('bg:user:account_select', {
                     accountId: this.account.selected.id,
                     callback: ({account}) => {
-                        app.setState({settings: {webrtc: {account: {selected: account, status: null}}}}, {persist: true})
                         this.stepNext()
                     },
                 })

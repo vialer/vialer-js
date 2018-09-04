@@ -178,19 +178,6 @@ function helpers(app) {
     }
 
 
-    /**
-    * Validate whether a selected account has the right settings.
-    * @returns {Boolean} - Valid or invalid.
-    */
-    _helpers.validAccountSettings = function() {
-        const selected = this.settings.webrtc.account.selected
-        if (selected && selected.settings) {
-            if (!selected.settings.avpf || !selected.settings.encryption) return false
-        }
-        return true
-    }
-
-
     _helpers.sharedMethods = function() {
         return {
             closeOverlay: function() {
@@ -310,7 +297,6 @@ function helpers(app) {
                 }
                 return transferStatus
             },
-            validAccountSettings: _helpers.validAccountSettings,
         }
     }
 
@@ -327,17 +313,12 @@ function helpers(app) {
                                     message: '',
                                     type: 'customValid',
                                 }, () => {
-                                    if (!this.settings.webrtc.toggle) {
-                                        return true
-                                    } else {
-                                        const account = this.settings.webrtc.account.selected
-                                        if (account.id) {
-                                            if (account.settings && account.settings.avpf && account.settings.encryption) {
-                                                return true
-                                            }
-                                        }
+                                    // No validation without WebRTC toggled off.
+                                    if (!this.settings.webrtc.toggle) return true
+                                    else {
+                                        if (this.settings.webrtc.account.status === 'loading') return false
+                                        else if (this.settings.webrtc.account.selected.id) return true
                                     }
-
                                     return false
                                 }),
                                 requiredIf: v.requiredIf(() => {

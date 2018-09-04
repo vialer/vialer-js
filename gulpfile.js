@@ -37,7 +37,7 @@ const writeFileAsync = promisify(fs.writeFile)
 
 // The main settings object containing info from .vialer-jsrc and build flags.
 let settings = require('./tools/settings')(__dirname)
-
+let WATCH_TASK = ''
 
 // Initialize the helpers, which make this file less dense.
 const helpers = new Helpers(settings)
@@ -69,8 +69,9 @@ gulp.task('build', 'Generate a <brand> build for <target>.', (done) => {
         return
     }
     let mainTasks = [
-        'assets', 'templates', 'i18n', 'html', 'scss', 'scss-vendor',
-        'js-vendor-bg', 'js-vendor-fg', 'js-app-bg', 'js-app-fg', 'js-app-plugins',
+        'assets', 'templates', 'html', 'scss', 'scss-vendor',
+        'js-app-i18n', 'js-vendor-bg', 'js-vendor-fg', 'js-app-bg',
+        'js-app-fg', 'js-app-plugins',
     ]
 
     if (settings.BUILD_TARGET === 'electron') {
@@ -238,7 +239,7 @@ gulp.task('js-vendor-fg', 'Generate vendor JavaScript for the foreground app sec
 
 gulp.task('js-app-bg', 'Generate background app section JavaScript.', (done) => {
     helpers.jsEntry('./src/js/bg/index.js', 'app_bg', []).then(() => {
-        if (settings.LIVERELOAD) livereload.changed('app_bg.js')
+        if (WATCH_TASK === 'js-app-bg' && settings.LIVERELOAD) livereload.changed('app_bg.js')
         if (WATCHTEST) runSequence(['test-unit'], done)
         else done()
     })
@@ -247,14 +248,27 @@ gulp.task('js-app-bg', 'Generate background app section JavaScript.', (done) => 
 
 gulp.task('js-app-fg', 'Generate foreground app section JavaScript.', (done) => {
     helpers.jsEntry('./src/js/fg/index.js', 'app_fg', []).then(() => {
-        if (settings.LIVERELOAD) livereload.changed('app_fg.js')
+        if (WATCH_TASK === 'js-app-fg' && settings.LIVERELOAD) livereload.changed('app_fg.js')
         if (WATCHTEST) runSequence(['test-unit'], done)
         else done()
     })
 })
 
 
-gulp.task('js-app-plugins', 'Generate app sections plugin JavaScript.', ['i18n'], (done) => {
+gulp.task('js-app-i18n', 'Generate i18n translations.', (done) => {
+    const builtin = settings.brands[settings.BRAND_TARGET].plugins.builtin
+    const custom = settings.brands[settings.BRAND_TARGET].plugins.custom
+    Promise.all([
+        helpers.jsPlugins(Object.assign(builtin, custom), 'i18n'),
+        helpers.jsEntry('./src/js/i18n/index.js', 'app_i18n', []),
+    ]).then(() => {
+        if (WATCH_TASK === 'js-app-i18n' && settings.LIVERELOAD) livereload.changed('app_i18n.js')
+        done()
+    })
+})
+
+
+gulp.task('js-app-plugins', 'Generate app sections plugin JavaScript.', ['js-app-i18n', 'js-app-bg', 'js-app-fg'], (done) => {
     const builtin = settings.brands[settings.BRAND_TARGET].plugins.builtin
     const custom = settings.brands[settings.BRAND_TARGET].plugins.custom
 
@@ -262,7 +276,7 @@ gulp.task('js-app-plugins', 'Generate app sections plugin JavaScript.', ['i18n']
         helpers.jsPlugins(Object.assign(builtin, custom), 'bg'),
         helpers.jsPlugins(Object.assign(builtin, custom), 'fg'),
     ]).then(() => {
-        if (settings.LIVERELOAD) livereload.changed('app_plugins_bg.js')
+        if (WATCH_TASK === 'js-app-plugins' && settings.LIVERELOAD) livereload.changed('app_plugins_bg.js')
         done()
     })
 })
@@ -404,19 +418,6 @@ gulp.task('test-browser', 'Run browser tests on a served webview.', function(don
 })
 
 
-gulp.task('i18n', 'Generate i18n translations.', (done) => {
-    const builtin = settings.brands[settings.BRAND_TARGET].plugins.builtin
-    const custom = settings.brands[settings.BRAND_TARGET].plugins.custom
-    Promise.all([
-        helpers.jsPlugins(Object.assign(builtin, custom), 'i18n'),
-        helpers.jsEntry('./src/js/i18n/index.js', 'app_i18n', []),
-    ]).then(() => {
-        if (settings.LIVERELOAD) livereload.changed('app_i18n.js')
-        done()
-    })
-})
-
-
 gulp.task('watch', 'Run developer watch modus.', () => {
     helpers.startDevService()
 
@@ -444,20 +445,29 @@ gulp.task('watch', 'Run developer watch modus.', () => {
         path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', 'js', 'i18n', '*.js'),
         path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'js', 'i18n', '*.js'),
         path.join(settings.NODE_PATH, 'vjs-provider-*', 'src', 'js', 'i18n', '*.js'),
-    ], ['i18n'])
+    ], function() {
+        WATCH_TASK = 'js-app-i18n'
+        runSequence('js-app-i18n')
+    })
 
     gulp.watch(path.join(settings.SRC_DIR, 'index.html'), ['html'])
 
     gulp.watch([
         path.join(settings.SRC_DIR, 'js', 'bg', '**', '*.js'),
         path.join(settings.SRC_DIR, 'js', 'lib', '**', '*.js'),
-    ], ['js-app-bg'])
+    ], function() {
+        WATCH_TASK = 'js-app-bg'
+        runSequence('js-app-bg')
+    })
 
     gulp.watch([
         path.join(settings.SRC_DIR, 'components', '**', '*.js'),
         path.join(settings.SRC_DIR, 'js', 'lib', '**', '*.js'),
         path.join(settings.SRC_DIR, 'js', 'fg', '**', '*.js'),
-    ], ['js-app-fg'])
+    ], function() {
+        WATCH_TASK = 'js-app-fg'
+        runSequence('js-app-fg')
+    })
 
     gulp.watch([
         // Glob for addons and custom modules includes both component and module js.
@@ -465,7 +475,10 @@ gulp.task('watch', 'Run developer watch modus.', () => {
         path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', '**', '*.js'),
         path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', '**', '*.js'),
         path.join(settings.NODE_PATH, 'vjs-provider-*', 'src', '**', '*.js'),
-    ], ['js-app-plugins'])
+    ], function() {
+        WATCH_TASK = 'js-app-plugins'
+        runSequence('js-app-plugins')
+    })
 
     gulp.watch([
         path.join(settings.SRC_DIR, 'js', 'observer', '**', '*.js'),
