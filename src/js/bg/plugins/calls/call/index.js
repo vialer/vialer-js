@@ -137,7 +137,7 @@ class Call {
         try {
             await this.app.media.remoteVideo.setSinkId(outputSink)
         } catch (err) {
-            const message = this.app.$t('failed to set output sink.')
+            const message = this.app.$t('failed to set output device!')
             this.app.notify({icon: 'warning', message, type: 'danger'})
             console.error(err)
         }
