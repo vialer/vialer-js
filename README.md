@@ -18,10 +18,10 @@ through the use of plugins that hook into the core functionality. The build syst
 accomodates this branding flexibility and offers an easy way to customize
 naming, testing, default configurations and more.
 
-![login screen](https://vialer-js.io/screens/alice-1-login.png "Bologna login")
-![device wizard](https://vialer-js.io/screens/alice-6-wizard-devices.png "Bologna device wizard")
-![dialpad](https://vialer-js.io/screens/alice-8-dialpad-call.png "Bologna dialpad")
-![outgoing call](https://vialer-js.io/screens/bob-2-calldialog-incoming-accepted.png "Bologna outgoing call")
+<img align="left" src="https://vialer-js.io/screens/alice-1-login.png" height="200">
+<img align="left" src="https://vialer-js.io/screens/alice-6-wizard-devices.png" height="200">
+<img align="left" src="https://vialer-js.io/screens/alice-8-dialpad-call.png" height="200">
+<img src="https://vialer-js.io/screens/bob-2-calldialog-incoming-accepted.png" height="200">
 
 
 ## Development pace
