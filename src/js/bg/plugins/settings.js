@@ -45,7 +45,6 @@ class PluginSettings extends Plugin {
                 selected: {id: null, name: null},
             },
             platform: {
-                enabled: true,
                 url: process.env.PLATFORM_URL,
             },
             ringtones: {
@@ -55,23 +54,28 @@ class PluginSettings extends Plugin {
                 selected: {id: 1, name: 'default.ogg'},
             },
             telemetry: {
+                analyticsClientId: null,
                 analyticsId: process.env.ANALYTICS_ID,
-                clientId: null,
                 enabled: false,
                 sentryDsn: process.env.SENTRY_DSN,
             },
             webrtc: {
                 account: {
-                    options: [], // A platform integration provides options.
-                    selected: {id: null, password: null, uri: null, username: null},
+                    // Account to use when no account is selected at all.
+                    fallback: {
+                        id: null,
+                        name: null,
+                        password: null,
+                        username: null,
+                    },
+                    // <Platform> may provide account options.
+                    options: [],
+                    // Remembers the last selected option.
+                    selected: {id: null, name: null, password: null, uri: null, username: null},
+                    // Whether user can select <platform> accounts from options.
+                    selection: true,
                     status: null,
-                },
-                codecs: {
-                    options: [
-                        {id: 1, name: 'G722'},
-                        {id: 2, name: 'opus'},
-                    ],
-                    selected: {id: 1, name: 'G722'},
+                    using: {id: null, name: null, password: null, uri: null, username: null},
                 },
                 devices: {
                     input: [],
@@ -88,7 +92,7 @@ class PluginSettings extends Plugin {
                         enabled: false,
                     },
                 },
-                enabled: false,
+                enabled: true,
                 endpoint: {
                     uri: process.env.SIP_ENDPOINT,
                 },
@@ -96,14 +100,14 @@ class PluginSettings extends Plugin {
                     permission: true,
                     type: {
                         options: [
-                            {id: 'AUDIO_NOPROCESSING', name: this.app.$t('audio without processing')},
-                            {id: 'AUDIO_PROCESSING', name: this.app.$t('audio with processing')},
+                            {id: 'AUDIO_NOPROCESSING', name: this.app.$t('disabled')},
+                            {id: 'AUDIO_PROCESSING', name: this.app.$t('enabled')},
                         ],
-                        selected: {id: 'AUDIO_NOPROCESSING', name: this.app.$t('audio without processing')},
+                        selected: {id: 'AUDIO_NOPROCESSING', name: this.app.$t('disabled')},
                     },
                 },
                 stun: process.env.STUN,
-                toggle: false,
+                toggle: true,
             },
             wizard: {
                 completed: false,
@@ -121,7 +125,7 @@ class PluginSettings extends Plugin {
         }
 
         // The selection flag determines whether the UI should include endpoint selection.
-        state.webrtc.endpoint.selection = Boolean(state.webrtc.endpoint.uri)
+        state.webrtc.account.selection = Boolean(state.webrtc.endpoint.uri)
         return state
     }
 
@@ -136,7 +140,7 @@ class PluginSettings extends Plugin {
     */
     _ready() {
         if (this.app.state.settings.telemetry.enabled) {
-            const release = process.env.VERSION + '-' + process.env.DEPLOY_TARGET + '-' + process.env.BRAND_NAME + '-' + this.app.env.name
+            const release = process.env.VERSION + '-' + process.env.DEPLOY_TARGET + '-' + process.env.BRAND_TARGET + '-' + this.app.env.name
             this.app.logger.info(`${this}monitoring exceptions for release ${release}`)
             Raven.config(process.env.SENTRY_DSN, {
                 allowSecretKey: true,
@@ -187,51 +191,13 @@ class PluginSettings extends Plugin {
                 this.app.emit('bg:telemetry:event', {eventAction: 'toggle', eventLabel: enabled, eventName: 'telemetry', override: true})
             },
             /**
-            * Deal with (de)selection of an account by connecting or disconnecting
-            * from the Calls endpoint when the involved data changes.
-            * The `toggle` flag is an intention to switch webrtc to
-            * `enabled` status.This is because the enabled flag represents
-            * the current mode of operation in the UI. We don't want to
-            * influence the UI while dealing with something like a
-            * webrtc-enabled switch.
-            * @param {String} newUsername - New selected account username.
-            * @param {String} oldUsername - Previous selected account username.
-            */
-            'store.settings.webrtc.account.selected.username': async(newUsername, oldUsername) => {
-                const toggle = this.app.state.settings.webrtc.toggle
-                if (toggle && !this.app.state.settings.webrtc.enabled) {
-                    await this.app.setState({settings: {webrtc: {enabled: true}}}, {persist: true})
-                }
-
-                if (newUsername) {
-                    this.app.logger.debug(`${this}account selection watcher: ${oldUsername} => ${newUsername}`)
-                    // Give the data store a chance to update.
-                    this.app.plugins.calls.connect({register: this.app.state.settings.webrtc.enabled})
-                } else {
-                    // Unset the selected account triggers an account reset.
-                    this.app.plugins.calls.disconnect(false)
-                    this.app.emit('bg:availability:account_reset', {}, true)
-                }
-            },
-            /**
             * The default value is true.
-            * @param {Boolean} enabled - Whether the permission is granted.
+            * @param {Boolean} enabled - Permission granted?
             */
             'store.settings.webrtc.media.permission': (enabled) => {
                 if (enabled) {
                     this.app.devices.verifySinks()
                 }
-            },
-            /**
-            * There is a distinction between `webrtc.enabled` and `webrtc.toggle`.
-            * The `webrtc.toggle` is used to trigger enabling and disabling of
-            * WebRTC, while the `webrtc.enabled` flag is used to keep track of
-            * the application status, depending on the value of `webrtc.enabled`.
-            * @param {Boolean} toggle - Should WebRTC be enabled or not.
-            */
-            'store.settings.webrtc.toggle': (toggle) => {
-                // this.app.setState({settings: {webrtc: {enabled: toggle, toggle}}}, {persist: true})
-                if (!toggle) this.app.emit('bg:availability:account_reset', {}, true)
             },
         }
     }

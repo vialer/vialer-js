@@ -1,8 +1,7 @@
 [![CircleCI](https://circleci.com/gh/vialer/vialer-js/tree/develop.svg?style=svg)](https://circleci.com/gh/vialer/vialer-js/tree/develop)
 
-Install [Bologna Alpha](https://chrome.google.com/webstore/detail/bologna-alpha/adgookjhbldhfflndfdgkcbmpmfhapgc) Chrome extension
-\
 Take me to the [quickstart guide](https://vialer-js.io/topics/quickstart)
+
 
 # The Vialer-js project
 Vialer-js is a free, pluggable, open-source communication platform that
@@ -11,6 +10,7 @@ Its philosophy is to empower developers and vendors to build their own
 communication tools at a fast pace, while maintaining flexibility of
 the most opinionated implementation details.
 
+
 ## Customization
 From application functionality to the documentation look-and-feel; all parts
 about Vialer-js can be styled, branded to fit a corporate identity or customized
@@ -18,10 +18,11 @@ through the use of plugins that hook into the core functionality. The build syst
 accomodates this branding flexibility and offers an easy way to customize
 naming, testing, default configurations and more.
 
-![login screen](/screens/alice-login.png "Bologna login")
-![device wizard](/screens/alice-wizard-devices.png "Bologna device wizard")
-![dialpad](/screens/alice-dialpad-call.png "Bologna dialpad")
-![outgoing call](/screens/bob-calldialog-incoming-accepted.png "Bologna outgoing call")
+<img align="left" src="https://vialer-js.io/screens/alice-1-login.png" height="200">
+<img align="left" src="https://vialer-js.io/screens/alice-6-wizard-devices.png" height="200">
+<img align="left" src="https://vialer-js.io/screens/alice-8-dialpad-call.png" height="200">
+<img src="https://vialer-js.io/screens/bob-2-calldialog-incoming-accepted.png" height="200">
+
 
 ## Development pace
 The *Bologna* Vialer-js brand uses [SIP-over-websockets](https://sipjs.com/)
@@ -32,8 +33,7 @@ on-hold, waiting music, transfers, queues, IVR and callgroups. Besides dealing
 with audio calls, video [through a PBX](https://blogs.asterisk.org/2017/09/20/asterisk-15-multi-stream-media-sfu/)
 may be another interesting application to your end-users. However, having a
 PBX in-between a call may not always be the desired situation.
-\
-\
+
 A decentralized approach with a custom WebRTC signalling protocol and p2p
 connections between call participants may be more appropriate in situations
 where scalability and/or privacy concerns dictate that (video) data needs to
@@ -42,22 +42,24 @@ use a custom signalling protocol, would be that features like
 [chat and file transfers](https://developer.mozilla.org/en-US/docs/Web/API/RTCDataChannel)
 are much easier to implement without having to deal with the complexity of
 the SIP protocol.
-\
-\
+
 The purpose of Vialer-js is not only to facilitate different use-cases,
 but also to be able to integrate them in one unified communication experience
 for your end-users. In our view, a user will be entirely free to use a
 VoIP-service provider with Vialer-js, while at the same time being able to
 communicate p2p with their friends over a decentralized signalling network.
 
+
 ## Platform reach
 Vialer-js is a readable environment-agnostic ES2017 codebase that uses a simple
-but powerful reactive data-oriented design. This allows Vialer-js to run
-on a range of platforms with a suitable JavaScript runtime. At the moment,
-our priority is to first to offer a Blink-compatible WebExtension, followed
-by an Electron desktop app, headless Node.js support, using custom website
-widgets and we would like to investigate whether an Android mobile WebView
-would be a suitable medium for a mobile application.
+but powerful reactive data-oriented design. This allows it to run on several
+suitable JavaScript runtimes. At the moment, this includes:
+* Blink-compatible WebExtension browsers (Opera, Chrome, Chromium)
+* Electron desktop app
+
+Headless Node.js support is implemented partially, to be able to run
+unit tests without having to mock data. Calling from Node.js is not supported
+yet though.
 
 
 ## Want to learn more?

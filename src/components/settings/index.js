@@ -10,23 +10,36 @@ module.exports = (app) => {
             classes: function(block, modifier) {
                 let classes = {}
                 if (block === 'tabs') {
-                    if (modifier === 'audio' && !this.settings.webrtc.enabled) classes.disabled = true
+                    if (modifier === 'devices' && !this.settings.webrtc.enabled) classes.disabled = true
                     if (modifier === this.tabs.active) classes['is-active'] = true
                 }
                 return classes
             },
             save: function(e) {
-                // Strip properties from the settings object that we don't
-                // want to update, because they are not part of a
-                // user-initiated setting.
-                let settings = app.utils.copyObject(this.settings)
-                delete settings.webrtc.account.options
-                // Disable dnd after a save to keep condition checks simple.
-                app.setState({availability: {dnd: false}, settings}, {persist: true})
+                // This event is used, so an external API may have some time
+                // to retrieve credentials. This way, we don't have to store
+                // full credentials of all accounts.
+                let accountId = null
+                if (this.settings.webrtc.toggle) accountId = this.settings.webrtc.account.selected.id
+                app.emit('bg:user:account_select', {
+                    accountId,
+                    callback: ({account}) => {
+                        // Modify properties on the cloned settings object
+                        // before writing to the store.
+                        let settings = app.utils.copyObject(this.settings)
+                        delete settings.webrtc.account.options
+                        delete settings.webrtc.account.selected
+                        app.setState({availability: {dnd: false}, settings}, {persist: true})
+                        app.emit('bg:calls:connect')
+                    },
+                }, 'both')
 
                 // Update the vault settings.
                 app.setState({app: {vault: this.app.vault}}, {encrypt: false, persist: true})
                 app.notify({icon: 'settings', message: app.$t('settings are updated.'), type: 'success'})
+
+                // Verify currently selected devices after saving settings again.
+                app.emit('bg:devices:verify-sinks')
             },
         }, app.helpers.sharedMethods()),
         mounted: async function() {
@@ -60,9 +73,9 @@ module.exports = (app) => {
                 },
             }
             // Add the validation that is shared with step_voipaccount, but
-            // only if the user is supposed to choose between voiapccount options.
-            if (this.user.platform.account.selection) {
-                validations.settings.webrtc = {account: app.helpers.sharedValidations.bind(this)().settings.webrtc.account}
+            // only if the user is supposed to choose between account options.
+            if (this.settings.webrtc.account.selection) {
+                validations.settings.webrtc.account = app.helpers.sharedValidations.bind(this)().settings.webrtc.account
             }
 
             return validations

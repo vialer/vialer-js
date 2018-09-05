@@ -52,6 +52,38 @@ class Helpers {
     }
 
 
+    _jsEnvify(brand) {
+        return envify({
+            ANALYTICS_ID: brand.telemetry.analytics_id[this.settings.BUILD_TARGET],
+            APP_NAME: brand.name.production,
+            BRAND_TARGET: this.settings.BRAND_TARGET,
+
+            BUILTIN_AVAILABILITY_ADDONS: brand.plugins.builtin.availability.addons,
+            BUILTIN_CONTACTS_I18N: brand.plugins.builtin.contacts.i18n,
+            BUILTIN_CONTACTS_PROVIDERS: brand.plugins.builtin.contacts.providers,
+            BUILTIN_USER_ADAPTER: brand.plugins.builtin.user.adapter,
+            BUILTIN_USER_I18N: brand.plugins.builtin.user.i18n,
+            CUSTOM_MOD: brand.plugins.custom,
+
+            DEPLOY_TARGET: this.settings.DEPLOY_TARGET,
+            NODE_ENV: this.settings.NODE_ENV,
+            PLATFORM_URL: brand.permissions,
+            PORTAL_NAME: brand.vendor.portal.name,
+            PORTAL_URL: brand.vendor.portal.url,
+            SENTRY_DSN: brand.telemetry.sentry.dsn,
+            SIP_ENDPOINT: brand.sip_endpoint,
+            STUN: brand.stun,
+
+            VENDOR_NAME: brand.vendor.name,
+            VENDOR_SUPPORT_EMAIL: brand.vendor.support.email,
+            VENDOR_SUPPORT_PHONE: brand.vendor.support.phone,
+            VENDOR_SUPPORT_WEBSITE: brand.vendor.support.website,
+            VERBOSE: this.settings.VERBOSE,
+            VERSION: this.settings.PACKAGE.version,
+        })
+    }
+
+
     /**
     * Rewrite requires in modules from something like 'vialer-js/bg/plugins/user/adapter`
     * to `vialer-js/src/js/bg/plugins/user/adapter`. Within the node runtime,
@@ -298,34 +330,7 @@ class Helpers {
                 .pipe(source(`${bundleName}.js`))
                 .pipe(buffer())
                 .pipe(sourcemaps.init({loadMaps: true}))
-                .pipe(envify({
-                    ANALYTICS_ID: brand.telemetry.analytics_id[this.settings.BUILD_TARGET],
-                    APP_NAME: brand.name.production,
-                    BRAND_NAME: this.settings.BRAND_TARGET,
-
-                    BUILTIN_AVAILABILITY_ADDONS: brand.plugins.builtin.availability.addons,
-                    BUILTIN_CONTACTS_I18N: brand.plugins.builtin.contacts.i18n,
-                    BUILTIN_CONTACTS_PROVIDERS: brand.plugins.builtin.contacts.providers,
-                    BUILTIN_USER_ADAPTER: brand.plugins.builtin.user.adapter,
-                    BUILTIN_USER_I18N: brand.plugins.builtin.user.i18n,
-                    CUSTOM_MOD: brand.plugins.custom,
-
-                    DEPLOY_TARGET: this.settings.DEPLOY_TARGET,
-                    NODE_ENV: this.settings.NODE_ENV,
-                    PLATFORM_URL: brand.permissions,
-                    PORTAL_NAME: brand.vendor.portal.name,
-                    PORTAL_URL: brand.vendor.portal.url,
-                    SENTRY_DSN: brand.telemetry.sentry.dsn,
-                    SIP_ENDPOINT: brand.sip_endpoint,
-                    STUN: brand.stun,
-
-                    VENDOR_NAME: brand.vendor.name,
-                    VENDOR_SUPPORT_EMAIL: brand.vendor.support.email,
-                    VENDOR_SUPPORT_PHONE: brand.vendor.support.phone,
-                    VENDOR_SUPPORT_WEBSITE: brand.vendor.support.website,
-                    VERBOSE: this.settings.VERBOSE,
-                    VERSION: this.settings.PACKAGE.version,
-                }))
+                .pipe(this._jsEnvify(brand))
                 .pipe(ifElse(this.settings.PRODUCTION, () => minifier()))
                 .pipe(sourcemaps.write('./'))
                 .pipe(size(_extend({title: `${bundleName}.js`}, this.settings.SIZE_OPTIONS)))
@@ -342,6 +347,7 @@ class Helpers {
     * @returns {Promise} - Resolves when all modules are processed.
     */
     jsPlugins(sectionModules, appSection) {
+        const brand = this.settings.brands[this.settings.BRAND_TARGET]
         return new Promise((resolve) => {
             let requires = []
 
@@ -395,6 +401,7 @@ class Helpers {
                 .pipe(source(`app_${appSection}_plugins.js`))
                 .pipe(buffer())
                 .pipe(sourcemaps.init({loadMaps: true}))
+                .pipe(this._jsEnvify(brand))
                 .pipe(ifElse(this.settings.PRODUCTION, () => minifier()))
                 .pipe(sourcemaps.write('./'))
                 .pipe(size(_extend({title: `app_${appSection}_plugins.js`}, this.settings.SIZE_OPTIONS)))

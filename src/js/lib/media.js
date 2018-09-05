@@ -84,9 +84,12 @@ class Media {
             if (this.app.state.user.authenticated) {
                 try {
                     await this.query()
-                    // Early device query.
                     if (this.app.env.section.bg && !this.app.devices.cached) {
                         await this.app.devices.verifySinks()
+                    }
+                    // Disable this poller as soon we got permission.
+                    if (this.app.state.settings.webrtc.media.permission) {
+                        clearInterval(this.intervalId)
                     }
                 } catch (err) {
                     console.error(err)

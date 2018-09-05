@@ -115,7 +115,7 @@ class AppBackground extends App {
     * @param {Boolean} contacts - Whether to subsribe to Contact Presence.
     */
     __initServices(callService = false) {
-        this.logger.info(`${this}init connectivity services (callservice: ${callService ? 'yes' : 'no'})`)
+        this.logger.info(`${this}init connectivity services (sip: ${callService ? 'yes' : 'no'})`)
         if (this.state.app.online) {
             if (callService) {
                 this.plugins.calls.connect({register: this.state.settings.webrtc.enabled})
@@ -344,16 +344,14 @@ class AppBackground extends App {
     */
     async _platformData() {
         this.logger.info(`${this}<platform> refreshing all data`)
-        const dataModules = Object.keys(this.plugins).filter((m) => this.plugins[m]._platformData)
+        const platformDataPlugins = Object.keys(this.plugins).filter((m) => this.plugins[m]._platformData)
         try {
-            const dataRequests = dataModules.map((m) => this.plugins[m]._platformData())
+            const dataRequests = platformDataPlugins.map((m) => this.plugins[m]._platformData())
             await Promise.all(dataRequests)
         } catch (err) {
             // Network changed in the meanwhile or a timeout error occured.
             this.logger.warn(`${this} network error occured: ${err}`)
         }
-
-        if (this.state.settings.wizard.completed) this.plugins.contacts.subscribe()
     }
 
 

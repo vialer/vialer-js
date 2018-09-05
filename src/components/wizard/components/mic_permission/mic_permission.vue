@@ -16,7 +16,7 @@
             </button>
 
             <button class="button is-primary cf test-wizard-mic-permission-next" @click="queryDevices()" :disabled="!stepValid">
-                {{$t('setup audio')}}
+                {{$t('next')}}
             </button>
         </div>
     </div>

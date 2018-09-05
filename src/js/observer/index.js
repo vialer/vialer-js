@@ -129,7 +129,7 @@ class AppTab extends Skeleton {
                 if (e.target.classList.contains('ctd-disabled')) return
                 const data = e.target.dataset
                 if (data.number) this.emit('bg:calls:call_create', {number: data.number, start: true})
-                // Immediatly disable all the c2d icons for this number and
+                // Immediately disable all the c2d icons for this number and
                 // let the `observer:click2dial:toggle` event further decide
                 // whether the user should be able to interact with an icon.
                 for (let node of $$(`.ctd-icon-${data.number}`)) {
@@ -212,6 +212,9 @@ class AppTab extends Skeleton {
 
         // Walk the DOM looking for elements to parse, but block reasonably
         // sized pages to prevent locking the page.
+        // A text node; no need to walk from here.
+        if (root.nodeType === 3) return
+
         const childrenLength = root.querySelectorAll('*').length // no lookup costs
         if (childrenLength >= 2001) return
 
@@ -249,8 +252,8 @@ class AppTab extends Skeleton {
                             }
                             // The phonenumber itself.
                             ctdNode.appendChild(numberTextNode)
-                            // The icon.
                             ctdNode.appendChild(numberIconElement)
+                            // The icon.
                             // And finally text after the icon when there is any.
                             if (afterText.length) {
                                 const afterTextNode = document.createTextNode(afterText)

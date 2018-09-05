@@ -59,6 +59,7 @@ module.exports = (app) => {
         render: templates.login.r,
         staticRenderFns: templates.login.s,
         store: {
+            account: 'settings.webrtc.account',
             app: 'app',
             availability: 'availability',
             calls: 'calls',

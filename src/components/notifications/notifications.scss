@@ -29,8 +29,6 @@
         padding: 0;
         transition: all 0.25s;
 
-        .icon svg {fill: $brand-accent-color;}
-
         &.is-warning {
             background: lighten($orange-color, 40%);
             border-bottom: 2px solid $orange-color;
@@ -48,6 +46,7 @@
             min-width: $spacer * 6;
 
             svg {
+                fill: $brand-accent-color;
                 height: $spacer * 3;
                 width: $spacer * 3;
             }
@@ -65,6 +64,14 @@
             margin-left: $spacer;
             margin-right: $spacer;
             vertical-align: middle;
+        }
+
+        .link {
+            font-weight: 500;
+
+            &:hover {
+                cursor: pointer;
+            }
         }
     }
 

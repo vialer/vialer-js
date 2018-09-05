@@ -2,7 +2,7 @@
     <header class="ca">{{$t('audio settings')}}</header>
 
     <div class="step-description">
-        <span class="cf">{{$t('make sure that your headset is properly connected and verify the audio settings.')}}</span>
+        <span class="cf">{{$t('make sure your headset is properly connected and inspect the audio device settings below:')}}</span>
         <DevicePicker/>
     </div>
 

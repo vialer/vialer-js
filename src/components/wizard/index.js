@@ -5,6 +5,7 @@ module.exports = (app) => {
         return {
             methods: {
                 finishWizard: function() {
+                    app.emit('bg:calls:connect')
                     app.setState({settings: {wizard: {completed: true}}}, {persist: true})
                     app.notify({icon: 'settings', message: this.$t('all set! We hope you enjoy the {name}.', {name: this.app.name}), type: 'info'})
                 },
@@ -31,7 +32,7 @@ module.exports = (app) => {
     const Wizard = {
         computed: app.helpers.sharedComputed(),
         created: function() {
-            if (!this.user.platform.account.selection) {
+            if (!this.settings.webrtc.account.selection) {
                 app.setState({
                     settings: {
                         webrtc: {enabled: true, toggle: true},

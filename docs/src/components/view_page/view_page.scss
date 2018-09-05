@@ -4,16 +4,16 @@
     display: flex;
     flex-direction: column;
     max-width: 900px;
-    padding: $spacer * 3;
 
     pre {
-        margin: $spacer * 2 0;
+        // background: none;
+        margin: 0;
         overflow: visible;
+        padding: $spacer;
     }
 
     p {
         margin: $spacer 0;
-
     }
 
     h1 {
@@ -38,23 +38,40 @@
         text-transform: uppercase;
     }
 
+    h4 {
+        color: $grey-color;
+        font-size: 1.2rem;
+    }
+
     strong {
         font-weight: 500;
     }
 
-    &.readme {
-
-        @media only screen and (min-width: $width-desktop) {
-            p {
-                columns: 2;
-            }
-        }
-
+    .illustration {
         img {
-            border: 1px solid $grey-color-lightest;
-            float: left;
-            margin: 0 $spacer;
-            max-width: calc(50% - #{$spacer * 2});
+            max-height: 300px;
+        }
+    }
+
+
+    .steps-images {
+        align-items: center;
+        display: flex;
+        justify-content: center;
+        margin: $spacer * 3 0;
+        width: 100%;
+
+        .cell {
+            background-color: $grey-color-lightest;
+            flex: 1 1 auto;
+            padding: 10px;
+            text-align: center;
+
+            img {
+                flex-grow: 1;
+                max-height: 300px;
+                max-width: 100%;
+            }
         }
     }
 }

@@ -1,10 +1,11 @@
 <component class="component-wizard-account">
-    <header class="ca">{{$t('softphone accounts')}}</header>
+    <header class="ca">{{$t('pick an account')}}</header>
+
 
     <div class="step-description">
-        <span class="cf">{{$t('the {name} needs a VoIP account to make calls. Choose one of the available accounts below to proceed:', {name: app.name})}}</span>
+        <AccountPicker :label="$t('softphone accounts')" :v="$v"/>
+        <span class="cf">{{$t('the {name} needs a softphone account to make calls. Choose one of the available accounts above to proceed.', {name: app.name})}}</span>
     </div>
-    <AccountPicker :label="$t('available accounts')" :v="$v"/>
     <slot name="progress"></slot>
 
     <div class="buttons is-centered">

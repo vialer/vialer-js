@@ -5,13 +5,21 @@ module.exports = function(app) {
     const Notifications = {
         methods: {
             classes: function(block, notification) {
-                let cssClasses = {}
-                if (block === 'notification') cssClasses[`is-${notification.type}`] = true
-                return cssClasses
+                let classes = {}
+                if (block === 'notification') {
+                    classes[`is-${notification.type}`] = true
+                } else if (block === 'component') {
+                    if (this.user.authenticated) classes.topbar = true
+                }
+                return classes
             },
             close: function(notification) {
                 let notifications = this.notifications.filter((i) => i.id !== notification.id)
                 app.setState({app: {notifications}})
+            },
+            openUrl: function(url) {
+                if (app.env.isExtension) browser.tabs.create({url})
+                else window.open(url, '_blank')
             },
         },
         props: ['notification'],
@@ -19,6 +27,7 @@ module.exports = function(app) {
         staticRenderFns: templates.notifications.s,
         store: {
             notifications: 'app.notifications',
+            user: 'user',
         },
     }
 

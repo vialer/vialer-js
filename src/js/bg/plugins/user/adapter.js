@@ -8,6 +8,18 @@ class UserAdapter {
 
 
     /**
+    * Placeholder that warns that this method
+    * needs to be implemented in the adapter.
+    * @param {Object} options - Options to pass.
+    * @param {Object} options.account - The account credentials.
+    * @param {Function} options.callback - Called when the account is set.
+    */
+    _selectAccount({account, callback}) {
+        this.app.logger.info(`${this}account selection not implemented!`)
+    }
+
+
+    /**
     * Some default actions that are done, no matter
     * what login provider is being used.
     * @param {Object} options - Options to pass.
@@ -26,9 +38,7 @@ class UserAdapter {
             user: {username},
         }, {encrypt: false, persist: true})
 
-        await this.app.setState({
-            user: userFields},
-        {persist: true})
+        await this.app.setState({user: userFields}, {persist: true})
     }
 
 

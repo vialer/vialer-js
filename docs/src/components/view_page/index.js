@@ -1,36 +1,25 @@
 module.exports = (app) => {
-    const markdownIt = new MarkdownIt({
-        highlight: function(str, lang) {
-            if (lang && hljs.getLanguage(lang)) {
-                return hljs.highlight(lang, str).value
-            }
-            return ''
-        },
-    }).enable('image')
 
     const ViewStory = {
         computed: {
             page: function() {
-                if (this.$route.name === 'view_readme') {
-                    return markdownIt.render(this.readme)
-
-                    // return this.readme.split('\n').map(function(line) {
-                    //     return markdownIt.renderInline(line).trim()
-                    // }).join('\n')
-
-                } else {
-                    let topic = this.topics.find((i) => i.name === this.$route.params.topic_id)
-                    if (topic) return markdownIt.render(topic.content)
+                let topic
+                if (this.$route.name === 'view_quickstart') {
+                    topic = this.topics.user.find((i) => i.name === 'introduction')
+                } else if (this.$route.name === 'view_developer_topic') {
+                    topic = this.topics.developer.find((i) => i.name === this.$route.params.topic_id)
+                } else if (this.$route.name === 'view_user_topic') {
+                    topic = this.topics.user.find((i) => i.name === this.$route.params.topic_id)
                 }
 
-                return ''
+                return topic.content
             },
         },
         methods: {
             classes: function(block) {
                 let classes = {}
                 if (block === 'component') {
-                    let topic = this.topics.find((i) => i.name === this.$route.params.topic_id)
+                    let topic = this.topics.developer.find((i) => i.name === this.$route.params.topic_id)
                     if (topic) classes.topic = true
                     else classes.readme = true
                 }
@@ -40,8 +29,9 @@ module.exports = (app) => {
         render: templates.view_page.r,
         staticRenderFns: templates.view_page.s,
         store: {
-            readme: 'pages.readme',
+            app: 'app',
             topics: 'pages.topics',
+            vendor: 'vendor',
         },
     }
 

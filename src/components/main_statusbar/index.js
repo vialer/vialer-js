@@ -35,7 +35,7 @@ module.exports = (app) => {
             titles: function(block) {
                 let title = ''
                 if (block === 'indicator') {
-                    if (this.settings.webrtc.enabled) title += 'WebRTC: '
+                    if (this.settings.webrtc.enabled) title += 'SIP: '
                     else title += 'ConnectAB: '
 
                     if (['disconnected', 'reconnect', 'registration_failed'].includes(this.ua.status)) {
@@ -71,8 +71,8 @@ module.exports = (app) => {
                         }
                     }
 
-                    if (this.selected.username) {
-                        title += ` (${this.selected.username})`
+                    if (this.account.using.username) {
+                        title += ` (${this.account.using.name})`
                     } else {
                         title += ` (${this.$t('no account')})`
                     }
@@ -84,6 +84,7 @@ module.exports = (app) => {
         render: templates.main_statusbar.r,
         staticRenderFns: templates.main_statusbar.s,
         store: {
+            account: 'settings.webrtc.account',
             app: 'app',
             dnd: 'availability.dnd',
             env: 'env',

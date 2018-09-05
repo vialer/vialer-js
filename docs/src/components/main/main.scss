@@ -15,5 +15,7 @@
         flex: 1;
         height: 100vh;
         overflow: auto;
+        padding: $spacer * 4;
+        padding-bottom: $spacer * 8;
     }
 }

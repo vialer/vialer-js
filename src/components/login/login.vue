@@ -34,7 +34,7 @@
     <!-- Login without any sessions, or when selecting a new session.-->
     <div v-else-if="!app.session.available.length || app.session.active === 'new' || user.status === 'login'">
 
-        <Field v-if="!settings.webrtc.endpoint.selection" name="endpoint" type="text"
+        <Field v-if="!settings.webrtc.account.selection" name="endpoint" type="text"
             :label="$t('SIP websocket domain')"
             :model.sync="settings.webrtc.endpoint.uri"
             :help="$t('SIP provider with support for SIP over websockets and WebRTC.')"
@@ -90,8 +90,8 @@
     </div>
 
     <footer>
-        <div v-if="calls.endpoint" class="forgot-pw">
-            <a :href="`${url}user/password_reset/`" class="cf" target="_blank">{{$t('forgot your password?')}}</a>
+        <div v-if="account.selection" class="forgot-pw">
+            <a :href="`${url}/user/password_reset/`" class="cf" target="_blank">{{$t('forgot your password?')}}</a>
         </div>
         <div class="help-message cf">{{$t('need help?')}}<br/><span class="cf">{{$t('click on the')}}</span><i @click="setOverlay('about')"><icon name="help"/></i>{{$t('icon')}}</div>
     </footer>

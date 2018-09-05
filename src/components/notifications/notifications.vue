@@ -4,8 +4,10 @@
             <div class="icon">
                 <icon :name="item.icon" v-if="item.icon"/>
             </div>
-            <div class="message cf" v-if="html" v-html="message"></div>
-            <div class="message cf" v-else>{{item.message}}</div>
+            <div class="message cf">
+                {{item.message}}
+                <span class="cf link" v-if="item.link" @click="openUrl(item.link.url)">{{item.link.text}}</span>
+            </div>
             <div class="actions">
                 <button class="delete test-delete-notification" @click="close(item)"></button>
             </div>
