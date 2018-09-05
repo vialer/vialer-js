@@ -29,6 +29,7 @@ module.exports = (app) => {
         staticRenderFns: templates.view_page.s,
         store: {
             topics: 'pages.topics',
+            vendor: 'vendor',
         },
     }
 

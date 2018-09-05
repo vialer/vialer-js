@@ -3,18 +3,18 @@
 
     <h2>Build system</h2>
     <p>
-        Vialer-js uses <a href="https://gulpjs.com/">Gulp</a> as its build system.
+        {{vendor.name}} uses <a href="https://gulpjs.com/">Gulp</a> as its build system.
         The build system is using a configuration file(<code>.vialerjs-rc</code>) and
-        runtime flags to determine how to build Vialer-js. There are several
+        runtime flags to determine how to build {{vendor.name}}. There are several
         configuration options that can be used to customize the build, as well
         as flags that indicate which brand to build and what platform to build for.
 
-        The preferred workflow for development is the webview build target, because
-        it will get you the fastest development feedback loop. The code automatically
+        The preferred workflow during development is to use the webview build target,
+        because it will get you the fastest development feedback loop. Code automatically
         rebuilds as you make filechanges, while the webview automatically reloads
         with the <a href="https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei)">
         livereload extension</a>. Use it whenever you are not developing
-        platform-specific code. A handy trick to test API-calls during development
+        platform-specific code! A handy trick to test API-calls during development
         without the need for CORS:
 
 <pre v-highlightjs><code class="bash"># --ignore-certificate-errors may be useful in certain cases as well.

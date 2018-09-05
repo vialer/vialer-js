@@ -59,6 +59,7 @@
     <div class="tab tab-phone" :class="{'is-active': tabs.active === 'phone'}">
 
         <Field name="webrtc_enabled" type="checkbox"
+            v-if="user.platform.account.selection"
             :disabled="env.isFirefox"
             :label="$t('use as softphone')"
             :model.sync="settings.webrtc.toggle"
