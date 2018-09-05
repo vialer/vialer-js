@@ -100,13 +100,13 @@ test('[browser] <alice> I am logging in.', async(t) => {
     t.end()
 
     test('[browser] <alice> I am going to complete the wizard.', async(_t) => {
-
+        const aliceContainer = await alice.$('#app')
         let [aliceOptions, bobOptions] = await Promise.all([
             await wizard(alice, SCREENS),
             await wizard(bob, false),
         ])
 
-        if (SCREENS) await alice.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}ready-to-use.png`)})
+        if (SCREENS) await aliceContainer.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}ready-to-use.png`)})
 
         await Promise.all([
             alice.click('.test-delete-notification'),
@@ -121,7 +121,6 @@ test('[browser] <alice> I am logging in.', async(t) => {
 
         _t.end()
 
-        // Open a second tab and get another tab ready.
         test('[browser] <alice> I am calling bob.', async(__t) => {
             // Wait until the status indicates a registered device.
             await alice.waitFor('.test-status-registered')
@@ -129,23 +128,24 @@ test('[browser] <alice> I am logging in.', async(t) => {
             await alice.click('.component-call-keypad .test-key-2')
             await alice.click('.component-call-keypad .test-key-2')
             await alice.click('.component-call-keypad .test-key-9')
-            if (SCREENS) await alice.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}dialpad-call.png`)})
+            if (SCREENS) await aliceContainer.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}dialpad-call.png`)})
             await alice.click('.test-call-button')
 
             await alice.waitFor('.component-calls .call-ongoing')
-            if (SCREENS) await alice.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}calldialog-outgoing.png`)})
+            if (SCREENS) await aliceContainer.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}calldialog-outgoing.png`)})
 
             __t.end()
 
             test('[browser] <bob> alice is calling; let\'s talk.', async(___t) => {
+                const bobContainer = await bob.$('#app')
                 await bob.waitFor('.component-calls .call-ongoing')
-                if (SCREENS) await bob.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(bob)}calldialog-incoming.png`)})
+                if (SCREENS) await bobContainer.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(bob)}calldialog-incoming.png`)})
                 await bob.click('.component-call .test-button-accept')
                 // Alice and bob are now getting connected;
                 // wait for Alice to see the connected screen.
                 await alice.waitFor('.component-call .call-options')
-                if (SCREENS) await alice.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}calldialog-outgoing-accepted.png`)})
-                if (SCREENS) await bob.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(bob)}calldialog-incoming-accepted.png`)})
+                if (SCREENS) await aliceContainer.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(alice)}calldialog-outgoing-accepted.png`)})
+                if (SCREENS) await bobContainer.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(bob)}calldialog-incoming-accepted.png`)})
 
                 await browserAlice.browser.close()
                 await browserBob.browser.close()

@@ -143,13 +143,13 @@
             user-select: none;
 
             &.selected {
-                background: $brand-color;
-                color: $white-color;
+                background: $grey-color-lightest;
+                color: $grey-color-darkest;
             }
 
             &:hover {
-                background: $brand-color;
-                color: $white-color;
+                background: $grey-color-lightest;
+                color: $grey-color-darker;
                 cursor: pointer;
             }
         }
@@ -186,7 +186,6 @@
 
 // Override some of the default styling of Bulma inputs.
 .control {
-
     input[disabled] {
         background: $grey-color-lightest;
 
@@ -225,6 +224,20 @@
     &:checked + label {
         &::before {
             background: $brand-accent-color;
+        }
+    }
+}
+
+// Obfiscate text-input during test runs and screenshot
+// generation. No need to give usernames away.
+html.test {
+    input {
+        // We really, really don't want anything else here.
+        color: transparent !important;  // sass-lint:disable-line no-important
+        text-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+
+        &::placeholder {
+            text-shadow: none;
         }
     }
 }

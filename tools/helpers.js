@@ -56,7 +56,7 @@ class Helpers {
         return envify({
             ANALYTICS_ID: brand.telemetry.analytics_id[this.settings.BUILD_TARGET],
             APP_NAME: brand.name.production,
-            BRAND_NAME: this.settings.BRAND_TARGET,
+            BRAND_TARGET: this.settings.BRAND_TARGET,
 
             BUILTIN_AVAILABILITY_ADDONS: brand.plugins.builtin.availability.addons,
             BUILTIN_CONTACTS_I18N: brand.plugins.builtin.contacts.i18n,

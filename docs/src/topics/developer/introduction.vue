@@ -1,14 +1,13 @@
 <component class="view-page">
-    <h1>Quickstart guide</h1>
+    <h1>Quickstart</h1>
 
     <p>
-        Just install the <a href="https://chrome.google.com/webstore/detail/bologna-alpha/adgookjhbldhfflndfdgkcbmpmfhapgc">Bologna Alpha</a>
-        Chrome extension if you want to see a short demo.
+        Install the <a href="https://chrome.google.com/webstore/detail/bologna-alpha/adgookjhbldhfflndfdgkcbmpmfhapgc">{{app.name}}</a>
+        Chrome extension if you just want to try a demo.
 
-        Do you want to build a softphone yourself? Lets get you up and running.
-        Installing Vialer-js is the quickest way to get a grasp on how Vialer-js works.
-        You need some dependencies installed on your system
-        to get started. These dependencies are:
+        Do you want to build a softphone yourself? Installing {{app.name}} is the
+        quickest way to get a grasp on how it works. You need some dependencies
+        installed on your system to get started. These dependencies are:
     </p>
 
     <ul>
@@ -27,7 +26,7 @@ cd vialer-js
 npm i
 # Setup a default settings file.
 cp ./.vialer-jsrc.example ~/.vialer-jsrc
-# Build Vialer-js Bologna brand as a Chrome extension.
+# Build {{app.name}} brand as a Chrome extension.
 gulp build --brand bologna --target chrome
 </code></pre>
 

@@ -3,9 +3,9 @@
 
     <h2>Build system</h2>
     <p>
-        {{vendor.name}} uses <a href="https://gulpjs.com/">Gulp</a> as its build system.
+        {{app.name}} uses <a href="https://gulpjs.com/">Gulp</a> as its build system.
         The build system is using a configuration file(<code>.vialerjs-rc</code>) and
-        runtime flags to determine how to build {{vendor.name}}. There are several
+        runtime flags to determine how to build {{app.name}}. There are several
         configuration options that can be used to customize the build, as well
         as flags that indicate which brand to build and what platform to build for.
 

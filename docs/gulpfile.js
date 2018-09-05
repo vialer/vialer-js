@@ -113,20 +113,26 @@ gulp.task('screenshots', 'Generate userstory screenshots.', (done) => {
 gulp.task('pages', 'Generate topics JSON.', async(done) => {
     const description = JSON.parse((await fs.readFile('src/topics/topics.json')))
 
-    let files = await Promise.all(
-        description.topics.map((topic) => fs.readFile(`src/topics/${topic.name}.vue`))
-    )
+    let developerFiles = await Promise.all(description.topics.developer.map((i) => fs.readFile(`src/topics/developer/${i.name}.vue`)))
+    let userFiles = await Promise.all(description.topics.user.map((i) => fs.readFile(`src/topics/user/${i.name}.vue`)))
+
     let data = {
-        topics: [],
+        topics: {
+            developer: [],
+            user: [],
+        },
     }
 
-    for (const [i, file] of files.entries()) {
-        data.topics.push({
-            content: file.toString('utf8'),
-            name: description.topics[i].name,
-            title: description.topics[i].title,
-        })
+    for (const [i, file] of developerFiles.entries()) {
+        let topic = description.topics.developer
+        data.topics.developer.push({content: file.toString('utf8'), name: topic[i].name, title: topic[i].title})
     }
+
+    for (const [i, file] of userFiles.entries()) {
+        let topic = description.topics.user
+        data.topics.user.push({content: file.toString('utf8'), name: topic[i].name, title: topic[i].title})
+    }
+
     await mkdirp(path.join(settings.BUILD_DIR, 'js'))
     fs.writeFile(path.join(settings.BUILD_DIR, 'js', 'pages.js'), `window.pages = ${JSON.stringify(data)}`)
     if (settings.LIVERELOAD) livereload.changed('pages.js')
@@ -171,7 +177,7 @@ gulp.task('watch', 'Run developer watch modus.', () => {
     gulp.watch(path.join(settings.SRC_DIR, 'scss', 'vendor.scss'), ['scss-vendor'])
     gulp.watch([
         path.join(settings.SRC_DIR, 'topics', 'topics.json'),
-        path.join(settings.SRC_DIR, 'topics', '*.vue'),
+        path.join(settings.SRC_DIR, 'topics', '**', '*.vue'),
     ], ['pages'])
     gulp.watch([path.join(settings.SRC_DIR, 'components', '**', '*.vue')], ['templates'])
 })

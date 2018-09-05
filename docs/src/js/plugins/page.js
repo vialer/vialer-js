@@ -13,8 +13,14 @@ class PluginPage extends Plugin {
 
         app.router.addRoutes([{
             component: app.components.ViewPage,
-            name: 'view_topic',
-            path: '/topics/:topic_id',
+            name: 'view_developer_topic',
+            path: '/developer/:topic_id',
+        }])
+
+        app.router.addRoutes([{
+            component: app.components.ViewPage,
+            name: 'view_user_topic',
+            path: '/user/:topic_id',
         }])
     }
 

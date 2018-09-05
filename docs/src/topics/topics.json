@@ -1,20 +1,19 @@
 {
-    "topics": [
-        {
-            "name": "quickstart",
-            "title": "Quickstart guide"
-        },
-        {
-            "name": "platforms",
-            "title": "Platforms"
-        },
-        {
-            "name": "customization",
-            "title": "Customization"
-        },
-        {
-            "name": "deployment",
-            "title": "Deployment"
-        }
-    ]
+    "topics": {
+        "developer": [
+            {"name": "introduction", "title": "Quickstart"},
+            {"name": "platforms", "title": "Platforms"},
+            {"name": "customization", "title": "Customization"},
+            {"name": "deployment", "title": "Deployment"}
+        ],
+        "user": [
+            {"name": "introduction", "title": "Welcome"},
+            {"name": "requirements", "title": "Requirements"},
+            {"name": "login", "title": "Login with an account"},
+            {"name": "wizard", "title": "Passing the wizard"},
+            {"name": "calling", "title": "Making a call"},
+            {"name": "call_options", "title": "Call options"},
+            {"name": "accessibility", "title": "Accessibility"}
+        ]
+    }
 }

@@ -140,7 +140,7 @@ class PluginSettings extends Plugin {
     */
     _ready() {
         if (this.app.state.settings.telemetry.enabled) {
-            const release = process.env.VERSION + '-' + process.env.DEPLOY_TARGET + '-' + process.env.BRAND_NAME + '-' + this.app.env.name
+            const release = process.env.VERSION + '-' + process.env.DEPLOY_TARGET + '-' + process.env.BRAND_TARGET + '-' + this.app.env.name
             this.app.logger.info(`${this}monitoring exceptions for release ${release}`)
             Raven.config(process.env.SENTRY_DSN, {
                 allowSecretKey: true,

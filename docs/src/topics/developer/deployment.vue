@@ -3,7 +3,7 @@
 
 <h2>Release cycle</h2>
 <p>
-Vialer-js uses <code>alpha</code>, <code>beta</code> and <code>production</code> release channels.
+{{app.name}} uses <code>alpha</code>, <code>beta</code> and <code>production</code> release channels.
 Each channel represents its own Chrome/Firefox store entry. A release will always be targetting the
 <em>alpha</em> channel first, so bleeding-edge users can verify within a week that the
 release works as expected. An alpha release will always involve a MINOR or a MAJOR semver
@@ -30,11 +30,11 @@ depending on the nature of the changes. The following applies here:
 </p>
 
 <h2>Store details</h2>
-<pre v-highlightjs><code class="bash">gulp deploy --brand bologna --target chrome --deploy alpha
+<pre v-highlightjs><code class="bash">gulp deploy --brand {{app.name}} --target chrome --deploy alpha
 </code></pre>
 
 <p>
-    The buildsystem can publish to the Chrome webstore and Mozilla <a href="https://addons.mozilla.org">
+    The buildsystem publishes to the Chrome webstore and Mozilla <a href="https://addons.mozilla.org">
     addons store</a>. A Google account and a $5 developer fee paid with a creditcard is needed
     to enable publishing rights to the Chrome webstore. Store-related branding
     material includes:
