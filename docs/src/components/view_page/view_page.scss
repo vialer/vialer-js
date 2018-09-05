@@ -4,16 +4,16 @@
     display: flex;
     flex-direction: column;
     max-width: 900px;
-    padding: $spacer * 3;
 
     pre {
-        margin: $spacer * 2 0;
+        // background: none;
+        margin: 0;
         overflow: visible;
+        padding: $spacer;
     }
 
     p {
         margin: $spacer 0;
-
     }
 
     h1 {
@@ -36,6 +36,11 @@
         font-weight: 500;
         margin-top: $spacer;
         text-transform: uppercase;
+    }
+
+    h4 {
+        color: $grey-color;
+        font-size: 1.2rem;
     }
 
     strong {

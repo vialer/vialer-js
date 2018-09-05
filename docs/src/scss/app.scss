@@ -6,7 +6,8 @@ html {
 }
 
 a, a:visited {
-    color: $grey-color;
+    color: $brand-color;
+    font-weight: 500;
 }
 
 a:hover {

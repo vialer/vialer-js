@@ -6,15 +6,15 @@
         },
         {
             "name": "platforms",
-            "title": "Supported platforms"
+            "title": "Platforms"
         },
         {
-            "name": "customize",
-            "title": "Customize your build"
+            "name": "customization",
+            "title": "Customization"
         },
         {
-            "name": "publish",
-            "title": "Publish information"
+            "name": "deployment",
+            "title": "Deployment"
         }
     ]
 }
