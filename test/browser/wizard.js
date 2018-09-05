@@ -16,11 +16,13 @@ module.exports = function(settings) {
 
         // For now, only vjs-adapter-user-vg supports account selection.
         if (brand.plugins.builtin.user.adapter === 'vjs-adapter-user-vg') {
-            // Wait for the select to be filled by the platform API call.
             await runner.waitFor('.component-wizard-account')
-            await runner.waitFor('select option:not([disabled="disabled"])')
+            // Wait for the select to be filled by the platform API call.
+            await runner.waitFor('.filtered-options .option')
 
-            await runner.select('select', brand.tests[runner._name].id)
+            await runner.click('input[id="webrtc_account"]')
+            await runner.click(`.filtered-options #option-${brand.tests[runner._name].id}`)
+
             if (screens) await container.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(runner)}wizard-account.png`)})
             await runner.click('.test-wizard-account-next')
         }
