@@ -69,6 +69,9 @@ class Call {
                 active: false,
             },
             number: null,
+            stats: {
+                callId: null,
+            },
             status: null,
             timer: {
                 current: null,
@@ -82,16 +85,16 @@ class Call {
             type: null, // incoming or outgoing
         }
 
-        // The default Call status codes, which each Call implementation
-        // should map to.
+        // The default Call status codes, which each Call implementation should map to.
         this._statusMap = {
             accepted: 'accepted',
             answered_elsewhere: 'answered_elsewhere',
             bye: 'bye',
+            callee_busy: 'callee_busy',
+            callee_unavailable: 'callee_unavailable',
             create: 'create',
             invite: 'invite',
-            rejected_a: 'rejected_a',
-            rejected_b: 'rejected_b',
+            request_terminated: 'request_terminated',
         }
     }
 
@@ -157,18 +160,17 @@ class Call {
             }
         }
 
-        if (!this.silent) {
-            // Always set this call to be the active call as soon
-            // a new connection has been made.
-            this.module.activateCall(this, true)
-            let message = ''
-            if (displayName) message = `${this.state.number}: ${displayName}`
-            else message = this.state.number
-            this.app.plugins.ui.notification({message, number: this.state.number, title: this.translations.create})
-        }
-
+        // Always set this call to be the active call.
+        this.module.activateCall(this, true)
+        let message = ''
+        if (displayName) message = `${this.state.number}: ${displayName}`
+        else message = this.state.number
+        this.app.plugins.ui.notification({message, number: this.state.number, title: this.translations.create})
         this.setState({displayName: displayName, status: this._statusMap.create})
-        this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
+
+        if (!this.silent) {
+            this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
+        }
     }
 
 
@@ -216,6 +218,7 @@ class Call {
     * @param {Number} options.timeout - Postpones resetting the call state.
     */
     _stop({force = false, message = '', timeout = 3000} = {}) {
+        this.app.logger.debug(`${this}call is stopping in ${timeout}ms`)
         if (this.silent) {
             this.module.deleteCall(this)
             return
@@ -230,8 +233,8 @@ class Call {
         this.ringtone.stop()
 
         if (force) {
-            if (this.state.status === 'rejected_b') {
-                const title = this.translations.rejected_b
+            if (this.state.status === 'callee_busy') {
+                const title = this.translations.callee_busy
                 this.app.plugins.ui.notification({force, message, number: this.state.number, stack: true, title})
             } else {
                 const title = this.translations.bye

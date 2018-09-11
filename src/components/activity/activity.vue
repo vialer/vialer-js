@@ -11,7 +11,7 @@
                 </div>
                 <div class="filter" :class="classes('filter-missed-calls')" @click="toggleFilterMissedCalls()">
                     <icon name="missed-call"/>
-                    <span class="cf">{{$t('missed')}}</span>
+                    <span class="cf">{{$t('missed')}}/<span class="cf">{{$t('unanswered')}}</span></span>
                 </div>
             </div>
         </div>

@@ -19,9 +19,10 @@ class CallSIP extends Call {
         super(app, target, {active, silent})
 
         if (!target || ['string', 'number'].includes(typeof target)) {
+            // Passing in no target or a number means an outgoing call.
             app.__mergeDeep(this.state, {keypad: {mode: 'call'}, number: target, status: 'new', type: 'outgoing'})
         } else {
-            // Passing in a session means an outgoing call.
+            // Passing in a session as target means an incoming call.
             app.__mergeDeep(this.state, {keypad: {mode: 'dtmf'}, status: 'invite', type: 'incoming'})
             this.session = target
         }
@@ -32,43 +33,17 @@ class CallSIP extends Call {
     * Handle an incoming `invite` call from.
     */
     _incoming() {
-        // (!) First set the state before calling super.
+        // (!) Set the state before calling super.
         this.state.displayName = this.session.remoteIdentity.displayName
         this.state.number = this.session.remoteIdentity.uri.user
+        this.state.stats.callId = this.session.request.call_id
+        this.app.logger.debug(`${this}incoming call ${this.state.stats.callId} started`)
         super._incoming()
 
         // Setup some event handlers for the different stages of a call.
         this.session.on('accepted', (request) => {
             this.app.telemetry.event('call[sip]', 'incoming', 'accepted')
             this._start({message: this.translations.accepted.incoming})
-        })
-
-        this.session.on('rejected', (e) => {
-            // The `e` is a SIP header string when the callee hangs up,
-            // otherwise it is an object. If it is an object, we can distinguish
-            // several rejected reasons from each other from the headers.
-            if (typeof e === 'object') {
-                const reason = this._parseHeader(e.getHeader('reason'))
-
-                if (reason.get('text') === 'Call completed elsewhere') {
-                    this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
-                    this.setState({status: 'answered_elsewhere'})
-                } else {
-                    // `Call completed elsewhere` is not considered to be
-                    // a missed call and will not end up in the activity log.
-                    this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
-                    this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
-                    // `e.method` is CANCEL when the incoming caller hung up.
-                    // `e` will be a SIP response 480 when the callee hung up.
-                    if (e.method === 'CANCEL') this.setState({status: 'rejected_b'})
-                    else this.setState({status: 'rejected_a'})
-                }
-            } else {
-                this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
-                this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
-            }
-
-            this._stop({message: this.translations[this.state.status]})
         })
 
         this.session.on('bye', (e) => {
@@ -82,6 +57,52 @@ class CallSIP extends Call {
 
             this.setState({status: 'bye'})
             this._stop({message: this.translations[this.state.status]})
+        })
+
+        /**
+        * The `failed` status is triggered when a call is rejected, but
+        * also when an incoming calls keeps ringing for a certain amount
+        * of time (60 seconds), and fails due to a timeout. In that case,
+        * no `rejected` event is triggered and we need to kill the
+        * call ASAP, so a new INVITE for the same call will be accepted by the
+        * call module's invite handler.
+        */
+        this.session.on('failed', (message) => {
+            if (typeof message === 'string') message = SIP.Parser.parseMessage(message, this.module.ua)
+
+            if (message.reason_phrase === 'Call completed elsewhere') {
+                this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
+                this.setState({status: 'answered_elsewhere'})
+            } else {
+                // `Call completed elsewhere` is not considered to be
+                // a missed call and will not end up in the activity log.
+                this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
+                this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
+                // We could distinguish here between a CANCEL send by the calling
+                // party, or a cancel made by the callee. For now let's use
+                // `request_terminated` for both cases.
+                if (message.method === 'CANCEL') {
+                    this.setState({status: 'request_terminated'})
+                } else if (message.status_code === 480) {
+                    // The accepting party receiving the incoming call terminated.
+                    this.setState({status: 'request_terminated'})
+                }
+            }
+
+            this.app.logger.info(`${this}call ${this.state.stats.callId} failed`)
+            this._stop({message: this.translations[this.state.status]})
+        })
+
+        // Check for the RPID. Update the display name and number to the
+        // transferred caller, if there is one.
+        this.session.on('reinvite', (session) => {
+            let rpid = session.transaction.request.getHeader('Remote-Party-Id')
+            if (rpid) {
+                const rpidMatch = /"(.*?)" <(.*)>/g
+                rpid = rpidMatch.exec(rpid.split(';')[0])
+                this.app.logger.info(`${this}changing transfer RPID to ${rpid[1]}/${rpid[2]}`)
+                this.setState({displayName: rpid[1], number: rpid[2].replace('sip:', '')})
+            }
         })
 
         // Blind transfer event.
@@ -101,10 +122,18 @@ class CallSIP extends Call {
             },
         })
 
+        this.setState({stats: {callId: this.session.request.call_id}})
+
         // Notify user about the new call being setup.
         this.session.on('accepted', (data) => {
             this.app.telemetry.event('call[sip]', 'outgoing', 'accepted')
             this._start({message: this.translations.accepted.outgoing})
+        })
+
+        // Reset call state when the other halve hangs up.
+        this.session.on('bye', (e) => {
+            this.setState({status: 'bye'})
+            this._stop({message: this.translations[this.state.status]})
         })
 
         // Handle connecting streams to the appropriate video element.
@@ -134,23 +163,29 @@ class CallSIP extends Call {
 
         // Blind transfer.
         this.session.on('refer', (target) => this.session.bye())
-        // Reset call state when the other halve hangs up.
-        this.session.on('bye', (e) => {
-            this.setState({status: 'bye'})
-            this._stop({message: this.translations[this.state.status]})
-        })
 
-        this.session.on('rejected', (e) => {
-            this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
-            this.app.telemetry.event('call[sip]', 'outgoing', 'rejected')
+        this.session.on('failed', (message) => {
             this.busyTone.play()
 
-            // Busy here; Callee is busy.
-            if (e.status_code === 486) this.setState({status: 'rejected_b'})
-            // Request terminated; Request has terminated by bye or cancel.
-            else if (e.status_code === 487) this.setState({status: 'rejected_a'})
-            // Just assume that Callee rejected the call otherwise.
-            else this.setState({status: 'rejected_b'})
+            if (message.status_code === 480) {
+                // Temporarily Unavailable; Callee currently unavailable.
+                this.setState({status: 'callee_unavailable'})
+            } else if (message.status_code === 486) {
+                // Busy here; Callee is busy.
+                this.setState({status: 'callee_busy'})
+            } else if (message.status_code === 487) {
+                // Request terminated; Request has terminated by bye or cancel.
+                this.setState({status: 'request_terminated'})
+            } else {
+                // Assume `request_terminated`, but log unhandled status as a warning.
+                this.app.logger.warn(`${this}unhandled status code: ${message.status_code}`)
+                this.setState({status: 'request_terminated'})
+            }
+
+            this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
+
+            this.app.telemetry.event('call[sip]', 'outgoing', 'rejected')
+            this.app.logger.debug(`${this}outgoing call ${this.state.stats.callId} failed: ${message.status_code}`)
             this._stop({message: this.translations[this.state.status]})
         })
     }
@@ -235,7 +270,7 @@ class CallSIP extends Call {
             // A fresh outgoing Call; not yet started. There may or may not
             // be a session object. End the session if there is one.
             if (this.session) this.session.terminate()
-            this.setState({status: 'rejected_a'})
+            this.setState({status: 'request_terminated'})
             // The session's closing events will not be called, so manually
             // trigger the Call to stop here.
             this._stop()
@@ -244,7 +279,7 @@ class CallSIP extends Call {
             // Calls with other statuses need some more work to end.
             try {
                 if (this.state.status === 'invite') {
-                    this.setState({status: 'rejected_a'})
+                    this.setState({status: 'request_terminated'})
                     this.session.reject() // Decline an incoming call.
                 } else if (['accepted'].includes(this.state.status)) {
                     // Hangup a running call.

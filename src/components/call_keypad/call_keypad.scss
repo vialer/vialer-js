@@ -57,7 +57,7 @@
 
             // Transfer button next to input.
             i {
-                background: $grey-color-lightest;
+                background: $white-tint-color-light;
                 border: 1px solid $grey-color-lighter;
                 border-bottom-right-radius: $spacer / 2;
                 border-top-right-radius: $spacer / 2;
@@ -73,7 +73,7 @@
                 }
 
                 &.disabled {
-                    background: rgba($grey-color-lighter, 0.3);
+                    background: $grey-color-lightest;
                     border: 1px solid $grey-color-lighter;
                     color: rgba($grey-color, 0.4);
                     cursor: not-allowed;

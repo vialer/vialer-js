@@ -1,6 +1,6 @@
 <component class="component-main-callbar" :class="{inactive: call.status === 'new'}">
     <div class="status-left">
-        <span class="status-indicator tooltip tooltip-right">
+        <span class="status-indicator">
             <icon class="vendor-logo" name="phone"/>
         </span>
     </div>
