@@ -35,7 +35,16 @@ class CallSIP extends Call {
     _incoming() {
         // (!) Set the state before calling super.
         this.state.displayName = this.session.remoteIdentity.displayName
-        this.state.number = this.session.remoteIdentity.uri.user
+
+        // Try to get the caller info first from the RPID.
+        let rpid = this.session.transaction.request.getHeader('Remote-Party-Id')
+        if (rpid) {
+            rpid = this._parseRpid(rpid)
+            Object.assign(this.state, rpid)
+        } else {
+            this.state.number = this.session.remoteIdentity.uri.aor
+        }
+
         this.state.stats.callId = this.session.request.call_id
         this.app.logger.debug(`${this}incoming call ${this.state.stats.callId} started`)
         super._incoming()
@@ -97,12 +106,10 @@ class CallSIP extends Call {
         // Check for the RPID. Update the display name and number to the
         // transferred caller, if there is one.
         this.session.on('reinvite', (session) => {
-            let rpid = session.transaction.request.getHeader('Remote-Party-Id')
-            if (rpid) {
-                const rpidMatch = /"(.*?)" <(.*)>/g
-                rpid = rpidMatch.exec(rpid.split(';')[0])
-                this.app.logger.info(`${this}changing transfer RPID to ${rpid[1]}/${rpid[2]}`)
-                this.setState({displayName: rpid[1], number: rpid[2].replace('sip:', '')})
+            let _rpid = session.transaction.request.getHeader('Remote-Party-Id')
+            if (_rpid) {
+                _rpid = this._parseRpid(_rpid)
+                this.setState(_rpid)
             }
         })
 
@@ -201,6 +208,22 @@ class CallSIP extends Call {
     */
     _parseHeader(header) {
         return new Map(header.replace(/\"/g, '').split(';').map((i) => i.split('=')))
+    }
+
+
+    /**
+    * Pase the name and number of the caller from the Remote-Party-ID header.
+    * @param {String} header - The raw RPID header string.
+    * @returns {Object} - displayName and number properties that map to state.
+    */
+    _parseRpid(header) {
+        const rpidMatch = /"(.*?)" <(.*)>/g
+        header = rpidMatch.exec(header.split(';')[0])
+        this.app.logger.info(`${this}changing transfer RPID to ${header[1]}/${header[2]}`)
+        return {
+            displayName: header[1],
+            number: header[2].replace('sip:', ''),
+        }
     }
 
 
