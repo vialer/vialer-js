@@ -211,14 +211,12 @@ class PluginUI extends Plugin {
             if (this.app.state.settings.webrtc.enabled) {
                 if (uaStatus === 'registered') {
                     if (this.app.state.availability.dnd) base = 'dnd'
-                    else if (!this.app.state.availability.available) base = 'unavailable'
                     else base = 'active'
                 } else base = 'disconnected'
             } else {
                 // ConnectAB only connects to a SIP backend.
                 if (uaStatus === 'connected') {
-                    if (!this.app.state.availability.available) base = 'unavailable'
-                    else base = 'active'
+                    base = 'active'
                 } else base = 'disconnected'
             }
         }

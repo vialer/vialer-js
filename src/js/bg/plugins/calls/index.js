@@ -464,7 +464,7 @@ class PluginCalls extends Plugin {
     * @param {String} [opts.number] - The number to call to.
     * @returns {Call} - A new or existing Call with status `new`.
     */
-    _newCall({number = null, type}) {
+    _newCall({number = null, type} = {}) {
         let call
 
         for (const callId of Object.keys(this.calls)) {
@@ -687,18 +687,17 @@ class PluginCalls extends Plugin {
             }
         }
 
-        if (action === 'accept-new') {
+        if (action === 'action-accept-hangup') {
             if (inviteCall) inviteCall.accept()
+            else if (activeCall) activeCall.terminate()
+        } else if (action === 'action-decline-new') {
+            if (inviteCall) inviteCall.terminate()
             else {
                 const call = this._newCall()
                 this.activateCall(call, true)
                 this.app.setState({ui: {layer: 'calls'}})
             }
-        } else if (action === 'decline-hangup') {
-            // Ongoing Calls can also be terminated.
-            if (inviteCall) inviteCall.terminate()
-            else if (activeCall) activeCall.terminate()
-        } else if (action === 'hold-active') {
+        } else if (action === 'action-hold-active') {
             // Make sure the action isn't provoked on a closing call.
             if (activeCall && activeCall.state.status === 'accepted') {
                 if (activeCall.state.hold.active) activeCall.unhold()

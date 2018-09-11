@@ -25,29 +25,29 @@
         ]
     },
     "commands": {
-        "action-accept-new": {
+        "action-accept-hangup": {
             "suggested_key": {
                 "default": "Ctrl+Shift+A"
             },
-            "description": "Accept an incoming call or head over to create a new call."
+            "description": "Accept an incoming call or hangup an accepted call."
         },
-        "action-decline-hangup": {
+        "action-decline-new": {
             "suggested_key": {
                 "default": "Ctrl+Shift+Z"
             },
-            "description": "Decline an incoming call or hangup an active call."
+            "description": "Decline an incoming call or switch to a new call."
         },
         "action-dnd": {
             "suggested_key": {
                 "default": "Ctrl+Shift+S"
             },
-            "description": "Toggle do-not-disturb in softphone mode."
+            "description": "Toggle do-not-disturb."
         },
         "action-hold-active": {
             "suggested_key": {
                 "default": "Ctrl+Shift+X"
             },
-            "description": "Toggle on-hold on the active call in softphone mode."
+            "description": "Toggle on-hold on the active accepted call."
         }
     },
     "permissions": [
