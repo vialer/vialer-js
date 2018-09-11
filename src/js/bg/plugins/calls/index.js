@@ -678,7 +678,6 @@ class PluginCalls extends Plugin {
     */
     callAction(action) {
         let inviteCall = null
-        let activeCall = this.findCall({active: true})
 
         for (const callId of Object.keys(this.calls)) {
             // Don't select a call that is already closing
@@ -687,19 +686,22 @@ class PluginCalls extends Plugin {
             }
         }
 
+        const activeCall = this.findCall({active: true, ongoing: true})
+
         if (action === 'action-accept-hangup') {
+
             if (inviteCall) inviteCall.accept()
             else if (activeCall) activeCall.terminate()
         } else if (action === 'action-decline-new') {
             if (inviteCall) inviteCall.terminate()
-            else {
+            else if (activeCall) {
                 const call = this._newCall()
                 this.activateCall(call, true)
                 this.app.setState({ui: {layer: 'calls'}})
             }
         } else if (action === 'action-hold-active') {
             // Make sure the action isn't provoked on a closing call.
-            if (activeCall && activeCall.state.status === 'accepted') {
+            if (activeCall) {
                 if (activeCall.state.hold.active) activeCall.unhold()
                 else activeCall.hold()
             }
