@@ -47,6 +47,7 @@ class CallSIP extends Call {
         })
 
         this.session.on('bye', (e) => {
+            this.busyTone.play()
             if (e.getHeader('X-Asterisk-Hangupcausecode') === '58') {
                 this.app.notify({
                     icon: 'warning',
@@ -132,6 +133,7 @@ class CallSIP extends Call {
 
         // Reset call state when the other halve hangs up.
         this.session.on('bye', (e) => {
+            this.busyTone.play()
             this.setState({status: 'bye'})
             this._stop({message: this.translations[this.state.status]})
         })

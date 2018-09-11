@@ -215,9 +215,9 @@ class Call {
     * @param {Object} options - Options to pass to _stop.
     * @param {Boolean} options.force - Force showing a notification.
     * @param {String} [options.message] - Force a notification message.
-    * @param {Number} options.timeout - Postpones resetting the call state.
+    * @param {Number} options.timeout - Postpone resetting the call state for the duration of 3 busy tones.
     */
-    _stop({force = false, message = '', timeout = 3000} = {}) {
+    _stop({force = false, message = '', timeout = 2750} = {}) {
         this.app.logger.debug(`${this}call is stopping in ${timeout}ms`)
         if (this.silent) {
             this.module.deleteCall(this)

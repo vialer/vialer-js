@@ -70,8 +70,7 @@ gulp.task('build', 'Generate a <brand> build for <target>.', (done) => {
     }
     let mainTasks = [
         'assets', 'templates', 'html', 'scss', 'scss-vendor',
-        'js-app-i18n', 'js-vendor-bg', 'js-vendor-fg', 'js-app-bg',
-        'js-app-fg', 'js-app-plugins',
+        'js-vendor-bg', 'js-vendor-fg', 'js-app-plugins',
     ]
 
     if (settings.BUILD_TARGET === 'electron') {
@@ -115,7 +114,7 @@ gulp.task('build-dist', 'Generate an optimized build and pack it for distributio
             setTimeout(() => {
                 archive.directory(buildDir, false)
                 archive.finalize()
-            }, 0)
+            }, 500)
         } else if (settings.BUILD_TARGET === 'electron') {
             const iconParam = `--icon=${buildDir}/img/electron-icon.png`
             let buildParams = `--arch=${settings.BUILD_ARCH} --asar --overwrite --platform=${settings.BUILD_PLATFORM} --prune=true`
@@ -130,7 +129,7 @@ gulp.task('build-dist', 'Generate an optimized build and pack it for distributio
                 setTimeout(() => {
                     archive.directory(path.join(distDir, distBuildName), distBuildName)
                     archive.finalize()
-                }, 0)
+                }, 500)
             })
         }
     })
