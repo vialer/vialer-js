@@ -22,8 +22,13 @@ class PluginActivity extends Plugin {
         super(app)
 
         this.app.on('bg:calls:call_rejected', ({call}) => {
+            // Not answered.
+            let label
+            if (call.type === 'outgoing') label = 'unanswered'
+            else label = 'missed'
+
             let activity = {
-                label: 'missed',
+                label,
                 status: 'warning',
                 type: `${call.type}-call`,
             }

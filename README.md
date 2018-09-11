@@ -63,7 +63,7 @@ yet though.
 
 
 ## Want to learn more?
-Great! Nice to have you interested in this project. Head over to the [quickstart guide](https://vialer-js.io/topics/quickstart)
+Great! Nice to have you interested in this project. Head over to the [quickstart guide](https://vialer-js.io/developer/introduction)
 to learn more about how to work with Vialer-js. Are you interested in contributing or
 would you like to see some feature implemented? Please read our [code of conduct](https://github.com/vialer/vialer-js/blob/develop/.github/CODE_OF_CONDUCT.md)
 and [contributing guide](https://github.com/vialer/vialer-js/blob/develop/.github/CONTRIBUTING.md) first.

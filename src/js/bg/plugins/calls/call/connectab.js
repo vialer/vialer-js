@@ -29,15 +29,15 @@ class CallConnectAB extends Call {
         // Map ConnectAB status codes to the default status codes, which are
         // based on the SIP Call implementation.
         this._statusMap = {
-            blacklisted: 'rejected_b',
+            blacklisted: 'callee_busy',
             confirm: 'accepted',
             connected: 'accepted',
             create: 'dialing_a',
             dialing_a: 'dialing_a', // unique connectab status
             dialing_b: 'dialing_b', // unique connectab status
             disconnected: 'bye',
-            failed_a: 'rejected_a',
-            failed_b: 'rejected_b',
+            failed_a: 'request_terminated',
+            failed_b: 'callee_busy',
         }
     }
 
@@ -90,9 +90,9 @@ class CallConnectAB extends Call {
         // Reject the call with an invalid HTTP response.
         if (this.app.api.NOTOK_STATUS.includes(res.status)) {
             this.app.telemetry.event('call[connectab]', 'outgoing', 'error')
-            // For now don't make a distination between rejected_a and rejected_b.
+            // For now don't make a distination between request_terminated and callee_busy.
             // Just use the latter.
-            this.setState({status: 'rejected_b'})
+            this.setState({status: 'callee_busy'})
             let message = this.app.$t('an unknown error occured during call setup.')
             // Hope we dealt with all possible failures.
             if (res.data.error) message = this.app.$t(res.data.error)

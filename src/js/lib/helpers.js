@@ -14,7 +14,7 @@
 */
 function helpers(app) {
 
-    const closingStatus = ['answered_elsewhere', 'rejected_a', 'rejected_b', 'bye']
+    const closingStatus = ['answered_elsewhere', 'request_terminated', 'callee_busy', 'bye']
     let _helpers = {}
 
     _helpers.activeCall = function() {
@@ -128,6 +128,7 @@ function helpers(app) {
     _helpers.getTranslations = function() {
         const $t = app.$t
         return {
+            // Human translation to internal status codes.
             call: {
                 accepted: {
                     hold: $t('on hold'),
@@ -136,12 +137,13 @@ function helpers(app) {
                 },
                 answered_elsewhere: $t('answered elsewhere'),
                 bye: $t('call ended'),
+                callee_busy: $t('callee is busy'),
+                callee_unavailable: $t('callee is unavailable'),
                 create: $t('setting up call'),
                 dialing_a: $t('dialing phone A'),
                 dialing_b: $t('dialing phone B'),
                 invite: $t('incoming call'),
-                rejected_a: $t('you disconnected'),
-                rejected_b: $t('callee is busy'),
+                request_terminated: $t('connection interrupted'),
             },
             callingDisabled: {
                 device: $t('audio device settings - invalid audio device').capitalize(),
@@ -178,8 +180,33 @@ function helpers(app) {
     }
 
 
+    _helpers.openTab = function(url) {
+        if (app.env.isExtension) browser.tabs.create({url})
+        else window.open(url, '_blank')
+    }
+
+
+    _helpers.openWindow = function(windowParams = {}, center = true) {
+        if (center) {
+            windowParams.left = (screen.width / 2) - (windowParams.width / 2)
+            windowParams.top = (screen.height / 2) - (windowParams.height / 2)
+        }
+
+        if (app.env.isExtension) browser.windows.create(windowParams)
+        else {
+            window.open(windowParams.url, '', Object.entries(windowParams).map((i) => i.join('=')).join(','))
+            window.focus()
+        }
+    }
+
+
+    // Allow plugins to add their own shared methods. These
+    // must be added before components are setting their
+    // methods.
+    _helpers.sharedMethodsMixin = {}
+
     _helpers.sharedMethods = function() {
-        return {
+        return Object.assign({
             closeOverlay: function() {
                 app.setState({ui: {overlay: null}})
             },
@@ -218,10 +245,7 @@ function helpers(app) {
                     browser.tabs.create({url: browser.runtime.getURL('index.html?popout=true')})
                 }
             },
-            openTab: function(url) {
-                if (app.env.isExtension) browser.tabs.create({url})
-                else window.open(url, '_blank')
-            },
+            openTab: _helpers.openTab,
             setLayer: function(layerName) {
                 app.setState({ui: {layer: layerName}}, {encrypt: false, persist: true})
             },
@@ -236,7 +260,7 @@ function helpers(app) {
                 if (!this._translations) this._translations = this.getTranslations()
                 return this._translations[category][key]
             },
-        }
+        }, _helpers.sharedMethodsMixin)
     }
 
 

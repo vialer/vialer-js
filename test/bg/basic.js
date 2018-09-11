@@ -34,6 +34,7 @@ test('[bg] translations', async function(t) {
     const bg = new AppBackground(options)
     let globPattern = '{src/js/**/*.js,src/components/**/{*.js,*.vue}'
     const plugins = settings.brands[BRAND].plugins
+
     if (plugins.builtin.user.adapter) globPattern += `,node_modules/${plugins.builtin.user.adapter}/src/**/{*.js,*.vue}`
     if (plugins.builtin.contacts.providers.length) {
         for (const provider of plugins.builtin.contacts.providers) {

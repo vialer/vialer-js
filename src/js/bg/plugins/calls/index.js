@@ -215,7 +215,7 @@ class PluginCalls extends Plugin {
                 // Always disable the keypad, set the sourceCall on-hold and
                 // switch to the default `attended` mode when activating
                 // transfer mode on a call.
-                sourceCall.setState({keypad: {active: false}, transfer: {active: true, type: 'attended'}})
+                sourceCall.setState({keypad: {active: false, number: ''}, transfer: {active: true, type: 'attended'}})
                 sourceCall.hold()
             }
             // Set attended status on other calls.
@@ -323,13 +323,12 @@ class PluginCalls extends Plugin {
 
                     if (notClosingNotNewCalls.length) {
                         acceptCall = false
-                        declineReason = 'call(s) ongoing'
+                        declineReason = 'call ongoing'
                     } else acceptCall = true
                 }
             }
 
             if (acceptCall) {
-                this.app.logger.info(`${this}accept incoming call`)
                 // An ongoing call may be a closing call. In that case we first
                 // remove all the closing calls before starting the new one.
                 for (const callId of closingCalls) {
@@ -344,9 +343,10 @@ class PluginCalls extends Plugin {
             call.start()
 
             if (!acceptCall) {
-                this.app.logger.info(`${this}decline incoming call (${declineReason})`)
+                this.app.logger.info(`${this}incoming call ${session.request.call_id} denied by invite handler: (${declineReason})`)
                 call.terminate()
             } else {
+                this.app.logger.info(`${this}incoming call ${session.request.call_id} allowed by invite handler`)
                 Vue.set(this.app.state.calls.calls, call.id, call.state)
                 this.app.emit('fg:set_state', {action: 'upsert', path: `calls.calls.${call.id}`, state: call.state})
             }
@@ -405,6 +405,8 @@ class PluginCalls extends Plugin {
                 builtinEnabled: true,
                 level: 'error',
             },
+            // Incoming unanswered calls are terminated after x seconds.
+            noanswertimeout: 60,
             sessionDescriptionHandlerFactoryOptions: {
                 constraints: {
                     audio: true,
@@ -633,7 +635,7 @@ class PluginCalls extends Plugin {
             // Activate the first found ongoing call when no call is given.
             for (const callId of callIds) {
                 // Don't select a call that is already closing.
-                if (!['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                if (!['answered_elsewhere', 'bye', 'request_terminated', 'callee_busy'].includes(this.calls[callId].state.status)) {
                     call = this.calls[callId]
                 }
             }
@@ -759,7 +761,7 @@ class PluginCalls extends Plugin {
                 if (callId === call.id) continue
 
                 // Prefer not to switch to a call that is already closing.
-                if (['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(this.calls[callId].state.status)) {
+                if (['answered_elsewhere', 'bye', 'request_terminated', 'callee_busy'].includes(this.calls[callId].state.status)) {
                     // The fallback Call is a non-specific closing call.
                     if (this.calls[callId]) fallbackCall = this.calls[callId]
                 } else {

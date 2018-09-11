@@ -30,16 +30,8 @@
             margin-left: -1px;
         }
 
-
-
         &.hint {
-            &.active {
-                @include animation("hint-pulse-active 1.5s infinite");
-            }
-
-            &:not(.active) {
-                @include animation("hint-pulse 1.5s ease-in infinite");
-            }
+            @include animation("hint-pulse 1s infinite ease-in-out");
         }
 
         // An existing call object with status `new`.
@@ -53,26 +45,24 @@
             }
         }
 
-        // &:hover,
-        &.active {
-            cursor: pointer;
-
-            svg {fill: $brand-color;}
-        }
-
-        &.state-active {
-            background: $brand-color;
+        &.state-accepted {
+            background: $grey-color-dark;
 
             svg {fill: $white-color;}
+
+            &.active {
+                background: $brand-color;
+                cursor: pointer;
+
+                svg {fill: $white-color;}
+            }
         }
 
 
         &.state-accept {
             background: $green-color;
 
-            svg {
-                fill: $white-color;
-            }
+            svg {fill: $white-color;}
 
         }
 

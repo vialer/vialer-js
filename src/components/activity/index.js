@@ -5,7 +5,7 @@ module.exports = (app) => {
             filteredActivity: function() {
                 let activity = this.activity.sort(app.utils.sortByMultipleKey(['date'], -1))
                 if (this.filters.reminders) activity = activity.filter((i) => i.remind)
-                if (this.filters.missed) activity = activity.filter((i) => i.label === 'missed')
+                if (this.filters.missed) activity = activity.filter((i) => (i.label === 'missed' || i.label === 'unanswered'))
                 return activity
             },
         },

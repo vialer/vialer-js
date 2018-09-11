@@ -1,6 +1,6 @@
 <component class="component-call-keypad" tabindex="-1" :class="{'call-ongoing': callOngoing}">
     <div :class="classes('number-input')" v-if="display === 'dense'">
-        <input name="number-input" type="text" ref="input" autofocus placeholder="..."
+        <input name="number-input" type="text" ref="input" autocomplete="off" autofocus placeholder="..."
             @keyup="pressKey()" @keydown="pressKey($event.key)"
 
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
@@ -10,7 +10,7 @@
             v-on:keyup.enter="keypadAction" @click="placeCall(number)"><icon name="transfer"/></i>
     </div>
     <div :class="classes('number-input')" v-else-if="display === 'touch'">
-        <input name="number-input" type="text" ref="input" autofocus placeholder="..."
+        <input name="number-input" type="text" ref="input" autocomplete="off" autofocus placeholder="..."
             @keyup="pressKey()" @keydown="pressKey($event.key)"
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
             v-on:keyup.enter="placeCall(number)"/>

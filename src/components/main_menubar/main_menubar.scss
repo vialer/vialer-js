@@ -11,6 +11,7 @@
 
         .option {
             align-items: center;
+            background: $brand-color;
             color: $white;
             display: flex;
             flex-direction: column;
@@ -86,9 +87,8 @@
                 }
             }
 
-
-            &.hint {
-                @include animation("hint-pulse 1.5s infinite");
+            &.hint:not(.active) {
+                @include animation("hint-pulse 1.5s ease-in infinite");
             }
 
             &.disabled {
@@ -112,7 +112,6 @@
                 }
 
                 &.hint {
-                    @include animation("hint-pulse-active 1.5s ease-in infinite");
 
                     svg {
                         fill: $brand-color;

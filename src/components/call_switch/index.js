@@ -23,7 +23,7 @@ module.exports = (app) => {
                 if (call.status === 'new') {
                     if (call.active) return 'dialpad'
                     else return 'dialpad'
-                } else if (['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
+                } else if (['answered_elsewhere', 'bye', 'request_terminated', 'callee_busy'].includes(call.status)) {
                     return 'hang-up'
                 } else {
                     if (call.hold.active) return 'on-hold'
@@ -58,13 +58,12 @@ module.exports = (app) => {
                     } else {
                         if (['create', 'invite'].includes(call.status)) {
                             classes['state-accept'] = true
-                        } else if (['answered_elsewhere', 'bye', 'rejected_a', 'rejected_b'].includes(call.status)) {
+                        } else if (['answered_elsewhere', 'bye', 'request_terminated', 'callee_busy'].includes(call.status)) {
                             classes['state-hangup'] = true
                         } else {
-                            classes['state-active'] = true
+                            classes['state-accepted'] = true
+                            if (call.transfer.type === 'accept') classes.hint = true
                         }
-
-                        if (call.transfer.type === 'accept') classes.hint = true
                     }
                 }
                 return classes
