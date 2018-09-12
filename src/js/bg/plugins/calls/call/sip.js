@@ -107,6 +107,7 @@ class CallSIP extends Call {
             this._stop({message: this.translations[this.state.status]})
         })
 
+
         // Check for the RPID. Update the display name and number to the
         // transferred caller, if there is one.
         this.session.on('reinvite', (session) => {
@@ -116,9 +117,6 @@ class CallSIP extends Call {
                 this.setState(_rpid)
             }
         })
-
-        // Blind transfer event.
-        this.session.on('refer', (target) => this.session.bye())
     }
 
 
@@ -174,8 +172,11 @@ class CallSIP extends Call {
             }
         })
 
+
         // Blind transfer.
-        this.session.on('refer', (target) => this.session.bye())
+        this.session.on('refer', (target) => {
+            this.session.bye()
+        })
 
         this.session.on('failed', (message) => {
             this.busyTone.play()
@@ -216,18 +217,30 @@ class CallSIP extends Call {
 
 
     /**
-    * Pase the name and number of the caller from the Remote-Party-ID header.
+    * Pass the name and number of the caller from the Remote-Party-ID header.
     * @param {String} header - The raw RPID header string.
     * @returns {Object} - displayName and number properties that map to state.
     */
     _parseRpid(header) {
-        const rpidMatch = /"(.*?)" <(.*)>/g
-        header = rpidMatch.exec(header.split(';')[0])
-        this.app.logger.info(`${this}changing transfer RPID to ${header[1]}/${header[2]}`)
-        return {
-            displayName: header[1],
-            number: header[2].replace('sip:', '').split('@')[0],
+        let rpid = {displayName: '', number: 'unknown'}
+
+        const numberMatch = (/<(.*)>/g).exec(header)
+        const nameMatch = (/"(.*?)"/g).exec(header)
+
+        if (numberMatch) {
+            try {
+                rpid.number = numberMatch[1].split('@')[0].replace('sip:', '')
+            } catch (err) {
+                this.app.logger.warn(`${this}failed to parse rpid header ${header}`)
+                rpid.number = numberMatch[0]
+            }
         }
+
+        if (nameMatch) {
+            rpid.displayName = nameMatch[1]
+        }
+
+        return rpid
     }
 
 
