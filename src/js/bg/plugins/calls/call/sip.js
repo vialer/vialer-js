@@ -110,8 +110,8 @@ class CallSIP extends Call {
 
         // Check for the RPID. Update the display name and number to the
         // transferred caller, if there is one.
-        this.session.on('reinvite', (session) => {
-            let _rpid = session.transaction.request.getHeader('Remote-Party-Id')
+        this.session.on('reinvite', (session, request) => {
+            let _rpid = request.getHeader('Remote-Party-Id')
             if (_rpid) {
                 _rpid = this._parseRpid(_rpid)
                 this.setState(_rpid)
