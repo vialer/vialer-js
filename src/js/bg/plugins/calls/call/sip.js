@@ -42,7 +42,7 @@ class CallSIP extends Call {
             rpid = this._parseRpid(rpid)
             Object.assign(this.state, rpid)
         } else {
-            this.state.number = this.session.remoteIdentity.uri.aor
+            this.state.number = this.session.remoteIdentity.uri.user
         }
 
         this.state.stats.callId = this.session.request.call_id
@@ -79,8 +79,12 @@ class CallSIP extends Call {
         */
         this.session.on('failed', (message) => {
             if (typeof message === 'string') message = SIP.Parser.parseMessage(message, this.module.ua)
+            let reason = message.getHeader('Reason')
+            if (reason) {
+                reason = this._parseHeader(reason).get('text')
+            }
 
-            if (message.reason_phrase === 'Call completed elsewhere') {
+            if (reason === 'Call completed elsewhere') {
                 this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
                 this.setState({status: 'answered_elsewhere'})
             } else {
@@ -94,7 +98,7 @@ class CallSIP extends Call {
                 if (message.method === 'CANCEL') {
                     this.setState({status: 'request_terminated'})
                 } else if (message.status_code === 480) {
-                    // The accepting party receiving the incoming call terminated.
+                    // The accepting party terminated the incoming call.
                     this.setState({status: 'request_terminated'})
                 }
             }
@@ -222,7 +226,7 @@ class CallSIP extends Call {
         this.app.logger.info(`${this}changing transfer RPID to ${header[1]}/${header[2]}`)
         return {
             displayName: header[1],
-            number: header[2].replace('sip:', ''),
+            number: header[2].replace('sip:', '').split('@')[0],
         }
     }
 

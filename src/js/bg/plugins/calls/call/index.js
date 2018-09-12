@@ -163,8 +163,12 @@ class Call {
         // Always set this call to be the active call.
         this.module.activateCall(this, true)
         let message = ''
-        if (displayName) message = `${this.state.number}: ${displayName}`
-        else message = this.state.number
+        if (displayName) {
+            message = `${this.state.number}: ${displayName}`
+        } else {
+            message = this.state.number
+        }
+
         this.app.plugins.ui.notification({message, number: this.state.number, title: this.translations.create})
         this.setState({displayName: displayName, status: this._statusMap.create})
 
