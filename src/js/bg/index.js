@@ -350,7 +350,7 @@ class AppBackground extends App {
             await Promise.all(dataRequests)
         } catch (err) {
             // Network changed in the meanwhile or a timeout error occured.
-            this.logger.warn(`${this} network error occured: ${err}`)
+            this.logger.warn(err)
         }
     }
 

@@ -11,9 +11,14 @@ const {ipcMain} = require('electron')
 
 const settings = require('./settings')
 
-require('electron-reload')(__dirname, {
-    electron: path.join(__dirname, 'node_modules', 'electron', 'dist', 'electron'),
-})
+const WATCH = process.env.WATCH ? true : false
+
+if (WATCH) {
+    require('electron-reload')(__dirname, {
+        electron: path.join(__dirname, 'node_modules', 'electron', 'dist', 'electron'),
+    })
+}
+
 /**
 * Initialize an Electron application.
 */

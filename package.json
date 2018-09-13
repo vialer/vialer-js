@@ -1,7 +1,7 @@
 {
     "name": "vialer-js",
     "productName": "vialer-js",
-    "version": "4.1.1",
+    "version": "4.1.4",
     "description": "Open-source WebRTC softphone & communication platform.",
     "engines": {
         "node": ">=8.0.0"
@@ -107,7 +107,7 @@
         "roboto-fontface": "0.8.x",
         "sdp-transform": "2.4.x",
         "shortid": "2.x.x",
-        "sip.js": "0.10.x",
+        "sip.js": "git+https://github.com/vialer/SIP.js#feature/reinvite-rpid",
         "v-click-outside": "^2.0.1",
         "vjs-adapter-user-voip": "1.x.x",
         "vue": "2.5.x",
