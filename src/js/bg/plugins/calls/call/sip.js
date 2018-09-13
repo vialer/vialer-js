@@ -85,9 +85,11 @@ class CallSIP extends Call {
             }
 
             if (reason === 'Call completed elsewhere') {
+                this.app.logger.info(`${this}call completed elsewhere: ${this.state.stats.callId}`)
                 this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
                 this.setState({status: 'answered_elsewhere'})
             } else {
+                this.app.logger.info(`${this}call rejected: ${this.state.stats.callId}`)
                 // `Call completed elsewhere` is not considered to be
                 // a missed call and will not end up in the activity log.
                 this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
@@ -103,7 +105,7 @@ class CallSIP extends Call {
                 }
             }
 
-            this.app.logger.info(`${this}call ${this.state.stats.callId} failed`)
+
             this._stop({message: this.translations[this.state.status]})
         })
 
@@ -179,6 +181,7 @@ class CallSIP extends Call {
         })
 
         this.session.on('failed', (message) => {
+            this.app.logger.info(`${this}call declined: ${message.status_code}/${this.state.stats.callId}`)
             this.busyTone.play()
 
             if (message.status_code === 480) {
@@ -199,7 +202,6 @@ class CallSIP extends Call {
             this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
 
             this.app.telemetry.event('call[sip]', 'outgoing', 'rejected')
-            this.app.logger.debug(`${this}outgoing call ${this.state.stats.callId} failed: ${message.status_code}`)
             this._stop({message: this.translations[this.state.status]})
         })
     }

@@ -348,6 +348,8 @@ class PluginCalls extends Plugin {
         })
 
         this.ua.on('transportCreated', (transport) => {
+            this.app.logger.debug(`${this}<event:transportCreated>`)
+
             this.ua.transport.on('connected', () => {
                 this.app.logger.debug(`${this}<event:connected>`)
                 this.app.setState({calls: {ua: {status: 'connected'}}})
@@ -359,9 +361,6 @@ class PluginCalls extends Plugin {
             this.ua.transport.on('disconnected', () => {
                 this.app.logger.debug(`${this}<event:disconnected>`)
                 this.app.setState({calls: {ua: {status: 'disconnected'}}})
-                // // Don't use SIPJS simpler reconnect logic, which doesn't have
-                // // jitter and an increasing timeout.
-                this.ua.stop()
 
                 if (this.app.state.user.authenticated) {
                     this.app.setState({calls: {ua: {status: 'disconnected'}}})
@@ -371,9 +370,11 @@ class PluginCalls extends Plugin {
                     this.reconnect = false
                 }
 
+                // We don't use SIPJS reconnect logic, because it can't deal
+                // with offline detection and incremental retry timeouts.
                 if (this.reconnect) {
                     // Reconnection timer logic is performed only here.
-                    this.app.logger.debug(`${this}reconnecting to ${this._uaOptions.transportOptions.wsServers} in ${this.retry.timeout} ms`)
+                    this.app.logger.debug(`${this}reconnect in ${this.retry.timeout} ms`)
                     setTimeout(() => {
                         this.connect({register: this.app.state.settings.webrtc.enabled})
                     }, this.retry.timeout)
@@ -422,6 +423,8 @@ class PluginCalls extends Plugin {
             },
             traceSip: false,
             transportOptions: {
+                // Reconnects are handled manually.
+                maxReconnectionAttempts: 0,
                 wsServers: `wss://${endpoint ? endpoint : settings.webrtc.endpoint.uri}`,
             },
             userAgentString: this._userAgent(),
@@ -582,18 +585,13 @@ class PluginCalls extends Plugin {
             */
             'store.app.online': (isOnline) => {
                 if (!isOnline) {
-                    this.app.setState({calls: {ua: {status: 'disconnected'}}})
-                    // Offline modus is not detected by Sip.js, so we manually disconnect.
-                    this.app.logger.debug(`${this}offline; disconnecting`)
+                    // Offline modus is not detected by Sip.js. We manually disconnect.
+                    this.app.logger.debug(`${this}switched to offline modus; disconnect`)
                     this.disconnect(false)
                 } else {
                     // We are online again, try to reconnect and refresh API data.
-                    this.app.logger.debug(`${this}online; connecting`)
+                    this.app.logger.debug(`${this}switched to online modus; connect`)
                     this.connect({register: this.app.state.settings.webrtc.enabled})
-                    // Set a small delay, so axios won't encounter network errors.
-                    setTimeout(() => {
-                        this.app._platformData()
-                    }, 1500)
                 }
             },
             /**
@@ -721,30 +719,28 @@ class PluginCalls extends Plugin {
     * is no state to get credentials from yet.
     * @param {Boolean} [register] - Whether to register to the SIP endpoint.
     */
-    connect({account = {}, endpoint = null, register = true} = {}) {
+    async connect({account = {}, endpoint = null, register = true} = {}) {
+        this.app.logger.info(`${this}connect ua (register: ${register})`)
+        // The default is to reconnect.
+        this.reconnect = true
+
         if (!account.username || !account.password || !account.uri) {
-            this.app.logger.debug(`${this}using account from selected state`)
             account = this.app.state.settings.webrtc.account.using
         } else {
             this.app.setState({settings: {webrtc: {account: {using: account}}}})
         }
 
 
-        // Reconnect when already connected.
-        if (this.ua && this.ua.transport.isConnected()) {
-            this.app.logger.debug(`${this}already connected; reconnecting`)
-            this.disconnect(true)
-            return
-        }
-
         this._uaOptions = this.__uaOptions(account, endpoint, register)
-        this.app.logger.debug(`${this}connecting to ${this._uaOptions.transportOptions.wsServers} (register: ${this._uaOptions.register})`)
+
         // Login with the WebRTC account or platform account.
         if (!this._uaOptions.authorizationUser || !this._uaOptions.password) {
             this.app.logger.error(`${this}cannot connect without username and password`)
         }
 
-        // Fresh new instance is used each time, so we can reset settings properly.
+
+        // Overwrite the existing instance with a new one every time.
+        // SIP.js doesn't handle resetting configuration well.
         this.ua = new SIP.UA(this._uaOptions)
         this.__uaEvents()
         this.ua.start()
@@ -794,17 +790,16 @@ class PluginCalls extends Plugin {
     * @param {Boolean} reconnect - Whether try to reconnect.
     */
     disconnect(reconnect = true) {
-        this.app.logger.info(`${this}disconnecting from ${this._uaOptions.transportOptions.wsServers} (reconnect: ${reconnect ? 'yes' : 'no'})`)
+        this.app.logger.info(`${this}disconnect ${this._uaOptions.transportOptions.wsServers} (reconnect: ${reconnect ? 'yes' : 'no'})`)
         this.reconnect = reconnect
-        // Directly try to reconnect.
-        if (reconnect) {
-            this.app.setState({calls: {status: 'loading'}})
-            this.retry.timeout = 0
-        } else {
-            this.app.setState({calls: {status: null}})
-        }
+        this.retry.timeout = 0
 
-        this.ua.stop()
+        // Don't rely on the disconnected event; just mark it as disconnected
+        // until the UA registers itself again.
+        this.app.setState({calls: {status: reconnect ? 'loading' : null, ua: {status: 'disconnected'}}})
+        this.ua.unregister()
+        this.ua.transport.disconnect()
+        this.ua.transport.disposeWs()
     }
 
 

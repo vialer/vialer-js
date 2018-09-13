@@ -79,5 +79,6 @@ gulp build --brand bologna --target electron
 gulp build-run --target electron
 # Package the app for a platform.
 gulp build-dist --target electron --arch x64 --platform linux
+./dist/bologna/vialer-linux-x64/vialer
 </code></pre>
 </component>
