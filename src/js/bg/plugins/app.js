@@ -27,20 +27,53 @@ class PluginApp extends Plugin {
                 this.app.logger.info(`${this}switched to offline modus`)
                 this.app.setState({app: {online: false}})
             })
+
             window.addEventListener('online', (e) => {
-                this.app.logger.info(`${this}switched to online modus`)
-                this.app.setState({app: {online: true}})
+                const pollConnection = async() => {
+                    const online = await this._checkConnectivity(1000)
+                    if (!online) pollConnection()
+                }
+                pollConnection()
             })
         }
     }
 
 
-    _checkConnectivity() {
-        if (this.app.env.isBrowser) {
-            return navigator.onLine
-        } else {
-            return true
-        }
+    /**
+    * The `online` event and `navigator.onLine` are not accurate,
+    * because it only verifies network connectivity, and not
+    * access to the internet. This additional check sees if
+    * we can open a websocket to the defined endpoint.
+    * Fallback to `navigator.onLine` if there is no endpoint
+    * to check.
+    * @param {Number} pause - Pauses resolving when polling is necessary.
+    * @returns {Promise} - Resolves when the websocket opens or fails.
+    */
+    _checkConnectivity(pause) {
+        return new Promise((resolve) => {
+            const endpoint = this.app.state.settings.webrtc.endpoint.uri
+            if (endpoint) {
+                this.app.logger.info(`${this}verifying online modus`)
+
+                const checkSocket = new WebSocket(`wss://${endpoint}`, 'sip')
+                checkSocket.onopen = (event) => {
+                    this.app.logger.info(`${this}switched to online modus`)
+                    this.app.setState({app: {online: true}})
+                    checkSocket.close()
+                    if (pause) setTimeout(() => resolve(true), pause)
+                    else resolve(true)
+                }
+
+                checkSocket.onerror = (error) => {
+                    this.app.setState({app: {online: false}})
+                    if (pause) setTimeout(() => resolve(false), pause)
+                    else resolve(false)
+                }
+            } else {
+                this.app.setState({app: {online: navigator.onLine}})
+                resolve(navigator.onLine)
+            }
+        })
     }
 
 
@@ -53,7 +86,7 @@ class PluginApp extends Plugin {
             installed: true,
             name: process.env.APP_NAME,
             notifications: [],
-            online: this._checkConnectivity(),
+            online: true,
             session: {
                 active: null,
                 available: [],
@@ -91,7 +124,7 @@ class PluginApp extends Plugin {
     */
     _restoreState(moduleStore) {
         moduleStore.notifications = []
-        moduleStore.online = this._checkConnectivity()
+        moduleStore.online = true
     }
 
 

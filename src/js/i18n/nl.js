@@ -6,7 +6,7 @@ module.exports = {
     'activity': 'activiteit',
     'add clickable icons next to phonenumbers in webpages.': 'voeg klikbare iconen toe naast telefoonnummers in webpagina\'s.',
     'added: "{name}"': 'toegevoegd: "{name}"',
-    'all set! We hope you enjoy the {name}.': 'klaar! Veel plezier met de {name}.',
+    'all set! Enjoy the {name}.': 'klaar! Veel plezier met de {name}.',
     'almost there!': 'bijna klaar!',
     'an hour ago': 'Een uur geleden',
     'an unknown error occured during call setup.': 'Er is een onbekende fout opgetreden tijdens het opzetten van het gesprek',

@@ -192,7 +192,7 @@ class Devices {
                 // already enabled; otherwise the whole audio tab should
                 // not be accessible at all.
                 if (this.app.state.settings.webrtc.enabled) {
-                    this.app.setState({ui: {layer: 'settings', tabs: {settings: {active: 'audio'}}}})
+                    this.app.setState({ui: {layer: 'settings', tabs: {settings: {active: 'devices'}}}})
                 }
             }
         }

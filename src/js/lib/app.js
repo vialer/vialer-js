@@ -97,34 +97,7 @@ class App extends Skeleton {
             Vue.i18n.add(id, translation)
         }
 
-        if (!this.state.settings) {
-            Vue.i18n.set('en')
-        } else {
-            let selectedLanguage = this.state.settings.language.selected.id
-
-            if (!selectedLanguage) {
-                let newLanguage
-                if (this.env.isBrowser) {
-                    // Try to figure out the language from the environment.
-                    // Check only the first part of en-GB/en-US.
-                    newLanguage = this.state.settings.language.options.find((i) => i.id === navigator.language.split('-')[0])
-                    if (newLanguage) {
-                        selectedLanguage = newLanguage.id
-                        this.setState({settings: {language: {selected: newLanguage}}})
-                    }
-                }
-
-                // Fallback to English language as a last resort.
-                if (!newLanguage) {
-                    newLanguage = this.state.settings.language.options[0]
-                    selectedLanguage = newLanguage.id
-                    this.setState({settings: {language: {selected: newLanguage}}})
-                }
-            }
-
-            this.logger.info(`${this}selected language: ${selectedLanguage}`)
-            Vue.i18n.set(selectedLanguage)
-        }
+        this._languagePresets()
 
         // Add a shortcut to the translation module.
         this.$t = Vue.i18n.translate
@@ -287,6 +260,29 @@ class App extends Skeleton {
         }
 
         return state
+    }
+
+
+    /**
+    * Set the language from browser presets when it
+    * can't be derived from the application state.
+    */
+    _languagePresets() {
+        let language = this.state.settings.language.selected
+
+        if (!language.id) {
+            const options = this.state.settings.language.options
+            // Try to figure out the language from the environment.
+            // Check only the first part of en-GB/en-US.
+            if (this.env.isBrowser) language = options.find((i) => i.id === navigator.language.split('-')[0])
+            else language = options.find((i) => i.id === process.env.LANGUAGE.split('_')[0])
+            // Fallback to English language as a last resort.
+            if (!language) language = options.find((i) => i.id === 'en')
+        }
+
+        this.logger.info(`${this}selected language: ${language.id}`)
+        this.setState({settings: {language: {selected: language}}}, {persist: this.state.user.authenticated})
+        Vue.i18n.set(language.id)
     }
 
 

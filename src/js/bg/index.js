@@ -111,19 +111,21 @@ class AppBackground extends App {
     * Load custom platform data and optionally connect to
     * a calling service backend. Only use this method on
     * an authenticated user.
-    * @param {Boolean} callService - Whether to initialize the calling service.
     * @param {Boolean} contacts - Whether to subsribe to Contact Presence.
     */
-    __initServices(callService = false) {
-        this.logger.info(`${this}init connectivity services (sip: ${callService ? 'yes' : 'no'})`)
+    __initServices() {
         if (this.state.app.online) {
-            if (callService) {
+            this.logger.info(`${this}init platform services`)
+            const endpoint = this.state.settings.webrtc.endpoint.uri
+            const account = this.state.settings.webrtc.account.using.id
+            if (endpoint && account) {
+                this.logger.info(`${this}init calling service`)
                 this.plugins.calls.connect({register: this.state.settings.webrtc.enabled})
             }
-        }
 
-        this.setState({ui: {menubar: {event: null}}})
-        this._platformData()
+            this.setState({ui: {menubar: {event: null}}})
+            this._platformData()
+        }
     }
 
 
@@ -196,9 +198,8 @@ class AppBackground extends App {
             // (!) State is reactive after initializing the view-model.
             this.__initViewModel({main: null})
             this.__storeWatchers(true)
-            if (this.state.app.online) {
-                this.__initServices(true)
-            }
+            this.__initServices()
+
         } else {
             // No session yet.
             this.__initViewModel({main: null})

@@ -39,6 +39,8 @@ class UserAdapter {
         }, {encrypt: false, persist: true})
 
         await this.app.setState({user: userFields}, {persist: true})
+        // Update the state with language presets from the browser if applicable.
+        this.app._languagePresets()
     }
 
 
@@ -56,13 +58,7 @@ class UserAdapter {
         // Disconnect without reconnect attempt.
         this.app.plugins.calls.disconnect(false)
         this.app.emit('bg:user:logged_out', {}, true)
-
-        // Fallback to the browser language or to english.
-        const languages = this.app.state.settings.language.options.map(i => i.id)
-        if (this.app.env.isBrowser && languages.includes(navigator.language)) {
-            this.app.logger.info(`${this}switching back to browser language: ${navigator.language}`)
-            Vue.i18n.set(navigator.language)
-        }
+        this.app._languagePresets()
     }
 
 
@@ -86,10 +82,11 @@ class UserAdapter {
         try {
             await this.app.__initSession({password})
             this.app.__storeWatchers(true)
+            this.app._languagePresets()
             this.app.api.setupClient(username, this.app.state.user.token)
             this.app.setState({ui: {layer: 'calls'}}, {encrypt: false, persist: true})
             this.app.notify({icon: 'user', message: this.app.$t('welcome back!'), type: 'info'})
-            this.app.__initServices(true)
+            this.app.__initServices()
         } catch (err) {
             // Wrong password, resulting in a failure to decrypt.
             this.app.setState({

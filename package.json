@@ -1,7 +1,7 @@
 {
     "name": "vialer-js",
     "productName": "vialer-js",
-    "version": "4.1.4",
+    "version": "4.1.5",
     "description": "Open-source WebRTC softphone & communication platform.",
     "engines": {
         "node": ">=8.0.0"

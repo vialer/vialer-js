@@ -139,26 +139,27 @@ class PluginSettings extends Plugin {
     * disabled.
     */
     _ready() {
-        if (this.app.state.settings.telemetry.enabled) {
-            const release = process.env.VERSION + '-' + process.env.DEPLOY_TARGET + '-' + process.env.BRAND_TARGET + '-' + this.app.env.name
-            this.app.logger.info(`${this}monitoring exceptions for release ${release}`)
-            Raven.config(process.env.SENTRY_DSN, {
-                allowSecretKey: true,
-                environment: process.env.DEPLOY_TARGET,
-                release,
-                tags: {
-                    sipjs: SIP.version,
-                    vuejs: Vue.version,
-                },
-            }).install()
-
-            Raven.setUserContext({
-                email: this.app.state.user.username,
-                id: `${this.app.state.user.client_id}/${this.app.state.user.id}`,
-            })
-        } else {
+        if (!this.app.state.settings.telemetry.enabled) {
             Raven.uninstall()
+            return
         }
+
+        const release = process.env.VERSION + '-' + process.env.DEPLOY_TARGET + '-' + process.env.BRAND_TARGET + '-' + this.app.env.name
+        this.app.logger.info(`${this}monitoring exceptions for release ${release}`)
+        Raven.config(process.env.SENTRY_DSN, {
+            allowSecretKey: true,
+            environment: process.env.DEPLOY_TARGET,
+            release,
+            tags: {
+                sipjs: SIP.version,
+                vuejs: Vue.version,
+            },
+        }).install()
+
+        Raven.setUserContext({
+            email: this.app.state.user.username,
+            id: `${this.app.state.user.client_id}/${this.app.state.user.id}`,
+        })
     }
 
 

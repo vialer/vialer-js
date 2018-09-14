@@ -581,17 +581,18 @@ class PluginCalls extends Plugin {
         return {
             /**
             * Respond to network changes.
-            * @param {Boolean} isOnline - Whether we are online now.
+            * @param {Boolean} online - Whether we are online now.
             */
-            'store.app.online': (isOnline) => {
-                if (!isOnline) {
-                    // Offline modus is not detected by Sip.js. We manually disconnect.
-                    this.app.logger.debug(`${this}switched to offline modus; disconnect`)
-                    this.disconnect(false)
-                } else {
+            'store.app.online': (online) => {
+                if (online) {
                     // We are online again, try to reconnect and refresh API data.
-                    this.app.logger.debug(`${this}switched to online modus; connect`)
+                    this.app.logger.debug(`${this}reconnect sip service (online modus)`)
                     this.connect({register: this.app.state.settings.webrtc.enabled})
+                } else {
+                    // Offline modus is not detected by Sip.js/Websocket.
+                    // Disconnect manually.
+                    this.app.logger.debug(`${this}disconnect sip service (offline modus)`)
+                    this.disconnect(false)
                 }
             },
             /**
@@ -720,7 +721,7 @@ class PluginCalls extends Plugin {
     * @param {Boolean} [register] - Whether to register to the SIP endpoint.
     */
     async connect({account = {}, endpoint = null, register = true} = {}) {
-        this.app.logger.info(`${this}connect ua (register: ${register})`)
+        this.app.logger.info(`${this}connect to ua (${register ? 'register' : 'no-register'})`)
         // The default is to reconnect.
         this.reconnect = true
 
@@ -730,14 +731,12 @@ class PluginCalls extends Plugin {
             this.app.setState({settings: {webrtc: {account: {using: account}}}})
         }
 
-
         this._uaOptions = this.__uaOptions(account, endpoint, register)
 
         // Login with the WebRTC account or platform account.
         if (!this._uaOptions.authorizationUser || !this._uaOptions.password) {
             this.app.logger.error(`${this}cannot connect without username and password`)
         }
-
 
         // Overwrite the existing instance with a new one every time.
         // SIP.js doesn't handle resetting configuration well.
@@ -790,16 +789,17 @@ class PluginCalls extends Plugin {
     * @param {Boolean} reconnect - Whether try to reconnect.
     */
     disconnect(reconnect = true) {
-        this.app.logger.info(`${this}disconnect ${this._uaOptions.transportOptions.wsServers} (reconnect: ${reconnect ? 'yes' : 'no'})`)
+        this.app.logger.info(`${this}disconnect ua (reconnect: ${reconnect ? 'yes' : 'no'})`)
         this.reconnect = reconnect
         this.retry.timeout = 0
 
-        // Don't rely on the disconnected event; just mark it as disconnected
-        // until the UA registers itself again.
         this.app.setState({calls: {status: reconnect ? 'loading' : null, ua: {status: 'disconnected'}}})
         this.ua.unregister()
         this.ua.transport.disconnect()
         this.ua.transport.disposeWs()
+        if (reconnect) {
+            this.connect()
+        }
     }
 
 
