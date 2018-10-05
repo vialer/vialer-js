@@ -103,6 +103,7 @@ module.exports = function(baseDir, overrides) {
     gutil.log(`- PRODUCTION: ${settings.PRODUCTION}`)
     gutil.log(`- TARGET: ${settings.BUILD_TARGET}`)
     gutil.log(`- VERBOSE: ${settings.VERBOSE}`)
+    gutil.log(`- LIVERELOAD: ${settings.LIVERELOAD}`)
 
     return settings
 }
