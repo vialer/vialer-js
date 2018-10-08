@@ -548,7 +548,9 @@ module.exports = function() {
         // Sanity check: are there any unwanted characters we kept because of skipping ?
         const tag = document.createElement('span')
         tag.innerHTML = result_raw
-        let justText = tag.innerText
+        // Try innerText (https://html.spec.whatwg.org/multipage/dom.html#the-innertext-idl-attribute)
+        // fallback to textContent (jsdom has no innerText support).
+        let justText = tag.innerText || tag.textContent
 
         // Find first digit
         let pos_digit = justText.search(/\d/g)
