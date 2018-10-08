@@ -418,7 +418,24 @@ gulp.task('pre-commit-lint', () => {
 })
 
 
-gulp.task('pre-commit', ['pre-commit-lint', 'test-unit']);
+gulp.task('protect-secrets', () => {
+    return gulp.src(['.vialer-jsrc', '.vialer-jsrc.example'])
+        .pipe(helpers.protectSecrets())
+})
+
+
+gulp.task('pre-commit-protect-secrets', () => {
+    return guppy.stream('pre-commit')
+        .pipe(filter(['.vialer-jsrc', '.vialer-jsrc.example']))
+        .pipe(helpers.protectSecrets())
+})
+
+
+gulp.task('pre-commit', [
+    'pre-commit-lint',
+    'pre-commit-protect-secrets',
+    'test-unit',
+])
 
 
 /**
