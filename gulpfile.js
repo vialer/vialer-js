@@ -504,5 +504,5 @@ gulp.task('watch', 'Run developer watch modus.', () => {
         path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'components', '**', '*.vue'),
     ], ['templates'])
 
-    gulp.watch(path.join(settings.ROOT_DIR, 'test', 'bg', '**', '*.js'), ['test-unit'])
+    gulp.watch([path.join(settings.ROOT_DIR, 'test', 'bg', '**', '*.js')], ['test-unit'])
 })

@@ -274,8 +274,11 @@ class App extends Skeleton {
             const options = this.state.settings.language.options
             // Try to figure out the language from the environment.
             // Check only the first part of en-GB/en-US.
-            if (this.env.isBrowser) language = options.find((i) => i.id === navigator.language.split('-')[0])
-            else language = options.find((i) => i.id === process.env.LANGUAGE.split('_')[0])
+            if (this.env.isBrowser) {
+                language = options.find((i) => i.id === navigator.language.split('-')[0])
+            } else if (process.env.LANGUAGE) {
+                language = options.find((i) => i.id === process.env.LANGUAGE.split('_')[0])
+            }
             // Fallback to English language as a last resort.
             if (!language) language = options.find((i) => i.id === 'en')
         }
