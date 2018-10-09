@@ -1,0 +1,12 @@
+{
+    "git.ignoreLimitWarning": true,
+    "files.exclude": {
+        "**/*.git": true,
+        ".idea": true,
+        "build": true,
+    },
+    "files.associations": {
+        "*.vue": "vue-html",
+        "*.vialer-jsrc": "json",
+    }
+}
