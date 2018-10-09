@@ -33,6 +33,8 @@ const source = require('vinyl-source-stream')
 const sourcemaps = require('gulp-sourcemaps')
 const through = require('through2')
 const watchify = require('watchify')
+const map = require('map-stream')
+const PluginError = require('plugin-error')
 
 // Browserify instance caching.
 let BUNDLERS = {bg: null, fg: null, tab: null}
@@ -499,6 +501,53 @@ class Helpers {
         }
         http.createServer(app).listen(port)
         gutil.log(`Development service listening on http://localhost:${port}`)
+    }
+
+
+    /**
+     * Scans JSON files for secrets that should not be committed.
+     * @return {Function} - Function to put in a gulp `pipe`.
+     */
+    protectSecrets() {
+        const protectedKeys = [
+            'apiKey',
+            'apiSecret',
+            'clientSecret',
+            'refreshToken',
+            'username',
+            'password',
+        ]
+
+        function scanForProtectedKeys(file, obj, attrPath) {
+            let count = 0
+            Object.entries(obj).forEach(([key, value]) => {
+                if (protectedKeys.includes(key) && value) {
+                    const attr = [...attrPath, key].join('.')
+                    console.log(`Secret leaking: ${file.path} in attr ${attr}`)
+                    count++
+                } else if (Array.isArray(value)) {
+                    value.map(([index, subvalue]) => {
+                        count += scanForProtectedKeys(file, subvalue, [...attrPath, key, index])
+                    })
+                } else if (value !== null && (typeof value) === 'object') {
+                    count += scanForProtectedKeys(file, value, [...attrPath, key])
+                }
+            })
+
+            return count
+        }
+
+        return map(function(file, done) {
+            let obj = JSON.parse(file.contents.toString())
+            if (scanForProtectedKeys(file, obj, [])) {
+                throw new PluginError({
+                    message: 'Secrets are leaking.',
+                    plugin: 'protect-secrets',
+                })
+            }
+
+            done(null, file)
+        })
     }
 }
 

@@ -31,6 +31,9 @@ const svgo = require('gulp-svgo')
 const tape = require('gulp-tape')
 const template = require('gulp-template')
 const test = require('tape')
+const eslint = require('gulp-eslint')
+const guppy = require('git-guppy')(gulp)
+const filter = require('gulp-filter')
 
 
 const writeFileAsync = promisify(fs.writeFile)
@@ -389,12 +392,50 @@ gulp.task('templates', 'Generate builtin and plugin Vue component templates.', (
 })
 
 
-gulp.task('test-unit', 'Run unit and integation tests.', function() {
+gulp.task('test-unit', 'Run unit and integation tests.', () => {
     return gulp.src('test/bg/**/*.js')
         .pipe(tape({
+            bail: true,
             outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
         }))
 })
+
+
+gulp.task('lint', () => {
+    return gulp.src(['src/**/*.js', 'test/**/*.js', 'gulpfile.js'])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
+})
+
+
+gulp.task('pre-commit-lint', () => {
+    return guppy.stream('pre-commit')
+        .pipe(filter(['*.js']))
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
+})
+
+
+gulp.task('protect-secrets', () => {
+    return gulp.src(['.vialer-jsrc', '.vialer-jsrc.example'])
+        .pipe(helpers.protectSecrets())
+})
+
+
+gulp.task('pre-commit-protect-secrets', () => {
+    return guppy.stream('pre-commit')
+        .pipe(filter(['.vialer-jsrc', '.vialer-jsrc.example']))
+        .pipe(helpers.protectSecrets())
+})
+
+
+gulp.task('pre-commit', [
+    'pre-commit-lint',
+    'pre-commit-protect-secrets',
+    'test-unit',
+])
 
 
 /**
