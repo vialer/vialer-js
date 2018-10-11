@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 const test = require('tape')
 const { JSDOM } = require('jsdom')
 const { document } = new JSDOM().window
@@ -8,17 +9,17 @@ const parsers = require('../../../src/js/observer/parsers')
 
 test('[bg] test parsing NL numbers', (t) => {
     function parse(str) {
-        const parser = parsers.find(([locale, _]) => locale == 'NL')[1]()
+        const parser = parsers.find(([locale, _]) => locale === 'NL')[1]()
         return parser.parse(str)
     }
 
     function match(str, expected, msg) {
-        name = msg || `'${str}'`
+        const name = msg || `'${str}'`
         t.deepEqual(parse(str), expected, `${name} matches`)
     }
 
     function noMatch(str, msg) {
-        name = msg || `'${str}'`
+        const name = msg || `'${str}'`
         t.deepEqual(parse(str), [], `${name} does not match`)
     }
 
@@ -65,7 +66,8 @@ test('[bg] test parsing NL numbers', (t) => {
     match('06-12345678', [ { start: 0, end: 11, number: '0612345678' } ])
     match('06-12345678 -', [ { start: 0, end: 12, number: '0612345678' } ])
 
-    match(`<p>
+    match(
+        `<p>
         Tel&nbsp; 0501-123456<br />
         T 0501-123457<br />
         Fax 0501-123458<br />
@@ -77,8 +79,8 @@ test('[bg] test parsing NL numbers', (t) => {
         ],
         'Two phonenumbers and ignore two faxnumbers')
 
-    match(`
-        <td style="width: 200px">Pietje Puk<br />
+    match(
+        `<td style="width: 200px">Pietje Puk<br />
         De Brandstraat 123<br />
         1234 AB&nbsp; Plaats<br />
         &nbsp;<br />
@@ -92,7 +94,7 @@ test('[bg] test parsing NL numbers', (t) => {
         <br />
         <strong>Openingstijden</strong>
         </td>`,
-        [ { start: 158, end: 169, number: '0501123457' } ],
+        [ { start: 149, end: 160, number: '0501123457' } ],
         'Contact details in a TD')
 
     match('050 1234 121', [ { start: 0, end: 12, number: '0501234121' } ])
