@@ -79,6 +79,7 @@
         "guppy-pre-commit": "^0.4.x",
         "jsdoc": "3.x.x",
         "jsdoc-spindle": "github:vialer/jsdoc-spindle#master",
+        "jsdom": "^12.2.0",
         "map-stream": "0.0.7",
         "mkdirp": "0.x.x",
         "plugin-error": "^1.0.1",
