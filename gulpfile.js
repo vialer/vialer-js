@@ -34,6 +34,7 @@ const test = require('tape')
 const eslint = require('gulp-eslint')
 const guppy = require('git-guppy')(gulp)
 const filter = require('gulp-filter')
+const sassLint = require('gulp-sass-lint')
 
 
 const writeFileAsync = promisify(fs.writeFile)
@@ -401,7 +402,7 @@ gulp.task('test-unit', 'Run unit and integation tests.', () => {
 })
 
 
-gulp.task('lint', () => {
+gulp.task('lint-js', () => {
     return gulp.src(['src/**/*.js', 'test/**/*.js', 'gulpfile.js'])
         .pipe(eslint())
         .pipe(eslint.format())
@@ -409,12 +410,36 @@ gulp.task('lint', () => {
 })
 
 
-gulp.task('pre-commit-lint', () => {
+gulp.task('lint-sass', () => {
+    return gulp.src(['src/**/*.scss'])
+        .pipe(sassLint({
+            config: '.sass-lint.yml',
+        }))
+        .pipe(sassLint.format())
+        .pipe(sassLint.failOnError())
+})
+
+
+gulp.task('lint', ['lint-js', 'lint-sass'])
+
+
+gulp.task('pre-commit-lint-js', () => {
     return guppy.stream('pre-commit')
         .pipe(filter(['*.js']))
         .pipe(eslint())
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
+})
+
+
+gulp.task('pre-commit-lint-sass', () => {
+    return guppy.stream('pre-commit')
+        .pipe(filter(['*.scss']))
+        .pipe(sassLint({
+            config: '.sass-lint.yml',
+        }))
+        .pipe(sassLint.format())
+        .pipe(sassLint.failOnError())
 })
 
 
@@ -432,7 +457,8 @@ gulp.task('pre-commit-protect-secrets', () => {
 
 
 gulp.task('pre-commit', [
-    'pre-commit-lint',
+    'pre-commit-lint-js',
+    'pre-commit-lint-sass',
     'pre-commit-protect-secrets',
     'test-unit',
 ])
