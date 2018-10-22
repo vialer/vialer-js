@@ -2,6 +2,7 @@
 
 options:
     formatter: stylish
+    max-warnings: 0
 
 files:
     include: '**/*.scss'
