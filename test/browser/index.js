@@ -58,6 +58,7 @@ if (process.env[`CI_USERNAME_ALICE_${BRAND.toUpperCase()}`]) {
 */
 async function createBrowser(name, options) {
     let browser = await puppeteer.launch({
+        executablePath: process.env.OVERRIDE_CHROMIUM_PATH,
         args: [
             '--disable-notifications',
             '--disable-web-security',
