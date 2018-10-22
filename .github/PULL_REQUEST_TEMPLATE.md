@@ -1,13 +1,19 @@
-## Purpose
-_Describe the problem or feature in addition to a link to the issues._
+### Issue number
 
-## Approach
-_How does this change address the problem?_
+{if exists provide related issue}
 
-#### Open Questions and Pre-Merge TODOs
-- [ ] Use github checklists. When solved, check the box and explain the answer.
+### Expected behaviour
 
-## Learning
-_Describe the research stage_
+{what should have happened}
 
-_Links to blog posts, patterns, libraries or addons used to solve this problem_
+### Actual behaviour
+
+{what happens}
+
+### Description of fix
+
+{small description of what fixes the issue}
+
+### Other info
+
+{anything else that might be related/useful}
