@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug-vialer-webview",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "url": "http://localhost:8999",
+            "webRoot": "${workspaceRoot}/build/vialer/webview",
+            "sourceMaps": true,
+            "trace": true,
+            "sourceMapPathOverrides": {
+                "*": "${workspaceRoot}/*",
+            },
+        },
+    ]
+}
