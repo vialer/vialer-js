@@ -6,7 +6,7 @@ module.exports = function(settings) {
     return async function(runner, screens) {
         const container = await runner.$('#app')
         await runner.waitFor('.greeting')
-        if (screens) await container.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(runner)}login.png`)})
+        if (screens) await brand.tests.screenshot(container, runner, 'login')
 
         // The voip adapter has an endpoint field that must be filled.
         if (brand.plugins.builtin.user.adapter === 'vjs-adapter-user-voip') {
@@ -15,7 +15,7 @@ module.exports = function(settings) {
 
         await runner.type('input[name="username"]', brand.tests[runner._name].username)
         await runner.type('input[name="password"]', brand.tests[runner._name].password)
-        if (screens) await container.screenshot({path: path.join(settings.SCREENS_DIR, `${brand.tests.step(runner)}login-credentials.png`)})
+        if (screens) await brand.tests.screenshot(container, runner, 'login-credentials')
 
         await runner.click('.test-login-button')
         await runner.waitFor('.component-wizard-welcome')
