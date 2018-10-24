@@ -1,83 +1,65 @@
-const test = require('tape-catch')
+const utils = require('../shared/utils')
+const test = utils.asyncTest
 
 const {
-    brand,
-    createBrowser,
-    login,
-    wizard,
+    screenshot,
+    step,
+    loginAndWizard,
 } = require('../shared/bootstrap.js')
 
 
-test('[browser] <alice> I am logging in.', async(t) => {
-    let [browserAlice, browserBob] = await Promise.all([createBrowser('alice'), createBrowser('bob')])
-    let alice = browserAlice.pages[0]
-    let bob = browserBob.pages[0]
-
-    alice.setViewport({height: 600, width: 500})
-    bob.setViewport({height: 600, width: 500})
-
-    const uri = `http://127.0.0.1:${brand.tests.port}/index.html?test=true`
-    await Promise.all([alice.goto(uri, {}), bob.goto(uri, {})])
-
-    await Promise.all([
-        await login(alice, true),
-        await login(bob, false),
+test('[browser] Alice calls Bob, Bob answers.', async (t, onExit) => {
+    const [alice, bob] = await Promise.all([
+        loginAndWizard('alice', onExit, {screens: true}),
+        loginAndWizard('bob', onExit),
     ])
 
-    t.end()
+    await screenshot(alice, 'ready-to-use')
 
-    test('[browser] <alice> I am going to complete the wizard.', async(_t) => {
-        const aliceContainer = await alice.$('#app')
-        let [aliceOptions, bobOptions] = await Promise.all([
-            await wizard(alice, true),
-            await wizard(bob, false),
-        ])
+    // Check that there are 3 fake input/output/sound devices at the start.
+    const aliceDevices = alice.options.input.length + alice.options.output.length + alice.options.sounds.length
+    const bobDevices = bob.options.input.length + bob.options.output.length + bob.options.sounds.length
+    t.equal(aliceDevices, 9, '[browser] <alice> all devices are available')
+    t.equal(bobDevices, 9, '[browser] <bob> all devices are available')
 
-        await brand.tests.screenshot(aliceContainer, alice, 'ready-to-use')
+    // Call bob.
+    await step('alice', 'I am calling bob.')
+    await utils.keypadEntry(alice, '229')
+    await screenshot(alice, 'dialpad-call')
+    await alice.page.click('.test-call-button')
 
-        await Promise.all([
-            alice.click('.test-delete-notification'),
-            bob.click('.test-delete-notification'),
-        ])
+    await alice.page.waitFor('.component-calls .call-ongoing')
+    await screenshot(alice, 'calldialog-outgoing')
 
-        // Check that there are 3 fake input/output/sound devices at the start.
-        const aliceDevices = aliceOptions.input.length + aliceOptions.output.length + aliceOptions.sounds.length
-        const bobDevices = bobOptions.input.length + bobOptions.output.length + bobOptions.sounds.length
-        t.equal(aliceDevices, 9, '[browser] <alice> all devices are available')
-        t.equal(bobDevices, 9, '[browser] <bob> all devices are available')
+    // Answer alice.
+    await step('bob', 'alice is calling; let\'s talk.')
+    await bob.page.waitFor('.component-calls .call-ongoing')
+    await screenshot(bob, 'calldialog-incoming')
+    await bob.page.click('.component-call .test-button-accept')
 
-        _t.end()
+    // Alice and bob are now getting connected;
+    // wait for alice and bob to see the connected screen.
+    await alice.page.waitFor('.component-call .call-options')
+    // Verify alice is talking to bob (229)
+    const aliceNumber = await utils.getText(alice, '.component-call .info-number')
+    t.equal('229', aliceNumber, '[browser] <alice> is called by number 229.')
 
-        test('[browser] <alice> I am calling bob.', async(__t) => {
-            // Wait until the status indicates a registered device.
-            await alice.waitFor('.test-status-registered')
-            // Enter a number and press the call button.
-            await alice.click('.component-call-keypad .test-key-2')
-            await alice.click('.component-call-keypad .test-key-2')
-            await alice.click('.component-call-keypad .test-key-9')
-            await brand.tests.screenshot(aliceContainer, alice, 'dialpad-call')
-            await alice.click('.test-call-button')
+    await bob.page.waitFor('.component-call .call-options')
+    // Verify bob is talking to alice (224)
+    const bobNumber = await utils.getText(bob, '.component-call .info-number')
+    t.equal('224', bobNumber, '[browser] <bob> is called by number 224.')
 
-            await alice.waitFor('.component-calls .call-ongoing')
-            await brand.tests.screenshot(aliceContainer, alice, 'calldialog-outgoing')
+    await screenshot(alice, 'calldialog-outgoing-accepted')
+    await screenshot(bob, 'calldialog-incoming-accepted')
 
-            __t.end()
+    console.log('[browser] Letting alice and bob "talk" for 5 seconds.')
+    await utils.delay(5000)
 
-            test('[browser] <bob> alice is calling; let\'s talk.', async(___t) => {
-                const bobContainer = await bob.$('#app')
-                await bob.waitFor('.component-calls .call-ongoing')
-                await brand.tests.screenshot(bobContainer, bob, 'calldialog-incoming')
-                await bob.click('.component-call .test-button-accept')
-                // Alice and bob are now getting connected;
-                // wait for Alice to see the connected screen.
-                await alice.waitFor('.component-call .call-options')
-                await brand.tests.screenshot(aliceContainer, alice, 'calldialog-outgoing-accepted')
-                await brand.tests.screenshot(bobContainer, bob, 'calldialog-incoming-accepted')
+    // Alice hangs up.
+    step('alice', 'Hangs up.')
+    await alice.page.click('.component-call .test-button-terminate')
 
-                await browserAlice.browser.close()
-                await browserBob.browser.close()
-                ___t.end()
-            })
-        })
-    })
+    // Wait for alice and bob to return to the keypad.
+    await alice.page.waitFor('.component-call .new-call')
+    await bob.page.waitFor('.component-call .new-call')
 })

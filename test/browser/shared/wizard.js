@@ -1,48 +1,47 @@
 const path = require('path')
 
-module.exports = function(settings) {
+module.exports = function(settings, screenshot) {
     const brand = settings.brands[settings.BRAND_TARGET]
 
-    return async function(runner, screens) {
-        const container = await runner.$('#app')
-        if (screens) await brand.tests.screenshot(container, runner, 'wizard-welcome')
+    return async function({page, app}, screens) {
+        if (screens) await screenshot({app, page}, 'wizard-welcome')
 
-        await runner.click('.test-wizard-welcome-next')
-        await runner.waitFor('.component-wizard-telemetry')
-        if (screens) await brand.tests.screenshot(container, runner, 'wizard-telemetry')
+        await page.click('.test-wizard-welcome-next')
+        await page.waitFor('.component-wizard-telemetry')
+        if (screens) await screenshot({app, page}, 'wizard-telemetry')
 
-        await runner.click('.test-wizard-telemetry-yes')
+        await page.click('.test-wizard-telemetry-yes')
 
         // For now, only vjs-adapter-user-vg supports account selection.
         if (brand.plugins.builtin.user.adapter === 'vjs-adapter-user-vg') {
-            await runner.waitFor('.component-wizard-account')
+            await page.waitFor('.component-wizard-account')
             // Wait for the select to be filled by the platform API call.
-            await runner.waitFor('.filtered-options .option')
+            await page.waitFor('.filtered-options .option')
 
-            await runner.click('input[id="webrtc_account"]')
-            await runner.click(`.filtered-options #option-${brand.tests[runner._name].id}`)
+            await page.click('input[id="webrtc_account"]')
+            await page.click(`.filtered-options #option-${brand.tests[page._name].id}`)
 
-            if (screens) await brand.tests.screenshot(container, runner, 'wizard-account')
-            await runner.click('.test-wizard-account-next')
+            if (screens) await screenshot({app, page}, 'wizard-account')
+            await page.click('.test-wizard-account-next')
         }
 
-        await runner.waitFor('.component-wizard-mic-permission')
-        if (screens) await brand.tests.screenshot(container, runner, 'wizard-mic-permission')
-        await runner.click('.test-wizard-mic-permission-next')
+        await page.waitFor('.component-wizard-mic-permission')
+        if (screens) await screenshot({app, page}, 'wizard-mic-permission')
+        await page.click('.test-wizard-mic-permission-next')
 
-        await runner.waitFor('.component-wizard-devices')
-        await runner.waitFor('select option:not([disabled="disabled"])')
+        await page.waitFor('.component-wizard-devices')
+        await page.waitFor('select option:not([disabled="disabled"])')
 
         let [input, output, sounds] = await Promise.all([
-            runner.$$('#input_device option'),
-            runner.$$('#output_device option'),
-            runner.$$('#sounds_device option'),
+            page.$$('#input_device option'),
+            page.$$('#output_device option'),
+            page.$$('#sounds_device option'),
         ])
 
-        if (screens) await brand.tests.screenshot(container, runner, 'wizard-devices')
-        await runner.click('.test-wizard-devices-next')
+        if (screens) await screenshot({app, page}, 'wizard-devices')
+        await page.click('.test-wizard-devices-next')
 
-        await runner.waitFor('.notification')
+        await page.waitFor('.notification')
 
         return {input, output, sounds}
     }
