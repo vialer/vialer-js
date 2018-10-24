@@ -28,12 +28,12 @@ if (process.env.HEADLESS) {
 // account credentials immediately when this happens.
 if (process.env[`CI_USERNAME_ALICE_${BRAND.toUpperCase()}`]) {
     brand.tests.endpoint = process.env[`CI_ENDPOINT_${BRAND.toUpperCase()}`]
-    brand.tests.alice.username = process.env[`CI_USERNAME_ALICE_${BRAND.toUpperCase()}`]
-    brand.tests.alice.password = process.env[`CI_PASSWORD_ALICE_${BRAND.toUpperCase()}`]
-    brand.tests.alice.id = process.env[`CI_ID_ALICE_${BRAND.toUpperCase()}`]
-    brand.tests.bob.username = process.env[`CI_USERNAME_BOB_${BRAND.toUpperCase()}`]
-    brand.tests.bob.password = process.env[`CI_PASSWORD_BOB_${BRAND.toUpperCase()}`]
-    brand.tests.bob.id = process.env[`CI_ID_BOB_${BRAND.toUpperCase()}`]
+    for (const actor of ['alice', 'bob', 'charlie']) {
+        for (const field of ['id', 'number', 'username', 'password']) {
+            const name = ['ci', field, actor, BRAND].map(e => e.toUpperCase()).join('_')
+            brand.tests[actor][field] = process.env[name]
+        }
+    }
 }
 
 /**
