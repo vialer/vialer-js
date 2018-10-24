@@ -64,14 +64,23 @@ async function createBrowser(name, options) {
 }
 
 
-
-
-async function step(name, message) {
-    console.log(`[browser] <${name}> ${message}`)
+/**
+ * Report a test step of `actor`.
+ * When not in HEADLESS mode, it will also pause for 2 seconds.
+ * @param {String} actor - Name of the actor.
+ * @param {String} message - Message to print.
+ */
+async function step(actor, message) {
+    console.log(`[browser] <${actor}> ${message}`)
     if (!HEADLESS) await utils.delay(2000)
 }
 
 
+/**
+ * Take a screenshot of `browser` and write it to file.
+ * @param {Object} browser - Browser instance returned by `loginAndWizard`.
+ * @param {*} name - Name the screenshot (actor name will be prepended).
+ */
 async function screenshot({app, page}, name) {
     if (SCREENS) {
         await mkdirp(settings.SCREENS_DIR)
@@ -86,11 +95,21 @@ const login = require('./login')(settings, screenshot)
 const wizard = require('./wizard')(settings, screenshot)
 
 
+/**
+ * Start a new browser, login and complete the wizard and return the
+ * instance for further testing. Login credentials are read from the
+ * settings.
+ * @param {String} name - Name of the actor.
+ * @param {Function} onExit - Exit function registration.
+ * @param {Object} options - Options.
+ * @returns {Object} - Browser instance.
+ */
 async function loginAndWizard(name, onExit, {screens = false} = {}) {
     await step(name, 'Opening browser')
-
     let browser = await createBrowser(name)
 
+    // Keep browsers open when HEADLESS=false, this will halt the next tests
+    // and gives the developer time to debug.
     if (HEADLESS) {
         onExit(async () => {
             console.log(`[browser] <${name}> Closing browser.`)
@@ -115,7 +134,6 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
 
     await step(name, 'Completing wizard.')
     const options = await wizard(me, screens)
-
     await page.click('.test-delete-notification')
 
     // Wait until the status indicates a registered device.
@@ -126,6 +144,7 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
 
 
 module.exports = {
+    brand: brand,
     settings: settings,
     screenshot: screenshot,
     step: step,

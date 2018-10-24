@@ -2,6 +2,7 @@ const utils = require('../shared/utils')
 const test = utils.asyncTest
 
 const {
+    brand,
     screenshot,
     step,
     loginAndWizard,
@@ -24,10 +25,9 @@ test('[browser] Alice calls Bob, Bob answers.', async (t, onExit) => {
 
     // Call bob.
     await step('alice', 'I am calling bob.')
-    await utils.keypadEntry(alice, '229')
+    await utils.keypadEntry(alice, brand.tests.bob.number)
     await screenshot(alice, 'dialpad-call')
     await alice.page.click('.test-call-button')
-
     await alice.page.waitFor('.component-calls .call-ongoing')
     await screenshot(alice, 'calldialog-outgoing')
 
@@ -40,20 +40,20 @@ test('[browser] Alice calls Bob, Bob answers.', async (t, onExit) => {
     // Alice and bob are now getting connected;
     // wait for alice and bob to see the connected screen.
     await alice.page.waitFor('.component-call .call-options')
-    // Verify alice is talking to bob (229)
+    // Verify alice is talking to bob.
     const aliceNumber = await utils.getText(alice, '.component-call .info-number')
-    t.equal('229', aliceNumber, '[browser] <alice> is called by number 229.')
+    t.equal(brand.tests.bob.number, aliceNumber, '[browser] <alice> is called by number bob.')
 
     await bob.page.waitFor('.component-call .call-options')
-    // Verify bob is talking to alice (224)
+    // Verify bob is talking to alice.
     const bobNumber = await utils.getText(bob, '.component-call .info-number')
-    t.equal('224', bobNumber, '[browser] <bob> is called by number 224.')
+    t.equal(brand.tests.alice.number, bobNumber, '[browser] <bob> is called by number alice.')
 
     await screenshot(alice, 'calldialog-outgoing-accepted')
     await screenshot(bob, 'calldialog-incoming-accepted')
 
-    console.log('[browser] Letting alice and bob "talk" for 5 seconds.')
-    await utils.delay(5000)
+    console.log('[browser] Letting alice and bob "talk" for 2 seconds.')
+    await utils.delay(2000)
 
     // Alice hangs up.
     step('alice', 'Hangs up.')
