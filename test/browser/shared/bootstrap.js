@@ -115,6 +115,8 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
             console.log(`[browser] <${name}> Closing browser.`)
             await browser.browser.close()
         })
+    } else {
+        console.log('HEADLESS=false: Not closing browsers automatically.')
     }
 
     let page = browser.pages[0]

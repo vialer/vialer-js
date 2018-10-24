@@ -97,7 +97,7 @@
                     "password": ""
                 },
                 "endpoint": "",
-                "headless": false,
+                "headless": true,
                 "port": 8999
             },
             "vendor": {
