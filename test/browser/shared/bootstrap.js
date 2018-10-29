@@ -146,9 +146,9 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
 
 
 module.exports = {
-    brand: brand,
-    settings: settings,
-    screenshot: screenshot,
-    step: step,
-    loginAndWizard: loginAndWizard,
+    brand,
+    settings,
+    screenshot,
+    step,
+    loginAndWizard,
 }

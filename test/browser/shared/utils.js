@@ -55,8 +55,8 @@ function delay(ms) {
 
 
 module.exports = {
-    asyncTest: asyncTest,
-    keypadEntry: keypadEntry,
-    getText: getText,
-    delay, delay,
+    asyncTest,
+    keypadEntry,
+    getText,
+    delay,
 }
