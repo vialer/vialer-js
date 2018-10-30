@@ -80,21 +80,24 @@
             "tests": {
                 "alice": {
                     "id": "",
+                    "number": "",
                     "username": "",
                     "password": ""
                 },
                 "bob": {
                     "id": "",
+                    "number": "",
                     "username": "",
                     "password": ""
                 },
                 "charlie": {
                     "id": "",
+                    "number": "",
                     "username": "",
                     "password": ""
                 },
                 "endpoint": "",
-                "headless": false,
+                "headless": true,
                 "port": 8999
             },
             "vendor": {

@@ -14,34 +14,34 @@
     <div class="call-options" v-if="['accepted'].includes(call.status)">
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="muteToggle" :class="classes('mute-button')">
+            <div class="rounded-button test-mute-button" @click="muteToggle" :class="classes('mute-button')">
                 <icon name="mute"/>
             </div>
             <p class="ca">{{$t('mute')}}</p>
         </div>
 
         <div class="rounded-button-with-text" v-if="call.transfer.type !== 'accept'">
-            <div class="rounded-button" @click="transferToggle" :class="classes('transfer-button')">
+            <div class="rounded-button test-transfer-button" @click="transferToggle" :class="classes('transfer-button')">
                 <icon name="transfer"/>
             </div>
             <p class="ca">{{$t('transfer')}}</p>
         </div>
         <div class="rounded-button-with-text" v-else>
-            <div class="rounded-button" @click="transferFinalize">
+            <div class="rounded-button test-transfer-finalize" @click="transferFinalize">
                 <icon name="merge"/>
             </div>
             <p class="ca">{{$t('transfer')}}</p>
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="holdToggle" :class="classes('hold-button')">
+            <div class="rounded-button test-hold-button" @click="holdToggle" :class="classes('hold-button')">
                 <icon name="on-hold"/>
             </div>
             <p class="ca">{{$t('on hold')}}</p>
         </div>
 
         <div class="rounded-button-with-text">
-            <div class="rounded-button" @click="keypadToggle" :class="classes('dialpad-button')">
+            <div class="rounded-button test-dialpad-button" @click="keypadToggle" :class="classes('dialpad-button')">
                 <icon name="dialpad"/>
             </div>
             <p class="ca">{{$t('keypad')}}</p>
@@ -51,15 +51,16 @@
     <!-- Show only when transfer is active and the call is still active -->
     <div class="transfer-options" v-if="call.transfer.active && ['accepted'].includes(call.status)">
         <div class="transfer-buttons">
-            <div class="transfer-button ca" :class="classes('attended-button')" @click="transferMode('attended')">
+            <div class="transfer-button ca test-attended-button" :class="classes('attended-button')" @click="transferMode('attended')">
                 {{$t('attended transfer')}}
             </div>
-            <div class="transfer-button ca" :class="classes('blind-button')" @click="transferMode('blind')">
+            <div class="transfer-button ca test-blind-button" :class="classes('blind-button')" @click="transferMode('blind')">
                 {{$t('blind transfer')}}
             </div>
         </div>
         <div class="transfer-text cf">{{$t('select a transfer recipient')}}:</div>
-        <CallKeypad :model.sync="call.keypad.number" display="dense" :call="call" mode="call" :number="call.keypad.number"/>
+        <CallKeypad :model.sync="call.keypad.number" display="dense" :call="call"
+            mode="call" :number="call.keypad.number"/>
     </div>
     <!-- Show attended/blind transfer option and a dense keypad when transfer is active and the call is still active -->
     <div class="new-call" v-if="call.status === 'new' || call.keypad.active">

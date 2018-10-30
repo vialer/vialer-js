@@ -6,7 +6,7 @@
             v-bind:value="number" v-on:input="inputChange($event.target.value)"
             v-on:keyup.enter="placeCall(number)"/>
 
-        <i class="icon icon-small" v-if="mode === 'call'" :class="{'disabled': !number}"
+        <i class="icon icon-small test-keypad-action" v-if="mode === 'call'" :class="{'disabled': !number}"
             v-on:keyup.enter="keypadAction" @click="placeCall(number)"><icon name="transfer"/></i>
     </div>
     <div :class="classes('number-input')" v-else-if="display === 'touch'">

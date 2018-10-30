@@ -92,6 +92,7 @@
         "serve-static": "1.x.x",
         "tap-colorize": "1.x.x",
         "tape": "4.x.x",
+        "tape-catch": "^1.0.6",
         "uglify-es": "3.x.x",
         "v-runtime-template": "^1.5.2",
         "vinyl-buffer": "1.x.x",
