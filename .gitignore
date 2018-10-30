@@ -1,6 +1,7 @@
 node_modules
 build
 dist
+yarn-error.log
 docs/screenshots
 super_secret.txt
 .tags

@@ -1,46 +1,47 @@
 {
     "brands": {
-        "bologna": {
+        "vialer": {
             "colors": {
-                "brand-color": "#2e3547",
-                "brand-accent-color": "#f2cc10",
+                "brand-accent-color": "#f98644",
+                "brand-color": "#f05a29",
                 "green-color": "#28ca42",
-                "grey-color": "#888",
+                "grey-color": "#8a8a8a",
                 "orange-color": "#f98644",
-                "primary-color": "#3c3c50",
+                "primary-color": "#2e3547",
                 "red-color": "#da534F"
             },
+            "name": {
+                "alpha": "Vialer alpha",
+                "beta": "Vialer beta",
+                "production": "Vialer"
+            },
+            "permissions": "https://partner.voipgrid.nl/",
             "plugins": {
                 "builtin": {
                     "availability": {
                         "addons": {
-                            "bg": [],
-                            "fg": [],
-                            "i18n": []
+                            "bg": ["@vialer/vjs-addon-availability-vg"],
+                            "fg": ["@vialer/vjs-addon-availability-vg"],
+                            "i18n": ["@vialer/vjs-addon-availability-vg"]
                         }
                     },
                     "contacts": {
-                        "i18n": [],
-                        "providers": []
+                        "i18n": ["@vialer/vjs-provider-contacts-vg"],
+                        "providers": ["@vialer/vjs-provider-contacts-vg"]
                     },
                     "user": {
-                        "adapter": "vjs-adapter-user-voip",
-                        "i18n": []
+                        "adapter": "@vialer/vjs-adapter-user-vg",
+                        "i18n": ["@vialer/vjs-adapter-user-vg"]
                     }
                 },
-                "custom": {}
+                "custom": {
+                    "queues": {
+                        "name": "@vialer/vjs-mod-queues-vg",
+                        "parts": ["bg", "fg", "i18n"]
+                    }
+                }
             },
-            "name": {
-                "alpha": "Bologna-alpha",
-                "beta": "Bologna-beta",
-                "production": "Bologna"
-            },
-            "permissions": "",
-            "sip_endpoint": "",
-            "stun": [
-                "stun:stun3.l.google.com:19302",
-                "stun:stun4.l.google.com:19302"
-            ],
+            "sip_endpoint": "websocket.voipgrid.nl",
             "store": {
                 "chrome": {
                     "clientId": "",
@@ -49,18 +50,12 @@
                     "extensionId_beta": "",
                     "extensionId_production": "",
                     "refreshToken": ""
-                },
-                "firefox": {
-                    "apiKey": "",
-                    "apiSecret": "",
-                    "gecko": {
-                        "id_alpha": "",
-                        "id_beta": "",
-                        "id_production": "",
-                        "strict_min_version": ""
-                    }
                 }
             },
+            "stun": [
+                "stun:stun0-grq.voipgrid.nl",
+                "stun:stun0-ams.voipgrid.nl"
+            ],
             "telemetry": {
                 "analytics_id": {
                     "chrome": "",
@@ -74,7 +69,7 @@
                     "dsn": "",
                     "host": "",
                     "org": "",
-                    "project": "bologna"
+                    "project": ""
                 }
             },
             "tests": {
@@ -96,21 +91,21 @@
                     "username": "",
                     "password": ""
                 },
-                "endpoint": "",
-                "headless": true,
+                "endpoint": "websocket.voipgrid.nl",
+                "headless": false,
                 "port": 8999
             },
             "theme": "@vialer/vjs-theme-bologna",
             "vendor": {
-                "name": "Bologna",
+                "name": "Vialer",
                 "portal": {
-                    "name": "",
-                    "url": ""
+                    "name": "portal",
+                    "url": "https://partner.voipgrid.nl/"
                 },
                 "support": {
-                    "email": "",
-                    "phone": "",
-                    "website": "https://vialer-js.io"
+                    "email": "support@voipgrid.nl",
+                    "phone": "+31508009000",
+                    "website": "https://plugin.vialer.io/"
                 }
             }
         }

@@ -2,7 +2,6 @@ const {promisify} = require('util')
 const mkdirp = promisify(require('mkdirp'))
 const path = require('path')
 const puppeteer = require('puppeteer')
-const test = require('tape-catch')
 const utils = require('./utils.js')
 
 
@@ -14,14 +13,15 @@ const settings = require('../../../tools/settings')(path.join(__dirname, '../../
 // Force to webview.
 settings.BUILD_TARGET = 'webview'
 
+
 const brand = settings.brands[BRAND]
 
 // Allows overriding the headless setting with an environment flag.
-let HEADLESS
-if (process.env.HEADLESS) {
-    HEADLESS = process.env.HEADLESS === '1' ? true : false
-} else HEADLESS = brand.tests.headless
+let HEADLESS = brand.tests.headless
+if (process.env.HEADLESS) HEADLESS = process.env.HEADLESS === '1' ? true : false
 
+let DEBUG = false
+if (process.env.DEBUG) DEBUG = process.env.DEBUG === '1' ? true : false
 
 // WARNING: Do NOT log CI variables while committing to Github.
 // This may expose the Circle CI secrets in the build log. Change the
@@ -44,7 +44,6 @@ if (process.env[`CI_USERNAME_ALICE_${BRAND.toUpperCase()}`]) {
 */
 async function createBrowser(name, options) {
     let browser = await puppeteer.launch({
-        executablePath: process.env.OVERRIDE_CHROMIUM_PATH,
         args: [
             '--disable-notifications',
             '--disable-web-security',
@@ -54,6 +53,7 @@ async function createBrowser(name, options) {
             '--use-fake-ui-for-media-stream',
             '--use-fake-device-for-media-stream',
         ],
+        executablePath: process.env.OVERRIDE_CHROMIUM_PATH,
         headless: HEADLESS,
         pipe: true,
     })
@@ -71,8 +71,10 @@ async function createBrowser(name, options) {
  * @param {String} message - Message to print.
  */
 async function step(actor, message) {
-    console.log(`[browser] <${actor}> ${message}`)
-    if (!HEADLESS) await utils.delay(2000)
+    if (DEBUG) {
+        console.log(`<${actor}> ${message}`)
+        await utils.delay(2000)
+    }
 }
 
 
@@ -85,7 +87,7 @@ async function screenshot({app, page}, name) {
     if (SCREENS) {
         await mkdirp(settings.SCREENS_DIR)
         const filename = `${page._name}-${name}.png`
-        screenshotPath = path.join(settings.SCREENS_DIR, filename)
+        const screenshotPath = path.join(settings.SCREENS_DIR, filename)
         await app.screenshot({path: screenshotPath})
     }
 }
@@ -108,27 +110,34 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
     await step(name, 'Opening browser')
     let browser = await createBrowser(name)
 
-    // Keep browsers open when HEADLESS=false, this will halt the next tests
+    // Keep browsers open when DEBUG=true, this will halt the next tests
     // and gives the developer time to debug.
-    if (HEADLESS) {
-        onExit(async () => {
-            console.log(`[browser] <${name}> Closing browser.`)
+    if (!DEBUG) {
+        onExit(async() => {
+            await step(name, 'Closing browser.')
             await browser.browser.close()
         })
     } else {
-        console.log('HEADLESS=false: Not closing browsers automatically.')
+        console.log('NOEXIT=false: Not closing browsers automatically.')
     }
 
     let page = browser.pages[0]
     page.setViewport({height: 600, width: 500})
+    // Apply timeouts to make tests fail earlier.
+    page.setDefaultNavigationTimeout(15000)
+    // Patch waitForSelector to always use a default timeout.
+    const _waitForSelector = page.waitForSelector.bind(page)
+    page.waitForSelector = async(selector, options = {timeout: 15000}) => {
+        await _waitForSelector(selector, options)
+    }
 
     const uri = `http://127.0.0.1:${brand.tests.port}/index.html?test=true`
     await page.goto(uri, {})
 
     const me = {
+        app: await page.$('#app'),
         browser: browser,
         page: page,
-        app: await page.$('#app'),
     }
 
     await step(name, 'Logging in.')
@@ -139,16 +148,16 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
     await page.click('.test-delete-notification')
 
     // Wait until the status indicates a registered device.
-    await page.waitFor('.test-status-registered')
+    await page.waitForSelector('.test-status-registered')
 
-    return Object.assign({options: options}, me)
+    return Object.assign({options}, me)
 }
 
 
 module.exports = {
     brand,
-    settings,
-    screenshot,
-    step,
     loginAndWizard,
+    screenshot,
+    settings,
+    step,
 }

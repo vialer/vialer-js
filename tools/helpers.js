@@ -11,7 +11,7 @@ const connect = require('connect')
 const createReleaseManager = require('gulp-sentry-release-manager')
 const envify = require('gulp-envify')
 const fs = require('fs')
-const fuet = require('gulp-fuet')
+const vueCompiler = require('@vialer/vue-compiler-gulp')
 const gulp = require('gulp-help')(require('gulp'), {})
 const gutil = require('gulp-util')
 const http = require('http')
@@ -107,7 +107,7 @@ class Helpers {
 
     compileTemplates(sources) {
         return gulp.src(sources)
-            .pipe(fuet({
+            .pipe(vueCompiler({
                 commonjs: false,
                 namespace: 'global.templates',
                 pathfilter: ['src', 'components', 'node_modules'],
@@ -413,6 +413,53 @@ class Helpers {
 
 
     /**
+     * Scans JSON files for secrets that should not be committed.
+     * @returns {Function} - Function to put in a gulp `pipe`.
+     */
+    protectSecrets() {
+        const protectedKeys = [
+            'apiKey',
+            'apiSecret',
+            'clientSecret',
+            'refreshToken',
+            'username',
+            'password',
+        ]
+
+        function scanForProtectedKeys(file, obj, attrPath) {
+            let count = 0
+            Object.entries(obj).forEach(([key, value]) => {
+                if (protectedKeys.includes(key) && value) {
+                    const attr = [...attrPath, key].join('.')
+                    console.log(`Secret leaking: ${file.path} in attr ${attr}`)
+                    count++
+                } else if (Array.isArray(value)) {
+                    value.map(([index, subvalue]) => {
+                        count += scanForProtectedKeys(file, subvalue, [...attrPath, key, index])
+                    })
+                } else if (value !== null && (typeof value) === 'object') {
+                    count += scanForProtectedKeys(file, value, [...attrPath, key])
+                }
+            })
+
+            return count
+        }
+
+        return map(function(file, done) {
+            let obj = JSON.parse(file.contents.toString())
+            if (scanForProtectedKeys(file, obj, [])) {
+                throw new PluginError({
+                    message: 'Secrets are leaking.',
+                    plugin: 'protect-secrets',
+                })
+            }
+
+            done(null, file)
+        })
+    }
+
+
+    /**
     * Generic SCSS parsing task for one or more entrypoints.
     * @param {String} entryPath - Name of the scss entrypoint.
     * @param {String} sourcemap - Generate sourcemaps.
@@ -499,55 +546,8 @@ class Helpers {
             app.use(mount(mountpoint.mount, serveStatic(mountpoint.dir)))
             gutil.log(`Development service mounted ${mountpoint.dir} on ${mountpoint.mount} (index: ${mountpoint.index ? 'yes' : 'no'})`)
         }
-        http.createServer(app).listen(port)
+        this.server = http.createServer(app).listen(port)
         gutil.log(`Development service listening on http://localhost:${port}`)
-    }
-
-
-    /**
-     * Scans JSON files for secrets that should not be committed.
-     * @return {Function} - Function to put in a gulp `pipe`.
-     */
-    protectSecrets() {
-        const protectedKeys = [
-            'apiKey',
-            'apiSecret',
-            'clientSecret',
-            'refreshToken',
-            'username',
-            'password',
-        ]
-
-        function scanForProtectedKeys(file, obj, attrPath) {
-            let count = 0
-            Object.entries(obj).forEach(([key, value]) => {
-                if (protectedKeys.includes(key) && value) {
-                    const attr = [...attrPath, key].join('.')
-                    console.log(`Secret leaking: ${file.path} in attr ${attr}`)
-                    count++
-                } else if (Array.isArray(value)) {
-                    value.map(([index, subvalue]) => {
-                        count += scanForProtectedKeys(file, subvalue, [...attrPath, key, index])
-                    })
-                } else if (value !== null && (typeof value) === 'object') {
-                    count += scanForProtectedKeys(file, value, [...attrPath, key])
-                }
-            })
-
-            return count
-        }
-
-        return map(function(file, done) {
-            let obj = JSON.parse(file.contents.toString())
-            if (scanForProtectedKeys(file, obj, [])) {
-                throw new PluginError({
-                    message: 'Secrets are leaking.',
-                    plugin: 'protect-secrets',
-                })
-            }
-
-            done(null, file)
-        })
     }
 }
 

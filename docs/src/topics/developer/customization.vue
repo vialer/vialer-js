@@ -46,18 +46,18 @@
     "builtin": {
         "availability": {
             "addons": {
-                "bg": ["vjs-addon-availability-vg"],
-                "fg": ["vjs-addon-availability-vg"],
-                "i18n": ["vjs-addon-availability-vg"]
+                "bg": ["@vialer/vjs-addon-availability-vg"],
+                "fg": ["@vialer/vjs-addon-availability-vg"],
+                "i18n": ["@vialer/vjs-addon-availability-vg"]
             }
         },
         "contacts": {
-            "i18n": ["vjs-provider-contacts-vg"],
-            "providers": ["vjs-provider-contacts-vg"]
+            "i18n": ["@vialer/vjs-provider-contacts-vg"],
+            "providers": ["@vialer/vjs-provider-contacts-vg"]
         },
         "user": {
-            "adapter": "vjs-adapter-user-vg",
-            "i18n": ["vjs-adapter-user-vg"]
+            "adapter": "@vialer/vjs-adapter-user-vg",
+            "i18n": ["@vialer/vjs-adapter-user-vg"]
         }
     },
     "custom": {
