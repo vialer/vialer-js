@@ -90,6 +90,10 @@ module.exports = (app) => {
                 app.logger.info(`${this} setting language to ${language.id}`)
                 Vue.i18n.set(language.id)
             },
+
+            'settings.telemetry.remoteLogging.enabled': (enabled) => {
+                app.emit('bg:remote_logger:set_enabled', {enabled})
+            },
         },
     }
 

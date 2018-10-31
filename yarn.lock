@@ -6257,6 +6257,10 @@ leven@^2.1.0:
   resolved "https://registry.yarnpkg.com/leven/-/leven-2.1.0.tgz#c2e7a9f772094dee9d34202ae8acce4687875580"
   integrity sha1-wuep93IJTe6dNCAq6KzORoeHVYA=
 
+"le_js@github:rapid7/le_js#master":
+  version "0.0.3"
+  resolved "https://codeload.github.com/rapid7/le_js/tar.gz/f5f07b4a20e9d376734bb08e5b9a9def3a50687d"
+
 levn@^0.3.0, levn@~0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/levn/-/levn-0.3.0.tgz#3b09924edf9f083c0490fdd4c0bc4421e04764ee"

@@ -56,6 +56,17 @@
             :label="$t('telemetry')"
             v-model="settings.telemetry.enabled"
             :help="$t('we are able to improve the {name} faster, when you allow us to process anonymized data about usage statistics and application errors for analysis.', {name: app.name})" />
+
+        <CheckboxField name="remote_logging_enabled"
+            :label="$t('remote logging')"
+            v-model="settings.telemetry.remoteLogging.enabled"
+            :help="$t('send anonymized logging to us for support.')" />
+
+        <div v-if="settings.telemetry.remoteLogging.enabled"
+            style="font-family: monospace; background-color: #eee; padding:5px;">
+            {{settings.telemetry.remoteLogging.trace}}
+        </div>
+
     </div>
 
     <!-- General preferences -->
