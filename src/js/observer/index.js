@@ -111,7 +111,7 @@ class AppTab extends Skeleton {
             if (e.target.nodeName === 'A') {
                 // Handle links with hrefs starting with `tel:`.
                 const href = e.target.getAttribute('href')
-                if (href.startsWith('tel:')) {
+                if (href && href.startsWith('tel:')) {
                     e.preventDefault()
                     if (e.target.classList.contains('ctd-disabled')) return
                     const number = href.substring(4)
