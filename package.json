@@ -47,6 +47,7 @@
         "chrome-webstore-upload": "0.x.x",
         "connect": "3.x.x",
         "connect-mount": "1.x.x",
+        "cz-conventional-changelog": "2.1.0",
         "del": "2.x.x",
         "electron-packager": "12.x.x",
         "eslint": "4.x.x",
@@ -133,5 +134,10 @@
     },
     "_moduleAliases": {
         "vialer-js": "./src/js"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
     }
 }
