@@ -16,8 +16,8 @@ if (!global.translations) global.translations = {}
 global.VueStash = require('vue-stash').default
 Vue.use(global.VueStash)
 
-global.I18nStash = require('vue-i18n-stash')
-global.I18nStore = require('vue-i18n-stash/src/store-stash')
+global.I18nStash = require('@vialer/vue-i18n')
+global.I18nStore = require('@vialer/vue-i18n/src/store-stash')
 
 if (process.env.NODE_ENV === 'production') {
     Vue.config.productionTip = false

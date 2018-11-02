@@ -14,22 +14,21 @@ const test = require('tape-catch')
  *
  * @param {String} title - Test title.
  * @param {AsyncFunction} func - Test body.
- * @returns Tape test case
+ * @returns {Tape} - Tape test case
  */
 function asyncTest(title, func) {
-    cleanup = []
+    const cleanup = []
+    const onExit = (f) => cleanup.push(f)
 
-    onExit = (f) => cleanup.push(f)
-
-    return test(title, async (t) => {
+    return test(title, async(t) => {
         try {
             await func(t, onExit)
             t.end()
         } catch (e) {
-            console.log('error', e)
+            console.log(e)
             t.fail('exception')
         } finally {
-            for (f of cleanup) {
+            for (const f of cleanup) {
                 await f()
             }
         }
@@ -38,7 +37,7 @@ function asyncTest(title, func) {
 
 
 async function keypadEntry({page}, str) {
-    for (number of str) {
+    for (const number of str) {
         await page.click(`.component-call-keypad .test-key-${number}`)
     }
 }
@@ -56,7 +55,7 @@ function delay(ms) {
 
 module.exports = {
     asyncTest,
-    keypadEntry,
-    getText,
     delay,
+    getText,
+    keypadEntry,
 }

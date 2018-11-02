@@ -4,22 +4,22 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:latest-browsers
-
     working_directory: ~/vialer-js
-
     steps:
       - checkout
       - restore_cache:
-          key: v5-{{ checksum "package-lock.json" }}
-
-      - run:
-          command:
-            npm ci
-
+          name: Restore Yarn Package Cache
+          keys:
+            - npm-packages-v1-{{ checksum "yarn.lock" }}
+      - run: yarn --cache-folder ~/.cache/yarn
       - save_cache:
-          key: v5-{{ checksum "package-lock.json" }}
+          name: Save Yarn Package Cache
+          key: npm-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
-            - "node_modules"
+            - ~/.cache/yarn
+      - run: cp .circleci/.vialer-jsrc.ci .vialer-jsrc
+      - run: BRAND=vialer npm run lint-js
+      - run: BRAND=vialer npm run lint-sass
+      - run: BRAND=vialer npm run test-unit
+      - run: BRAND=vialer npm run test-browser
 
-      - run: cp .vialer-jsrc.example .vialer-jsrc
-      - run: npm run test

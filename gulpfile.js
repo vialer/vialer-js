@@ -11,14 +11,10 @@ const path = require('path')
 const addsrc = require('gulp-add-src')
 const argv = require('yargs').argv
 const childExec = require('child_process').exec
-const colorize = require('tap-colorize')
 
 const del = require('del')
+const eslint = require('gulp-eslint')
 const flatten = require('gulp-flatten')
-const gulp = require('gulp-help')(require('gulp'), {
-    hideDepsMessage: true,
-    hideEmpty: true,
-})
 const gutil = require('gulp-util')
 const Helpers = require('./tools/helpers')
 const livereload = require('gulp-livereload')
@@ -29,14 +25,14 @@ const runSequence = require('run-sequence')
 const size = require('gulp-size')
 const svgo = require('gulp-svgo')
 const tape = require('gulp-tape')
+const tapSpec = require('tap-spec')
 const template = require('gulp-template')
-const test = require('tape')
-const eslint = require('gulp-eslint')
-const guppy = require('git-guppy')(gulp)
+const through = require('through2')
 const filter = require('gulp-filter')
 const sassLint = require('gulp-sass-lint')
 
-
+const gulp = require('gulp-help')(require('gulp'), {hideDepsMessage: true, hideEmpty: true})
+const guppy = require('git-guppy')(gulp)
 const writeFileAsync = promisify(fs.writeFile)
 
 // The main settings object containing info from .vialer-jsrc and build flags.
@@ -52,8 +48,8 @@ gulp.task('assets', 'Copy <brand> assets to <target>.', () => {
     const robotoPath = path.join(settings.NODE_PATH, 'roboto-fontface', 'fonts', 'roboto')
     return gulp.src(path.join(robotoPath, '{Roboto-Light.woff2,Roboto-Regular.woff2,Roboto-Medium.woff2}'))
         .pipe(flatten({newPath: './fonts'}))
-        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/img/{*.icns,*.png,*.jpg,*.gif}`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
-        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/ringtones/*`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(addsrc(path.join(settings.THEME_PATH, 'img', '{*.icns,*.png,*.jpg,*.gif}'), {base: settings.THEME_PATH}))
+        .pipe(addsrc(path.join(settings.THEME_PATH, 'ringtones', '*'), {base: settings.THEME_PATH}))
         .pipe(ifElse(settings.PRODUCTION, imagemin))
         .pipe(ifElse(settings.BUILD_TARGET === 'electron', () => addsrc('./package.json')))
         .pipe(addsrc('./LICENSE'))
@@ -184,7 +180,7 @@ gulp.task('html', 'Generate HTML index file.', () => {
 
 gulp.task('__tmp-icons', '', (done) => {
     return gulp.src('./src/svg/*.svg', {base: 'src'})
-        .pipe(addsrc(`./src/brand/${settings.BRAND_TARGET}/svg/*.svg`, {base: `./src/brand/${settings.BRAND_TARGET}/`}))
+        .pipe(addsrc(path.join(settings.THEME_PATH, 'svg', '*.svg'), {base: settings.THEME_PATH}))
         .pipe(svgo())
         .pipe(size(_extend({title: 'icons'}, settings.SIZE_OPTIONS)))
         .pipe(gulp.dest(path.join(settings.TEMP_DIR, settings.BRAND_TARGET)))
@@ -197,9 +193,9 @@ gulp.task('__tmp-icons', '', (done) => {
 */
 gulp.task('icons', 'Generate Vue icon components from SVG.', ['__tmp-icons'], (done) => {
     // Use relative paths or vsvg will choke.
-    let srcDir = path.join('build', '__tmp', settings.BRAND_TARGET, 'svg')
-    const srcBuildDir = path.join('src', 'brand', settings.BRAND_TARGET, 'icons')
-    let execCommand = `node_modules/vue-svgicon/dist/lib/index.js -s ${srcDir} -t ${srcBuildDir}`
+    const iconSrc = path.join('build', '__tmp', settings.BRAND_TARGET, 'svg')
+    const iconBuildDir = path.join(settings.TEMP_DIR, settings.BRAND_TARGET, 'build')
+    const execCommand = `node_modules/vue-svgicon/dist/lib/index.js -s ${iconSrc} -t ${iconBuildDir}`
     childExec(execCommand, undefined, (_err, stdout, stderr) => {
         if (stderr) gutil.log(stderr)
         if (stdout) gutil.log(stdout)
@@ -233,10 +229,10 @@ gulp.task('js-vendor-bg', 'Generate vendor JavaScript for the background app sec
 
 gulp.task('js-vendor-fg', 'Generate vendor JavaScript for the foreground app section.', ['icons'], (done) => {
     helpers.jsEntry('./src/js/fg/vendor.js', 'vendor_fg',
-        [`./src/brand/${settings.BRAND_TARGET}/icons/index.js`])
-        .then(() => {
-            done()
-        })
+        [path.join(settings.TEMP_DIR, settings.BRAND_TARGET, 'build', 'index.js')]
+    ).then(() => {
+        done()
+    })
 })
 
 
@@ -293,6 +289,32 @@ gulp.task('js-app-observer', 'Generate tab app section Javascript.', (done) => {
 })
 
 
+gulp.task('lint', ['lint-js', 'lint-sass'])
+
+
+gulp.task('lint-js', () => {
+    return gulp.src([
+        'gulpfile.js',
+        'src/**/*.js',
+        'test/**/*.js',
+        'tools/**/*.js',
+    ])
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
+})
+
+
+gulp.task('lint-sass', () => {
+    return gulp.src(['src/**/*.scss'])
+        .pipe(sassLint({
+            config: '.sass-lint.yml',
+        }))
+        .pipe(sassLint.format())
+        .pipe(sassLint.failOnError())
+})
+
+
 gulp.task('manifest', 'Generate a browser-specific manifest file.', (done) => {
     let manifest = helpers.getManifest(settings.BRAND_TARGET, settings.BUILD_TARGET)
     const manifestTarget = path.join(settings.BUILD_DIR, 'manifest.json')
@@ -302,6 +324,47 @@ gulp.task('manifest', 'Generate a browser-specific manifest file.', (done) => {
         })
     })
 })
+
+
+gulp.task('pre-commit-lint-js', () => {
+    return guppy.stream('pre-commit')
+        .pipe(filter(['*.js']))
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
+})
+
+
+gulp.task('pre-commit-lint-sass', () => {
+    return guppy.stream('pre-commit')
+        .pipe(filter(['*.scss']))
+        .pipe(sassLint({
+            config: '.sass-lint.yml',
+        }))
+        .pipe(sassLint.format())
+        .pipe(sassLint.failOnError())
+})
+
+
+gulp.task('pre-commit-protect-secrets', () => {
+    return guppy.stream('pre-commit')
+        .pipe(filter(['.vialer-jsrc', '.vialer-jsrc.example']))
+        .pipe(helpers.protectSecrets())
+})
+
+
+gulp.task('protect-secrets', () => {
+    return gulp.src(['.vialer-jsrc', '.vialer-jsrc.example'])
+        .pipe(helpers.protectSecrets())
+})
+
+
+gulp.task('pre-commit', [
+    'pre-commit-lint-js',
+    'pre-commit-lint-sass',
+    'pre-commit-protect-secrets',
+    'test-unit',
+])
 
 
 gulp.task('scss', 'Generate all CSS files.', [], (done) => {
@@ -378,9 +441,8 @@ gulp.task('templates', 'Generate builtin and plugin Vue component templates.', (
 
         if (sectionPlugin.addons && sectionPlugin.addons.fg.length) {
             for (const addon of sectionPlugin.addons.fg) {
-                const dirName = addon.split('/')[0]
                 gutil.log(`[fg] addon templates for ${moduleName} (${addon})`)
-                sources.push(path.join(settings.NODE_PATH, dirName, 'src', 'components', '**', '*.vue'))
+                sources.push(path.join(settings.NODE_PATH, addon, 'src', 'components', '**', '*.vue'))
             }
         } else if (sectionPlugin.parts && sectionPlugin.parts.includes('fg')) {
             gutil.log(`[fg] custom templates for ${moduleName} (${sectionPlugin.name})`)
@@ -394,93 +456,24 @@ gulp.task('templates', 'Generate builtin and plugin Vue component templates.', (
 
 
 gulp.task('test-unit', 'Run unit and integation tests.', () => {
+    const reporter = through.obj()
+    reporter.pipe(tapSpec()).pipe(process.stdout)
+
     return gulp.src('test/bg/**/*.js')
-        .pipe(tape({
-            bail: true,
-            outputStream: test.createStream().pipe(colorize()).pipe(process.stdout),
-        }))
+        .pipe(tape({bail: true, outputStream: reporter}))
 })
 
 
-gulp.task('lint-js', () => {
-    return gulp.src(['src/**/*.js', 'test/**/*.js', 'gulpfile.js'])
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError())
-})
-
-
-gulp.task('lint-sass', () => {
-    return gulp.src(['src/**/*.scss'])
-        .pipe(sassLint({
-            config: '.sass-lint.yml',
-        }))
-        .pipe(sassLint.format())
-        .pipe(sassLint.failOnError())
-})
-
-
-gulp.task('lint', ['lint-js', 'lint-sass'])
-
-
-gulp.task('pre-commit-lint-js', () => {
-    return guppy.stream('pre-commit')
-        .pipe(filter(['*.js']))
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError())
-})
-
-
-gulp.task('pre-commit-lint-sass', () => {
-    return guppy.stream('pre-commit')
-        .pipe(filter(['*.scss']))
-        .pipe(sassLint({
-            config: '.sass-lint.yml',
-        }))
-        .pipe(sassLint.format())
-        .pipe(sassLint.failOnError())
-})
-
-
-gulp.task('protect-secrets', () => {
-    return gulp.src(['.vialer-jsrc', '.vialer-jsrc.example'])
-        .pipe(helpers.protectSecrets())
-})
-
-
-gulp.task('pre-commit-protect-secrets', () => {
-    return guppy.stream('pre-commit')
-        .pipe(filter(['.vialer-jsrc', '.vialer-jsrc.example']))
-        .pipe(helpers.protectSecrets())
-})
-
-
-gulp.task('pre-commit', [
-    'pre-commit-lint-js',
-    'pre-commit-lint-sass',
-    'pre-commit-protect-secrets',
-    'test-unit',
-])
-
-
-/**
-* Defined as extra task which makes it easier to respond
-* when the tests are finished, due to gulp-task not being
-* able to deal with `end` events.
-*/
-gulp.task('__test-browser', '', function() {
-    return gulp.src('test/browser/**/index.js').pipe(tape({bail: true}))
-})
-
-gulp.task('test-browser', 'Run browser tests on a served webview.', function(done) {
+gulp.task('test-browser', 'Run browser tests on a served webview.', ['build'], function(done) {
     // Force the build target.
     helpers.startDevService()
-    settings.BUILD_TARGET = 'webview'
-    runSequence(['build'], ['__test-browser'], () => {
-        process.exit(0)
-        done()
-    })
+
+    const reporter = through.obj()
+    reporter.pipe(tapSpec()).pipe(process.stdout)
+    return gulp.src('test/browser/**/index.js')
+        .pipe(tape({bail: true, outputStream: reporter}))
+        .on('error', () => {process.exit(1)})
+        .on('end', () => {process.exit()})
 })
 
 

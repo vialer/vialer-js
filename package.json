@@ -1,21 +1,22 @@
 {
-    "name": "vialer-js",
+    "name": "@vialer/vialer-js",
     "productName": "vialer-js",
-    "version": "4.1.5",
-    "description": "Open-source WebRTC softphone & communication platform.",
+    "version": "4.2.0",
+    "description": "Pluggable WebRTC softphone and communication platform.",
     "engines": {
         "node": ">=8.0.0"
     },
     "scripts": {
         "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-        "test": "gulp test-unit; gulp test-browser",
-        "link": "npm link vjs-adapter-user-vg;npm link vjs-adapter-user-voip;npm link vjs-addon-availability-vg;npm link vjs-mod-queues-vg;npm link vjs-provider-contacts-vg;npm link jsdoc-rtd; npm link gulp-fuet",
+        "link": "yarn link @vialer/vjs-adapter-user-vg;yarn link @vialer/vjs-adapter-user-voip;yarn link @vialer/vjs-addon-availability-vg;yarn link @vialer/vjs-mod-queues-vg;yarn link @vialer/vjs-provider-contacts-vg; yarn link @vialer/vue-compiler-gulp; yarn link @vialer/vue-i18n",
         "lint-js": "gulp lint-js",
-        "lint-scss": "gulp lint-sass"
+        "lint-sass": "gulp lint-sass",
+        "test-browser": "gulp test-browser",
+        "test-unit": "gulp test-unit"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/voipgrid/vialer-js.git"
+        "url": "https://github.com/vialer/vialer-js.git"
     },
     "keywords": [
         "chrome",
@@ -31,20 +32,22 @@
     "contributors": [
         {
             "name": "CONTRIBUTORS",
-            "url": "https://github.com/voipgrid/vialer-js/graphs/contributors"
+            "url": "https://github.com/vialer/vialer-js/graphs/contributors"
         }
     ],
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/voipgrid/vialer-js/issues"
+        "url": "https://github.com/vialer/vialer-js/issues"
     },
     "homepage": "https://vialer-js.io",
     "devDependencies": {
+        "@vialer/vue-compiler-gulp": "1.x.x",
         "archiver": "2.x.x",
         "browserify": "14.x.x",
         "chrome-webstore-upload": "0.x.x",
         "connect": "3.x.x",
         "connect-mount": "1.x.x",
+        "cz-conventional-changelog": "2.1.0",
         "del": "2.x.x",
         "electron-packager": "12.x.x",
         "eslint": "4.x.x",
@@ -59,7 +62,6 @@
         "gulp-eslint": "^5.0.0",
         "gulp-filter": "^5.1.0",
         "gulp-flatten": "^0.4.0",
-        "gulp-fuet": "^1.0.13",
         "gulp-gh-pages": "0.x.x",
         "gulp-help": "1.x.x",
         "gulp-if-else": "1.x.x",
@@ -90,8 +92,8 @@
         "sass-lint": "1.x.x",
         "serve-index": "1.x.x",
         "serve-static": "1.x.x",
-        "tap-colorize": "1.x.x",
-        "tape": "4.x.x",
+        "tap-spec": "^5.0.0",
+        "tape": "^4.9.1",
         "tape-catch": "^1.0.6",
         "uglify-es": "3.x.x",
         "v-runtime-template": "^1.5.2",
@@ -104,11 +106,18 @@
         "yargs": "7.x.x"
     },
     "dependencies": {
+        "@vialer/vjs-adapter-user-vg": "^3.0.2",
+        "@vialer/vjs-adapter-user-voip": "3.x.x",
+        "@vialer/vjs-addon-availability-vg": "^3.0.1",
+        "@vialer/vjs-mod-queues-vg": "^3.0.1",
+        "@vialer/vjs-provider-contacts-vg": "^3.0.1",
+        "@vialer/vjs-theme-bologna": "^1.0.1",
+        "@vialer/vue-i18n": "1.x.x",
         "axios": "0.16.x",
         "bulma": "0.6.x",
         "bulma-switch": "0.1.x",
         "css-element-queries": "0.4.x",
-        "electron": "^3.0.0-beta.4",
+        "electron": "3.0.x",
         "electron-reload": "1.x.x",
         "eventemitter3": "2.x.x",
         "module-alias": "2.x.x",
@@ -118,14 +127,17 @@
         "shortid": "2.x.x",
         "sip.js": "git+https://github.com/vialer/SIP.js#feature/reinvite-rpid",
         "v-click-outside": "^2.0.1",
-        "vjs-adapter-user-voip": "1.x.x",
         "vue": "2.5.x",
-        "vue-i18n-stash": "git+https://github.com/wearespindle/vue-stash-i18n.git#master",
         "vue-stash": "2.0.1-beta",
         "vuelidate": "0.6.x",
         "webextension-polyfill": "0.x.x"
     },
     "_moduleAliases": {
         "vialer-js": "./src/js"
+    },
+    "config": {
+        "commitizen": {
+            "path": "./node_modules/cz-conventional-changelog"
+        }
     }
 }

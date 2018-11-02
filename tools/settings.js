@@ -15,7 +15,7 @@ module.exports = function(baseDir, overrides) {
         BUILD_ARCH: argv.arch ? argv.arch : 'x64',
         // `all`, or one or more of: `darwin`, `linux`, `mas`, `win32`
         BUILD_PLATFORM: argv.platform ? argv.platform : 'linux',
-        BUILD_TARGET: argv.target ? argv.target : 'chrome',
+        BUILD_TARGET: argv.target ? argv.target : 'webview',
         BUILD_TARGETS: ['chrome', 'docs', 'electron', 'edge', 'firefox', 'node', 'webview'],
         // Default deploy target is `alpha` because it has the least impact.
         DEPLOY_TARGET: argv.deploy ? argv.deploy : 'alpha',
@@ -33,7 +33,6 @@ module.exports = function(baseDir, overrides) {
     settings.NODE_PATH = path.join(settings.ROOT_DIR, 'node_modules') || process.env.NODE_PATH
     settings.PACKAGE = require(`${settings.ROOT_DIR}/package`)
     settings.VERSION = argv.version ? argv.version : settings.PACKAGE.version
-
     settings.BUILD_ROOT = path.join(settings.ROOT_DIR, 'build')
 
 
@@ -95,6 +94,8 @@ module.exports = function(baseDir, overrides) {
     settings.NODE_ENV = process.env.NODE_ENV
     // Load the Vialer settings from ~/.vialer-jsrc into the existing settings.
     rc('vialer-js', settings)
+
+    settings.THEME_PATH = path.join(settings.NODE_PATH, settings.brands[settings.BRAND_TARGET].theme, 'src')
 
     // Notify developer about some essential build flag values.
     gutil.log('BUILD FLAGS:')

@@ -97,7 +97,6 @@ class DtmfTone {
         this.audio = new Audio()
         this.dest = context.createMediaStreamDestination()
         this.audio.srcObject = this.dest.stream
-        this.audio.play()
 
         this.frequencies = {
             '#': {f1: 941, f2: 1477},
@@ -118,6 +117,7 @@ class DtmfTone {
 
     play(key, sink) {
         if (this.started) return
+        this.audio.play()
 
         if (!sink) {
             const speaker = this.app.state.settings.webrtc.devices.speaker
