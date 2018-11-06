@@ -6,7 +6,7 @@ const {
     screenshot,
     step,
     loginAndWizard,
-} = require('../shared/bootstrap.js')
+} = require('../shared')
 
 
 test('[browser] Alice calls Bob, Bob answers.', async(t, onExit) => {
@@ -19,12 +19,10 @@ test('[browser] Alice calls Bob, Bob answers.', async(t, onExit) => {
 
     // Check that there are 3 fake input/output/sound devices at the start.
     const aliceDevices = alice.options.input.length + alice.options.output.length + alice.options.sounds.length
-    const bobDevices = bob.options.input.length + bob.options.output.length + bob.options.sounds.length
-    t.equal(aliceDevices, 9, '<alice> all devices are available')
-    t.equal(bobDevices, 9, '<bob> all devices are available')
+    t.equal(aliceDevices, 9, '    devices are available')
 
     // Call bob.
-    await step('alice', 'I am calling bob.')
+    await step('alice', 'calling bob')
     await utils.keypadEntry(alice, brand.tests.bob.number)
     await screenshot(alice, 'dialpad-call')
     await alice.page.click('.test-call-button')
@@ -32,8 +30,8 @@ test('[browser] Alice calls Bob, Bob answers.', async(t, onExit) => {
     await screenshot(alice, 'calldialog-outgoing')
 
     // Answer alice.
-    await step('bob', 'alice is calling; let\'s talk.')
     await bob.page.waitForSelector('.component-calls .call-ongoing')
+    await step('bob', 'answer call', 'alice calls')
     await screenshot(bob, 'calldialog-incoming')
     await bob.page.click('.component-call .test-button-accept')
 
@@ -42,18 +40,18 @@ test('[browser] Alice calls Bob, Bob answers.', async(t, onExit) => {
     await alice.page.waitForSelector('.component-call .call-options')
     // Verify alice is talking to bob.
     const aliceNumber = await utils.getText(alice, '.component-call .info-number')
-    t.equal(brand.tests.bob.number, aliceNumber, '<alice> is called by number bob.')
+    t.equal(brand.tests.bob.number, aliceNumber, 'alice sees bob\'s number')
 
     await bob.page.waitForSelector('.component-call .call-options')
     // Verify bob is talking to alice.
     const bobNumber = await utils.getText(bob, '.component-call .info-number')
-    t.equal(brand.tests.alice.number, bobNumber, '<bob> is called by number alice.')
+    t.equal(brand.tests.alice.number, bobNumber, 'bob sees alice\'s number')
 
     await screenshot(alice, 'calldialog-outgoing-accepted')
     await screenshot(bob, 'calldialog-incoming-accepted')
 
     // Alice hangs up.
-    step('alice', 'Hangs up.')
+    step('alice', 'hangs up')
     await alice.page.click('.component-call .test-button-terminate')
 
     // Wait for alice and bob to return to the keypad.

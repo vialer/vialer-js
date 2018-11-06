@@ -13,6 +13,7 @@ const Telemetry = require('./lib/telemetry')
 
 const Timer = require('./lib/timer')
 
+
 /**
 * The Vialer-js `AppBackground` is a separate running script.
 * Functionality that is considered to be part of the backend

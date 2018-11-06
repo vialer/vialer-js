@@ -1,8 +1,7 @@
-@import "vialer-js/lib/mixins";
-@import "vialer-js/lib/variables";
+@import 'vialer-js/lib/mixins';
+@import 'vialer-js/lib/variables';
 
 .component-contacts {
-
     .contacts-options {
         display: flex;
 
@@ -173,31 +172,31 @@
     @include icon-size($spacer * 2);
 
     &.unregistered {
-        path[pid="0"] {fill: $grey-color-light;}
-        path[pid="1"] {fill: $grey-color-lightest;}
+        path[pid='0'] {fill: $grey-color-light;}
+        path[pid='1'] {fill: $grey-color-lightest;}
     }
 
     &.unavailable,
     &.no-results {
-        path[pid="0"] {fill: $grey-color;}
-        path[pid="1"] {fill: $white;}
+        path[pid='0'] {fill: $grey-color;}
+        path[pid='1'] {fill: $white;}
     }
 
     &.busy {
-        path[pid="0"] {fill: $red-color;}
-        path[pid="1"] {fill: $white;}
+        path[pid='0'] {fill: $red-color;}
+        path[pid='1'] {fill: $white;}
     }
 
     &.available {
-        path[pid="0"] {fill: $green-color;}
-        path[pid="1"] {fill: $white;}
+        path[pid='0'] {fill: $green-color;}
+        path[pid='1'] {fill: $white;}
     }
 
     &.ringing {
-        animation: ringing-svg .75s ease-in-out infinite;
+        animation: ringing-svg 0.75s ease-in-out infinite;
 
-        path[pid="0"] {fill: $red-color;}
-        path[pid="1"] {fill: $white;}
+        path[pid='0'] {fill: $red-color;}
+        path[pid='1'] {fill: $white;}
     }
 }
 
@@ -214,7 +213,7 @@
     &.available {background: $green-color;}
 
     &.ringing {
-        animation: ringing-element .75s ease-in-out infinite;
+        animation: ringing-element 0.75s ease-in-out infinite;
         background-color: $red-color;
         box-shadow: rgba(saturate($red-color, 20%), 0.8) 0 0 10px;
     }

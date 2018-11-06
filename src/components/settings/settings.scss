@@ -1,4 +1,4 @@
-@import "vialer-js/lib/variables";
+@import 'vialer-js/lib/variables';
 
 .component-settings {
     background: none;
@@ -11,7 +11,7 @@
     // The switch is disabled, but use more opacity to indicate
     // that it's value is set from the browser.
     .webrtc-switch {
-        input[type="checkbox"][disabled] {
+        input[type='checkbox'][disabled] {
             &:checked {
                 + label {
                     opacity: 0.9;

@@ -53,7 +53,7 @@ class Skeleton extends EventEmitter {
         // Increases verbosity beyond the logger's debug level. Not
         // always useful during development, so it can be switched
         // of manually.
-        if (process.env.VERBOSE === true) this.verbose = true
+        if (process.env.BUILD_VERBOSE === true) this.verbose = true
         else this.verbose = false
         this.logger.debug(`${this}verbose mode: ${this.verbose}`)
     }
