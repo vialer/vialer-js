@@ -17,7 +17,7 @@
 <div class="field field-file" v-else-if="type === 'file'">
     <label class="label ca" :for="name">{{label}}</label>
     <input type="file" />
-    <span class="validation-message help is-danger" :class="{hide: invalidFieldValue, show: invalidFieldValue}" v-html="validationMessage"></span>
+    <span class="validation-message help is-danger" v-html="validationMessage"></span>
     <em class="help cf" v-if="help">{{help}}</em>
 </div>
 
@@ -50,7 +50,7 @@
         </span>
     </div>
     <em class="help cf" v-if="help">{{help}}</em>
-    <span class="validation-message help is-danger" :class="{hide: !invalidFieldValue, show: invalidFieldValue}" v-html="validationMessage"></span>
+    <span class="validation-message help is-danger" v-html="validationMessage"></span>
 </div>
 
 
@@ -71,7 +71,7 @@
         <slot name="select-extra"></slot>
     </div>
     <em class="help cf" v-if="help">{{help}}</em>
-    <span v-if="invalidFieldValue && validationMessage" class="validation-message is-danger" v-html="validationMessage"></span>
+    <span v-if="invalidFieldValue" class="validation-message is-danger" v-html="validationMessage"></span>
     <slot name="select-after"></slot>
 </div>
 
@@ -103,7 +103,7 @@
         <slot name="select-extra"></slot>
     </div>
     <em class="help cf" v-if="help">{{help}}</em>
-    <span v-if="invalidFieldValue && validationMessage" class="validation-message is-danger" v-html="validationMessage"></span>
+    <span v-if="invalidFieldValue" class="validation-message is-danger" v-html="validationMessage"></span>
     <slot name="select-after"></slot>
 </div>
 
@@ -116,7 +116,7 @@
             :id="name" :name="name" :placeholder="placeholder.capitalize()" :disabled="disabled" :autofocus="autofocus"/>
     </div>
     <em class="help cf" v-if="help">{{help}}</em>
-    <span class="validation-message help is-danger" :class="{hide: !invalidFieldValue, show: invalidFieldValue}" v-html="validationMessage"></span>
+    <span class="validation-message help is-danger" v-html="validationMessage"></span>
 </div>
 
 
@@ -124,5 +124,5 @@
     <label class="label ca" :class="classes('label')" :for="name">{{label}}</label>
     <textarea class="textarea" v-on:input="updateModel($event)" :value="model.join('\n')"
          :id="name" :name="name" :placeholder="placeholder" :disabled="disabled">{{model.join('\n')}}</textarea>
-    <span class="validation-message help is-danger" :class="{hide: !invalidFieldValue, show: invalidFieldValue}" v-html="validationMessage"></span>
+    <span class="validation-message help is-danger" v-html="validationMessage"></span>
 </div>

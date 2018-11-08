@@ -7,11 +7,16 @@ module.exports = (app) => {
     */
     const Login = {
         computed: app.helpers.sharedComputed(),
+        created: function() {
+            // Restore password from state to local data if set.
+            if (this.user.password) {
+                this.password = this.user.password
+            }
+        },
         data: function() {
             return {
                 password: '',
                 twoFactorToken: {message: '', valid: true, value: null},
-                validateApi: false,
             }
         },
         methods: Object.assign({
@@ -23,9 +28,15 @@ module.exports = (app) => {
                         // Two-factor login flow.
                         app.emit('bg:user:login', {
                             callback: ({valid, message}) => {
-                                this.twoFactorToken.valid = valid
-                                this.validateApi = true
-                                this.twoFactorToken.message = message.capitalize()
+                                if (valid) {
+                                    // Remove the password from the state.
+                                    app.setState({user: {password: null}})
+                                } else {
+                                    console.log('setting not valid 2fa: ', message)
+                                    this.twoFactorToken.valid = valid
+                                    this.twoFactorToken.message = message.capitalize()
+                                    this.$v.$reset()
+                                }
                             },
                             password: this.password,
                             token: this.twoFactorToken.value,
@@ -33,6 +44,13 @@ module.exports = (app) => {
                         })
                     } else {
                         app.emit('bg:user:login', {
+                            callback: ({twoFactor}) => {
+                                if (twoFactor) {
+                                    // Save password in the (bg-)state, so that if the user
+                                    // we still have the password for the next login.
+                                    app.setState({user: {password: this.password}})
+                                }
+                            },
                             endpoint: this.settings.webrtc.endpoint.uri,
                             password: this.password,
                             username: this.user.username,
