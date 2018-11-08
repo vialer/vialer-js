@@ -25,17 +25,7 @@ module.exports = (app) => {
              * @returns {Boolean} - Whether the field is valid or not.
              */
             invalidFieldValue: function() {
-                if (!this.validation) return null
-                if (!this.validation.$dirty) return null
-                // Validation for `requiredIf` depends on the state of other
-                // fields. Therefor don't use the $dirty check on this field,
-                // but go straight for the $invalid state.
-                if ('requiredIf' in this.validation) {
-                    return this.validation.$invalid
-                }
-
-                // Invalid has 3 states: true, false and null (not changed/dirty).
-                return this.validation.$error
+                return this.validationMessage !== ''
             },
             /**
              * Match a validation error with a (translated) error message.
@@ -45,7 +35,7 @@ module.exports = (app) => {
                 let err = []
                 const v = this.validation
 
-                if (!v) return err
+                if (this.fresh || !v) return ''
 
                 if (v.customValid === false) {
                     err.push(this.$t(v.$params.customValid.message).capitalize())
@@ -105,7 +95,10 @@ module.exports = (app) => {
             },
         },
         data: function() {
-            let data = {}
+            let data = {
+                fresh: true,
+            }
+
             if (this.type === 'password') {
                 data.visible = false
             }
@@ -228,6 +221,7 @@ module.exports = (app) => {
             * @param {Event} event - The original browser event that triggered the change.
             */
             updateModel: function(event) {
+                this.fresh = false
                 let value = event.target.value
                 // Toggles value of a checkbox.
                 if (event.target.type === 'checkbox') {
