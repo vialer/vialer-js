@@ -500,10 +500,10 @@ gulp.task('watch', 'Run developer watch modus.', () => {
 
     gulp.watch([
         path.join(settings.SRC_DIR, 'js', 'i18n', '*.js'),
-        path.join(settings.NODE_PATH, 'vjs-adapter-*', 'src', 'js', 'i18n', '*.js'),
-        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', 'js', 'i18n', '*.js'),
-        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'js', 'i18n', '*.js'),
-        path.join(settings.NODE_PATH, 'vjs-provider-*', 'src', 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-adapter-*', 'src', 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-addon-*', 'src', 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-mod-*', 'src', 'js', 'i18n', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-provider-*', 'src', 'js', 'i18n', '*.js'),
     ], function() {
         WATCH_TASK = 'js-app-i18n'
         runSequence('js-app-i18n')
@@ -530,10 +530,10 @@ gulp.task('watch', 'Run developer watch modus.', () => {
 
     gulp.watch([
         // Glob for addons and custom modules includes both component and module js.
-        path.join(settings.NODE_PATH, 'vjs-adapter-*', 'src', '**', '*.js'),
-        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', '**', '*.js'),
-        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', '**', '*.js'),
-        path.join(settings.NODE_PATH, 'vjs-provider-*', 'src', '**', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-adapter-*', 'src', '**', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-addon-*', 'src', '**', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-mod-*', 'src', '**', '*.js'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-provider-*', 'src', '**', '*.js'),
     ], function() {
         WATCH_TASK = 'js-app-plugins'
         runSequence('js-app-plugins')
@@ -550,8 +550,8 @@ gulp.task('watch', 'Run developer watch modus.', () => {
     gulp.watch([
         path.join(settings.SRC_DIR, 'scss', '**', '*.scss'),
         path.join(settings.SRC_DIR, 'components', '**', '*.scss'),
-        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', 'components', '**', '*.scss'),
-        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'components', '**', '*.scss'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-addon-*', 'src', 'components', '**', '*.scss'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-mod-*', 'src', 'components', '**', '*.scss'),
         `!${path.join(settings.SRC_DIR, 'scss', 'vialer-js', 'observer.scss')}`,
     ], ['scss-app'])
 
@@ -560,8 +560,8 @@ gulp.task('watch', 'Run developer watch modus.', () => {
 
     gulp.watch([
         path.join(settings.SRC_DIR, 'components', '**', '*.vue'),
-        path.join(settings.NODE_PATH, 'vjs-addon-*', 'src', 'components', '**', '*.vue'),
-        path.join(settings.NODE_PATH, 'vjs-mod-*', 'src', 'components', '**', '*.vue'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-addon-*', 'src', 'components', '**', '*.vue'),
+        path.join(settings.NODE_PATH, '@vialer', 'vjs-mod-*', 'src', 'components', '**', '*.vue'),
     ], ['templates'])
 
     gulp.watch([path.join(settings.ROOT_DIR, 'test', 'bg', '**', '*.js')], ['test-unit'])
