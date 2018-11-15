@@ -205,18 +205,18 @@
                     "[methods]",
                     "[everything-else]"
             ],
-            groups: {
-                methods: [
+            "groups": {
+                "methods": [
                     {
-                        sort: 'alphabetical',
-                        type: 'method'
+                        "sort": "alphabetical",
+                        "type": "method"
                     }
                 ],
                 "conventional-private-methods": [
                     {
-                        name: '/_.+/',
-                        sort: 'alphabetical',
-                        type: 'method',
+                        "name": "/_.+/",
+                        "sort": "alphabetical",
+                        "type": "method"
                     }
                 ]
             },
