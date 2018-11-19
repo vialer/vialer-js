@@ -71,22 +71,21 @@ class Skeleton extends EventEmitter {
     * @param {Boolean|String} noIpc - Flag to skip ipc emission or to do `both`.
     * @param {Boolean|String} [tabId=false] - Emit to specific tab over ipc.
     * @param {Boolean|String} [parent=false] - Emit to script's parent over ipc.
-    * @returns {Promise} - Promise that will resolve when the emit is done - if availabl
     */
     emit(event, data = {}, noIpc = false, tabId = false, parent = false) {
-        let promise
         if (this.env.isExtension && (!noIpc || noIpc === 'both')) {
             let payloadData = {data: data, event: event}
 
             if (tabId) {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
-                return browser.tabs.sendMessage(tabId, payloadData).catch((err) => {
+                browser.tabs.sendMessage(tabId, payloadData).catch((err) => {
                     if (this.verbose) this.logger.debug(`${this}${err.message}`)
                 })
+                return
             } else if (parent) {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to parent`)
                 parent.postMessage({data: data, event: event}, '*')
-                return undefined
+                return
             }
 
             if (data && data.callback) {
@@ -94,16 +93,16 @@ class Skeleton extends EventEmitter {
                 const callback = data.callback
                 // Make sure that functions are not part of the payload data.
                 delete data.callback
-                promise = browser.runtime.sendMessage(payloadData).then(function handleResponse(message) {
+                browser.runtime.sendMessage(payloadData).then(function handleResponse(message) {
                     callback(message)
                 }).catch((err) => {
                     if (this.verbose) this.logger.debug(`${this}${err.message}`)
                 })
             } else {
                 if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
-                promise = browser.runtime.sendMessage(payloadData)
-                if (promise) {
-                    promise.catch((err) => {
+                let _promise = browser.runtime.sendMessage(payloadData)
+                if (_promise) {
+                    _promise.catch((err) => {
                         if (this.verbose) this.logger.debug(`${this}${err.message}`)
                     })
                 }
@@ -120,8 +119,6 @@ class Skeleton extends EventEmitter {
             }
             super.emit(event, data)
         }
-
-        return promise
     }
 
 

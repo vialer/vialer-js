@@ -48,7 +48,6 @@ class AppForeground extends App {
             CallSwitch: require('../../components/call_switch'),
             Contacts: require('../../components/contacts'),
             DevicePicker: require('../../components/device_picker'),
-            Field: require('../../components/field'),
             Login: require('../../components/login'),
             MainCallBar: require('../../components/main_callbar'),
             MainMenuBar: require('../../components/main_menubar'),
@@ -65,6 +64,8 @@ class AppForeground extends App {
         for (const name of Object.keys(this.components)) {
             Vue.component(name, this.components[name](this))
         }
+
+        require('../../components/field')(this)
 
         this.__initStore()
     }
