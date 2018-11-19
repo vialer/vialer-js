@@ -223,7 +223,7 @@
             "accessorPairPositioning": "getThenSet",
             "stopAfterFirstProblem": true
         }],
-        "sort-keys": [2, "asc", {"natural": true, "caseSensitive": false}],
+        "sort-keys": [0, "asc", {"natural": true, "caseSensitive": false}],
         "sort-vars": [2, {"ignoreCase": true}],
         "space-before-function-paren": [2, "never"],
         "space-in-brackets": [0, "never"],

@@ -9,8 +9,8 @@ module.exports = (app) => {
         computed: app.helpers.sharedComputed(),
         created: function() {
             // Restore password from state to local data if set.
-            if (this.user.password) {
-                this.password = this.user.password
+            if (this.user.stashedPassword) {
+                this.password = this.user.stashedPassword
             }
         },
         data: function() {
@@ -30,12 +30,10 @@ module.exports = (app) => {
                             callback: ({valid, message}) => {
                                 if (valid) {
                                     // Remove the password from the state.
-                                    app.setState({user: {password: null}})
+                                    app.setState({user: {stashedPassword: null}})
                                 } else {
-                                    console.log('setting not valid 2fa: ', message)
                                     this.twoFactorToken.valid = valid
                                     this.twoFactorToken.message = message.capitalize()
-                                    this.$v.$reset()
                                 }
                             },
                             password: this.password,
@@ -44,11 +42,12 @@ module.exports = (app) => {
                         })
                     } else {
                         app.emit('bg:user:login', {
-                            callback: ({twoFactor}) => {
+                            callback: ({valid, twoFactor}) => {
                                 if (twoFactor) {
                                     // Save password in the (bg-)state, so that if the user
-                                    // we still have the password for the next login.
-                                    app.setState({user: {password: this.password}})
+                                    // closes the popup (in the web ext) we can restore the
+                                    // password for the next login attempt.
+                                    app.setState({user: {stashedPassword: this.password}})
                                 }
                             },
                             endpoint: this.settings.webrtc.endpoint.uri,
@@ -85,12 +84,6 @@ module.exports = (app) => {
             url: 'settings.platform.url',
             user: 'user',
             vendor: 'app.vendor',
-        },
-        updated: function() {
-            // Validation needs to be reset after an update, so
-            // the initial validation is only done after a user
-            // action.
-            this.$v.$reset()
         },
         validations: function() {
             // Bind the API response message to the validator $params.

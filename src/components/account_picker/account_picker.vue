@@ -1,10 +1,11 @@
 <component class="component-account-picker">
 
-    <Field name="webrtc_account" type="select-search"
+    <SelectSearchField name="webrtc_account"
         :disabled="!settings.webrtc.toggle"
         :empty="(account.status === 'loading') ? `${$t('loading accounts').capitalize()}...` : $t('no accounts').capitalize()"
         :help="$t('account that will be used to call with.')"
-        :label="label" :model.sync="account.selected"
+        :label="label"
+        v-model="account.selected"
         :options="account.options"
         :placeholder="`${$t('no account selected')}...`"
         :validation="validationField">
@@ -18,5 +19,6 @@
 
         <!-- This component must be provided by a `vjs-addon-availability-*` module. -->
         <AccountPickerInstructions slot="select-after"/>
-    </Field>
+    </SelectSearchField>
+
 </component>
