@@ -22,7 +22,7 @@ module.exports = function config(projectDir, {overrides = {}} = {}) {
         BASE_DIR: path.join(projectDir, './'),
         BUILD_OPTIMIZED: argv.optimized ? true : (process.env.NODE_ENV === 'production'),
         BUILD_TARGET: argv.target ? argv.target : 'webview',
-        BUILD_TARGETS: ['chrome', 'electron', 'edge', 'firefox', 'node', 'webview'],
+        BUILD_TARGETS: ['chrome', 'electron', 'edge', 'firefox', 'node', 'webview', 'pwa'],
         BUILD_VERBOSE: argv.verbose ? true : false,
         BUILD_WEBEXTENSION: ['chrome', 'edge', 'firefox'],
         DEBUG_MODE: process.env.DEBUG === '1' ? true : false,

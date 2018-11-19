@@ -6,11 +6,14 @@
         <link rel="icon" href="img/logo-16.png"/>
         <link href="css/vendor.css" rel="stylesheet" />
         <link href="css/app.css" rel="stylesheet" />
+        <%if (settings.BUILD_TARGET === 'pwa') { %>
+        <link rel="manifest" href="manifest.json">
+        <% } %>
         <script src="js/vendor_fg.js"></script>
         <script src="js/templates.js"></script>
         <script src="js/app_i18n_plugins.js"></script>
         <script src="js/app_i18n.js"></script>
-        <%if (['electron', 'webview'].includes(settings.BUILD_TARGET)) { %>
+        <%if (['electron', 'webview', 'pwa'].includes(settings.BUILD_TARGET)) { %>
         <script src="js/vendor_bg.js"></script>
         <script src="js/app_fg_plugins.js"></script>
         <script src="js/app_bg_plugins.js"></script>
@@ -24,14 +27,20 @@
     <body>
         <div id="app-placeholder"></div>
     </body>
-    <%if (['electron', 'webview'].includes(settings.BUILD_TARGET)) { %>
     <script>
+    <%if (['electron', 'webview', 'pwa'].includes(settings.BUILD_TARGET)) { %>
     Raven.context(function() {
         this.bg = new AppBackground(bgOptions)
         this.bg.on('ready', () => {
             fgOptions.apps = {bg: this.bg}
             this.fg = new AppForeground(fgOptions)
         })
+    })
+    <% } %>
+
+    <%if (settings.BUILD_TARGET === 'pwa') { %>
+    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('Registered events at scope: ', registration.scope);
     })
     </script>
     <% } %>

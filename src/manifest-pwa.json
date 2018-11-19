@@ -1,0 +1,25 @@
+{
+    "name": "Vialer-js",
+    "short_name": "vialer-js",
+    "display": "standalone",
+    "start_url": "/",
+    "theme_color": "#313131",
+    "background_color": "#313131",
+    "icons": [
+        {
+            "src": "/img/logo-128.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/logo-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/img/logo-256.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

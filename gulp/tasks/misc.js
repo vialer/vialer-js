@@ -65,39 +65,49 @@ module.exports = function(settings) {
     */
     tasks.manifest = async function miscManifest() {
         const brand = settings.brands[settings.BRAND_TARGET]
-        let manifest = require(path.join(settings.SRC_DIR, 'manifest.json'))
-        // Distinguish between the test-version and production name.
-        manifest.name = brand.name[settings.PUBLISH_CHANNEL]
+        let target = path.join(settings.BUILD_DIR, 'manifest.json')
 
-        if (settings.BUILD_TARGET === 'edge') {
-            manifest.background.persistent = true
-            manifest.browser_specific_settings = {
-                edge: {
-                    browser_action_next_to_addressbar: true,
-                },
+        let manifest
+        // WebExtension manifest.
+        if (settings.BUILD_WEBEXTENSION.includes(settings.BUILD_TARGET)) {
+            manifest = require(path.join(settings.SRC_DIR, 'manifest-webextension.json'))
+            // Distinguish between the test-version and production name.
+            manifest.name = brand.name[settings.PUBLISH_CHANNEL]
+
+            if (settings.BUILD_TARGET === 'edge') {
+                manifest.background.persistent = true
+                manifest.browser_specific_settings = {
+                    edge: {
+                        browser_action_next_to_addressbar: true,
+                    },
+                }
+            } else if (settings.BUILD_TARGET === 'firefox') {
+                manifest.applications = {
+                    gecko: {
+                        // (!) Deploys to production, alpha or beta environment.
+                        id: brand.store.firefox.gecko[`id_${settings.PUBLISH_CHANNEL}`],
+                        strict_min_version: brand.store.firefox.gecko.strict_min_version,
+                    },
+                }
             }
-        } else if (settings.BUILD_TARGET === 'firefox') {
-            manifest.applications = {
-                gecko: {
-                    // (!) Deploys to production, alpha or beta environment.
-                    id: brand.store.firefox.gecko[`id_${settings.PUBLISH_CHANNEL}`],
-                    strict_min_version: brand.store.firefox.gecko.strict_min_version,
-                },
+
+            manifest.browser_action.default_title = manifest.name
+            // Make sure this permission is not pushed multiple times to the same manifest.
+            if (!manifest.permissions.includes(brand.permissions)) {
+                manifest.permissions.push(brand.permissions)
             }
+
+            manifest.homepage_url = brand.vendor.support.website
+            manifest.version = PACKAGE.version
+
+
+        } else if (settings.BUILD_TARGET === 'pwa') {
+            manifest = require(path.join(settings.SRC_DIR, 'manifest-pwa.json'))
         }
 
-        manifest.browser_action.default_title = manifest.name
-        // Make sure this permission is not pushed multiple times to the same manifest.
-        if (!manifest.permissions.includes(brand.permissions)) {
-            manifest.permissions.push(brand.permissions)
-        }
 
-        manifest.homepage_url = brand.vendor.support.website
-        manifest.version = PACKAGE.version
-
-        const manifestTarget = path.join(settings.BUILD_DIR, 'manifest.json')
         await mkdirp(settings.BUILD_DIR)
-        await writeFileAsync(manifestTarget, JSON.stringify(manifest, null, 4))
+        await writeFileAsync(target, JSON.stringify(manifest, null, 4))
     }
 
 
@@ -134,6 +144,12 @@ module.exports = function(settings) {
             gulp.watch([
                 path.join(settings.SRC_DIR, 'manifest.json'),
             ], gulp.series(misc.tasks.manifest, helpers.reload('app_fg.js')))
+        }
+
+        if (settings.BUILD_TARGET === 'pwa') {
+            gulp.watch([
+                path.join(settings.SRC_DIR, 'js', 'sw.js'),
+            ], gulp.series(code.tasks.serviceWorker))
         }
 
 

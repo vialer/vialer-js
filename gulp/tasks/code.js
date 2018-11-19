@@ -30,12 +30,13 @@ module.exports = function(settings) {
      * Create a Browserify bundle.
      * @param {Object} options - Options to pass.
      * @param {Array} options.addons - Extra bundle entries.
+     * * @param {String} options.destination - Override the default destination.
      * @param {String} options.entry - Entrypoint file.
      * @param {String} options.name - Bundle name.
      * @param {Array} options.requires - Extra bundle requires.
      * @returns {Promise} - Resolves when bundling is finished.
      */
-    helpers.compile = function({addons = [], entry, requires = [], name}) {
+    helpers.compile = function({addons = [], destination = './js', entry, name, requires = []}) {
         const brand = settings.brands[settings.BRAND_TARGET]
 
         if (!bundlers[name]) {
@@ -63,7 +64,9 @@ module.exports = function(settings) {
             bundlers[name].ignore('module-alias/register')
 
             // Exclude the webextension polyfill from non-webextension builds.
-            if (name === 'webview') bundlers[name].ignore('webextension-polyfill')
+            if (!settings.BUILD_WEBEXTENSION.includes(settings.BUILD_TARGET)) {
+                bundlers[name].ignore('webextension-polyfill')
+            }
             helpers.transform(bundlers[name])
         }
 
@@ -78,7 +81,7 @@ module.exports = function(settings) {
                 .pipe(ifElse(settings.BUILD_OPTIMIZED, () => minifier()))
                 .pipe(sourcemaps.write('./'))
                 .pipe(size(_extend({title: `${name}.js`}, settings.SIZE_OPTIONS)))
-                .pipe(gulp.dest(path.join(settings.BUILD_DIR, 'js')))
+                .pipe(gulp.dest(path.join(settings.BUILD_DIR, destination)))
         })
     }
 
@@ -229,6 +232,12 @@ module.exports = function(settings) {
         const electronBrandSettings = settings.brands[settings.BRAND_TARGET].vendor
         const settingsFile = `./build/${settings.BRAND_TARGET}/${settings.BUILD_TARGET}/settings.json`
         writeFileAsync(settingsFile, JSON.stringify(electronBrandSettings)).then(() => {done()})
+    }
+
+
+    tasks.serviceWorker = async function codeServiceWorker(done) {
+        await helpers.compile({destination: './', entry: './src/js/sw.js', name: 'sw'})
+        done()
     }
 
 
