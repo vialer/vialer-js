@@ -1,8 +1,5 @@
 Vue.config.ignoredElements = ['component']
 
-global.VueSVGIcon = require('vue-svgicon')
-Vue.use(global.VueSVGIcon, {tagName: 'icon'})
-
 if (global.document) {
     window.global = window
     global.$ = document.querySelector.bind(document)

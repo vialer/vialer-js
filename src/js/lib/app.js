@@ -97,7 +97,7 @@ class App extends Skeleton {
             Vue.i18n.add(id, translation)
         }
 
-        this._languagePresets()
+
 
         // Add a shortcut to the translation module.
         this.$t = Vue.i18n.translate
@@ -105,6 +105,8 @@ class App extends Skeleton {
             data: {store: this.state},
             render: h => h(main),
         }, settings))
+
+        this._languagePresets()
     }
 
 

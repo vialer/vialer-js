@@ -1,7 +1,7 @@
 @keyframes blink {
-    0% {opacity: .2;}
+    0% {opacity: 0.2;}
     20% {opacity: 1;}
-    100% {opacity: .2;}
+    100% {opacity: 0.2;}
 }
 
 @keyframes grow {
@@ -23,8 +23,9 @@
 }
 
 @keyframes hint-pulse {
-    0%, 100%  {-webkit-filter: brightness(1);}
-    50% {-webkit-filter: brightness(1.3);}
+    0%,
+    100% {filter: brightness(1);}
+    50% {filter: brightness(1.3);}
 }
 
 @keyframes slide {
@@ -66,22 +67,14 @@
 }
 
 .animated {
-    -webkit-animation-duration: .5s;
-    -webkit-animation-fill-mode: both;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-timing-function: linear;
-    animation-duration: .5s;
+    animation-duration: 0.5s;
     animation-fill-mode: both;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
 
-@-webkit-keyframes bounce {
-    0%, 100% { -webkit-transform: translateY(0); }
-    50% { -webkit-transform: translateY(-1px); }
-}
-
 @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
+    0%,
+    100% { transform: translateY(0); }
     50% { transform: translateY(-1px); }
 }

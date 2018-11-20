@@ -1,6 +1,9 @@
 global.Vue = require('vue/dist/vue.runtime')
 require('../lib/vendor')
 
+global.VueSVGIcon = require('vue-svgicon')
+Vue.use(global.VueSVGIcon, {tagName: 'icon'})
+
 global.vClickOutside = require('v-click-outside')
 Vue.use(global.vClickOutside)
 

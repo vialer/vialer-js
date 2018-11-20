@@ -1,4 +1,10 @@
 version: 2
+machine:
+  pre:
+    - mkdir ~/.yarn
+dependencies:
+  cache_directories:
+    - ~/.yarn
 jobs:
   build:
     docker:
@@ -11,15 +17,16 @@ jobs:
           name: Restore Yarn Package Cache
           keys:
             - npm-packages-v1-{{ checksum "yarn.lock" }}
-      - run: yarn --cache-folder ~/.cache/yarn
+      - run: yarn --cache-folder ~/.yarn
       - save_cache:
           name: Save Yarn Package Cache
           key: npm-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
-            - ~/.cache/yarn
+            - ~/.yarn-cache
+      - run: yarn commitlint-ci
+      - run: yarn eslint
+      - run: yarn stylelint
       - run: cp .circleci/.vialer-jsrc.ci .vialer-jsrc
-      - run: BRAND=vialer npm run lint-js
-      - run: BRAND=vialer npm run lint-sass
-      - run: BRAND=vialer npm run test-unit
-      - run: BRAND=vialer npm run test-browser
+      - run: BRAND=vialer yarn test-unit
+      - run: BRAND=vialer yarn test-browser
 

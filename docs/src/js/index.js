@@ -34,6 +34,18 @@ class AppDocs extends App {
                 name: process.env.APP_NAME,
             },
             pages: global.pages,
+            settings: {
+                language: {
+                    options: [
+                        {id: 'en', name: 'english'},
+                        {id: 'nl', name: 'nederlands'},
+                    ],
+                    selected: {id: null, name: null},
+                },
+            },
+            user: {
+                authenticated: true,
+            },
             vendor: {
                 name: process.env.VENDOR_NAME,
             },

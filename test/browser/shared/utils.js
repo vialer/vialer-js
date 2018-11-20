@@ -25,7 +25,6 @@ function asyncTest(title, func) {
             await func(t, onExit)
             t.end()
         } catch (e) {
-            console.log(e)
             t.fail('exception')
         } finally {
             for (const f of cleanup) {
@@ -36,8 +35,14 @@ function asyncTest(title, func) {
 }
 
 
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+
 async function keypadEntry({page}, str) {
     for (const number of str) {
+        await delay(1000)
         await page.click(`.component-call-keypad .test-key-${number}`)
     }
 }
@@ -48,9 +53,7 @@ async function getText({page}, selector) {
 }
 
 
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms))
-}
+
 
 
 module.exports = {

@@ -1,9 +1,9 @@
-// Entrypoint for all vendor SCSS.
-@import "lib/variables";
+// Variables overwrite Bulma defaults.
+@import 'lib/variables';
 
-@import "bulma/sass/utilities/all";
-@import "bulma/sass/base/all";
-@import "bulma/sass/elements/all";
-@import "bulma/sass/components/tabs";
+@import 'bulma/sass/utilities/all';
+@import 'bulma/sass/base/all';
+@import 'bulma/sass/elements/all';
+@import 'bulma/sass/components/tabs';
 
-@import "bulma-switch/dist/bulma-switch";
+@import 'bulma-switch/dist/bulma-switch';

@@ -1,5 +1,5 @@
-@import "vialer-js/lib/mixins";
-@import "vialer-js/lib/variables";
+@import 'vialer-js/lib/mixins';
+@import 'vialer-js/lib/variables';
 
 .component-call {
     color: $primary-color;
@@ -55,6 +55,13 @@
             padding: $spacer * 0.75;
             text-align: center;
 
+            p {
+                color: lighten($grey-color, 15%);
+                font-size: 0.9rem;
+                font-weight: 500;
+                user-select: none;
+            }
+
             .rounded-button {
                 background: $white-color;
                 border: 2px solid darken($grey-color-lightest, 5%);
@@ -88,28 +95,11 @@
                     }
                 }
             }
-
-            p {
-                color: lighten($grey-color, 15%);
-                font-size: 0.9rem;
-                font-weight: 500;
-                user-select: none;
-            }
         }
 
         .option {
             padding: $spacer * 2;
             text-align: center;
-
-            &.active {
-                .icon {
-                    background: $white;
-
-                    i {
-                        color: $brand-color;
-                    }
-                }
-            }
 
             .icon {
                 border: 2px solid $white;
@@ -124,6 +114,18 @@
                     font-size: 24px;
                 }
             }
+
+            &.active {
+                .icon {
+                    background: $white;
+
+                    i {
+                        color: $brand-color;
+                    }
+                }
+            }
+
+
         }
     }
 
@@ -197,12 +199,6 @@
     margin-top: $spacer;
     width: 100%;
 
-    .rounded-button {
-        svg {
-            @include icon-size($spacer * 4);
-        }
-    }
-
     .action {
         margin: $spacer;
 
@@ -231,6 +227,12 @@
                 background: $grey-color;
                 cursor: not-allowed;
             }
+        }
+    }
+
+    .rounded-button {
+        svg {
+            @include icon-size($spacer * 4);
         }
     }
 }

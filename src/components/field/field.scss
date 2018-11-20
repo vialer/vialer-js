@@ -1,5 +1,5 @@
-@import "vialer-js/lib/mixins";
-@import "vialer-js/lib/variables";
+@import 'vialer-js/lib/mixins';
+@import 'vialer-js/lib/variables';
 
 // Bulma form field with some small modifications.
 .field-password,
@@ -159,7 +159,7 @@
 .field-checkbox {
     margin-bottom: $spacer * 2;
 
-    .switch[type="checkbox"] + label {
+    .switch[type='checkbox'] + label {
         display: block;
     }
 }
@@ -167,7 +167,6 @@
 .field-password {
     .control {
         .input {
-
             +.icon {
                 pointer-events: auto;
 
@@ -204,11 +203,11 @@
             box-shadow: 0 0 1px 1px rgba($brand-color, 0.3);
         }
 
-        &[type="password"],
-        &[type="text"] {
+        &[type='password'],
+        &[type='text'] {
             height: $spacer * 5;
 
-            & + .icon {
+            + .icon {
                 height: $spacer * 5;
             }
         }
@@ -216,8 +215,8 @@
 }
 
 
-.switch[type="checkbox"] {
-    & + label {
+.switch[type='checkbox'] {
+    + label {
         font-weight: 500;
     }
 

@@ -189,7 +189,7 @@
         "operator-linebreak": 0,
         "padded-blocks": 0,
         "quote-props": [2, "as-needed"],
-        "quotes": [1, "single"],
+        "quotes": [2, "single"],
         "radix": 0,
         "require-yield": 0,
         "semi": 0,

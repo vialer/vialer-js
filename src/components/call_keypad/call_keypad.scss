@@ -1,5 +1,5 @@
-@import "vialer-js/lib/variables";
-@import "vialer-js/lib/mixins";
+@import 'vialer-js/lib/variables';
+@import 'vialer-js/lib/mixins';
 
 // The default styling is against a white background. The
 // `call-ongoing` class is used to differentiate.
@@ -31,7 +31,7 @@
             font-weight: 500;
             text-align: right;
 
-            &[disabled="disabled"] {
+            &[disabled='disabled'] {
                 &::placeholder {
                     color: $grey-color-light;
                 }
@@ -80,7 +80,7 @@
                 }
             }
 
-            & + .number-input-match {
+            + .number-input-match {
                 color: $white;
                 height: $spacer * 3;
                 line-height: $spacer * 3;
@@ -120,7 +120,7 @@
                 }
             }
 
-            & + .number-input-match {
+            + .number-input-match {
                 color: $grey-color-darker;
                 height: $spacer * 5;
                 line-height: $spacer * 5;
@@ -136,20 +136,6 @@
         justify-content: space-between;
         margin-top: $spacer;
         width: 100%;
-
-        &.disabled {
-            opacity: 0.5;
-
-            .key-row {
-                .key {
-                    &:hover {
-                        background: $white;
-                        color: $brand-color;
-                        cursor: not-allowed;
-                    }
-                }
-            }
-        }
 
         .key-row {
             display: flex;
@@ -181,6 +167,20 @@
                 }
             }
         }
+
+        &.disabled {
+            opacity: 0.5;
+
+            .key-row {
+                .key {
+                    &:hover {
+                        background: $white;
+                        color: $brand-color;
+                        cursor: not-allowed;
+                    }
+                }
+            }
+        }
     }
 
     .rounded-button {
@@ -195,17 +195,8 @@
 
 
     &.call-ongoing {
-        .number-input {
+        .contacts-match {
             color: $primary-color;
-
-            input {
-                color: $primary-color;
-
-                &::placeholder {
-                    color: $grey-color;
-                }
-            }
-
         }
 
         .keys {
@@ -224,8 +215,19 @@
             }
         }
 
-        .contacts-match {
+        .number-input {
             color: $primary-color;
+
+            input {
+                color: $primary-color;
+
+                &::placeholder {
+                    color: $grey-color;
+                }
+            }
+
         }
+
+
     }
 }
