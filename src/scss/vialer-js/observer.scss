@@ -1,7 +1,7 @@
 // sass-lint:disable no-important
 //
-@import "lib/variables";
-@import "lib/fonts";
+@import 'lib/variables';
+@import 'lib/fonts';
 
 // Make sure that the icon styling doesn't end up
 // in the print version.
@@ -26,7 +26,7 @@
                 // Make a best effort to force a consist style.
                 ctdicon.ctd-icon {
                     background-color: transparent !important;
-                    background-image: url("../img/click-to-dial.png") !important;
+                    background-image: url('../img/click-to-dial.png') !important;
                     background-position: center center !important;
                     background-repeat: no-repeat !important;
                     background-size: contain;
@@ -51,7 +51,7 @@
                             box-shadow: 1px 0 3px rgba(0, 0, 0, 0.2) !important;
                             color: $grey-color-darker !important;
                             content: attr(data-content) !important;
-                            font-family: "Roboto" !important;
+                            font-family: 'Roboto' !important;
                             font-size: $spacer !important;
                             font-weight: bold !important;
                             line-height: 18px !important;

@@ -1,5 +1,5 @@
-@import "vialer-js/lib/mixins";
-@import "vialer-js/lib/variables";
+@import 'vialer-js/lib/mixins';
+@import 'vialer-js/lib/variables';
 
 .component-main-menubar {
     background: $brand-color;
@@ -24,24 +24,23 @@
             }
 
             &.availability {
-
                 &.available {
-                    path[pid="0"] {fill: $green-color;}
-                    path[pid="1"] {fill: $white;}
+                    path[pid='0'] {fill: $green-color;}
+                    path[pid='1'] {fill: $white;}
                 }
 
                 &.dnd {
-                    path[pid="0"] {
+                    path[pid='0'] {
                         fill: $orange-color;
                     }
-                    path[pid="1"] {fill: $white;}
+                    path[pid='1'] {fill: $white;}
                 }
 
                 &.unavailable {
-                    path[pid="0"] {
+                    path[pid='0'] {
                         fill: $orange-color;
                     }
-                    path[pid="1"] {fill: $white;}
+                    path[pid='1'] {fill: $white;}
                 }
             }
 
@@ -51,11 +50,11 @@
 
                 &::after {
                     @include icon-size(14px);
-                    animation: bounce .5s ease-in-out infinite;
+                    animation: bounce 0.5s ease-in-out infinite;
                     background: $brand-accent-color;
                     border-radius: 50%;
                     bottom: 13px;
-                    content: "";
+                    content: '';
                     left: 3px;
                     position: absolute;
                     z-index: 10;
@@ -75,7 +74,7 @@
             }
 
             &.hint:not(.active) {
-                @include animation("hint-pulse 1.5s ease-in infinite");
+                @include animation('hint-pulse 1.5s ease-in infinite');
             }
 
             &.disabled {
@@ -99,7 +98,6 @@
                 }
 
                 &.hint {
-
                     svg {
                         fill: $brand-color;
                     }

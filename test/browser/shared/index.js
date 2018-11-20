@@ -1,37 +1,29 @@
 const {promisify} = require('util')
+const c = require('ansi-colors')
 const mkdirp = promisify(require('mkdirp'))
 const path = require('path')
 const puppeteer = require('puppeteer')
 const utils = require('./utils.js')
 
-
-// Environment initialization.
-const BRAND = process.env.BRAND ? process.env.BRAND : 'bologna'
-const SCREENS = process.env.SCREENS ? true : false
-
-const settings = require('../../../tools/settings')(path.join(__dirname, '../../'))
-// Force to webview.
-settings.BUILD_TARGET = 'webview'
-
-
-const brand = settings.brands[BRAND]
-
-// Allows overriding the headless setting with an environment flag.
-let HEADLESS = brand.tests.headless
-if (process.env.HEADLESS) HEADLESS = process.env.HEADLESS === '1' ? true : false
-
-let DEBUG = false
-if (process.env.DEBUG) DEBUG = process.env.DEBUG === '1' ? true : false
+// Use the project directory as base directory.
+const settings = require('../../../gulp/settings')(
+    path.join(__dirname, '../../../'), {
+        overrides: {
+            // Force webview build modus.
+            BUILD_TARGET: 'webview',
+        },
+    }
+)
 
 // WARNING: Do NOT log CI variables while committing to Github.
 // This may expose the Circle CI secrets in the build log. Change the
 // account credentials immediately when this happens.
-if (process.env[`CI_USERNAME_ALICE_${BRAND.toUpperCase()}`]) {
-    brand.tests.endpoint = process.env[`CI_ENDPOINT_${BRAND.toUpperCase()}`]
+if (process.env[`CI_USERNAME_ALICE_${settings.BRAND_TARGET.toUpperCase()}`]) {
+    settings.BRAND.tests.endpoint = process.env[`CI_ENDPOINT_${settings.BRAND_TARGET.toUpperCase()}`]
     for (const actor of ['alice', 'bob', 'charlie']) {
         for (const field of ['id', 'number', 'username', 'password']) {
-            const name = ['ci', field, actor, BRAND].map(e => e.toUpperCase()).join('_')
-            brand.tests[actor][field] = process.env[name]
+            const name = ['ci', field, actor, settings.BRAND_TARGET].map(e => e.toUpperCase()).join('_')
+            settings.BRAND.tests[actor][field] = process.env[name]
         }
     }
 }
@@ -54,7 +46,7 @@ async function createBrowser(name, options) {
             '--use-fake-device-for-media-stream',
         ],
         executablePath: process.env.OVERRIDE_CHROMIUM_PATH,
-        headless: HEADLESS,
+        headless: settings.HEADLESS,
         pipe: true,
     })
 
@@ -68,11 +60,19 @@ async function createBrowser(name, options) {
  * Report a test step of `actor`.
  * When not in HEADLESS mode, it will also pause for 2 seconds.
  * @param {String} actor - Name of the actor.
- * @param {String} message - Message to print.
+ * @param {String} message - Step message to print.
+ * @param {String} context - Step context to print.
  */
-async function step(actor, message) {
-    if (DEBUG) {
-        console.log(`<${actor}> ${message}`)
+async function step(actor, message, context = '') {
+    let prefix
+
+    prefix = actor.padEnd(7)
+    if (context) context = c.italic(` <${context}>`)
+    if (actor === 'alice') prefix = c.cyan(prefix)
+    else if (actor === 'bob') prefix = c.magenta(prefix)
+    else if (actor === 'charlie') prefix = c.yellow(prefix)
+    console.log(`${prefix}${context} ${c.grey(message)}`)
+    if (settings.DEBUG_MODE) {
         await utils.delay(2000)
     }
 }
@@ -84,7 +84,7 @@ async function step(actor, message) {
  * @param {*} name - Name the screenshot (actor name will be prepended).
  */
 async function screenshot({app, page}, name) {
-    if (SCREENS) {
+    if (settings.SCREENS) {
         await mkdirp(settings.SCREENS_DIR)
         const filename = `${page._name}-${name}.png`
         const screenshotPath = path.join(settings.SCREENS_DIR, filename)
@@ -107,14 +107,14 @@ const wizard = require('./wizard')(settings, screenshot)
  * @returns {Object} - Browser instance.
  */
 async function loginAndWizard(name, onExit, {screens = false} = {}) {
-    await step(name, 'Opening browser')
+    await step(name, 'open browser')
     let browser = await createBrowser(name)
 
     // Keep browsers open when DEBUG=true, this will halt the next tests
     // and gives the developer time to debug.
-    if (!DEBUG) {
+    if (!settings.DEBUG_MODE) {
         onExit(async() => {
-            await step(name, 'Closing browser.')
+            await step(name, 'close browser')
             await browser.browser.close()
         })
     } else {
@@ -127,11 +127,11 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
     page.setDefaultNavigationTimeout(15000)
     // Patch waitForSelector to always use a default timeout.
     const _waitForSelector = page.waitForSelector.bind(page)
-    page.waitForSelector = async(selector, options = {timeout: 15000}) => {
+    page.waitForSelector = async(selector, options = {timeout: 30000}) => {
         await _waitForSelector(selector, options)
     }
 
-    const uri = `http://127.0.0.1:${brand.tests.port}/index.html?test=true`
+    const uri = `http://127.0.0.1:${settings.BRAND.tests.port}/index.html?test=true`
     await page.goto(uri, {})
 
     const me = {
@@ -140,22 +140,21 @@ async function loginAndWizard(name, onExit, {screens = false} = {}) {
         page: page,
     }
 
-    await step(name, 'Logging in.')
+    await step(name, 'logging in')
     await login(me, screens)
 
-    await step(name, 'Completing wizard.')
+    await step(name, 'completing wizard')
     const options = await wizard(me, screens)
     await page.click('.test-delete-notification')
 
-    // Wait until the status indicates a registered device.
-    await page.waitForSelector('.test-status-registered')
-
+    // Wait until the keypad is available.
+    await page.waitForSelector('.test-keypad-available')
     return Object.assign({options}, me)
 }
 
 
 module.exports = {
-    brand,
+    brand: settings.BRAND,
     loginAndWizard,
     screenshot,
     settings,

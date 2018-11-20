@@ -1,7 +1,7 @@
-@import "bulma/sass/utilities/initial-variables";
+@import 'bulma/sass/utilities/initial-variables';
 
 // Paths.
-$font-path: "../fonts";
+$font-path: '../fonts';
 
 // Dimensions: spacing units.
 $spacer: 8px;
@@ -45,7 +45,7 @@ $danger: $red-color;
 
 $primary: $brand-color;
 $link: $brand-color;
-$family-primary: "Roboto";
+$family-primary: 'Roboto';
 
 $fa-font-path: $font-path;
 $text: $primary-color;

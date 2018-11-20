@@ -24,7 +24,7 @@
         <span v-if="matchedContact">{{matchedContact.endpoint.number}} - {{matchedContact.contact.name}}</span>
     </div>
 
-    <div class="keys" v-if="display === 'touch'" v-on:keyup.enter="placeCall(number)">
+    <div class="keys test-keypad-available" v-if="display === 'touch'" v-on:keyup.enter="placeCall(number)">
         <div class="key-row">
             <button class="rounded-button key test-key-1" @mouseup="pressKey()" @mousedown="pressKey('1')">1</button>
             <button class="rounded-button key test-key-2" @mouseup="pressKey()" @mousedown="pressKey('2')">2<div class="sub">ABC</div></button>

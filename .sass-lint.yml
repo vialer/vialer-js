@@ -18,7 +18,7 @@ rules:
 
     # Line Spacing
     one-declaration-per-line: 1
-    empty-line-between-blocks: 1
+    empty-line-between-blocks: 2
     single-line-per-selector: 0
 
     # Disallows
@@ -27,7 +27,7 @@ rules:
     no-css-comments: 1
     no-debug: 1
     no-duplicate-properties: 1
-    no-empty-rulesets: 1
+    no-empty-rulesets: 2
     no-extends: 0
     no-ids: 1
     no-important: 1
@@ -94,5 +94,5 @@ rules:
     space-around-operator: 1
 
     # Final Items
-    trailing-semicolon: 1
+    trailing-semicolon: 2
     final-newline: 1
