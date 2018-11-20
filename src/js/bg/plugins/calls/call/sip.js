@@ -70,41 +70,38 @@ class CallSIP extends Call {
         })
 
         /**
-        * The `failed` status is triggered when a call is rejected, but
-        * also when an incoming calls keeps ringing for a certain amount
+        * The `failed` event is triggered when a call is being rejected,
+        * but also when an incoming calls keeps ringing for a certain amount
         * of time (60 seconds), and fails due to a timeout. In that case,
         * no `rejected` event is triggered and we need to kill the
         * call ASAP, so a new INVITE for the same call will be accepted by the
         * call module's invite handler.
+        * See: https://sipjs.com/api/0.11.0/session/#failed
+        * And: https://sipjs.com/api/0.11.0/causes/
         */
-        this.session.on('failed', (message) => {
-            if (typeof message === 'string') message = SIP.Parser.parseMessage(message, this.module.ua)
-            let reason = message.getHeader('Reason')
-            if (reason) {
-                reason = this._parseHeader(reason).get('text')
-            }
+        this.session.on('failed', (response, cause) => {
+            this.app.logger.info(`${this}incoming call failed caused by: ${cause}`)
 
-            if (reason === 'Call completed elsewhere') {
-                this.app.logger.info(`${this}call completed elsewhere: ${this.state.stats.callId}`)
-                this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
-                this.setState({status: 'answered_elsewhere'})
-            } else {
-                this.app.logger.info(`${this}call rejected: ${this.state.stats.callId}`)
-                // `Call completed elsewhere` is not considered to be
-                // a missed call and will not end up in the activity log.
-                this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
-                this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
-                // We could distinguish here between a CANCEL send by the calling
-                // party, or a cancel made by the callee. For now let's use
-                // `request_terminated` for both cases.
-                if (message.method === 'CANCEL') {
+            if (response) {
+                if (typeof response === 'string') response = SIP.Parser.parseMessage(response, this.module.ua)
+
+                let reason = response.getHeader('Reason')
+                if (reason) reason = this._parseHeader(reason).get('text')
+
+                if (reason === 'Call completed elsewhere') {
+                    // `Call completed elsewhere` is not considered to be
+                    // a missed call and will not end up in the activity log.
+                    this.app.logger.info(`${this}call completed elsewhere: ${this.state.stats.callId}`)
+                    this.app.telemetry.event('call[sip]', 'incoming', 'answered_elsewhere')
+                    this.setState({status: 'answered_elsewhere'})
+                } else {
                     this.setState({status: 'request_terminated'})
-                } else if (message.status_code === 480) {
-                    // The accepting party terminated the incoming call.
-                    this.setState({status: 'request_terminated'})
+                    this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
+                    this.app.telemetry.event('call[sip]', 'incoming', 'rejected')
                 }
+            } else {
+                this.setState({status: 'request_terminated'})
             }
-
 
             this._stop({message: this.translations[this.state.status]})
         })
@@ -180,27 +177,22 @@ class CallSIP extends Call {
             this.session.bye()
         })
 
-        this.session.on('failed', (message) => {
-            this.app.logger.info(`${this}call declined: ${message.status_code}/${this.state.stats.callId}`)
+        /**
+         * See: https://sipjs.com/api/0.11.0/session/#failed
+         * And: https://sipjs.com/api/0.11.0/causes/
+         */
+        this.session.on('failed', (response, cause) => {
+            this.app.logger.info(`${this}outgoing call fail caused by: ${cause}`)
+            // The busy tone is only audible for the calling party.
             this.busyTone.play()
 
-            if (message.status_code === 480) {
-                // Temporarily Unavailable; Callee currently unavailable.
-                this.setState({status: 'callee_unavailable'})
-            } else if (message.status_code === 486) {
-                // Busy here; Callee is busy.
+            if (cause === SIP.C.causes.BUSY) {
                 this.setState({status: 'callee_busy'})
-            } else if (message.status_code === 487) {
-                // Request terminated; Request has terminated by bye or cancel.
-                this.setState({status: 'request_terminated'})
             } else {
-                // Assume `request_terminated`, but log unhandled status as a warning.
-                this.app.logger.warn(`${this}unhandled status code: ${message.status_code}`)
                 this.setState({status: 'request_terminated'})
             }
 
             this.app.emit('bg:calls:call_rejected', {call: this.state}, true)
-
             this.app.telemetry.event('call[sip]', 'outgoing', 'rejected')
             this._stop({message: this.translations[this.state.status]})
         })
