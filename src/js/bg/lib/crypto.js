@@ -79,7 +79,7 @@ class Crypto {
         if (this.app.env.isBrowser) {
             let binary = ''
             let bytes = new Uint8Array(data)
-            let len = bytes.byteLength;
+            let len = bytes.byteLength
             for (let i = 0; i < len; i++) {
                 binary += String.fromCharCode(bytes[i])
             }
