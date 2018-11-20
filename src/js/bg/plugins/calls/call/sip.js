@@ -316,7 +316,8 @@ class CallSIP extends Call {
             try {
                 if (this.state.status === 'invite') {
                     this.setState({status: 'request_terminated'})
-                    this.session.reject() // Decline an incoming call.
+                    // Decline an incoming call with 'Busy Here'.
+                    this.session.reject({statusCode: 486})
                 } else if (['accepted'].includes(this.state.status)) {
                     // Hangup a running call.
                     this.session.bye()
