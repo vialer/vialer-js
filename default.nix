@@ -23,5 +23,7 @@ mkShell {
     optipng
     gifsicle
     libjpeg  # for jpegtran
+
+    electron
   ];
 }
