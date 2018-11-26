@@ -1,5 +1,6 @@
 const LE = require('le_js')
 
+// Log name in LogEntries.
 const LOG_NAME = 'default'
 
 const INITIAL_SETTINGS = {
@@ -17,6 +18,9 @@ const LEVELS_MAP = {
     verbose: 'log',
 }
 
+const CONTEXT_INTERVAL = 60 * 60 * 1000 // 1 hour in ms
+
+
 /**
  * Remote Logger will sent log messages to LogEntries, if remote logging is
  * enabled by the user.
@@ -28,6 +32,7 @@ class RemoteLogger {
         this.logentries = null
         this.persistentTrace = true
         this.settings = INITIAL_SETTINGS
+        this.contextTimer = null
 
         this.app.on('ready', () => this.init())
 
@@ -65,93 +70,66 @@ class RemoteLogger {
 
     /**
      * Enable or disable remote logging.
-     * @param {Boolean} enabled - Enable or disable remote logging.
+     * @param {Boolean} enabled - Enable remote logging or not.
      */
     setRemote(enabled) {
         if (enabled) {
-            if (!this.isRemoteSupported()) {
-                console.error('Remote logging enabled, but no API KEY is defined!')
+            // Prevent re-enabling, LogEntries API doesn't like that.
+            if (!this.logentries) {
+                this.enableRemote()
             }
-
-            if (!this.settings.trace) {
-                this.setTrace(this.generateTrace())
-            }
-
-            LE.createLogStream({
-                name: LOG_NAME,
-                token: this.settings.apiKey,
-                ssl: true,
-                page_info: 'never',
-                print: false,
-                // Built-in trace is disabled, since we have no way to extract
-                // the randomly created code from the library.
-                trace: null,
-                catchall: false,
-            })
-
-            this.logentries = LE.to(LOG_NAME)
         } else {
-            if (this.logentries) {
-                LE.destroy(LOG_NAME)
-                this.logentries = null;
-            }
-            if (!this.persistentTrace) {
-                this.setTrace(null)
-            }
+            this.disableRemote()
         }
     }
 
-    /**
-     * Build a message to be sent to the LogEntries.
-     * @param {String} message - Message to log.
-     * @param {Object} context - Optional extra context information.
-     * @returns {Object} - log message object.
-     */
-    buildMessage(message, context) {
-        const release = [
-            process.env.VERSION,
-            process.env.PUBLISH_CHANNEL,
-            process.env.BRAND_TARGET,
-            this.app.env.name,
-        ].join('-')
+    enableRemote() {
+        if (!this.isRemoteSupported()) {
+            console.error('Remote logging enabled, but no API KEY is defined!')
+            return
+        }
 
-        // TODO: extract things from the context which don't change very often?
-        //       like app versions, userAgent etc.
-        //       actually the only thing that could change is the connection.
-        return Object.assign({
-            timestamp: new Date().toISOString(),
-            trace: this.settings.trace,
-            message: message,
+        if (!this.settings.trace) {
+            this.setTrace(this.generateTrace())
+        }
 
-            navigator: {
-                // User agent string contains platform, browser and version.
-                userAgent: navigator.userAgent,
-                language: navigator.language,
-                deviceMemory: navigator.deviceMemory,
-                cookieEnabled: navigator.cookieEnabled,
-                doNotTrack: navigator.doNotTrack,
+        LE.createLogStream({
+            name: LOG_NAME,
+            token: this.settings.apiKey,
+            ssl: true,
+            page_info: 'never',
+            print: false,
+            // Built-in trace is disabled, since we have no way to extract
+            // the randomly created code from the library.
+            trace: null,
+            catchall: false,
+        })
 
-                // TODO doesn't work in BG.
-                screen: {
-                    width: window.screen.width,
-                    height: window.screen.height,
-                },
+        this.logentries = LE.to(LOG_NAME)
 
-                // Connection info.
-                connection: {
-                    downlink: navigator.connection.downlink,
-                    effectiveType: navigator.connection.effectiveType,
-                    rtt: navigator.connection.rtt,
-                },
-            },
+        // Request the foreground to log a detailed description of the
+        // current environment (calling it context here). Thereafter
+        // log a context every `CONTEXT_INTERVAL` milliseconds.
+        this.requestContext()
+        this.contextTimer = setInterval(() => this.requestContext(), CONTEXT_INTERVAL)
+    }
 
-            app: {
-                release: release,
-                sipjs: SIP.version,
-                vuejs: Vue.version,
-                // TODO Input/output devices
-            },
-        }, context)
+    disableRemote() {
+        if (this.contextTimer) {
+            clearInterval(this.contextTimer)
+            this.contextTimer = null;
+        }
+        if (this.logentries) {
+            LE.destroy(LOG_NAME)
+            this.logentries = null;
+        }
+        if (!this.persistentTrace) {
+            this.setTrace(null)
+        }
+    }
+
+    requestContext() {
+        this.app.emit('fg:logger:request_context')
     }
 
     /**
@@ -167,7 +145,12 @@ class RemoteLogger {
             return
         }
 
-        const msg = this.buildMessage(message, context)
+        const msg = Object.assign({
+            timestamp: new Date().toISOString(),
+            trace: this.settings.trace,
+            message: message,
+        }, context)
+
         if (this.logentries) {
             this.logentries[mappedLevel](msg)
         } else {

@@ -39,6 +39,10 @@ module.exports = (app) => {
                     },
                 }, 'both')
 
+                app.emit('bg:remote_logger:set_enabled', {
+                    enabled: this.settings.telemetry.remoteLogging.enabled,
+                })
+
                 // Update the vault settings.
                 app.setState({app: {vault: this.app.vault}}, {encrypt: false, persist: true})
             },
@@ -89,10 +93,6 @@ module.exports = (app) => {
             'settings.language.selected': function(language) {
                 app.logger.info(`${this} setting language to ${language.id}`)
                 Vue.i18n.set(language.id)
-            },
-
-            'settings.telemetry.remoteLogging.enabled': (enabled) => {
-                app.emit('bg:remote_logger:set_enabled', {enabled})
             },
         },
     }
