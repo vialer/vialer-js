@@ -58,6 +58,11 @@ class PluginSettings extends Plugin {
                 analyticsId: process.env.ANALYTICS_ID,
                 enabled: false,
                 sentryDsn: process.env.SENTRY_DSN,
+                remoteLogging: {
+                    enabled: false,
+                    trace: null,
+                    apiKey: process.env.LOGENTRIES_API_KEY,
+                },
             },
             webrtc: {
                 account: {

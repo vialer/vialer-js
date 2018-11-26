@@ -10,6 +10,7 @@ const Store = require('./lib/store')
 const Media = require('../lib/media')
 const Sounds = require('../lib/sounds')
 const Telemetry = require('./lib/telemetry')
+const RemoteLogger = require('./lib/remote_logger')
 
 const Timer = require('./lib/timer')
 
@@ -40,6 +41,10 @@ class AppBackground extends App {
         // Allow context debugging during development.
         // Avoid leaking this global in production mode.
         if (!(process.env.NODE_ENV === 'production')) global.bg = this
+
+        // Initialize as early as possible to enable (remote) logging in the
+        // components constructors.
+        this.remoteLogger = new RemoteLogger(this)
 
         this.store = new Store(this)
         this.crypto = new Crypto(this)
@@ -104,6 +109,7 @@ class AppBackground extends App {
         }
 
         if (!validSchema) this.__factoryDefaults(notification)
+
         this.emit('ready')
     }
 

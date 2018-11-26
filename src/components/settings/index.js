@@ -39,6 +39,10 @@ module.exports = (app) => {
                     },
                 }, 'both')
 
+                app.emit('bg:remote_logger:set_enabled', {
+                    enabled: this.settings.telemetry.remoteLogging.enabled,
+                })
+
                 // Update the vault settings.
                 app.setState({app: {vault: this.app.vault}}, {encrypt: false, persist: true})
             },

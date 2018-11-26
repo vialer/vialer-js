@@ -186,4 +186,6 @@ module.exports = {
     'you can always change your decision afterwards from the privacy settings.': 'je kunt je keuze altijd later aangepassen vanuit de privacy instellingen.',
     'your privacy': 'je privacy',
     'your VoIP account misses AVPF and encryption support.': 'je VoIP-account mist AVPF en encryptie ondersteuning.',
+    'remote logging': 'externe logging',
+    'send anonymized logging to us for support.': 'stuur geanonimiseerde logs naar ons voor support.',
 }

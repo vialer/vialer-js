@@ -346,7 +346,6 @@ class PluginCalls extends Plugin {
             this.app.logger.debug(`${this}<event:unregistered>`)
             this.app.setState({calls: {ua: {status: this.ua.transport.isConnected() ? 'connected' : 'disconnected'}}})
         })
-
         this.ua.on('transportCreated', (transport) => {
             this.app.logger.debug(`${this}<event:transportCreated>`)
 
@@ -405,8 +404,24 @@ class PluginCalls extends Plugin {
             autostart: false,
             autostop: false,
             log: {
-                builtinEnabled: true,
-                level: 'error',
+                builtinEnabled: false, // Write messages to console.
+                level: 'debug',
+                /*
+                level: String representing the level of the log message
+                ('debug', 'log', 'warn', 'error')
+
+                category: String representing the SIPjs instance class firing
+                the log. ie: 'sipjs.ua'
+
+                label: String indicating the 'identifier' of the class instance
+                when the log level is '3' (debug). ie: transaction.id
+
+                content: String representing the log message
+                */
+                connector: (level, category, label, content) => {
+                    // TODO to LogEntries!
+                    // console.log('[',category,']', content, label, level)
+                },
             },
             // Incoming unanswered calls are terminated after x seconds.
             noanswertimeout: 60,
@@ -421,11 +436,11 @@ class PluginCalls extends Plugin {
                     },
                 },
             },
-            traceSip: false,
             transportOptions: {
                 // Reconnects are handled manually.
                 maxReconnectionAttempts: 0,
                 wsServers: `wss://${endpoint ? endpoint : settings.webrtc.endpoint.uri}`,
+                traceSip: true,
             },
             userAgentString: this._userAgent(),
         }

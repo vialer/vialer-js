@@ -105,6 +105,7 @@ module.exports = function(settings) {
             SENTRY_DSN: brand.telemetry.sentry.dsn,
             SIP_ENDPOINT: brand.sip_endpoint,
             STUN: brand.stun,
+            LOGENTRIES_API_KEY: brand.telemetry.logentries.apiKey,
 
             VENDOR_NAME: brand.vendor.name,
             VENDOR_SUPPORT_EMAIL: brand.vendor.support.email,

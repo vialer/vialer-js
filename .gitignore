@@ -8,6 +8,7 @@ super_secret.txt
 .publish
 .vialer-jsrc
 .directory
+.direnv.*
 src/brand/*
 src/brand/bologna/icons/
 !src/brand/bologna/

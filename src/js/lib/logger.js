@@ -1,73 +1,77 @@
 /**
  * A thin wrapper around the native console that makes it possible to set
- * loglevels. Use source blacklisting and sourcemaps to get to the
- * original error.
+ * loglevels.
  * @memberof lib
  */
 class Logger {
 
     constructor(app) {
         this.app = app
-        this.levels = {
-            debug: 4,
+
+        this.LEVELS = {
             error: 0,
+            warn: 1,
             info: 2,
             verbose: 3,
-            warn: 1,
+            debug: 4,
         }
 
-        this.id = 0
-        this._notification = null
-    }
-
-
-    debug(...args) {
-        if (this.level >= this.levels.debug) {
-            args[0] = `%c${args[0]}`
-            args.push('color: #999')
-            console.log(...args)
-        }
-    }
-
-
-    error(...args) {
-        console.error(...args)
-    }
-
-
-    group(name) {
-        console.group(name)
-    }
-
-
-    groupEnd() {
-        console.groupEnd()
-    }
-
-
-    info(...args) {
-        if (this.level >= this.levels.info) {
-            console.info(...args)
-        }
+        this.setLevel('info')
     }
 
 
     setLevel(level) {
-        this.level = this.levels[level]
+        if (!this.LEVELS.hasOwnProperty(level)) {
+            console.warn(`Logging level '${level}' is not defined.`)
+            return
+        }
+
+        this.level = this.LEVELS[level]
     }
 
 
-    verbose(...args) {
-        if (this.level >= this.levels.verbose) {
-            console.log(...args)
+    log(level, message, context) {
+        if (!this.LEVELS.hasOwnProperty(level)) {
+            console.warn(`Logging level '${level}' is not defined.`)
+            return
         }
+
+        if (this.level >= this.LEVELS[level]) {
+            let args = [message]
+            if (level === 'debug') {
+                args[0] = `%c${args[0]}`
+                args.push('color: #999')
+            }
+
+            let fn = console[level]
+            if (level in ['verbose', 'debug']) fn = console.log
+            fn(...args)
+        }
+
+        // Emit message to the RemoteLogger.
+        this.app.emit('bg:remote_logger:log', {level, message, context})
     }
 
 
-    warn(...args) {
-        if (this.level >= this.levels.warn) {
-            console.warn(...args)
-        }
+    // Convenience methods
+    error(message, context) {
+        this.log('error', message, context)
+    }
+
+    warn(message, context) {
+        this.log('warn', message, context)
+    }
+
+    info(message, context) {
+        this.log('info', message, context)
+    }
+
+    debug(message, context) {
+        this.log('debug', message, context)
+    }
+
+    verbose(message, context) {
+        this.log('verbose', message, context)
     }
 }
 

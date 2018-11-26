@@ -140,6 +140,7 @@
     "electron": "3.0.x",
     "electron-reload": "1.x.x",
     "eventemitter3": "2.x.x",
+    "le_js": "github:rapid7/le_js#master",
     "module-alias": "2.x.x",
     "raven-js": "3.x.x",
     "roboto-fontface": "0.8.x",
