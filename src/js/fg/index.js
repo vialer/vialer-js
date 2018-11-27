@@ -34,9 +34,6 @@ class AppForeground extends App {
             this.__mergeState(data)
         })
 
-        // Log the context when requested.
-        this.on('fg:logger:request_context', () => this.logContext())
-
         /**
         * @namespace AppForeground.components
         */
@@ -111,51 +108,6 @@ class AppForeground extends App {
 
             },
         })
-    }
-
-
-    /**
-     * Log a detailed description of the environment we are running in to the
-     * remote logger.
-     */
-    logContext() {
-        const release = [
-            process.env.VERSION,
-            process.env.PUBLISH_CHANNEL,
-            process.env.BRAND_TARGET,
-            this.env.name,
-        ].join('-')
-
-        const context = {
-            app: {
-                release: release,
-                sipjs: SIP.version,
-                vuejs: Vue.version,
-                env: this.env,
-            },
-
-            navigator: {
-                // User agent string contains platform, browser and version.
-                userAgent: navigator.userAgent,
-                language: navigator.language,
-                deviceMemory: navigator.deviceMemory,
-                cookieEnabled: navigator.cookieEnabled,
-                doNotTrack: navigator.doNotTrack,
-
-                screen: {
-                    width: window.screen.width,
-                    height: window.screen.height,
-                },
-
-                connection: {
-                    downlink: navigator.connection.downlink,
-                    effectiveType: navigator.connection.effectiveType,
-                    rtt: navigator.connection.rtt,
-                },
-            },
-        }
-
-        this.logger.info('[context] reporting to remote logger', context)
     }
 
 

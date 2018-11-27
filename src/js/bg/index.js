@@ -10,7 +10,8 @@ const Store = require('./lib/store')
 const Media = require('../lib/media')
 const Sounds = require('../lib/sounds')
 const Telemetry = require('./lib/telemetry')
-const RemoteLogger = require('./lib/remote_logger')
+const RemoteLogger = require('./lib/logging/remote_logger')
+const ContextLogger = require('./lib/logging/context_logger.js')
 
 const Timer = require('./lib/timer')
 
@@ -45,6 +46,7 @@ class AppBackground extends App {
         // Initialize as early as possible to enable (remote) logging in the
         // components constructors.
         this.remoteLogger = new RemoteLogger(this)
+        this.contextLogger = new ContextLogger(this)
 
         this.store = new Store(this)
         this.crypto = new Crypto(this)
@@ -110,7 +112,7 @@ class AppBackground extends App {
 
         if (!validSchema) this.__factoryDefaults(notification)
 
-        this.emit('ready')
+        this.emit('ready', {}, 'both')
     }
 
 
