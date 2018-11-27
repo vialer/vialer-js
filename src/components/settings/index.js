@@ -39,7 +39,6 @@ module.exports = (app) => {
                     },
                 }, 'both')
 
-                console.log('settings remote logger to: ', this.settings.telemetry.remoteLogging.enabled)
                 app.emit('bg:remote_logger:set_enabled', {
                     enabled: this.settings.telemetry.remoteLogging.enabled,
                 }, 'both')

@@ -16,7 +16,7 @@ class ContextLogger {
     }
 
     init() {
-        this.setUpTimer()
+        this.startTimer()
         this.app.on('bg:context_logger:trigger', () => {
             this.performNow()
         })
@@ -32,7 +32,7 @@ class ContextLogger {
         this.startTimer()
     }
 
-    setUpTimer() {
+    startTimer() {
         this.timer = setInterval(() => this.timerElapsed(), CONTEXT_INTERVAL)
     }
 
@@ -81,13 +81,13 @@ class ContextLogger {
             }
         }
 
-        this.app.logger.info('[context] reporting', context)
+        this.app.logger.info('[bg] [context] reporting', context)
     }
 
     connectionChanged(e) {
         const net = e.target
 
-        this.app.logger.info(`[network] connection changed to ${net.effectiveType} (${net.downlink}/${net.rtt})`, {
+        this.app.logger.info(`[bg] [network] connection changed to ${net.effectiveType} (${net.downlink}/${net.rtt})`, {
             effectiveType: net.effectiveType,
             downlink: net.downlink,
             rtt: net.rtt,

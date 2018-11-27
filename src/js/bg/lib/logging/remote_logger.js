@@ -43,16 +43,14 @@ class RemoteLogger {
      * Called when the app is ready.
      */
     init() {
-        // TODO test what happens when remoteLogging does not exists,
-        // due to the state being of the older version.
-        this.settings = this.app.state.settings.telemetry.remoteLogging;
+        this.settings = this.app.state.settings.telemetry.remoteLogging
         this.setRemote(this.settings.enabled)
 
         this.app.on('bg:remote_logger:set_enabled', ({enabled}) => {
             this.setRemote(enabled)
         })
 
-        this.app.logger.info('Remote logger initialized')
+        this.app.logger.info('[bg] Remote logger initialized')
     }
 
     generateTrace() {
@@ -141,8 +139,6 @@ class RemoteLogger {
         }, context)
 
         if (this.logentries) {
-            // TODO what if this fails, then queue it for resend.
-            //      how to detect failure? does this throw an exception?
             this.logentries[mappedLevel](msg)
         } else {
             // TODO queue message in local log storage.
