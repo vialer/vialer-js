@@ -35,12 +35,21 @@ class Api {
         }, (err) => {
             // Catch Network Errors.
             if (err.message === 'Network Error') {
+                this.app.logger.error('[bg] [api] network error')
                 return Promise.reject({status: 'Network Error'})
             }
-            // Reject all status codes from 500 and timeouts.
-            if (!err.response || err.response.status >= 500) {
+            // Reject all timeouts.
+            if (!err.response) {
+                this.app.logger.error('[bg] [api] timeout')
                 return Promise.reject(err)
             }
+            // Reject all status codes from 500 and up.
+            if (!err.response || err.response.status >= 500) {
+                this.app.logger.error(`[bg] [api] error: ${err.response.status}`)
+                return Promise.reject(err)
+            }
+
+            this.app.logger.warn(`[bg] [api] non-ok status: ${err.response.status}`)
             // All other error codes are part of the normal application flow.
             return Promise.resolve(err.response)
         })
