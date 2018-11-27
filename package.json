@@ -86,7 +86,7 @@
     "gulp-if-else": "1.x.x",
     "gulp-imagemin": "3.x.x",
     "gulp-insert": "0.x.x",
-    "gulp-livereload": "3.x.x",
+    "gulp-livereload": "4.x.x",
     "gulp-notify": "3.x.x",
     "gulp-rename": "1.x.x",
     "gulp-sass": "3.x.x",
