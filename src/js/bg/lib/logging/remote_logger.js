@@ -18,8 +18,6 @@ const LEVELS_MAP = {
     verbose: 'log',
 }
 
-const CONTEXT_INTERVAL = 60 * 60 * 1000 // 1 hour in ms
-
 
 /**
  * Remote Logger will sent log messages to LogEntries, if remote logging is
@@ -42,7 +40,7 @@ class RemoteLogger {
     }
 
     /**
-     * Called when the app state is read (is 'ready').
+     * Called when the app is ready.
      */
     init() {
         // TODO test what happens when remoteLogging does not exists,
@@ -53,6 +51,8 @@ class RemoteLogger {
         this.app.on('bg:remote_logger:set_enabled', ({enabled}) => {
             this.setRemote(enabled)
         })
+
+        this.app.logger.info('Remote logger initialized')
     }
 
     generateTrace() {
@@ -107,18 +107,11 @@ class RemoteLogger {
 
         this.logentries = LE.to(LOG_NAME)
 
-        // Request the foreground to log a detailed description of the
-        // current environment (calling it context here). Thereafter
-        // log a context every `CONTEXT_INTERVAL` milliseconds.
-        this.requestContext()
-        this.contextTimer = setInterval(() => this.requestContext(), CONTEXT_INTERVAL)
+        // Request a context to be logged now.
+        this.app.emit('bg:context_logger:trigger')
     }
 
     disableRemote() {
-        if (this.contextTimer) {
-            clearInterval(this.contextTimer)
-            this.contextTimer = null;
-        }
         if (this.logentries) {
             LE.destroy(LOG_NAME)
             this.logentries = null;
@@ -126,10 +119,6 @@ class RemoteLogger {
         if (!this.persistentTrace) {
             this.setTrace(null)
         }
-    }
-
-    requestContext() {
-        this.app.emit('fg:logger:request_context')
     }
 
     /**
@@ -152,6 +141,8 @@ class RemoteLogger {
         }, context)
 
         if (this.logentries) {
+            // TODO what if this fails, then queue it for resend.
+            //      how to detect failure? does this throw an exception?
             this.logentries[mappedLevel](msg)
         } else {
             // TODO queue message in local log storage.
