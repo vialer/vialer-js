@@ -12,3 +12,4 @@ src/brand/*
 src/brand/bologna/icons/
 !src/brand/bologna/
 !src/brand/bologna/*.*
+.direnv.*
