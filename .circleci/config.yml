@@ -17,7 +17,7 @@ jobs:
           name: Restore Yarn Package Cache
           keys:
             - npm-packages-v1-{{ checksum "yarn.lock" }}
-      - run: yarn --cache-folder ~/.yarn
+      - run: yarn --frozen-lockfile --cache-folder ~/.yarn
       - save_cache:
           name: Save Yarn Package Cache
           key: npm-packages-v1-{{ .Branch }}-{{ checksum "yarn.lock" }}
