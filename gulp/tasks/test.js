@@ -126,12 +126,22 @@ module.exports = function(settings) {
     }
 
 
-    tasks.unit = function testUnit() {
+    tasks.unit = function testUnit(done) {
+        const misc = require('./misc')(settings)
         const reporter = through.obj()
         reporter.pipe(tapSpec()).pipe(process.stdout)
 
         return gulp.src('test/bg/**/*.js')
             .pipe(tape({bail: false, outputStream: reporter}))
+            .on('error', () => {
+                if (!settings.LIVERELOAD) process.exit(1)
+            })
+            .on('end', () => {
+                if (!settings.LIVERELOAD) {
+                    if (misc.helpers.server) misc.helpers.server.close()
+                    done()
+                }
+            })
     }
 
     return {helpers, tasks}

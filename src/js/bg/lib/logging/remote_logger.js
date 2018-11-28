@@ -1,4 +1,5 @@
 const LE = require('le_js')
+const { anonymize } = require('./anonymize')
 
 // Log name in LogEntries.
 const LOG_NAME = 'default'
@@ -121,6 +122,7 @@ class RemoteLogger {
 
     /**
      * Send a log message to the remote logger.
+     * The `message` field is anonymized by the `anonymize` function.
      * @param {String} level - Logging level, must be in `LEVELS_MAP`.
      * @param {String} message - Message to log.
      * @param {Object} context - Optional context.
@@ -135,7 +137,7 @@ class RemoteLogger {
         const msg = Object.assign({
             timestamp: new Date().toISOString(),
             trace: this.settings.trace,
-            message: message,
+            message: anonymize(message),
         }, context)
 
         if (this.logentries) {
