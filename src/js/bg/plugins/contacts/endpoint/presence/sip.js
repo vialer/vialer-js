@@ -90,7 +90,7 @@ class PresenceSip extends Presence {
                 this.subscription.unsubscribe()
                 this.endpoint.setState({status: 'unregistered'})
             } catch (err) {
-                this.app.logger.debug(`${this}failed to unsubscribe properly`)
+                this.app.logger.verbose(`${this}failed to unsubscribe properly`)
             }
 
 

@@ -83,7 +83,7 @@ class Store {
 
 
     get(key) {
-        if (this.app.verbose) this.app.logger.debug(`${this}get value for key '${key}'`)
+        if (this.app.verbose) this.app.logger.verbose(`${this}get value for key '${key}'`)
         var value = this.store.getItem(key)
         if (value) {
             return JSON.parse(value)

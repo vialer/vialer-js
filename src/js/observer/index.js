@@ -181,7 +181,7 @@ class AppTab extends Skeleton {
         // Handle mutations if it probably isn't too much to handle
         // (current limit is totally random).
         if (_parkedNodes.length < 151) {
-            this.logger.debug(`${this}processing ${_parkedNodes.length} parked nodes.`)
+            this.logger.verbose(`${this}processing ${_parkedNodes.length} parked nodes.`)
             let batchSize = 40 // random size
             for (let i = 0; i < Math.ceil(_parkedNodes.length / batchSize); i++) {
                 ((index) => {
@@ -317,7 +317,7 @@ class AppTab extends Skeleton {
     * Injects icons in the page and start observing the page for changes.
     */
     processPage() {
-        this.logger.debug(`${this}start observing`)
+        this.logger.verbose(`${this}start observing`)
         $('head').appendChild(this.stylesheet)
         this.insertIconInDom()
         this.observePage()

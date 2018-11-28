@@ -38,7 +38,7 @@ class Skeleton extends EventEmitter {
             // Allows parent scripts to use the same EventEmitter syntax.
             if (this.env.section.tab) {
                 window.addEventListener('message', (event) => {
-                    if (this.verbose) this.logger.debug(`${this}emit '${event.data.event}' event from child`)
+                    if (this.verbose) this.logger.verbose(`${this}emit '${event.data.event}' event from child`)
                     this.emit(event.data.event, event.data.data, true)
                 })
             }
@@ -50,14 +50,14 @@ class Skeleton extends EventEmitter {
             else if (this.env.section.observer) this.logger.setLevel('error')
         } else {
             if (this.env.isNode) this.logger.setLevel('error')
-            else this.logger.setLevel('debug')
+            else this.logger.setLevel('verbose')
         }
         // Increases verbosity beyond the logger's debug level. Not
         // always useful during development, so it can be switched
         // of manually.
         if (process.env.BUILD_VERBOSE === true) this.verbose = true
         else this.verbose = false
-        this.logger.debug(`${this}verbose mode: ${this.verbose}`)
+        this.logger.verbose(`${this}verbose mode: ${this.verbose}`)
     }
 
 
@@ -79,33 +79,33 @@ class Skeleton extends EventEmitter {
             let payloadData = {data: data, event: event}
 
             if (tabId) {
-                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to tab ${tabId}`)
+                if (this.verbose) this.logger.verbose(`${this}emit ipc event '${event}' to tab ${tabId}`)
                 browser.tabs.sendMessage(tabId, payloadData).catch((err) => {
-                    if (this.verbose) this.logger.debug(`${this}${err.message}`)
+                    if (this.verbose) this.logger.verbose(`${this}${err.message}`)
                 })
                 return
             } else if (parent) {
-                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}' to parent`)
+                if (this.verbose) this.logger.verbose(`${this}emit ipc event '${event}' to parent`)
                 parent.postMessage({data: data, event: event}, '*')
                 return
             }
 
             if (data && data.callback) {
-                if (this.verbose) this.logger.debug(`${this}emit ipc event with callback '${event}'`)
+                if (this.verbose) this.logger.verbose(`${this}emit ipc event with callback '${event}'`)
                 const callback = data.callback
                 // Make sure that functions are not part of the payload data.
                 delete data.callback
                 browser.runtime.sendMessage(payloadData).then(function handleResponse(message) {
                     callback(message)
                 }).catch((err) => {
-                    if (this.verbose) this.logger.debug(`${this}${err.message}`)
+                    if (this.verbose) this.logger.verbose(`${this}${err.message}`)
                 })
             } else {
-                if (this.verbose) this.logger.debug(`${this}emit ipc event '${event}'`)
+                if (this.verbose) this.logger.verbose(`${this}emit ipc event '${event}'`)
                 let _promise = browser.runtime.sendMessage(payloadData)
                 if (_promise) {
                     _promise.catch((err) => {
-                        if (this.verbose) this.logger.debug(`${this}${err.message}`)
+                        if (this.verbose) this.logger.verbose(`${this}${err.message}`)
                     })
                 }
             }
@@ -113,7 +113,7 @@ class Skeleton extends EventEmitter {
         // The web version will always use a local emitter, no matter what
         // the value is of `noIpc`. An extension may do both.
         if (!this.env.isExtension || noIpc) {
-            if (this.verbose) this.logger.debug(`${this}emit local event '${event}'`)
+            if (this.verbose) this.logger.verbose(`${this}emit local event '${event}'`)
             if (this.apps) {
                 for (const name of Object.keys(this.apps)) {
                     this.apps[name].emit(event, data)

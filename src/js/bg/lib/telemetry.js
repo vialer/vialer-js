@@ -45,7 +45,7 @@ class Telemetry {
             v: 1,  // Version.
         }
         navigator.sendBeacon(this.telemetryServer, this.app.utils.stringifySearch(telemetryData))
-        this.app.logger.debug(`${this}telemetry: "${eventName}:${eventAction}:${eventLabel}"`)
+        this.app.logger.verbose(`${this}telemetry: "${eventName}:${eventAction}:${eventLabel}"`)
     }
 
 

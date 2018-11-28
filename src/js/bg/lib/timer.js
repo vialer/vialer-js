@@ -51,7 +51,7 @@ class Timer {
 
 
     registerTimer(timerId, timerFunction) {
-        this.app.logger.debug(`${this}register timer ${timerId}`)
+        this.app.logger.verbose(`${this}register timer ${timerId}`)
         registeredTimers[timerId] = {
             function: timerFunction,
             interval: null, // interval in miliseconds
@@ -95,7 +95,7 @@ class Timer {
 
         if (registeredTimers[timerId].interval) {
             registeredTimers[timerId].timer.interval = setInterval(timerFunction, registeredTimers[timerId].interval)
-            this.app.logger.debug(`${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
+            this.app.logger.verbose(`${this}start interval timer ${timerId} with id ${registeredTimers[timerId].timer.interval}`)
         }
 
         let timeout = registeredTimers[timerId].timeout
@@ -127,13 +127,13 @@ class Timer {
                 registeredTimers[timerId].timer.timeout = setTimeout(timerFunction, timeout)
             }
         }
-        if (this.app.verbose) this.app.logger.debug(`${this}start timer ${timerId} with timeout ${timeout}`)
+        if (this.app.verbose) this.app.logger.verbose(`${this}start timer ${timerId} with timeout ${timeout}`)
     }
 
 
     stopAllTimers() {
         for (const timerId of Object.keys(this.registeredTimers)) {
-            this.app.logger.debug(`${this}remove remaining timer '${timerId}'`)
+            this.app.logger.verbose(`${this}remove remaining timer '${timerId}'`)
             this.stopTimer(timerId)
         }
     }
@@ -142,17 +142,17 @@ class Timer {
     stopTimer(timerId) {
         if (this.getRegisteredTimer(timerId)) {
             if (registeredTimers[timerId].timer.interval) {
-                this.app.logger.debug(`${this}clearing interval timer ${timerId}`)
+                this.app.logger.verbose(`${this}clearing interval timer ${timerId}`)
                 clearInterval(registeredTimers[timerId].timer.interval)
                 registeredTimers[timerId].timer.interval = null
             }
             if (registeredTimers[timerId].timer.timeout) {
-                if (this.app.verbose) this.app.logger.debug(`${this}clearing timeout timer ${timerId}`)
+                if (this.app.verbose) this.app.logger.verbose(`${this}clearing timeout timer ${timerId}`)
                 clearTimeout(registeredTimers[timerId].timer.timeout)
                 registeredTimers[timerId].timer.timeout = null
             }
         } else {
-            this.app.logger.debug(`${this}no such timer: ${timerId}`)
+            this.app.logger.verbose(`${this}no such timer: ${timerId}`)
         }
     }
 

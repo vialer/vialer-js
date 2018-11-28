@@ -29,7 +29,7 @@ class Api {
         }
 
         this.client = axios.create(options)
-        this.app.logger.debug(`${this}setup axios api client`)
+        this.app.logger.verbose(`${this}setup axios api client`)
         this.client.interceptors.response.use(function(response) {
             return response
         }, (err) => {

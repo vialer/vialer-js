@@ -44,7 +44,7 @@ class Endpoint {
 
         if (this.id) {
             if (!this.app.state.contacts.contacts[this.contact.id]) {
-                this.app.logger.debug(`${this}contact is empty`)
+                this.app.logger.verbose(`${this}contact is empty`)
                 return
             }
             Vue.set(this.app.state.contacts.contacts[this.contact.id].endpoints, this.id, this.state)
