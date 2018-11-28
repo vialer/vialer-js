@@ -1,9 +1,9 @@
 /* eslint-disable sort-keys */
 const test = require('tape')
 const { JSDOM } = require('jsdom')
-const { document } = new JSDOM().window
+const window = new JSDOM().window
 
-global.document = document
+global.document = window.document
 const parsers = require('../../../src/js/observer/parsers')
 
 
@@ -126,5 +126,9 @@ test('[bg] test parsing NL numbers', (t) => {
     match('<strong>T</strong>&nbsp;050 -&nbsp;123 4123', [ { start: 24, end: 43, number: '0501234123' } ])
     match('050 - 123 4123', [ { start: 0, end: 14, number: '0501234123' } ])
 
+    match('T. +31 (0) 12 345 6789', [ { start: 3, end: 22, number: '+31123456789' } ])
+
     t.end()
 })
+
+test.onFinish(() => process.exit(0))

@@ -21,7 +21,7 @@ class ContextLogger {
             this.performNow()
         })
 
-        if (navigator && navigator.connection) {
+        if (typeof navigator !== 'undefined' && navigator.connection) {
             navigator.connection.onchange = (e) => this.connectionChanged(e)
         }
     }
@@ -58,7 +58,7 @@ class ContextLogger {
             },
         }
 
-        if (navigator) {
+        if (typeof navigator !== 'undefined') {
             context.navigator = {
                 userAgent: navigator.userAgent,
                 language: navigator.language,
