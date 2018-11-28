@@ -131,7 +131,7 @@ module.exports = function(settings) {
         reporter.pipe(tapSpec()).pipe(process.stdout)
 
         return gulp.src('test/bg/**/*.js')
-            .pipe(tape({bail: true, outputStream: reporter}))
+            .pipe(tape({bail: false, outputStream: reporter}))
     }
 
     return {helpers, tasks}
