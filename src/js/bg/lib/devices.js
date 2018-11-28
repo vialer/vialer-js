@@ -117,7 +117,7 @@ class Devices {
             if (!storedDevice) {
                 // The stored sink is not in the stored input/output device options
                 // anymore. Add the missing option to the stored device list.
-                this.app.logger.debug(`${this}restoring sink '${sink.name}'`)
+                this.app.logger.verbose(`${this}restoring sink '${sink.name}'`)
                 storedDevice = sink
                 storedDevice.valid = true
                 storedDevices[sinkType].push(storedDevice)
@@ -133,7 +133,7 @@ class Devices {
 
         storedDevices.ready = valid
         this.app.setState(storedDevices, {path: 'settings.webrtc.devices'})
-        this.app.logger.debug(`${this}audio sink list is ${valid ? 'valid' : 'invalid'}`)
+        this.app.logger.verbose(`${this}audio sink list is ${valid ? 'valid' : 'invalid'}`)
         return valid
     }
 
@@ -152,7 +152,7 @@ class Devices {
         const {input, output} = await this.query()
 
         if (!this.cached.input.length || !this.cached.output.length) {
-            this.app.logger.debug(`${this}no sinks stored yet; store query list`)
+            this.app.logger.verbose(`${this}no sinks stored yet; store query list`)
             // No sinks stored before; fill the output and input device options.
             this.app.setState({settings: {webrtc: {devices: {input, output}}}}, {persist: true})
         } else {

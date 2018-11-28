@@ -150,7 +150,7 @@ class AppBackground extends App {
             await this.crypto._importVaultKey(key)
         } else if (password) {
             const sessionId = this.state.app.session.active
-            this.logger.debug(`${this}init session identity for "${sessionId}"`)
+            this.logger.verbose(`${this}init session identity for "${sessionId}"`)
             await this.crypto.createIdentity(sessionId, password)
         } else {
             throw new Error('failed to unlock (no session key or credentials)')
@@ -200,7 +200,7 @@ class AppBackground extends App {
         })
 
         if (this.state.app.vault.key) {
-            this.logger.info(`${this}continuing existing session '${this.state.user.username}'...`)
+            this.logger.info(`${this}continuing existing session "${this.state.user.username}"...`)
             await this.__initSession({key: this.state.app.vault.key})
             // The API username and token are now available in the store.
             this.api.setupClient(this.state.user.username, this.state.user.token)
@@ -379,7 +379,7 @@ class AppBackground extends App {
 
         let unencryptedState = this.store.get(`${sessionId}/state`)
         if (!unencryptedState) {
-            throw new Error(`${this}state store for session not found: '${sessionId}'`)
+            throw new Error(`${this}state store for session not found: "${sessionId}"`)
         }
 
         this.store.cache.unencrypted = unencryptedState
@@ -391,11 +391,11 @@ class AppBackground extends App {
             try {
                 decryptedState = JSON.parse(await this.crypto.decrypt(this.crypto.sessionKey, cipherData))
             } catch (err) {
-                this.logger.debug(`${this}failed to restore encrypted state`)
+                this.logger.verbose(`${this}failed to restore encrypted state`)
                 throw new Error('failed to decrypt; wrong password?')
             }
 
-            this.logger.debug(`${this}restored encrypted vault session ${sessionId}`)
+            this.logger.verbose(`${this}restored encrypted vault session ${sessionId}`)
         } else decryptedState = {}
         this.store.cache.encrypted = decryptedState
 
@@ -410,7 +410,7 @@ class AppBackground extends App {
                 this.plugins[module]._restoreState(state[module])
             }
         }
-        this.logger.debug(`${this}restore state of session "${sessionId}"`)
+        this.logger.verbose(`${this}restore state of session "${sessionId}"`)
         await this.setState(state)
     }
 
@@ -433,7 +433,7 @@ class AppBackground extends App {
 
         if (sessionId === 'active') {
             sessionId = session.active ? session.active : null
-            this.logger.debug(`${this}active session found: "${sessionId}"`)
+            this.logger.verbose(`${this}active session found: "${sessionId}"`)
         }
 
         if (logout) {
@@ -444,7 +444,7 @@ class AppBackground extends App {
             this.store.cache.unencrypted = {}
         }
 
-        this.logger.debug(`${this}switch to session "${sessionId}"`)
+        this.logger.verbose(`${this}switch to session "${sessionId}"`)
         // Disable all watchers while switching sessions.
         if (this._watchers.length) this.__storeWatchers(false)
 

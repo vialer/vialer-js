@@ -46,7 +46,7 @@ class CallSIP extends Call {
         }
 
         this.state.stats.callId = this.session.request.call_id
-        this.app.logger.debug(`${this}incoming call ${this.state.stats.callId} started`)
+        this.app.logger.verbose(`${this}incoming call ${this.state.stats.callId} started`)
         super._incoming()
 
         // Setup some event handlers for the different stages of a call.

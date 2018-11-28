@@ -130,7 +130,7 @@ class Crypto {
     * encryption and decryption between endpoints.
     */
     async __deriveAESKeyFromECDH(publicKey) {
-        this.app.logger.debug(`${this}deriving common aes-gcm key from ecdh secret`)
+        this.app.logger.verbose(`${this}deriving common aes-gcm key from ecdh secret`)
         const sessionKey = await crypto.subtle.deriveKey({
             name: 'ECDH',
             namedCurve: 'P-256',
@@ -154,7 +154,7 @@ class Crypto {
         const keydata = await crypto.subtle.exportKey('raw', aesKey)
         //returns the exported key data
         let base64Keydata = this.__dataArrayToBase64(keydata)
-        this.app.logger.debug(`${this}exported AES-GCM session key`)
+        this.app.logger.verbose(`${this}exported AES-GCM session key`)
         return base64Keydata
     }
 
@@ -167,7 +167,7 @@ class Crypto {
     async __exportPrivateKey(privateKey) {
         // Export the AES key, so we can see if they look the same.
         const keydata = await crypto.subtle.exportKey('pkcs8', privateKey)
-        this.app.logger.debug(`${this}exported private key`)
+        this.app.logger.verbose(`${this}exported private key`)
         return this.__dataArrayToBase64(keydata)
     }
 
@@ -180,7 +180,7 @@ class Crypto {
     async __exportPublicKey(publicKey) {
         const keydata = await crypto.subtle.exportKey('spki', publicKey)
         let base64Keydata = this.__dataArrayToBase64(keydata)
-        this.app.logger.debug(`${this}exported public key`)
+        this.app.logger.verbose(`${this}exported public key`)
         return base64Keydata
     }
 
@@ -209,7 +209,7 @@ class Crypto {
     * @returns {Promise} - Resolves with a private CryptoKey.
     */
     __importPrivateKey(privateKey, params, uses) {
-        this.app.logger.debug(`${this}importing ${params.name} private key`)
+        this.app.logger.verbose(`${this}importing ${params.name} private key`)
         if (this.app.env.isBrowser) {
             privateKey = this.__base64ToDataArray(privateKey.replace(
                 'MFYwEAYEK4EEcAYIKoZIzj0DAQcDQgAE',
@@ -231,7 +231,7 @@ class Crypto {
     * @returns {Promise} - Resolves with the imported public ECDH CryptoKey.
     */
     __importPublicKey(publicKey, params, uses = []) {
-        this.app.logger.debug(`${this}importing ${params.name} public key`)
+        this.app.logger.verbose(`${this}importing ${params.name} public key`)
         let publicKeyData
         if (!this.app.env.isBrowser) {
             let chromeSpkiPublickey = publicKey.replace(
@@ -413,7 +413,7 @@ class Crypto {
     * @returns {String} - The base64-encoded vault key.
     */
     async storeVaultKey() {
-        this.app.logger.debug(`${this}enable auto session recovery`)
+        this.app.logger.verbose(`${this}enable auto session recovery`)
         const sessionKey = await this.__exportAESKey(this.sessionKey)
         this.app.setState({app: {vault: {key: sessionKey}}}, {encrypt: false, persist: true})
         return sessionKey

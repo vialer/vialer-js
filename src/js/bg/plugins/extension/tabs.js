@@ -94,7 +94,7 @@ class Tabs {
         let allowedUrl = true
         for (let blacklistRegex of this.app.state.settings.click2dial.blacklist) {
             if (new RegExp(blacklistRegex).test(tab.url)) {
-                this.app.logger.debug(`${this}skipping icon placement for site with regex: '${blacklistRegex}'`)
+                this.app.logger.verbose(`${this}skipping icon placement for site with regex: '${blacklistRegex}'`)
                 allowedUrl = false
                 break
             }

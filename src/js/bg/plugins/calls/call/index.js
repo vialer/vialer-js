@@ -136,7 +136,7 @@ class Call {
         if (devices.speaker.enabled) outputSink = devices.sinks.speakerOutput.id
         else outputSink = devices.sinks.headsetOutput.id
 
-        this.app.logger.debug(`${this}change sink of remote video element to ${outputSink}`)
+        this.app.logger.verbose(`${this}change sink of remote video element to ${outputSink}`)
         try {
             await this.app.media.remoteVideo.setSinkId(outputSink)
         } catch (err) {
@@ -222,7 +222,7 @@ class Call {
     * @param {Number} options.timeout - Postpone resetting the call state for the duration of 3 busy tones.
     */
     _stop({force = false, message = '', timeout = 2750} = {}) {
-        this.app.logger.debug(`${this}call is stopping in ${timeout}ms`)
+        this.app.logger.verbose(`${this}call is stopping in ${timeout}ms`)
         if (this.silent) {
             this.module.deleteCall(this)
             return

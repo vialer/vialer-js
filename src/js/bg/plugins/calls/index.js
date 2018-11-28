@@ -99,7 +99,7 @@ class PluginCalls extends Plugin {
         */
         this.app.on('bg:calls:call_delete', ({callId}) => {
             if (this.calls[callId]) this.deleteCall(this.calls[callId])
-            else this.app.logger.debug(`${this}trying to delete non-existent Call with id ${callId}`)
+            else this.app.logger.verbose(`${this}trying to delete non-existent Call with id ${callId}`)
         })
 
 
@@ -261,7 +261,7 @@ class PluginCalls extends Plugin {
         * ongoing will be silently terminated.
         */
         this.ua.on('invite', (session) => {
-            this.app.logger.debug(`${this}<event:invite>`)
+            this.app.logger.verbose(`${this}<event:invite>`)
             const callIds = Object.keys(this.calls)
             const callOngoing = this.app.helpers.callOngoing()
             const closingCalls = this.app.helpers.callsClosing()
@@ -299,7 +299,7 @@ class PluginCalls extends Plugin {
                 // An ongoing call may be a closing call. In that case we first
                 // remove all the closing calls before starting the new one.
                 for (const callId of closingCalls) {
-                    this.app.logger.debug(`${this}deleting closing call ${callId}.`)
+                    this.app.logger.verbose(`${this}deleting closing call ${callId}.`)
                     this.deleteCall(this.calls[callId])
                 }
             }
@@ -321,7 +321,7 @@ class PluginCalls extends Plugin {
 
 
         this.ua.on('registered', () => {
-            this.app.logger.debug(`${this}<event:registered>`)
+            this.app.logger.verbose(`${this}<event:registered>`)
             if (this.__registerPromise) {
                 this.__registerPromise.resolve()
                 delete this.__registerPromise
@@ -332,7 +332,7 @@ class PluginCalls extends Plugin {
 
 
         this.ua.on('registrationFailed', () => {
-            this.app.logger.debug(`${this}<event:registrationFailed>`)
+            this.app.logger.verbose(`${this}<event:registrationFailed>`)
             if (this.__registerPromise) {
                 this.__registerPromise.reject()
                 this.disconnect()
@@ -343,14 +343,14 @@ class PluginCalls extends Plugin {
 
 
         this.ua.on('unregistered', () => {
-            this.app.logger.debug(`${this}<event:unregistered>`)
+            this.app.logger.verbose(`${this}<event:unregistered>`)
             this.app.setState({calls: {ua: {status: this.ua.transport.isConnected() ? 'connected' : 'disconnected'}}})
         })
         this.ua.on('transportCreated', (transport) => {
-            this.app.logger.debug(`${this}<event:transportCreated>`)
+            this.app.logger.verbose(`${this}<event:transportCreated>`)
 
             this.ua.transport.on('connected', () => {
-                this.app.logger.debug(`${this}<event:connected>`)
+                this.app.logger.verbose(`${this}<event:connected>`)
                 this.app.setState({calls: {ua: {status: 'connected'}}})
                 // Reset the retry interval timer..
                 this.retry = Object.assign({}, this.retryDefault)
@@ -358,7 +358,7 @@ class PluginCalls extends Plugin {
             })
 
             this.ua.transport.on('disconnected', () => {
-                this.app.logger.debug(`${this}<event:disconnected>`)
+                this.app.logger.verbose(`${this}<event:disconnected>`)
                 this.app.setState({calls: {ua: {status: 'disconnected'}}})
 
                 if (this.app.state.user.authenticated) {
@@ -373,7 +373,7 @@ class PluginCalls extends Plugin {
                 // with offline detection and incremental retry timeouts.
                 if (this.reconnect) {
                     // Reconnection timer logic is performed only here.
-                    this.app.logger.debug(`${this}reconnect in ${this.retry.timeout} ms`)
+                    this.app.logger.verbose(`${this}reconnect in ${this.retry.timeout} ms`)
                     setTimeout(() => {
                         this.connect({register: this.app.state.settings.webrtc.enabled})
                     }, this.retry.timeout)
@@ -533,7 +533,7 @@ class PluginCalls extends Plugin {
         }
 
         // Always set the number in the local state.
-        this.app.logger.debug(`${this}_newCall ${call.constructor.name} instance`)
+        this.app.logger.verbose(`${this}_newCall ${call.constructor.name} instance`)
         return call
     }
 
@@ -600,12 +600,12 @@ class PluginCalls extends Plugin {
             'store.app.online': (online) => {
                 if (online) {
                     // We are online again, try to reconnect and refresh API data.
-                    this.app.logger.debug(`${this}reconnect sip service (online modus)`)
+                    this.app.logger.verbose(`${this}reconnect sip service (online modus)`)
                     this.connect({register: this.app.state.settings.webrtc.enabled})
                 } else {
                     // Offline modus is not detected by Sip.js/Websocket.
                     // Disconnect manually.
-                    this.app.logger.debug(`${this}disconnect sip service (offline modus)`)
+                    this.app.logger.verbose(`${this}disconnect sip service (offline modus)`)
                     this.disconnect(false)
                 }
             },
@@ -658,7 +658,7 @@ class PluginCalls extends Plugin {
             }
 
             if (!call) {
-                this.app.logger.debug(`${this}no call to activate!`)
+                this.app.logger.verbose(`${this}no call to activate!`)
                 return false
             }
         }
@@ -790,7 +790,7 @@ class PluginCalls extends Plugin {
         }
 
         // Finally delete the call and its references.
-        this.app.logger.debug(`${this}delete call ${call.id}`)
+        this.app.logger.verbose(`${this}delete call ${call.id}`)
         Vue.delete(this.app.state.calls.calls, call.id)
         delete this.calls[call.id]
 
