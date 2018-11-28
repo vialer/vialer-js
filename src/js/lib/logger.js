@@ -44,7 +44,7 @@ class Logger {
             }
 
             let fn = console[level]
-            if (level in ['verbose', 'debug']) fn = console.log
+            if (level === 'verbose' || level === 'debug') fn = console.log
             fn(...args)
         }
 

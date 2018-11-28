@@ -404,24 +404,9 @@ class PluginCalls extends Plugin {
             autostart: false,
             autostop: false,
             log: {
-                builtinEnabled: false, // Write messages to console.
+                builtinEnabled: false, // Don't write to console.
                 level: 'debug',
-                /*
-                level: String representing the level of the log message
-                ('debug', 'log', 'warn', 'error')
-
-                category: String representing the SIPjs instance class firing
-                the log. ie: 'sipjs.ua'
-
-                label: String indicating the 'identifier' of the class instance
-                when the log level is '3' (debug). ie: transaction.id
-
-                content: String representing the log message
-                */
-                connector: (level, category, label, content) => {
-                    // TODO to LogEntries!
-                    // console.log('[',category,']', content, label, level)
-                },
+                connector: this._sipjsLog.bind(this),
             },
             // Incoming unanswered calls are terminated after x seconds.
             noanswertimeout: 60,
@@ -459,6 +444,20 @@ class PluginCalls extends Plugin {
         }
 
         return options
+    }
+
+
+    /**
+     * Handler called by SIPjs when a log message is produced.
+     * @param {String} level - Level of the message: debug, log, warn or error.
+     * @param {String} category - SIPjs instance class, for ex 'sipjs.ua'.
+     * @param {String} label - Identifier of the class instance.
+     * @param {String} content - Log message.
+     */
+    _sipjsLog(level, category, label, content) {
+        let context = {category: category}
+        if (label) context.label = label
+        this.app.logger.debug(`[${category}] ${content}`, context)
     }
 
 
@@ -563,7 +562,7 @@ class PluginCalls extends Plugin {
 
     /**
     * Build the useragent to identify Vialer-js with.
-    * The format is `Vialer-js/<VERSION> (<OS/<ENV>) <Vendor>`.
+    * The format is `Vialer-js/<VERSION> (<OS>/<ENV>) <Vendor>`.
     * Don't change this string lightly since third-party
     * applications depend on it.
     * @returns {String} - Useragent string.
