@@ -10,8 +10,8 @@ const Store = require('./lib/store')
 const Media = require('../lib/media')
 const Sounds = require('../lib/sounds')
 const Telemetry = require('./lib/telemetry')
-const RemoteLogger = require('./lib/logging/remote_logger')
-const ContextLogger = require('./lib/logging/context_logger.js')
+const RemoteLogger = require('./lib/logging/remote')
+const ContextLogger = require('./lib/logging/context')
 
 const Timer = require('./lib/timer')
 

@@ -140,6 +140,7 @@
     "electron": "3.0.x",
     "electron-reload": "1.x.x",
     "eventemitter3": "2.x.x",
+    "idb": "^2.1.3",
     "le_js": "github:rapid7/le_js#master",
     "module-alias": "2.x.x",
     "raven-js": "3.x.x",
