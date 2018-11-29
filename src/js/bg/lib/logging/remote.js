@@ -184,7 +184,7 @@ class RemoteLogger {
                 break;
             }
 
-            for (let msg in batch) {
+            for (let msg of batch) {
                 this._send(msg)
             }
 
