@@ -13,8 +13,10 @@ const INITIAL_SETTINGS = {
 
 // When flushing the local log buffer to LogEntries we keep a lid on.
 // Flush in batches of `FLUSH_SIZE` and then sleep for `FLUSH_DELAY` ms.
+// After each send sleep for `FLUSH_THROTTLE` milliseconds.
 const FLUSH_SIZE = 100
 const FLUSH_DELAY = 2000
+const FLUSH_THROTTLE = 25
 
 
 // TODO move this to a lib/utils.js or something.
@@ -155,7 +157,7 @@ class RemoteLogger {
         if (this.logentries) {
             this._send(msg)
         } else {
-            this.buffer.append([msg])
+            this.buffer.append([msg]).catch(console.error)
         }
     }
 
@@ -185,7 +187,9 @@ class RemoteLogger {
             }
 
             for (let msg of batch) {
+                msg.trace = this.settings.trace
                 this._send(msg)
+                await sleep(FLUSH_THROTTLE)
             }
 
             console.log(`${this} flushed ${batch.length} messages, ${count} are left`)
