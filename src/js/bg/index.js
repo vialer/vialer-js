@@ -433,7 +433,7 @@ class AppBackground extends App {
 
         if (sessionId === 'active') {
             sessionId = session.active ? session.active : null
-            this.logger.verbose(`${this}active session found: "${sessionId}"`)
+            this.logger.verbose(`${this}found active session "${sessionId}"`)
         }
 
         if (logout) {

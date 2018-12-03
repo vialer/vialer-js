@@ -130,7 +130,7 @@ class RemoteLogger {
     disableRemote() {
         if (this.logentries) {
             LE.destroy(LOG_NAME)
-            this.logentries = null;
+            this.logentries = null
         }
         if (!this.persistentTrace) {
             this.setTrace(null)
@@ -181,7 +181,7 @@ class RemoteLogger {
             let batch = await this.buffer.take(FLUSH_SIZE)
             count -= batch.length
             if (batch.length === 0) {
-                break;
+                break
             }
 
             for (let msg of batch) {

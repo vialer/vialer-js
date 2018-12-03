@@ -8,6 +8,7 @@ const PIPELINE = [
     (str) => str.replace(/nonce=\"(.+?)\"/g, 'nonce="<NONCE>"'),
     (str) => str.replace(/username=(.+?)&/g, 'username=<USERNAME>'),
     (str) => str.replace(/session ['"][^'"]+['"]/g, 'session "<SESSION>"'),
+    (str) => str.replace(/account \d+/g, 'account <ACCOUNT_ID>'),
     (str) => str.replace(/contactName: "[^"]+"/g, 'contactName: "<CONTACT>"'),
     (str) => str.replace(/authorizationUser: .+/g, 'authorizationUser: "<SIP_USER_ID>"'),
 ]
