@@ -73,6 +73,7 @@ class Utils {
             .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
             .join('&')
     }
+
 }
 
 

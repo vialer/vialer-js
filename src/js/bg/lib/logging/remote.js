@@ -1,5 +1,6 @@
 const LE = require('le_js')
 const { anonymize } = require('./anonymize')
+const LocalLogBuffer = require('./buffer.js')
 
 // Log name in LogEntries.
 const LOG_NAME = 'default'
@@ -10,13 +11,24 @@ const INITIAL_SETTINGS = {
     apiKey: null,
 }
 
-const LEVELS_MAP = {
-    error: 'error',
-    warn: 'warn',
-    info: 'info',
-    log: 'log',
-    debug: 'log',
-    verbose: 'log',
+// When flushing the local log buffer to LogEntries we keep a lid on.
+// Flush in batches of `FLUSH_SIZE` and then sleep for `FLUSH_DELAY` ms.
+const FLUSH_SIZE = 100
+const FLUSH_DELAY = 2000
+
+
+// TODO move this to a lib/utils.js or something.
+
+/**
+ * Sleep for a number of milliseconds. This will not block the thread, but
+ * instead it returns a `Promise` which will resolve after `ms`
+ * milliseconds.
+ *
+ * @param {Number} ms - Number of milliseconds to sleep.
+ * @returns {Promise} - which resolves after `ms` milliseconds.
+ */
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 
@@ -32,6 +44,8 @@ class RemoteLogger {
         this.persistentTrace = true
         this.settings = INITIAL_SETTINGS
         this.contextTimer = null
+
+        this.buffer = new LocalLogBuffer(this)
 
         this.app.on('ready', () => this.init())
 
@@ -51,7 +65,7 @@ class RemoteLogger {
             this.setRemote(enabled)
         })
 
-        this.app.logger.info('[bg] Remote logger initialized')
+        this.app.logger.info(`${this} initialized`)
     }
 
     generateTrace() {
@@ -84,7 +98,7 @@ class RemoteLogger {
 
     enableRemote() {
         if (!this.isRemoteSupported()) {
-            console.error('Remote logging enabled, but no API KEY is defined!')
+            console.error(`${this} Remote logging enabled, but no API KEY is defined!`)
             return
         }
 
@@ -108,6 +122,9 @@ class RemoteLogger {
 
         // Request a context to be logged now.
         this.app.emit('bg:context_logger:trigger')
+
+        // Flush the local log buffer to remote.
+        this.flush()
     }
 
     disableRemote() {
@@ -123,28 +140,70 @@ class RemoteLogger {
     /**
      * Send a log message to the remote logger.
      * The `message` field is anonymized by the `anonymize` function.
-     * @param {String} level - Logging level, must be in `LEVELS_MAP`.
+     * @param {String} level - Logging level.
      * @param {String} message - Message to log.
      * @param {Object} context - Optional context.
      */
     log(level, message, context) {
-        const mappedLevel = LEVELS_MAP[level]
-        if (!mappedLevel) {
-            console.warn(`Logging level '${level}' is not supported by RemoteLogger.`)
-            return
-        }
-
         const msg = Object.assign({
             timestamp: new Date().toISOString(),
             trace: this.settings.trace,
+            level: level,
             message: anonymize(message),
         }, context)
 
         if (this.logentries) {
-            this.logentries[mappedLevel](msg)
+            this._send(msg)
         } else {
-            // TODO queue message in local log storage.
+            this.buffer.append([msg])
         }
+    }
+
+    /**
+     * Send a log message to LogEntries.
+     * @param {Object} msg - Composed message (see `log`).
+     */
+    _send(msg) {
+        this.logentries.log(msg)
+    }
+
+    /**
+     * Flush the buffer to LogEntries.
+     */
+    async flush() {
+        // Purge first to remove outdated messages.
+        await this.buffer.purge()
+
+        let count = await this.buffer.count()
+        this.app.logger.info(`${this} flushing ${count} messages to remote`)
+
+        while (count > 0) {
+            let batch = await this.buffer.take(FLUSH_SIZE)
+            count -= batch.length
+            if (batch.length === 0) {
+                break;
+            }
+
+            for (let msg of batch) {
+                this._send(msg)
+            }
+
+            console.log(`${this} flushed ${batch.length} messages, ${count} are left`)
+
+            if (count > 0) {
+                await sleep(FLUSH_DELAY)
+            }
+        }
+
+        this.app.logger.info(`${this} flushed all messages`)
+
+        if (count > 0) {
+            this.app.logger.warn(`${this} failed to flush ${count} messages`)
+        }
+    }
+
+    toString() {
+        return '[bg] [RemoteLogger]'
     }
 }
 
