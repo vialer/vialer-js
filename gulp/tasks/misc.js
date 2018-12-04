@@ -148,7 +148,7 @@ module.exports = function(settings) {
 
         if (settings.BUILD_TARGET === 'pwa') {
             gulp.watch([
-                path.join(settings.SRC_DIR, 'js', 'sw.js'),
+                path.join(settings.SRC_DIR, 'js', 'service_worker.js'),
             ], gulp.series(code.tasks.serviceWorker))
         }
 
