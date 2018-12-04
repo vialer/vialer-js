@@ -236,7 +236,7 @@ module.exports = function(settings) {
 
 
     tasks.serviceWorker = async function codeServiceWorker(done) {
-        await helpers.compile({destination: './', entry: './src/js/service_worker.js', name: 'sw'})
+        await helpers.compile({destination: './', entry: './src/js/service_worker.js', name: 'service_worker'})
         done()
     }
 
