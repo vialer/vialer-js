@@ -112,6 +112,7 @@ class Call {
             this.app.setState({ui: {layer: 'calls', menubar: {event: 'ringing'}}})
 
             this.app.plugins.ui.notification({
+                force: true,
                 message: `${this.state.number}: ${this.state.displayName}`,
                 number: this.state.number,
                 title: this.translations.invite,
