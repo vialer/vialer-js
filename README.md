@@ -1,5 +1,4 @@
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![CircleCI](https://circleci.com/gh/vialer/vialer-js/tree/develop.svg?style=svg)](https://circleci.com/gh/vialer/vialer-js/tree/develop)
+**NOTE: THIS PRODUCT IS NO LONGER MAINTAINED. UPDATES ABOUT THE FUTURE OF THIS REPO WILL FOLLOW**
 
 Take me to the [quickstart guide](https://vialer-js.io/developer/introduction)
 
